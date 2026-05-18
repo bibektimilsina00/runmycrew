@@ -1,15 +1,16 @@
 from typing import Any
 
 from apps.api.app.node_system.base.base_node import BaseNode
+from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
-from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
-from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
-from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.common.json_transform.json_transform import JsonTransformNode
 from apps.api.app.node_system.nodes.common.merge.merge import MergeNode
 from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetVariableNode
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
+from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
+from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
+from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 
@@ -35,6 +36,7 @@ node_registry = NodeRegistry()
 
 # Register builtin nodes
 node_registry.register(TriggerNode)
+node_registry.register(AgentNode)
 node_registry.register(HttpRequestNode)
 node_registry.register(WebhookTriggerNode)
 node_registry.register(DelayNode)

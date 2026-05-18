@@ -1,0 +1,270 @@
+ 
+ # Sim Block And Integration Catalog
+
+Source reference: `temp/sim/blocks/registry.ts`.
+
+Minimal catalog of blocks and integrations available in the Sim reference project. Entries are grouped by Sim's registry category.
+
+## Blocks
+
+- `a2a` - A2A (DevOps): Interact with external A2A-compatible agents.
+- `agent` - Agent (AI): Build an agent.
+- `api` - API (DevOps): Use any API.
+- `browser_use` - Browser Use (AI): Run browser automation tasks.
+- `condition` - Condition: Add a condition.
+- `credential` - Credential: Select or list OAuth credentials.
+- `evaluator` - Evaluator: Evaluate content.
+- `file` - File (Legacy, Documents): Read and parse multiple files.
+- `file_v2` - File (Legacy, Documents): Read and parse multiple files.
+- `file_v3` - File (Documents): Read and write workspace files.
+- `function` - Function: Run custom logic.
+- `guardrails` - Guardrails: Validate content with guardrails.
+- `human_in_the_loop` - Human in the Loop: Pause workflow execution and wait for human input.
+- `image_generator` - Image Generator (AI): Generate images.
+- `knowledge` - Knowledge: Use vector search.
+- `logs` - Logs: Query workflow execution logs.
+- `mcp` - MCP Tool (DevOps): Execute tools from Model Context Protocol servers.
+- `memory` - Memory: Add memory store.
+- `mothership` - Mothership: Query the Mothership AI agent.
+- `mysql` - MySQL (Databases): Connect to MySQL database.
+- `neo4j` - Neo4j (Databases): Connect to Neo4j graph database.
+- `note` - Note: Canvas annotation.
+- `postgresql` - PostgreSQL (Databases): Connect to PostgreSQL database.
+- `response` - Response: Send structured API response.
+- `router` - Router (Legacy): Route workflow.
+- `router_v2` - Router: Route workflow based on context.
+- `search` - Search (Search): Search the web.
+- `sftp` - SFTP (Documents): Transfer files via SFTP.
+- `smtp` - SMTP (Email): Send emails via SMTP.
+- `ssh` - SSH (DevOps): Connect to remote servers.
+- `starter` - Starter: Start workflow.
+- `stt` - Speech-to-Text (AI): Convert speech to text.
+- `table` - Table: User-defined data tables.
+- `translate` - Translate (AI): Translate text.
+- `tts` - Text-to-Speech (AI): Convert text to speech.
+- `variables` - Variables: Set workflow-scoped variables.
+- `video_generator` - Video Generator (Legacy, AI): Generate videos from text.
+- `vision` - Vision (Legacy, AI): Analyze images.
+- `wait` - Wait: Pause workflow execution.
+- `webhook_request` - Webhook: Send a webhook request.
+- `workflow` - Workflow: Execute another workflow.
+- `workflow_input` - Workflow: Execute another workflow with input mapping.
+
+## Tools And Integrations
+
+- `agentmail` - AgentMail (Email): Manage inboxes, threads, and messages.
+- `agentphone` - AgentPhone (Communication): Provision numbers, SMS/iMessage, voice calls.
+- `agiloft` - Agiloft (Productivity): Manage Agiloft CLM records.
+- `ahrefs` - Ahrefs (Analytics): SEO analysis.
+- `airtable` - Airtable (Databases): Read, create, and update Airtable.
+- `airweave` - Airweave (Search): Search synced data collections.
+- `algolia` - Algolia (Search): Search and manage indices.
+- `amplitude` - Amplitude (Analytics): Track events and query analytics.
+- `apify` - Apify (Search): Run actors and retrieve results.
+- `apollo` - Apollo (Sales): Search, enrich, and manage contacts.
+- `arxiv` - ArXiv (Search): Search academic papers.
+- `asana` - Asana (Productivity): Interact with Asana.
+- `ashby` - Ashby (HR): Manage candidates, jobs, applications.
+- `athena` - Athena (Analytics): Run SQL on S3 data.
+- `attio` - Attio (Sales): Manage CRM records, notes, tasks, lists, comments.
+- `box` - Box (Documents): Manage files, folders, e-signatures.
+- `brandfetch` - Brandfetch (Sales): Look up brand assets.
+- `brightdata` - Bright Data (Search): Scrape and extract structured web data.
+- `calcom` - Cal.com (Productivity): Manage bookings and availability.
+- `calendly` - Calendly (Productivity): Manage scheduling and events.
+- `clay` - Clay (Sales): Populate Clay workbook.
+- `clerk` - Clerk (Security): Manage users, orgs, sessions.
+- `cloudflare` - Cloudflare (DevOps): Manage DNS, domains, certificates, cache.
+- `cloudformation` - CloudFormation (DevOps): Inspect and manage AWS stacks.
+- `cloudwatch` - CloudWatch (Observability): Query logs, metrics, alarms.
+- `confluence` - Confluence (Legacy, Documents): Interact with Confluence.
+- `crowdstrike` - CrowdStrike (Security): Query identity protection data.
+- `cursor` - Cursor (Legacy, DevOps): Launch Cursor cloud agents.
+- `dagster` - Dagster (Observability): Orchestrate data pipeline runs.
+- `databricks` - Databricks (Databases): Run SQL and manage jobs.
+- `datadog` - Datadog (Observability): Monitor infra, apps, logs.
+- `devin` - Devin (DevOps): Autonomous AI software engineer.
+- `discord` - Discord (Communication): Interact with Discord.
+- `docusign` - DocuSign (Documents): Send documents for e-signature.
+- `dropbox` - Dropbox (Documents): Upload, download, share, manage files.
+- `dspy` - DSPy (AI): Run self-hosted DSPy programs.
+- `dub` - Dub (DevOps): Link management.
+- `duckduckgo` - DuckDuckGo (Search): Search with DuckDuckGo.
+- `dynamodb` - Amazon DynamoDB (Databases): Get, put, query, scan, update, delete.
+- `elasticsearch` - Elasticsearch (Databases): Search, index, manage data.
+- `elevenlabs` - ElevenLabs (AI): Text-to-speech.
+- `enrich` - Enrich (Sales): B2B enrichment and LinkedIn intelligence.
+- `evernote` - Evernote (Documents): Manage notes, notebooks, tags.
+- `exa` - Exa (Search): Search with Exa AI.
+- `extend` - Extend (AI): Parse and extract document content.
+- `fathom` - Fathom (Analytics): Meeting recordings, transcripts, summaries.
+- `firecrawl` - Firecrawl (Search): Scrape, search, crawl, map, extract web data.
+- `fireflies` - Fireflies (Legacy, Productivity): Meeting transcripts and recordings.
+- `gamma` - Gamma (Marketing): Generate presentations, documents, webpages.
+- `github` - GitHub (Legacy, DevOps): GitHub actions and triggers.
+- `gitlab` - GitLab (DevOps): Projects, issues, merge requests, pipelines.
+- `gmail` - Gmail (Legacy, Email): Send, read, search, move messages.
+- `gong` - Gong (Sales): Revenue intelligence.
+- `google_ads` - Google Ads (Analytics): Query campaigns and metrics.
+- `google_bigquery` - Google BigQuery (Databases): Query, list, insert data.
+- `google_books` - Google Books (Search): Search and retrieve books.
+- `google_calendar` - Google Calendar (Legacy, Productivity): Manage events.
+- `google_contacts` - Google Contacts (Productivity): Manage contacts.
+- `google_docs` - Google Docs (Documents): Read, write, create docs.
+- `google_drive` - Google Drive (Documents): Manage files, folders, permissions.
+- `google_forms` - Google Forms (Documents): Manage forms and responses.
+- `google_groups` - Google Groups (Communication): Manage groups and members.
+- `google_maps` - Google Maps (Search): Geocoding, directions, places.
+- `google_meet` - Google Meet (Communication): Create/manage meetings.
+- `google_pagespeed` - Google PageSpeed (Analytics): Analyze web performance.
+- `google_search` - Google Search (Search): Search the web.
+- `google_sheets` - Google Sheets (Legacy, Documents): Read, write, update sheets.
+- `google_sheets_v2` - Google Sheets (Documents): Sheet selection plus read/write/update.
+- `google_slides` - Google Slides (Legacy, Documents): Read, write, create presentations.
+- `google_tasks` - Google Tasks (Productivity): Manage tasks.
+- `google_translate` - Google Translate (AI): Translate text.
+- `google_vault` - Google Vault (Security): Search/export Vault matters.
+- `grafana` - Grafana (Observability): Dashboards, alerts, annotations.
+- `grain` - Grain (Productivity): Meeting recordings and summaries.
+- `granola` - Granola (Productivity): Meeting notes and transcripts.
+- `greenhouse` - Greenhouse (HR): Candidates, jobs, applications.
+- `greptile` - Greptile (DevOps): AI codebase search and Q&A.
+- `hex` - Hex (Analytics): Run and manage Hex projects.
+- `hubspot` - HubSpot (Sales): CRM actions and triggers.
+- `huggingface` - Hugging Face (AI): Inference API.
+- `hunter` - Hunter.io (Sales): Find and verify professional emails.
+- `iam` - AWS IAM (Security): Users, roles, policies, groups.
+- `identity_center` - AWS Identity Center (Security): Temporary elevated access.
+- `incidentio` - incident.io (Observability): Manage incidents.
+- `infisical` - Infisical (Security): Manage secrets.
+- `intercom` - Intercom (Legacy, Support): Contacts, companies, conversations, tickets.
+- `jina` - Jina (Search): Search/extract URL content.
+- `jira` - Jira (Productivity): Interact with Jira.
+- `jira_service_management` - Jira Service Management (Support): Service management actions.
+- `kalshi` - Kalshi (Legacy, Analytics): Prediction markets.
+- `ketch` - Ketch (Security): Consent, subscriptions, data rights.
+- `langsmith` - LangSmith (Observability): Forward workflow runs.
+- `launchdarkly` - LaunchDarkly (Observability): Feature flags.
+- `lemlist` - Lemlist (Email): Outreach, leads, email.
+- `linear` - Linear (Legacy, Productivity): Issues and projects.
+- `linkedin` - LinkedIn (Sales): Share posts and manage presence.
+- `linkup` - Linkup (Search): Search the web.
+- `loops` - Loops (Email): Contacts and transactional emails.
+- `luma` - Luma (Productivity): Events and guests.
+- `mailchimp` - Mailchimp (Email): Audiences and campaigns.
+- `mailgun` - Mailgun (Email): Emails and mailing lists.
+- `mem0` - Mem0 (AI): Agent memory management.
+- `microsoft_ad` - Azure AD (Security): Users and groups.
+- `microsoft_dataverse` - Microsoft Dataverse (Databases): Table records.
+- `microsoft_excel` - Microsoft Excel (Legacy, Documents): Read/write/update.
+- `microsoft_excel_v2` - Microsoft Excel (Documents): Sheet selection plus read/write.
+- `microsoft_planner` - Microsoft Planner (Productivity): Tasks, plans, buckets.
+- `microsoft_teams` - Microsoft Teams (Communication): Messages, reactions, members.
+- `mistral_parse` - Mistral Parser (Legacy, AI): PDF extraction.
+- `monday` - Monday (Productivity): Boards, items, groups.
+- `mongodb` - MongoDB (Databases): Connect to MongoDB.
+- `notion` - Notion (Legacy, Documents): Manage pages.
+- `notion_v2` - Notion (Documents): Manage pages.
+- `obsidian` - Obsidian (Documents): Local REST API vault access.
+- `okta` - Okta (Security): Users and groups.
+- `onedrive` - OneDrive (Documents): Files and folders.
+- `onepassword` - 1Password (Security): Vault items and secrets.
+- `openai` - Embeddings (AI): Generate OpenAI embeddings.
+- `outlook` - Outlook (Email): Send/read/draft/forward/move email.
+- `pagerduty` - PagerDuty (Observability): Incidents and on-call schedules.
+- `parallel_ai` - Parallel AI (Search): Web/deep research.
+- `perplexity` - Perplexity (AI): Chat and search.
+- `pinecone` - Pinecone (Databases): Vector database.
+- `pipedrive` - Pipedrive (Sales): CRM actions.
+- `polymarket` - Polymarket (Analytics): Prediction market data.
+- `posthog` - PostHog (Analytics): Product analytics and feature management.
+- `profound` - Profound (Analytics): AI visibility analytics.
+- `pulse` - Pulse (AI): Document OCR.
+- `qdrant` - Qdrant (Databases): Vector database.
+- `quiver` - Quiver (Marketing): Generate and vectorize SVGs.
+- `rds` - Amazon RDS (Databases): Data API access.
+- `reddit` - Reddit (Communication): Reddit content/data.
+- `redis` - Redis (Databases): Key-value operations.
+- `reducto` - Reducto (AI): PDF extraction.
+- `resend` - Resend (Email): Send emails and manage contacts.
+- `revenuecat` - RevenueCat (Commerce): Subscriptions and entitlements.
+- `rippling` - Rippling (HR): Workers, departments, company data.
+- `rootly` - Rootly (Observability): Incidents, alerts, on-call.
+- `s3` - S3 (Documents): S3 file operations.
+- `salesforce` - Salesforce (Sales): CRM actions.
+- `sap_s4hana` - SAP S4HANA (HR): OData business data.
+- `secrets_manager` - AWS Secrets Manager (Security): Secrets management.
+- `sendgrid` - SendGrid (Email): Emails, contacts, lists, templates.
+- `sentry` - Sentry (Observability): Issues, projects, events.
+- `serper` - Serper (Search): Web search.
+- `servicenow` - ServiceNow (Support): CRUD records.
+- `ses` - AWS SES (Email): Emails and templates.
+- `sharepoint` - SharePoint (Documents): Pages and lists.
+- `shopify` - Shopify (Commerce): Products, orders, customers, inventory.
+- `similarweb` - Similarweb (Analytics): Website analytics.
+- `sixtyfour` - Sixtyfour AI (Sales): AI lead/company research.
+- `slack` - Slack (Communication): Messages, modals, reactions, channels.
+- `spotify` - Spotify (Communication): Music search/playlists/playback.
+- `sqs` - Amazon SQS (DevOps): Queue operations.
+- `stagehand` - Stagehand (AI): Web automation and extraction.
+- `stripe` - Stripe (Commerce): Payments and Stripe data.
+- `sts` - AWS STS (Security): Security token service.
+- `supabase` - Supabase (Databases): Supabase database.
+- `tailscale` - Tailscale (Security): Devices and network settings.
+- `tavily` - Tavily (Search): Search and extract information.
+- `telegram` - Telegram (Communication): Telegram actions.
+- `textract` - AWS Textract (AI): Text/table/form extraction.
+- `thinking` - Thinking: Thought-process instruction tool.
+- `tinybird` - Tinybird (Analytics): Send/query events.
+- `trello` - Trello (Productivity): Lists, cards, activity.
+- `twilio_sms` - Twilio SMS (Communication): Send SMS.
+- `twilio_voice` - Twilio Voice (Communication): Phone calls.
+- `typeform` - Typeform (Documents): Typeform actions.
+- `upstash` - Upstash (Databases): Serverless Redis.
+- `vercel` - Vercel (DevOps): Deployments, projects, infrastructure.
+- `webflow` - Webflow (Marketing): CMS collections.
+- `wealthbox` - Wealthbox (Sales): Wealthbox CRM.
+- `whatsapp` - WhatsApp (Communication): Send WhatsApp messages.
+- `wikipedia` - Wikipedia (Search): Search/retrieve content.
+- `wordpress` - WordPress (Marketing): Manage content.
+- `workday` - Workday (HR): Workers, hiring, onboarding, HR operations.
+- `x` - X (Communication): Interact with X.
+- `youtube` - YouTube (Communication): Videos, channels, playlists.
+- `zendesk` - Zendesk (Support): Tickets, users, organizations.
+- `zep` - Zep (AI): Long-term memory for AI agents.
+- `zoom` - Zoom (Communication): Meetings and recordings.
+
+## Triggers
+
+- `api_trigger` - API (Legacy): Legacy HTTP API endpoint trigger.
+- `chat_trigger` - Chat: Legacy chat start block.
+- `circleback` - Circleback (AI): Meeting notes/action-item trigger.
+- `generic_webhook` - Webhook: Custom webhook trigger.
+- `imap` - IMAP Email (Email): Trigger on new email.
+- `input_trigger` - Input Form (Legacy): Structured input trigger.
+- `manual_trigger` - Manual (Legacy): Manual start trigger.
+- `rss` - RSS Feed (Search): Trigger on new feed items.
+- `schedule` - Schedule: Scheduled workflow trigger.
+- `start_trigger` - Start: Unified chat/manual/API entry point.
+
+## Versioned Or Partially-Inferred Entries
+
+- `confluence_v2` - Confluence.
+- `cursor_v2` - Cursor.
+- `extend_v2` - Extend.
+- `fireflies_v2` - Fireflies.
+- `github_v2` - GitHub.
+- `gmail_v2` - Gmail.
+- `google_calendar_v2` - Google Calendar.
+- `google_slides_v2` - Google Slides.
+- `intercom_v2` - Intercom.
+- `kalshi_v2` - Kalshi.
+- `linear_v2` - Linear.
+- `mistral_parse_v2` - Mistral Parser.
+- `mistral_parse_v3` - Mistral Parser.
+- `pulse_v2` - Pulse.
+- `reducto_v2` - Reducto.
+- `stt_v2` - Speech-to-Text.
+- `textract_v2` - AWS Textract.
+- `video_generator_v2` - Video Generator.
+- `vision_v2` - Vision.
