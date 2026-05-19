@@ -84,6 +84,7 @@ export const LogInspector = React.memo(({
 
   const jsonString = JSON.stringify(displayData ?? {}, null, 2)
   const isStructured = logViewMode === 'structured'
+  const interpolationNodeId = activeTab === 'Output' ? selectedLog?.node_id : null
 
   return (
     <>
@@ -191,6 +192,8 @@ export const LogInspector = React.memo(({
                     label={node.label}
                     value={node.value}
                     initialCollapsed={false}
+                    interpolationNodeId={interpolationNodeId ?? undefined}
+                    interpolationPath={interpolationNodeId ? [node.label] : undefined}
                   />
                 ))
               ) : (

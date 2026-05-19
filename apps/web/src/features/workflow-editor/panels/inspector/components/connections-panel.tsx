@@ -4,6 +4,10 @@ import { ChevronDown, ChevronRight, Workflow } from 'lucide-react'
 import { useResizable } from '@/features/workflow-editor/hooks/use-resizable'
 import { useWorkflowStore } from '@/stores/workflow-store'
 import { getIcon } from '@/features/workflow-editor/utils/icon-map'
+import {
+  buildOutputInterpolation,
+  writeInterpolationDragData,
+} from '@/features/workflow-editor/utils/interpolation'
 
 interface ConnectionsPanelProps {
   connectedNodes: { node: any, direction: 'incoming' | 'outgoing' }[]
@@ -46,8 +50,10 @@ const NodeItem = ({ node, nodeDefinitions }: { node: any, direction: 'incoming' 
                 className="flex items-center gap-2 h-5 cursor-grab active:cursor-grabbing hover:bg-white/5 rounded px-1 transition-colors group/item"
                 draggable
                 onDragStart={(e) => {
-                  e.dataTransfer.setData('text/plain', `{{${node.id}.output.${out.label}}}`)
-                  e.dataTransfer.effectAllowed = 'copy'
+                  writeInterpolationDragData(
+                    e,
+                    buildOutputInterpolation(node.id, [out.label]),
+                  )
                 }}
               >
                 <span className="text-[11px] font-medium text-[var(--text-muted)] group-hover/item:text-white transition-colors">

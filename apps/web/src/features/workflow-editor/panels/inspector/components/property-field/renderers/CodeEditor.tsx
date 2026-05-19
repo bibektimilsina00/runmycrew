@@ -4,6 +4,11 @@ import Prism from 'prismjs'
 import '@/styles/prism.css'
 import type { NodeProperty } from '@fuse/node-definitions'
 import { toEditorValue, parseStructuredValue } from '../../../utils/field-helpers'
+import {
+  hasInterpolationDragData,
+  insertInterpolationAtSelection,
+  readInterpolationDragData,
+} from '@/features/workflow-editor/utils/interpolation'
 
 ;(globalThis as any).Prism = Prism
 import('prismjs/components/prism-json').then(() => {
@@ -24,6 +29,8 @@ interface CodeEditorProps {
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   prop, value, onChange, onShowPicker, isFirstClickAllowed, onFirstClickUsed,
 }) => {
+  const editorValue = toEditorValue(value, prop.type === 'list' ? [] : prop.default)
+
   const openPicker = (target: HTMLTextAreaElement) => {
     const rect = target.getBoundingClientRect()
     const start = target.selectionStart || 0
@@ -39,7 +46,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   return (
     <div className="w-full bg-surface-editor rounded-md overflow-hidden transition-all">
       <Editor
-        value={toEditorValue(value, prop.type === 'list' ? [] : prop.default)}
+        value={editorValue}
         onValueChange={(code) => onChange(parseStructuredValue(code))}
         highlight={(code) => Prism.highlight(code || '', Prism.languages.json || {}, 'json')}
         padding={12}
@@ -66,6 +73,27 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               })
             }, 0)
           }
+        }}
+        onDragOver={(e) => {
+          if (!hasInterpolationDragData(e)) return
+          e.preventDefault()
+          e.dataTransfer.dropEffect = 'copy'
+        }}
+        onDrop={(e) => {
+          const interpolation = readInterpolationDragData(e)
+          if (!interpolation) return
+
+          e.preventDefault()
+          const target = e.target instanceof HTMLTextAreaElement ? e.target : null
+          const selectionStart = target?.selectionStart ?? editorValue.length
+          const selectionEnd = target?.selectionEnd ?? editorValue.length
+          const nextValue = insertInterpolationAtSelection(
+            editorValue,
+            interpolation,
+            selectionStart,
+            selectionEnd,
+          )
+          onChange(parseStructuredValue(nextValue))
         }}
         style={{ fontFamily: '"Fira code", "Fira Mono", monospace', fontSize: 13 }}
       />

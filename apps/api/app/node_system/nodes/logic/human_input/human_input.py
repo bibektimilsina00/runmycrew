@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import suppress
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -64,6 +65,7 @@ class HumanInputNode(BaseNode[HumanInputProperties]):
                     "label": "Timeout (hours)",
                     "type": "number",
                     "default": 72,
+                    "mode": "advanced",
                 },
             ],
             inputs=1,
@@ -89,10 +91,8 @@ class HumanInputNode(BaseNode[HumanInputProperties]):
             if isinstance(item, InputField):
                 fields.append(item)
             elif isinstance(item, dict):
-                try:
+                with suppress(Exception):
                     fields.append(InputField(**item))
-                except Exception:
-                    pass
         return fields
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:

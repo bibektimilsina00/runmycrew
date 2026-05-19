@@ -115,13 +115,12 @@ class AgentNode(BaseNode[AgentProperties]):
                 {
                     "name": "messages",
                     "label": "Messages",
-                    "type": "json",
+                    "type": "messages",
                     "required": True,
                     "default": [
-                        {"role": "system", "content": "You are a helpful workflow agent."},
                         {"role": "user", "content": "{{trigger.output}}"},
                     ],
-                    "description": "Array of messages with role and content.",
+                    "description": "Prompt messages with role and content.",
                 },
                 {
                     "name": "tools",
@@ -135,6 +134,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Tool Choice",
                     "type": "options",
                     "default": "auto",
+                    "mode": "advanced",
                     "options": [
                         {"label": "Auto", "value": "auto"},
                         {"label": "Required", "value": "required"},
@@ -146,6 +146,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Max Iterations",
                     "type": "number",
                     "default": 10,
+                    "mode": "advanced",
                     "description": "Maximum number of agentic loop iterations.",
                 },
                 {
@@ -153,6 +154,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Memory",
                     "type": "options",
                     "default": "none",
+                    "mode": "advanced",
                     "options": [
                         {"label": "None", "value": "none"},
                         {"label": "Workflow", "value": "workflow"},
@@ -163,6 +165,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Memory Key",
                     "type": "string",
                     "placeholder": "customer-123",
+                    "mode": "advanced",
                     "condition": {"field": "memoryType", "value": "workflow"},
                 },
                 {
@@ -170,6 +173,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Memory Limit",
                     "type": "number",
                     "default": 10,
+                    "mode": "advanced",
                     "condition": {"field": "memoryType", "value": "workflow"},
                 },
                 {
@@ -177,18 +181,21 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Temperature",
                     "type": "number",
                     "default": 0.3,
+                    "mode": "advanced",
                 },
                 {
                     "name": "maxTokens",
                     "label": "Max Output Tokens",
                     "type": "number",
                     "default": 4096,
+                    "mode": "advanced",
                 },
                 {
                     "name": "responseFormat",
                     "label": "Response Format",
                     "type": "json",
                     "required": False,
+                    "mode": "advanced",
                     "description": "Optional JSON Schema or provider response-format object.",
                 },
                 {
@@ -196,12 +203,14 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Timeout (ms)",
                     "type": "number",
                     "default": 60000,
+                    "mode": "advanced",
                 },
                 {
                     "name": "reasoningEffort",
                     "label": "Reasoning Effort",
                     "type": "options",
                     "default": "auto",
+                    "mode": "advanced",
                     "options": [
                         {"label": "Auto", "value": "auto"},
                         {"label": "Low", "value": "low"},
@@ -215,6 +224,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Stream Response",
                     "type": "boolean",
                     "default": False,
+                    "mode": "advanced",
                     "description": "Stream LLM tokens in real-time via WebSocket.",
                 },
                 {

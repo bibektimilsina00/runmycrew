@@ -12,6 +12,7 @@ import { NumberInput } from './renderers/NumberInput'
 import { BooleanInput } from './renderers/BooleanInput'
 import { OptionsSelect } from './renderers/OptionsSelect'
 import { CodeEditor } from './renderers/CodeEditor'
+import { MessagesInput } from './renderers/MessagesInput'
 import { KeyValueField } from '../key-value-field'
 import { SchemaEditorField } from '../schema-editor-field'
 import { CredentialPicker } from '../credential-picker'
@@ -146,6 +147,13 @@ export const PropertyField: React.FC<PropertyFieldProps> = (props) => {
             onShowPicker={onShowPicker}
             isFirstClickAllowed={() => isFirstClickAllowed()}
             onFirstClickUsed={() => onFirstClickUsed()}
+          />
+        )
+      case 'messages':
+        return (
+          <MessagesInput
+            value={currentValue}
+            onChange={onChange}
           />
         )
       default:

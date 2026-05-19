@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Trash2 } from 'lucide-react'
+import {
+  hasInterpolationDragData,
+  insertInterpolationAtSelection,
+  readInterpolationDragData,
+} from '@/features/workflow-editor/utils/interpolation'
 
 export const KeyValueField = ({ 
   value, 
@@ -52,6 +57,30 @@ export const KeyValueField = ({
     const newPairs = pairs.filter((_, i) => i !== index)
     setPairs(newPairs)
     syncToParent(newPairs)
+  }
+
+  const handleDragOver = (event: React.DragEvent<HTMLInputElement>) => {
+    if (!hasInterpolationDragData(event)) return
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
+  }
+
+  const handleDrop = (
+    event: React.DragEvent<HTMLInputElement>,
+    index: number,
+    field: 'key' | 'value',
+  ) => {
+    const interpolation = readInterpolationDragData(event)
+    if (!interpolation) return
+
+    event.preventDefault()
+    const target = event.currentTarget
+    handleChange(index, field, insertInterpolationAtSelection(
+      target.value,
+      interpolation,
+      target.selectionStart ?? target.value.length,
+      target.selectionEnd ?? target.value.length,
+    ))
   }
 
   return (
@@ -124,6 +153,8 @@ export const KeyValueField = ({
                 }
               }}
               onChange={e => handleChange(idx, 'key', e.target.value)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, idx, 'key')}
               placeholder="Key"
               className="flex-1 bg-transparent px-2 py-1.5 text-[12px] text-white focus:outline-none placeholder:text-text-placeholder min-w-0"
             />
@@ -183,6 +214,8 @@ export const KeyValueField = ({
                 }
               }}
               onChange={e => handleChange(idx, 'value', e.target.value)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, idx, 'value')}
               placeholder="Value"
               className="flex-1 bg-transparent px-2 py-1.5 text-[12px] text-white focus:outline-none placeholder:text-text-placeholder min-w-0"
             />

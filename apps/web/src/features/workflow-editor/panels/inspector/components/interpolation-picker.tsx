@@ -83,7 +83,7 @@ const PickerNodeItem = ({ node, onSelect, def }: { node: any, onSelect: (val: st
   const [isExpanded, setIsExpanded] = useState(false)
   if (!def) return null
 
-  const outputs = def.outputs_schema || []
+  const outputs = def.outputsSchema || def.outputs_schema || []
 
   return (
     <div className="flex flex-col gap-0.5">

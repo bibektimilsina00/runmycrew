@@ -63,6 +63,7 @@ class MySQLNode(BaseNode[MySQLProperties]):
                     "label": "Parameters",
                     "type": "json",
                     "default": [],
+                    "mode": "advanced",
                     "description": "Array of parameter values for %s placeholders.",
                 },
             ],

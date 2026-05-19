@@ -1,6 +1,10 @@
 import React, { memo } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  buildOutputInterpolation,
+  writeInterpolationDragData,
+} from '@/features/workflow-editor/utils/interpolation'
 
 // --- Shared Types ---
 export interface NodeItem {
@@ -63,16 +67,44 @@ export const LogEntry = memo(({ icon, iconBg, label, duration, active = false, l
   </div>
 ))
 
-export const DataNode = memo(({ label, value, initialCollapsed = false, wrap = false }: { label: string, value: any, initialCollapsed?: boolean, wrap?: boolean }) => {
+interface DataNodeProps {
+  label: string
+  value: any
+  initialCollapsed?: boolean
+  wrap?: boolean
+  interpolationNodeId?: string
+  interpolationPath?: string[]
+}
+
+export const DataNode = memo(({
+  label,
+  value,
+  initialCollapsed = false,
+  wrap = false,
+  interpolationNodeId,
+  interpolationPath,
+}: DataNodeProps) => {
   const [isCollapsed, setIsCollapsed] = React.useState(initialCollapsed)
   const isObject = value !== null && typeof value === 'object'
   const displayType = Array.isArray(value) ? 'array' : typeof value
+  const canDragInterpolation = Boolean(interpolationNodeId && interpolationPath)
+  const interpolation = canDragInterpolation && interpolationNodeId && interpolationPath
+    ? buildOutputInterpolation(interpolationNodeId, interpolationPath)
+    : null
   
   return (
     <div className="flex min-w-0 overflow-hidden flex-col">
       <div 
         onClick={() => setIsCollapsed(!isCollapsed)} 
-        className="group flex min-h-[30px] cursor-pointer items-center gap-2 rounded-lg px-2 -mx-2 hover:bg-[var(--surface-active)] transition-all"
+        draggable={canDragInterpolation}
+        onDragStart={(event) => {
+          if (!interpolation) return
+          writeInterpolationDragData(event, interpolation)
+        }}
+        className={cn(
+          "group flex min-h-[30px] cursor-pointer items-center gap-2 rounded-lg px-2 -mx-2 hover:bg-[var(--surface-active)] transition-all",
+          canDragInterpolation && "cursor-grab active:cursor-grabbing"
+        )}
       >
         <span className="text-[12px] font-semibold text-[var(--text-primary)]">{label}</span>
         <div className={cn(
@@ -91,7 +123,15 @@ export const DataNode = memo(({ label, value, initialCollapsed = false, wrap = f
           {isObject ? (
             <div className="flex flex-col gap-1">
               {Object.entries(value).map(([k, v]) => (
-                <DataNode key={k} label={k} value={v} initialCollapsed={true} wrap={wrap} />
+                <DataNode
+                  key={k}
+                  label={k}
+                  value={v}
+                  initialCollapsed={true}
+                  wrap={wrap}
+                  interpolationNodeId={interpolationNodeId}
+                  interpolationPath={interpolationPath ? [...interpolationPath, k] : undefined}
+                />
               ))}
               {Object.keys(value).length === 0 && (
                 <span className="text-[11px] text-[var(--text-muted)] italic py-1">Empty {displayType}</span>

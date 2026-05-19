@@ -7,6 +7,7 @@ export type KnownNodePropertyType =
   | 'credential'
   | 'key-value'
   | 'list'
+  | 'messages'
   | 'schema'
   | 'file-list'
   | 'tool-selector'

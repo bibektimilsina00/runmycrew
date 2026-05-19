@@ -3,6 +3,11 @@ import { RefreshCw } from 'lucide-react'
 import type { NodeProperty } from '@fuse/node-definitions'
 import { CustomSelect } from '../../custom-select'
 import { toInputValue } from '../../../utils/field-helpers'
+import {
+  hasInterpolationDragData,
+  insertInterpolationAtSelection,
+  readInterpolationDragData,
+} from '@/features/workflow-editor/utils/interpolation'
 
 interface StringInputProps {
   prop: NodeProperty
@@ -45,6 +50,24 @@ export const StringInput: React.FC<StringInputProps> = ({
       onClick={onClick}
       onKeyDown={onKeyDown}
       onChange={(e) => onChange(e.target.value)}
+      onDragOver={(e) => {
+        if (!hasInterpolationDragData(e)) return
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'copy'
+      }}
+      onDrop={(e) => {
+        const interpolation = readInterpolationDragData(e)
+        if (!interpolation) return
+
+        e.preventDefault()
+        const target = e.currentTarget
+        onChange(insertInterpolationAtSelection(
+          target.value,
+          interpolation,
+          target.selectionStart ?? target.value.length,
+          target.selectionEnd ?? target.value.length,
+        ))
+      }}
       placeholder={prop.placeholder || `Enter ${prop.label}`}
       className="w-full bg-surface-editor border border-border rounded-md px-3 h-[36px] text-[13px] text-white placeholder:text-text-placeholder focus:outline-none"
     />

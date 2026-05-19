@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Literal
+from contextlib import suppress
+from typing import Any
 
 import httpx
 from pydantic import BaseModel, Field
@@ -93,6 +94,7 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                     "label": "Temperature",
                     "type": "number",
                     "default": 0.0,
+                    "mode": "advanced",
                 },
             ],
             inputs=1,
@@ -120,10 +122,8 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
             if isinstance(item, EvaluatorMetric):
                 metrics.append(item)
             elif isinstance(item, dict):
-                try:
+                with suppress(Exception):
                     metrics.append(EvaluatorMetric(**item))
-                except Exception:
-                    pass
         return metrics
 
     def _build_prompt(self, metrics: list[EvaluatorMetric]) -> tuple[str, dict[str, Any]]:
@@ -204,7 +204,7 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                     data = response.json()
                     raw_content = data["choices"][0]["message"]["content"]
                 else:
-                    return NodeResult(success=False, error=f"Evaluator supports openai_compatible providers only.")
+                    return NodeResult(success=False, error="Evaluator supports openai_compatible providers only.")
 
             result = json.loads(raw_content)
             scores = {m.name: result.get(m.name, m.min) for m in metrics}

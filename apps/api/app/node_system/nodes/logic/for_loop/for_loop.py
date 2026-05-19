@@ -35,9 +35,9 @@ class ForLoopNode(BaseNode[ForLoopProperties]):
             color="#6366f1",
             properties=[
                 {"name": "count", "label": "Count", "type": "number", "required": True, "default": 10, "description": "Number of iterations."},
-                {"name": "start", "label": "Start", "type": "number", "default": 0},
-                {"name": "step", "label": "Step", "type": "number", "default": 1},
-                {"name": "parallel", "label": "Run in parallel", "type": "boolean", "default": False},
+                {"name": "start", "label": "Start", "type": "number", "default": 0, "mode": "advanced"},
+                {"name": "step", "label": "Step", "type": "number", "default": 1, "mode": "advanced"},
+                {"name": "parallel", "label": "Run in parallel", "type": "boolean", "default": False, "mode": "advanced"},
             ],
             inputs=1,
             outputs=1,

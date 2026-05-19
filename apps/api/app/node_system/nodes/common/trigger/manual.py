@@ -39,6 +39,7 @@ class TriggerNode(BaseNode[TriggerProperties]):
                     "label": "Input Schema",
                     "type": "schema",
                     "default": [],
+                    "mode": "advanced",
                 },
             ],
             inputs=0,

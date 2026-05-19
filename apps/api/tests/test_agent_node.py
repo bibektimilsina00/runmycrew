@@ -32,6 +32,14 @@ def test_agent_model_field_uses_generic_dynamic_options_contract():
     assert not any(prop["name"].endswith("Model") for prop in metadata.properties)
 
 
+def test_agent_messages_field_uses_messages_editor_contract():
+    metadata = AgentNode.get_metadata()
+    messages_property = next(prop for prop in metadata.properties if prop["name"] == "messages")
+
+    assert messages_property["type"] == "messages"
+    assert messages_property["default"] == [{"role": "user", "content": "{{trigger.output}}"}]
+
+
 @pytest.fixture
 def anyio_backend() -> str:
     return "asyncio"

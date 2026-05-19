@@ -45,6 +45,7 @@ class DoWhileNode(BaseNode[DoWhileProperties]):
                     "label": "Max Iterations",
                     "type": "number",
                     "default": 100,
+                    "mode": "advanced",
                 },
             ],
             inputs=1,

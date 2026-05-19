@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from contextlib import suppress
 from typing import Any
 
 import httpx
@@ -74,6 +75,7 @@ class A2ANode(BaseNode[A2AProperties]):
                     "label": "Input Data",
                     "type": "json",
                     "required": False,
+                    "mode": "advanced",
                     "condition": {"field": "operation", "value": "send_message"},
                 },
                 {
@@ -81,6 +83,7 @@ class A2ANode(BaseNode[A2AProperties]):
                     "label": "Wait for completion",
                     "type": "boolean",
                     "default": True,
+                    "mode": "advanced",
                     "description": "Poll until the remote execution finishes.",
                     "condition": {"field": "operation", "value": "send_message"},
                 },
@@ -102,12 +105,14 @@ class A2ANode(BaseNode[A2AProperties]):
                     "label": "Auth Token",
                     "type": "string",
                     "required": False,
+                    "mode": "advanced",
                 },
                 {
                     "name": "timeoutSeconds",
                     "label": "Timeout (seconds)",
                     "type": "number",
                     "default": 120,
+                    "mode": "advanced",
                 },
             ],
             inputs=1,
@@ -157,10 +162,8 @@ class A2ANode(BaseNode[A2AProperties]):
         if self.props.inputData is not None:
             raw = self.props.inputData
             if isinstance(raw, str):
-                try:
+                with suppress(json.JSONDecodeError):
                     raw = json.loads(raw)
-                except json.JSONDecodeError:
-                    pass
             payload["input_data"] = raw
 
         resp = await client.post(url, headers=self._headers(), json=payload)

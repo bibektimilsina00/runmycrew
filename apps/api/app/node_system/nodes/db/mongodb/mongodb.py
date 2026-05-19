@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import suppress
 from typing import Any
 
 from pydantic import BaseModel
@@ -89,6 +90,7 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
                     "label": "Limit",
                     "type": "number",
                     "default": 100,
+                    "mode": "advanced",
                     "condition": {"field": "operation", "value": "find"},
                 },
             ],
@@ -175,10 +177,8 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
         except Exception as e:
             return NodeResult(success=False, error=f"MongoDB error: {e}")
         finally:
-            try:
+            with suppress(Exception):
                 client.close()
-            except Exception:
-                pass
 
     def _serialize_doc(self, doc: dict[str, Any]) -> dict[str, Any]:
         result = {}

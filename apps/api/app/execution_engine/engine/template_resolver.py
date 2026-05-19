@@ -120,10 +120,58 @@ class TemplateResolver:
 
     def _resolve_path(self, path: str) -> Any:
         """Resolve a dot-path like 'node_1.output.body.id'."""
+        path = path.strip()
+        current = self._resolve_node_output_path(path)
+        if current is not None:
+            return current
+
         parts = path.split(".")
         current = self._context
 
         for part in parts:
+            if isinstance(current, dict):
+                current = current.get(part)
+            elif isinstance(current, list):
+                try:
+                    current = current[int(part)]
+                except (ValueError, IndexError):
+                    logger.warning(f"Could not resolve index '{part}' in path '{path}'")
+                    return None
+            else:
+                logger.warning(f"Could not resolve part '{part}' in path '{path}'")
+                return None
+
+            if current is None:
+                return None
+
+        return current
+
+    def _resolve_node_output_path(self, path: str) -> Any:
+        """Resolve paths whose node IDs may contain dots.
+
+        Node IDs are generated from node type prefixes, for example
+        ``action.http_request-1778949244013``. Splitting the whole path on
+        dots treats ``action`` as the context key and loses the real node ID,
+        so node output paths are split on the explicit ``.output`` marker.
+        """
+        output_marker = ".output"
+        if output_marker not in path:
+            return None
+
+        node_id, output_path = path.split(output_marker, 1)
+        node_context = self._context.get(node_id)
+        if not isinstance(node_context, dict) or "output" not in node_context:
+            return None
+
+        current: Any = node_context["output"]
+        if not output_path:
+            return current
+
+        output_path = output_path.removeprefix(".")
+        if not output_path:
+            return current
+
+        for part in output_path.split("."):
             if isinstance(current, dict):
                 current = current.get(part)
             elif isinstance(current, list):

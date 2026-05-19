@@ -63,6 +63,7 @@ class PostgresNode(BaseNode[PostgresProperties]):
                     "label": "Parameters",
                     "type": "json",
                     "default": [],
+                    "mode": "advanced",
                     "description": "Array of parameter values for $1, $2, ... placeholders.",
                 },
             ],

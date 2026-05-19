@@ -45,6 +45,7 @@ class WhileLoopNode(BaseNode[WhileLoopProperties]):
                     "label": "Max Iterations",
                     "type": "number",
                     "default": 100,
+                    "mode": "advanced",
                     "description": "Safety cap to prevent infinite loops.",
                 },
             ],

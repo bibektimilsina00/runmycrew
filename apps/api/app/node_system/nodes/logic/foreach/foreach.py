@@ -47,6 +47,7 @@ class ForEachNode(BaseNode[ForEachProperties]):
                     "label": "Run in parallel",
                     "type": "boolean",
                     "default": False,
+                    "mode": "advanced",
                     "description": "Execute all iterations concurrently (max 1000 items).",
                 },
             ],

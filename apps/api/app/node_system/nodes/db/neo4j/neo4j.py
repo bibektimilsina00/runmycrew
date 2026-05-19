@@ -51,6 +51,7 @@ class Neo4jNode(BaseNode[Neo4jProperties]):
                     "label": "Parameters",
                     "type": "json",
                     "default": {},
+                    "mode": "advanced",
                     "description": "Dict of named parameters for the Cypher query.",
                 },
             ],

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import httpx
@@ -77,6 +76,7 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
                     "label": "Thinking Budget (tokens)",
                     "type": "number",
                     "default": 8192,
+                    "mode": "advanced",
                     "description": "Max tokens for the thinking process (1024–32768).",
                 },
             ],
