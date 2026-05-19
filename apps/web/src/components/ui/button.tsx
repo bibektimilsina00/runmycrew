@@ -45,6 +45,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       'inline-flex items-center justify-center transition-all duration-150',
       'disabled:opacity-50 disabled:cursor-not-allowed',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)]/50',
+      '[&_svg]:shrink-0 [&_svg]:size-[1em]',
       variantClasses[variant],
       sizeClasses[size],
       fullWidth && 'w-full',

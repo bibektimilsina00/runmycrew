@@ -12,7 +12,7 @@ export const SettingsSearchInput: React.FC<SettingsSearchInputProps> = ({
   className,
   ...props
 }) => (
-  <div className={cn('relative flex-1 group', containerClassName)}>
+  <div className={cn('relative min-w-0 flex-1 group', containerClassName)}>
     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] group-focus-within:text-white transition-colors" />
     <input
       type="text"
@@ -35,11 +35,13 @@ interface SettingsButtonProps extends Omit<ButtonProps, 'size'> {
 export const SettingsButton: React.FC<SettingsButtonProps> = ({
   variant = 'secondary',
   size = 'md',
+  className,
   ...props
 }) => (
   <Button
     variant={variant}
     size={size === 'sm' ? 'sm' : 'md'}
+    className={cn('shrink-0 whitespace-nowrap', className)}
     {...props}
   />
 )

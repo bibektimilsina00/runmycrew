@@ -70,20 +70,20 @@ export const IntegrationsSettings: React.FC = () => {
 
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         {/* Toolbar */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-2 mb-8">
           <SettingsSearchInput 
             placeholder="Search your integrations..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <IconButton
               icon={<RefreshCw size={16} className={isCredentialsLoading ? 'animate-spin' : ''} />}
               tooltip="Refresh list"
               onClick={() => refresh()}
             />
-            <SettingsButton variant="primary" onClick={handleOpenMainConnect}>
-              <Plus className="w-3.5 h-3.5" />
+            <SettingsButton variant="primary" onClick={handleOpenMainConnect} className="gap-1.5">
+              <Plus />
               Connect
             </SettingsButton>
           </div>
