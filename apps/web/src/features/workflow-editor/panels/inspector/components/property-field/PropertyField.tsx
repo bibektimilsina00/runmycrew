@@ -137,6 +137,18 @@ export const PropertyField: React.FC<PropertyFieldProps> = (props) => {
             disabled={disabled}
           />
         )
+      case 'code':
+        return (
+          <CodeEditor
+            prop={prop}
+            value={currentValue}
+            onChange={onChange}
+            onShowPicker={onShowPicker}
+            isFirstClickAllowed={() => isFirstClickAllowed()}
+            onFirstClickUsed={() => onFirstClickUsed()}
+            language={properties['language'] || 'python'}
+          />
+        )
       case 'json':
       case 'list':
         return (

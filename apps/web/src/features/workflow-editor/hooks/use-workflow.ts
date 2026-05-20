@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import type React from 'react';
 import { useWorkflowStore } from '@/stores/workflow-store';
 import { CanvasEngine } from '@/features/workflow-editor/utils/canvas-engine';
 import { type Connection, useReactFlow } from 'reactflow';
@@ -25,9 +26,20 @@ export const useWorkflow = () => {
   } = useWorkflowStore();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
-  const { setInspectorTab } = useUIStore();
+  const { setInspectorTab, setSearchOpen } = useUIStore();
   const [mode, setMode] = useState<'select' | 'pan'>('select');
   const { data: nodeRegistry = [] } = useNodes();
+  const { removeNode, toggleNodeLock, duplicateNode, updateNodeData, nodes: allNodes } = useWorkflowStore();
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    type: 'node' | 'pane'
+    x: number
+    y: number
+    nodeId?: string
+  } | null>(null);
+
+  const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
   const addNode = useCallback(
     (type: string, position: { x: number; y: number }) => {
@@ -281,6 +293,44 @@ export const useWorkflow = () => {
     [nodes, edges, setNodes, setEdges]
   );
 
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: any) => {
+      event.preventDefault()
+      setSelectedNodeId(node.id)
+      setContextMenu({ type: 'node', x: event.clientX, y: event.clientY, nodeId: node.id })
+    },
+    [setSelectedNodeId]
+  )
+
+  const onPaneContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault()
+      setContextMenu({ type: 'pane', x: event.clientX, y: event.clientY })
+    },
+    []
+  )
+
+  const startNodeRename = useCallback(
+    (nodeId: string) => {
+      setSelectedNodeId(nodeId)
+      setInspectorTab('Editor')
+      // Small delay to let inspector open before triggering rename
+      setTimeout(() => {
+        const el = document.querySelector(`[data-rename-trigger="${nodeId}"]`) as HTMLElement
+        el?.click()
+      }, 100)
+    },
+    [setSelectedNodeId, setInspectorTab]
+  )
+
+  const selectAllNodes = useCallback(() => {
+    setNodes(prev => prev.map(n => ({ ...n, selected: true })))
+  }, [setNodes])
+
+  const toggleNodeDisabled = useCallback((nodeId: string) => {
+    updateNodeData(nodeId, { disabled: !(allNodes.find(n => n.id === nodeId)?.data?.disabled) })
+  }, [updateNodeData, allNodes])
+
   return {
     nodes,
     edges,
@@ -293,6 +343,17 @@ export const useWorkflow = () => {
     onNodeDragStop,
     onDragOver,
     onDrop,
+    onNodeContextMenu,
+    onPaneContextMenu,
+    contextMenu,
+    closeContextMenu,
+    removeNode,
+    duplicateNode,
+    toggleNodeLock,
+    toggleNodeDisabled,
+    startNodeRename,
+    selectAllNodes,
+    setSearchOpen,
     reactFlowWrapper,
     mode,
     setMode,

@@ -21,6 +21,7 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
+from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
 from apps.api.app.node_system.nodes.logic.loop.loop_node import LoopNode
 from apps.api.app.node_system.nodes.logic.human_input.human_input import HumanInputNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
@@ -88,6 +89,7 @@ node_registry.register(WaitNode)
 node_registry.register(EvaluatorNode)
 node_registry.register(ThinkingNode)
 node_registry.register(LoopNode)
+node_registry.register(CodeNode)
 node_registry.register(HumanInputNode)
 node_registry.register(A2ANode)
 node_registry.register(PostgresNode)

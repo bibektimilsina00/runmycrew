@@ -11,11 +11,14 @@ import {
 } from '@/features/workflow-editor/utils/interpolation'
 
 ;(globalThis as any).Prism = Prism
-import('prismjs/components/prism-json').then(() => {
-  if (Prism.languages.json) {
-    Prism.languages.json['interpolation'] = { pattern: /\{\{.*?\}\}/g, alias: 'important' }
-  }
-})
+
+// Load language grammars — interpolation {{}} highlighted in all
+const addInterpolation = (lang: any) => {
+  if (lang) lang['interpolation'] = { pattern: /\{\{.*?\}\}/g, alias: 'important' }
+}
+import('prismjs/components/prism-json').then(() => addInterpolation(Prism.languages.json))
+import('prismjs/components/prism-python').then(() => addInterpolation(Prism.languages.python))
+import('prismjs/components/prism-javascript').then(() => addInterpolation(Prism.languages.javascript))
 
 interface CodeEditorProps {
   prop: NodeProperty
@@ -24,12 +27,19 @@ interface CodeEditorProps {
   onShowPicker: (rect: DOMRect, onSelect: (val: string) => void) => void
   isFirstClickAllowed: () => boolean
   onFirstClickUsed: () => void
+  language?: string
+}
+
+function getHighlighter(language?: string) {
+  if (language === 'python') return (code: string) => Prism.highlight(code || '', Prism.languages.python || Prism.languages.plain || {}, 'python')
+  if (language === 'javascript') return (code: string) => Prism.highlight(code || '', Prism.languages.javascript || Prism.languages.plain || {}, 'javascript')
+  return (code: string) => Prism.highlight(code || '', Prism.languages.json || {}, 'json')
 }
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({
-  prop, value, onChange, onShowPicker, isFirstClickAllowed, onFirstClickUsed,
+  prop, value, onChange, onShowPicker, isFirstClickAllowed, onFirstClickUsed, language,
 }) => {
-  const editorValue = toEditorValue(value, prop.type === 'list' ? [] : prop.default)
+  const editorValue = toEditorValue(value, prop.type === 'list' || prop.type === 'code' ? (prop.default ?? '') : prop.default)
 
   const openPicker = (target: HTMLTextAreaElement) => {
     const rect = target.getBoundingClientRect()
@@ -48,7 +58,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       <Editor
         value={editorValue}
         onValueChange={(code) => onChange(parseStructuredValue(code))}
-        highlight={(code) => Prism.highlight(code || '', Prism.languages.json || {}, 'json')}
+        highlight={getHighlighter(language)}
         padding={12}
         className="prism-editor min-h-[100px] focus:outline-none"
         textareaClassName="focus:outline-none"

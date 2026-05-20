@@ -4,19 +4,22 @@ import ReactFlow, {
   ReactFlowProvider,
   SelectionMode,
   ConnectionLineType,
-  Background
+  Background,
+  useReactFlow,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 import { EditorInspector } from '@/features/workflow-editor/panels/inspector/EditorInspector'
 import { EditorLogs } from '@/features/workflow-editor/panels/logs-panel/EditorLogs'
 import { WorkflowControls } from '@/features/workflow-editor/controls/WorkflowControls'
+import { ContextMenu, NODE_CONTEXT_ITEMS, PANE_CONTEXT_ITEMS } from '@/features/workflow-editor/components/context-menu/ContextMenu'
 import { useWorkflow } from '@/features/workflow-editor/hooks/use-workflow'
 import { useAutoSave } from '@/features/workflow-editor/hooks/use-auto-save'
 import { useWorkflowData } from '@/features/workflow-editor/hooks/use-workflow-data'
 import { useResizable } from '@/features/workflow-editor/hooks/use-resizable'
 import { useNodes } from '@/hooks/nodes/queries'
 import { useWorkflowStore } from '@/stores/workflow-store'
+import { useUIStore } from '@/stores/ui-store'
 
 import { CustomNode } from '@/features/workflow-editor/nodes/CustomNode'
 import { ConditionNode } from '@/features/workflow-editor/nodes/ConditionNode'
@@ -94,14 +97,27 @@ function EditorContent() {
     onNodeDragStop,
     onDragOver,
     onDrop,
+    onNodeContextMenu,
+    onPaneContextMenu,
+    contextMenu,
+    closeContextMenu,
+    removeNode,
+    duplicateNode,
+    toggleNodeLock,
+    toggleNodeDisabled,
+    startNodeRename,
+    selectAllNodes,
+    setSearchOpen,
     reactFlowWrapper,
     mode,
     setMode,
   } = useWorkflow()
 
+  const { fitView } = useReactFlow()
   const { data: nodeRegistry = [] } = useNodes()
   const setNodeDefinitions = useWorkflowStore(s => s.setNodeDefinitions)
   const nodeDefinitions = useWorkflowStore(s => s.nodeDefinitions)
+  const { setInspectorTab: switchTab } = useUIStore()
   const location = useLocation()
 
   React.useEffect(() => {
@@ -173,6 +189,8 @@ function EditorContent() {
           onDrop={onDrop}
           onNodeDrag={onNodeDrag}
           onNodeDragStop={onNodeDragStop}
+          onNodeContextMenu={onNodeContextMenu}
+          onPaneContextMenu={onPaneContextMenu}
           onConnectStart={onConnectStart}
           onConnectEnd={onConnectEnd}
           defaultEdgeOptions={{
@@ -201,6 +219,53 @@ function EditorContent() {
         <WorkflowControls mode={mode} onModeChange={setMode} />
       </div>
       <EditorLogs />
+
+      {/* Node context menu */}
+      {contextMenu?.type === 'node' && contextMenu.nodeId && (() => {
+        const node = nodes.find(n => n.id === contextMenu.nodeId)
+        return (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={closeContextMenu}
+            items={NODE_CONTEXT_ITEMS({
+              nodeId: contextMenu.nodeId,
+              isLocked: node?.data?.locked ?? false,
+              isDisabled: node?.data?.disabled ?? false,
+              onDuplicate: () => duplicateNode(contextMenu.nodeId!),
+              onDisableToggle: () => toggleNodeDisabled(contextMenu.nodeId!),
+              onFlipHandles: () => {
+                const n = nodes.find(x => x.id === contextMenu.nodeId)
+                if (n) toggleNodeLock(contextMenu.nodeId!) // reuse — or add flip action
+              },
+              onLockToggle: () => toggleNodeLock(contextMenu.nodeId!),
+              onRename: () => startNodeRename(contextMenu.nodeId!),
+              onOpenEditor: () => { switchTab('Editor') },
+              onDelete: () => removeNode(contextMenu.nodeId!),
+            })}
+          />
+        )
+      })()}
+
+      {/* Pane context menu */}
+      {contextMenu?.type === 'pane' && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={closeContextMenu}
+          items={PANE_CONTEXT_ITEMS({
+            onUndo: () => {},
+            onRedo: () => {},
+            onAddNode: () => setSearchOpen(true),
+            onAutoLayout: () => fitView({ duration: 400, padding: 0.2 }),
+            onFitView: () => fitView({ duration: 300, padding: 0.15 }),
+            onOpenLogs: () => switchTab('Editor'),
+            onOpenChat: () => switchTab('Copilot'),
+            canUndo: false,
+            canRedo: false,
+          })}
+        />
+      )}
     </div>
   )
 }
