@@ -44,6 +44,15 @@ class Settings(BaseSettings):
     LINEAR_CLIENT_ID: str = ""
     LINEAR_CLIENT_SECRET: str = ""
 
+    # Email (SMTP) — works with Gmail, SendGrid, Mailgun, SES, etc.
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = "noreply@fuse.app"
+    SMTP_FROM_NAME: str = "Fuse"
+    SMTP_TLS: bool = True
+
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).resolve().parents[4] / ".env"),
         case_sensitive=True,
