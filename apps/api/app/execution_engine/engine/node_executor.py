@@ -63,10 +63,14 @@ class NodeExecutor:
             if isinstance(e, ValidationError):
                 errors = []
                 for error in e.errors():
-                    field = ".".join(str(loc) for loc in error["loc"])
-                    msg = error["msg"]
-                    errors.append(f"{field}: {msg}")
-                error_msg = f"Configuration Error: {', '.join(errors)}"
+                    # Convert field path to human-readable property name
+                    loc = error["loc"]
+                    field = loc[-1] if loc else "unknown"  # last segment is the field name
+                    raw_msg = error["msg"]
+                    # Strip pydantic noise
+                    msg = raw_msg.replace("Value error, ", "").replace("String should ", "").strip()
+                    errors.append(f'"{field}" — {msg}')
+                error_msg = "Missing or invalid fields: " + "; ".join(errors)
                 logger.warning(f"Node {node_id} validation failed: {error_msg}")
                 return NodeResult(success=False, error=error_msg, logs=[error_msg])
 

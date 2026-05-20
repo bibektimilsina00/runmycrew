@@ -4,11 +4,12 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from apps.api.app.models import Execution, ExecutionLog
+from apps.api.app.models.workflow import Workflow
 
 
 class ExecutionRepository:
@@ -90,6 +91,52 @@ class ExecutionRepository:
             execution.resume_schema = resume_schema
             execution.snapshot = snapshot
             await self.db.commit()
+
+    async def list_by_user(
+        self,
+        user_id: uuid.UUID,
+        limit: int = 50,
+        offset: int = 0,
+        status: str | None = None,
+        workflow_id: uuid.UUID | None = None,
+    ) -> tuple[list[dict], int]:
+        """Return executions for all workflows owned by user, with workflow name."""
+        q = (
+            select(
+                Execution.id,
+                Execution.workflow_id,
+                Execution.status,
+                Execution.trigger_type,
+                Execution.started_at,
+                Execution.finished_at,
+                Workflow.name.label("workflow_name"),
+                Workflow.color.label("workflow_color"),
+            )
+            .join(Workflow, Execution.workflow_id == Workflow.id)
+            .where(Workflow.user_id == user_id)
+        )
+        if status:
+            q = q.where(Execution.status == status)
+        if workflow_id:
+            q = q.where(Execution.workflow_id == workflow_id)
+
+        total_result = await self.db.execute(select(func.count()).select_from(q.subquery()))
+        total = total_result.scalar() or 0
+
+        q = q.order_by(Execution.started_at.desc()).limit(limit).offset(offset)
+        rows = await self.db.execute(q)
+        return [dict(r._mapping) for r in rows.fetchall()], total
+
+    async def count_by_workflow(self, workflow_ids: list[uuid.UUID]) -> dict[str, int]:
+        """Return execution counts keyed by workflow_id string."""
+        if not workflow_ids:
+            return {}
+        result = await self.db.execute(
+            select(Execution.workflow_id, func.count(Execution.id))
+            .where(Execution.workflow_id.in_(workflow_ids))
+            .group_by(Execution.workflow_id)
+        )
+        return {str(row[0]): row[1] for row in result.fetchall()}
 
     async def get_paused(self, execution_id: uuid.UUID, resume_token: str) -> Execution | None:
         result = await self.db.execute(

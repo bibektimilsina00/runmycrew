@@ -111,6 +111,59 @@ const CronInfoBanner: React.FC<{ expression: string }> = ({ expression }) => {
   )
 }
 
+// ─── Output Schema Panel ─────────────────────────────────────────────────────
+
+const TYPE_COLOR: Record<string, string> = {
+  string: 'text-green-400',
+  number: 'text-blue-400',
+  boolean: 'text-yellow-400',
+  object: 'text-purple-400',
+  array: 'text-orange-400',
+}
+
+const OutputSchemaPanel: React.FC<{ outputs: { label: string; type: string }[]; nodeId: string }> = ({ outputs, nodeId }) => {
+  const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
+
+  const copy = (label: string) => {
+    navigator.clipboard.writeText(`{{${nodeId}.${label}}}`)
+    setCopied(label)
+    setTimeout(() => setCopied(null), 1500)
+  }
+
+  return (
+    <div className="border-t border-[var(--border-default)]">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-[var(--bg-surface-2)] transition-colors"
+      >
+        <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">Outputs</span>
+        <ChevronDown className={cn('w-3.5 h-3.5 text-[var(--text-muted)] transition-transform duration-200', open && 'rotate-180')} />
+      </button>
+      {open && (
+        <div className="px-4 pb-3 flex flex-col gap-1">
+          {outputs.map(o => (
+            <div key={o.label} className="flex items-center justify-between group">
+              <div className="flex items-center gap-2">
+                <span className="text-[12px] text-white font-mono">{o.label}</span>
+                <span className={cn('text-[10px] font-medium', TYPE_COLOR[o.type] || 'text-[var(--text-muted)]')}>{o.type}</span>
+              </div>
+              <button
+                onClick={() => copy(o.label)}
+                title={`Copy {{${nodeId}.${o.label}}}`}
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-[var(--text-muted)] hover:text-white"
+              >
+                {copied === o.label ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+              </button>
+            </div>
+          ))}
+          <p className="text-[10px] text-[var(--text-muted)] mt-1 italic">Click field name to copy interpolation</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── EditorTab ────────────────────────────────────────────────────────────────
 
 export const EditorTab: React.FC = () => {
@@ -229,6 +282,11 @@ export const EditorTab: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Output Schema */}
+      {definition?.outputsSchema && definition.outputsSchema.length > 0 && (
+        <OutputSchemaPanel outputs={definition.outputsSchema} nodeId={selectedNode?.id || ''} />
+      )}
 
       <ConnectionsPanel connectedNodes={connectedNodes} />
 

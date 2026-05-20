@@ -6,16 +6,18 @@ interface NodePropertyProps {
   value: string
   handleId?: string
   handleClass?: string
+  labelClass?: string
   direction?: 'vertical' | 'horizontal'
   index?: number
   total?: number
 }
 
-export const NodeProperty = ({ 
-  label, 
-  value, 
-  handleId, 
+export const NodeProperty = ({
+  label,
+  value,
+  handleId,
   handleClass,
+  labelClass,
   direction = 'horizontal',
   index = 0,
   total = 1
@@ -32,7 +34,7 @@ export const NodeProperty = ({
 
   return (
     <div className="relative flex items-center gap-2 px-3 h-[24px]">
-      <span className="min-w-0 truncate text-[var(--text-tertiary)] text-[12px] font-medium capitalize" title={label}>
+      <span className={cn("min-w-0 truncate text-[var(--text-tertiary)] text-[12px] font-medium capitalize", labelClass)} title={label}>
         {label}
       </span>
       <span className="flex-1 truncate text-right text-[var(--text-primary)] text-[12px]" title={value}>

@@ -14,6 +14,9 @@ import { FuseKeysSettings } from '@/features/settings/pages/FuseKeysSettings'
 import { MCPServersSettings } from '@/features/settings/pages/MCPServersSettings'
 import { RecentlyDeletedSettings } from '@/features/settings/pages/RecentlyDeletedSettings'
 import { KnowledgePage } from '@/features/knowledge/KnowledgePage'
+import { WorkflowsPage } from '@/features/workflows/WorkflowsPage'
+import { ExecutionsPage } from '@/features/executions/ExecutionsPage'
+import { ExecutionDetailPage } from '@/features/executions/ExecutionDetailPage'
 import LoginPage from '@/features/auth/login-page'
 import SignupPage from '@/features/auth/signup-page'
 import ResetPasswordPage from '@/features/auth/reset-password-page'
@@ -61,11 +64,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'workflows',
-        element: <div className="p-8 text-text-muted">Workflow list coming soon...</div>,
+        element: <WorkflowsPage />,
       },
       {
         path: 'executions',
-        element: <div className="p-8 text-text-muted">Execution history coming soon...</div>,
+        element: <ExecutionsPage />,
+      },
+      {
+        path: 'executions/:executionId',
+        element: <ExecutionDetailPage />,
       },
       {
         path: 'kb',

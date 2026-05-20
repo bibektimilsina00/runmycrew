@@ -105,6 +105,29 @@ export function useUpdateWorkflow() {
 }
 
 /**
+ * Hook to duplicate a workflow.
+ */
+export function useDuplicateWorkflow() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return requestJson(WorkflowSchema, {
+        url: `/workflows/${id}/duplicate`,
+        method: 'POST',
+      })
+    },
+    onSuccess: (newWorkflow) => {
+      queryClient.setQueryData(workflowKeys.lists(), (old: Workflow[] | undefined) =>
+        old ? [newWorkflow, ...old] : [newWorkflow]
+      )
+      navigate(`/workflows/${newWorkflow.id}`)
+    },
+  })
+}
+
+/**
  * Hook to batch update workflows (position/folder).
  */
 export function useBatchUpdateWorkflows() {

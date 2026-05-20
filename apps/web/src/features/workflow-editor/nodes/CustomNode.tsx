@@ -83,11 +83,12 @@ export function CustomNode({ id, type, data, selected }: NodeProps) {
           })}
           
           {hasErrorHandle && (
-            <NodeProperty 
-              label="error" 
-              value="-" 
+            <NodeProperty
+              label="error"
+              value=""
               handleId="error"
-              handleClass="!bg-error"
+              handleClass="!bg-red-500"
+              labelClass="!text-red-400"
             />
           )}
         </div>

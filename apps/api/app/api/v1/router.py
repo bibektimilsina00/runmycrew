@@ -12,6 +12,7 @@ from apps.api.app.api.v1.folders.router import router as folders_router
 from apps.api.app.api.v1.integrations.router import router as integrations_router
 from apps.api.app.api.v1.nodes.router import router as nodes_router
 from apps.api.app.api.v1.knowledge.router import router as knowledge_router
+from apps.api.app.api.v1.secrets.router import router as secrets_router
 from apps.api.app.api.v1.triggers.cron_utils import router as cron_router
 from apps.api.app.api.v1.triggers.webhook_handler import router as webhooks_router
 from apps.api.app.api.v1.websocket.router import router as websocket_router
@@ -35,3 +36,4 @@ router.include_router(copilot_router, prefix="/copilot", tags=["copilot"])
 router.include_router(webhooks_router)
 router.include_router(cron_router)
 router.include_router(knowledge_router, prefix="/kb", tags=["knowledge"])
+router.include_router(secrets_router, prefix="/secrets", tags=["secrets"])

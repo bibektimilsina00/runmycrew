@@ -64,7 +64,8 @@ class ForLoopNode(BaseNode[ForLoopProperties]):
         import asyncio
 
         async def run_iteration(i: int, value: int) -> dict[str, Any]:
-            sub = await context.run_downstream({"index": i, "value": value, "total": total})
+            loop_vars = {"index": i, "value": value, "total": total}
+            sub = await context.run_downstream(loop_vars, loop_data=loop_vars)
             return sub[0] if sub else {}
 
         if self.props.parallel:

@@ -44,6 +44,8 @@ class WorkflowRunner:
         self.emitter = emitter
         self.variables: dict[str, Any] = {}
         self.env: dict[str, str] = {}
+        self.secrets: dict[str, str] = {}
+        self.loop_data: dict[str, Any] = {}  # populated by loop nodes for {{loop.*}}
 
         # Parallel-safe shared state
         self._lock = asyncio.Lock()
@@ -111,6 +113,8 @@ class WorkflowRunner:
             trigger_data=self._trigger_data,
             variables=self.variables,
             env=self.env,
+            secrets=self.secrets,
+            loop_data=self.loop_data,
         )
         resolved_properties = resolver.resolve_properties(
             node_data.get("data", {}).get("properties", {})
@@ -126,7 +130,10 @@ class WorkflowRunner:
             if e["source"] == node_id and e.get("sourceHandle") != "error"
         ]
 
-        async def run_downstream(item_input: dict[str, Any]) -> list[dict[str, Any]]:
+        async def run_downstream(
+            item_input: dict[str, Any],
+            loop_data: dict[str, Any] | None = None,
+        ) -> list[dict[str, Any]]:
             results: list[dict[str, Any]] = []
             for start_id in _successor_ids:
                 sub_runner = WorkflowRunner(
@@ -140,6 +147,8 @@ class WorkflowRunner:
                 )
                 sub_runner.variables = self.variables
                 sub_runner.env = self.env
+                sub_runner.secrets = self.secrets
+                sub_runner.loop_data = loop_data or item_input  # expose as {{loop.*}}
                 sub_runner._outputs = dict(self._outputs)
                 result = await sub_runner._execute_subgraph(start_id, item_input)
                 results.append(result)
@@ -170,13 +179,29 @@ class WorkflowRunner:
             "label": label,
         })
 
-        result = await node_executor.execute_node(
-            node_type=node_data["type"],
-            node_id=node_id,
-            properties=resolved_properties,
-            input_data=input_data,
-            context=context,
-        )
+        # Retry config — read from resolved properties
+        max_retries = int(resolved_properties.get("retries") or 0)
+        retry_delay_ms = int(resolved_properties.get("retry_delay_ms") or 1000)
+        attempt = 0
+        result = None
+
+        while True:
+            result = await node_executor.execute_node(
+                node_type=node_data["type"],
+                node_id=node_id,
+                properties=resolved_properties,
+                input_data=input_data,
+                context=context,
+            )
+            if result.success or attempt >= max_retries:
+                break
+            attempt += 1
+            await self._log(
+                f"Attempt {attempt}/{max_retries} failed: {result.error}. Retrying in {retry_delay_ms}ms…",
+                level="warning",
+                node_id=node_id,
+            )
+            await asyncio.sleep(retry_delay_ms / 1000)
 
         async with self._lock:
             self._executed[node_id] = result

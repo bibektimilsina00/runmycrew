@@ -3,6 +3,7 @@ from typing import Any
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
 from apps.api.app.node_system.nodes.ai.knowledge.knowledge_node import KnowledgeNode
+from apps.api.app.node_system.nodes.ai.browser_use.browser_use_node import BrowserUseNode
 from apps.api.app.node_system.nodes.ai.embeddings.embeddings_node import EmbeddingsNode
 from apps.api.app.node_system.nodes.ai.image_gen.image_gen_node import ImageGenNode
 from apps.api.app.node_system.nodes.ai.memory.memory_node import MemoryNode
@@ -20,11 +21,8 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
-from apps.api.app.node_system.nodes.logic.do_while.do_while import DoWhileNode
-from apps.api.app.node_system.nodes.logic.for_loop.for_loop import ForLoopNode
-from apps.api.app.node_system.nodes.logic.foreach.foreach import ForEachNode
+from apps.api.app.node_system.nodes.logic.loop.loop_node import LoopNode
 from apps.api.app.node_system.nodes.logic.human_input.human_input import HumanInputNode
-from apps.api.app.node_system.nodes.logic.while_loop.while_loop import WhileLoopNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
 from apps.api.app.node_system.nodes.common.json_transform.json_transform import JsonTransformNode
@@ -69,6 +67,7 @@ node_registry.register(KnowledgeNode)
 node_registry.register(VisionNode)
 node_registry.register(MemoryNode)
 node_registry.register(PerplexityNode)
+node_registry.register(BrowserUseNode)
 node_registry.register(EmbeddingsNode)
 node_registry.register(TTSNode)
 node_registry.register(STTNode)
@@ -88,7 +87,7 @@ node_registry.register(SwitchNode)
 node_registry.register(WaitNode)
 node_registry.register(EvaluatorNode)
 node_registry.register(ThinkingNode)
-node_registry.register(ForEachNode)
+node_registry.register(LoopNode)
 node_registry.register(HumanInputNode)
 node_registry.register(A2ANode)
 node_registry.register(PostgresNode)
@@ -96,9 +95,6 @@ node_registry.register(MySQLNode)
 node_registry.register(MongoDBNode)
 node_registry.register(DynamoDBNode)
 node_registry.register(Neo4jNode)
-node_registry.register(ForLoopNode)
-node_registry.register(WhileLoopNode)
-node_registry.register(DoWhileNode)
 
 # Load tool definitions (side-effect: registers all tools in tool_registry)
 import apps.api.app.node_system.tools.loader  # noqa: F401

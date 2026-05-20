@@ -42,6 +42,14 @@ class APIKeyProvider:
 
 
 PROVIDERS = {
+    "browser_use": APIKeyProvider(
+        id="browser_use_api_key",
+        name="Browser Use",
+        description="Browser Use — AI-powered browser automation via browser-use.com",
+        icon_url="https://cdn.brandfetch.io/browser-use.com/icon",
+        hint="bu-...",
+        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="bu-...")],
+    ),
     "perplexity": APIKeyProvider(
         id="perplexity_api_key",
         name="Perplexity",

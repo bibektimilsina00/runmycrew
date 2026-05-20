@@ -1,5 +1,6 @@
 import { addEdge } from 'reactflow';
 import type { Node, Edge, Connection } from 'reactflow';
+import { LOOP_DIMS } from './loop-utils';
 
 export class CanvasEngine {
   static onConnect(params: Connection, edges: Edge[]): Edge[] {
@@ -25,13 +26,28 @@ export class CanvasEngine {
       });
     }
 
+    const defaultWidth = definition?.defaultWidth
+    const defaultHeight = definition?.defaultHeight
+    const isLoop = type === 'logic.loop'
+
+    // Loop nodes store width/height in data (Sim pattern) + ReactFlow style
+    const loopData = isLoop
+      ? { width: defaultWidth ?? LOOP_DIMS.DEFAULT_WIDTH, height: defaultHeight ?? LOOP_DIMS.DEFAULT_HEIGHT }
+      : {}
+
     return {
       id: `${type}-${Date.now()}`,
       type,
       position,
+      ...(defaultWidth ? { width: defaultWidth } : {}),
+      ...(defaultHeight ? { height: defaultHeight } : {}),
+      style: (defaultWidth || defaultHeight)
+        ? { width: defaultWidth, height: defaultHeight }
+        : undefined,
       data: {
         label: '',
         properties,
+        ...loopData,
       },
     };
   }

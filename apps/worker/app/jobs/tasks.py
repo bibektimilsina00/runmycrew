@@ -60,9 +60,24 @@ async def _run_workflow(
         await emitter.emit("execution_started", {})
 
         workflow = await wf_repo.get_by_id(uuid.UUID(workflow_id))
+        secrets_dict: dict[str, str] = {}
         if workflow:
             credential_service = CredentialService(db)
             credentials_list = await credential_service.list_decrypted_for_user(workflow.user_id)
+            # Load user secrets for {{secrets.KEY}} interpolation
+            try:
+                import sqlalchemy as sa
+                from apps.api.app.models.secret import Secret
+                from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
+                _enc = AESEncryptionService()
+                result = await db.execute(sa.select(Secret).where(Secret.user_id == workflow.user_id))
+                for s in result.scalars().all():
+                    try:
+                        secrets_dict[s.name] = _enc.decrypt(s.encrypted_value)
+                    except Exception:
+                        pass
+            except Exception as e:
+                logger.warning(f"Failed to load secrets for workflow {workflow_id}: {e}")
         else:
             logger.error(f"Workflow {workflow_id} not found when fetching credentials")
 
@@ -88,6 +103,7 @@ async def _run_workflow(
             )
             if workflow:
                 runner.env = workflow.env or {}
+                runner.secrets = secrets_dict
 
             # If resuming, restore snapshot state so already-run nodes are skipped
             if resume_from and snapshot:

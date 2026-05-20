@@ -355,7 +355,7 @@ export const CopilotTab = React.memo(() => {
   const [input, setInput] = useState('')
   const [showSettings, setShowSettings] = useState(false)
   const initialLoadDone = useRef(false)
-  const { copilotView: view, setCopilotView: setView, copilotNewChatTrigger } = useUIStore()
+  const { copilotView: view, setCopilotView: setView, copilotNewChatTrigger, copilotAutoPrompt, setCopilotAutoPrompt } = useUIStore()
 
   const { settings, updateSettings } = useCopilotSettings(workflowId)
   const { sessions, currentSessionId, isFetching, loadSession, deleteSession, startNewSession, onSessionSaved } =
@@ -385,6 +385,20 @@ export const CopilotTab = React.memo(() => {
       })
     }
   }, [isFetching, sessions]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-send template prompt once settings are ready
+  const autoPromptFired = useRef(false)
+  useEffect(() => {
+    if (!copilotAutoPrompt || autoPromptFired.current || isFetching) return
+    if (!settings.provider || !settings.credentialId) return
+    autoPromptFired.current = true
+    setCopilotAutoPrompt(null)
+    sendMessage(
+      copilotAutoPrompt,
+      { provider: settings.provider, model: settings.model, credentialId: settings.credentialId },
+      null
+    )
+  }, [copilotAutoPrompt, settings, isFetching]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll to bottom
   useEffect(() => {

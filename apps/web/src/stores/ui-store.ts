@@ -27,6 +27,8 @@ interface UIState {
   setCopilotView: (view: 'chat' | 'history') => void
   copilotNewChatTrigger: number
   triggerCopilotNewChat: () => void
+  copilotAutoPrompt: string | null
+  setCopilotAutoPrompt: (prompt: string | null) => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -50,6 +52,8 @@ export const useUIStore = create<UIState>()(
       setCopilotView: (view) => set({ copilotView: view }),
       copilotNewChatTrigger: 0,
       triggerCopilotNewChat: () => set((s) => ({ copilotNewChatTrigger: s.copilotNewChatTrigger + 1 })),
+      copilotAutoPrompt: null,
+      setCopilotAutoPrompt: (prompt) => set({ copilotAutoPrompt: prompt }),
     }),
     {
       name: 'fuse-ui',

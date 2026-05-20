@@ -24,7 +24,7 @@ interface WorkflowState {
   onNodesChange: OnNodesChange
   onEdgesChange: OnEdgesChange
   onConnect: OnConnect
-  setNodes: (nodes: Node[]) => void
+  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void
   setEdges: (edges: Edge[]) => void
   setNodeDefinitions: (definitions: NodeDefinition[]) => void
   addNode: (node: Node) => void
@@ -37,12 +37,21 @@ interface WorkflowState {
   setSelectedNodeId: (id: string | null) => void
   nodeSelectionTimestamp: number
   loadWorkflow: (workflow: any) => void
+  // Workflow metadata
+  workflowId: string | null
+  workflowName: string | null
+  isActive: boolean
+  setIsActive: (active: boolean) => void
 }
 
 export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   nodes: [],
   edges: [],
   nodeDefinitions: [],
+  workflowId: null,
+  workflowName: null,
+  isActive: true,
+  setIsActive: (active) => set({ isActive: active }),
   onNodesChange: (changes: NodeChange[]) => {
     set({ nodes: applyNodeChanges(changes, get().nodes) })
   },
@@ -52,7 +61,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   onConnect: (connection: Connection) => {
     set({ edges: addEdge(connection, get().edges) })
   },
-  setNodes: (nodes: Node[]) => set({ nodes }),
+  setNodes: (nodes) => set(state => ({ nodes: typeof nodes === 'function' ? nodes(state.nodes) : nodes })),
   setEdges: (edges: Edge[]) => set({ edges }),
   setNodeDefinitions: (nodeDefinitions: NodeDefinition[]) => set({ nodeDefinitions }),
   addNode: (node: Node) => set({ nodes: [...get().nodes, node] }),
@@ -123,10 +132,34 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     nodeSelectionTimestamp: Date.now()
   }),
   loadWorkflow: (workflow: any) => {
-    // Assuming the graph contains nodes and edges in the format React Flow expects
-    // If it's a raw backend graph, we might need a converter
-    const nodes = workflow.graph?.nodes || []
+    const rawNodes = workflow.graph?.nodes || []
     const edges = workflow.graph?.edges || []
-    set({ nodes, edges, selectedNodeId: null, nodeSelectionTimestamp: Date.now() })
+
+    // ReactFlow requires parent nodes before children — use centralized sort
+    // (inline to avoid circular import from loop-utils)
+    const nodeMap = new Map(rawNodes.map((n: any) => [n.id, n]))
+    const result: any[] = []
+    const added = new Set<string>()
+    const addNode = (node: any) => {
+      if (added.has(node.id)) return
+      if (node.parentNode && !added.has(node.parentNode)) {
+        const parent = nodeMap.get(node.parentNode)
+        if (parent) addNode(parent)
+      }
+      result.push(node)
+      added.add(node.id)
+    }
+    rawNodes.forEach(addNode)
+    const nodes = result
+
+    set({
+      nodes,
+      edges,
+      selectedNodeId: null,
+      nodeSelectionTimestamp: Date.now(),
+      workflowId: workflow.id ?? null,
+      workflowName: workflow.name ?? null,
+      isActive: workflow.is_active !== false,
+    })
   }
 }))

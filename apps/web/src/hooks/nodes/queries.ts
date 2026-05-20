@@ -12,6 +12,8 @@ function normalizeNodeDefinition(node: ApiNodeDefinition): NodeDefinition {
     outputsSchema: node.outputs_schema,
     tools: node.tools ?? undefined,
     operationToolMap: node.operation_tool_map ?? undefined,
+    defaultWidth: node.default_width ?? undefined,
+    defaultHeight: node.default_height ?? undefined,
   }
 }
 

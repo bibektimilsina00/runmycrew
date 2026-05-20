@@ -157,6 +157,8 @@ export const ApiNodeDefinitionSchema = z.object({
   credential_type: z.union([z.string(), z.array(z.string())]).nullable().optional(),
   tools: z.array(z.string()).nullable().optional(),
   operation_tool_map: z.record(z.string()).nullable().optional(),
+  default_width: z.number().nullable().optional(),
+  default_height: z.number().nullable().optional(),
 })
 
 export const ApiNodeDefinitionListSchema = z.array(ApiNodeDefinitionSchema)

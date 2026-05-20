@@ -80,7 +80,8 @@ class WhileLoopNode(BaseNode[WhileLoopProperties]):
             if not resolver.evaluate_condition(self.props.condition):
                 break
 
-            sub = await context.run_downstream({**current_input, "iteration": iteration})
+            loop_vars = {"iteration": iteration, "total": self.props.maxIterations}
+            sub = await context.run_downstream({**current_input, "iteration": iteration}, loop_data=loop_vars)
             iteration_result = sub[0] if sub else {}
             results.append(iteration_result)
             current_input = iteration_result

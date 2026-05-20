@@ -40,7 +40,7 @@ class ForEachNode(BaseNode[ForEachProperties]):
                     "type": "string",
                     "required": True,
                     "placeholder": "{{trigger.output.items}}",
-                    "description": "Array to iterate. Each item is passed downstream as {item, index, total}.",
+                    "description": "Array to iterate. In downstream nodes use: {{loop.item}}, {{loop.index}}, {{loop.total}}, {{loop.items}}",
                 },
                 {
                     "name": "parallel",
@@ -85,7 +85,8 @@ class ForEachNode(BaseNode[ForEachProperties]):
             return NodeResult(success=False, error="run_downstream not injected — cannot iterate")
 
         async def run_item(i: int, item: Any) -> dict[str, Any]:
-            sub_results = await context.run_downstream({"item": item, "index": i, "total": total})
+            loop_vars = {"item": item, "index": i, "total": total, "items": items}
+            sub_results = await context.run_downstream(loop_vars, loop_data=loop_vars)
             return sub_results[0] if sub_results else {}
 
         if self.props.parallel:

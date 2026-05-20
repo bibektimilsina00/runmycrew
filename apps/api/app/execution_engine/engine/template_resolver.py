@@ -26,12 +26,15 @@ class TemplateResolver:
         trigger_data: dict[str, Any],
         variables: dict[str, Any],
         env: dict[str, str] | None = None,
+        secrets: dict[str, str] | None = None,
+        loop_data: dict[str, Any] | None = None,
     ):
-        # context: { "trigger": {"output": {...}}, "node_1": {"output": {...}}, "variables": {...} }
         self._context = {
             "trigger": {"output": trigger_data},
             "variables": variables,
             "env": env or {},
+            "secrets": secrets or {},
+            "loop": loop_data or {},   # {{loop.item}}, {{loop.index}}, {{loop.total}}, {{loop.value}}
             **{node_id: {"output": output} for node_id, output in node_outputs.items()},
         }
 

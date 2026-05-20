@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import ReactFlow, {
   ReactFlowProvider,
   SelectionMode,
@@ -19,6 +20,7 @@ import { useWorkflowStore } from '@/stores/workflow-store'
 
 import { CustomNode } from '@/features/workflow-editor/nodes/CustomNode'
 import { ConditionNode } from '@/features/workflow-editor/nodes/ConditionNode'
+import { LoopNode } from '@/features/workflow-editor/nodes/LoopNode'
 
 const MIN_PANEL_WIDTH = 280
 const MAX_PANEL_WIDTH = 600
@@ -88,6 +90,8 @@ function EditorContent() {
     onEdgesChange,
     onConnect,
     onNodeClick,
+    onNodeDrag,
+    onNodeDragStop,
     onDragOver,
     onDrop,
     reactFlowWrapper,
@@ -98,6 +102,7 @@ function EditorContent() {
   const { data: nodeRegistry = [] } = useNodes()
   const setNodeDefinitions = useWorkflowStore(s => s.setNodeDefinitions)
   const nodeDefinitions = useWorkflowStore(s => s.nodeDefinitions)
+  const location = useLocation()
 
   React.useEffect(() => {
     if (nodeRegistry.length > 0) {
@@ -105,11 +110,23 @@ function EditorContent() {
     }
   }, [nodeRegistry, setNodeDefinitions])
 
+  // Auto-open Copilot tab and send prompt when navigated from a template
+  useEffect(() => {
+    const autoPrompt = (location.state as any)?.autoPrompt
+    if (!autoPrompt) return
+    const { setInspectorTab, setCopilotAutoPrompt } = require('@/stores/ui-store').useUIStore.getState()
+    setInspectorTab('Copilot')
+    setCopilotAutoPrompt(autoPrompt)
+    // Clear location state so refresh doesn't re-trigger
+    window.history.replaceState({}, '')
+  }, [location.state])
+
   // Build nodeTypes from API response — all non-condition types use CustomNode.
   // Memoized: only rebuilds when nodeDefinitions change (rare after first load).
   const nodeTypes = React.useMemo(() => {
     const types: Record<string, React.ComponentType<any>> = {
       'logic.condition': ConditionNode,
+      'logic.loop': LoopNode,
     }
     for (const def of nodeDefinitions) {
       if (!types[def.type]) types[def.type] = CustomNode
@@ -154,6 +171,8 @@ function EditorContent() {
           onNodeClick={onNodeClick}
           onDragOver={onDragOver}
           onDrop={onDrop}
+          onNodeDrag={onNodeDrag}
+          onNodeDragStop={onNodeDragStop}
           onConnectStart={onConnectStart}
           onConnectEnd={onConnectEnd}
           defaultEdgeOptions={{
