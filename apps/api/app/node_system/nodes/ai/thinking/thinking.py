@@ -54,7 +54,17 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
                     "type": "credential",
                     "required": True,
                     "dependsOn": ["provider"],
-                    "credentialTypeByField": {"field": "provider", "values": {}},
+                    "credentialTypeByField": {"field": "provider", "values": {
+                        "anthropic": "anthropic_api_key",
+                        "openai": "openai_api_key",
+                        "groq": "groq_api_key",
+                        "openrouter": "openrouter_api_key",
+                        "deepseek": "deepseek_api_key",
+                        "mistral": "mistral_api_key",
+                        "xai": "xai_api_key",
+                        "together": "together_api_key",
+                        "fireworks": "fireworks_api_key",
+                    }},
                 },
                 {
                     "name": "model",

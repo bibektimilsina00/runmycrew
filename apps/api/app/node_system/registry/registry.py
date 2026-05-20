@@ -3,7 +3,12 @@ from typing import Any
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
 from apps.api.app.node_system.nodes.ai.knowledge.knowledge_node import KnowledgeNode
+from apps.api.app.node_system.nodes.ai.embeddings.embeddings_node import EmbeddingsNode
+from apps.api.app.node_system.nodes.ai.image_gen.image_gen_node import ImageGenNode
 from apps.api.app.node_system.nodes.ai.memory.memory_node import MemoryNode
+from apps.api.app.node_system.nodes.ai.perplexity.perplexity_node import PerplexityNode
+from apps.api.app.node_system.nodes.ai.stt.stt_node import STTNode
+from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.ai.llm.llm import LLMNode
 from apps.api.app.node_system.nodes.ai.a2a.a2a import A2ANode
@@ -63,6 +68,11 @@ node_registry.register(LLMNode)
 node_registry.register(KnowledgeNode)
 node_registry.register(VisionNode)
 node_registry.register(MemoryNode)
+node_registry.register(PerplexityNode)
+node_registry.register(EmbeddingsNode)
+node_registry.register(TTSNode)
+node_registry.register(STTNode)
+node_registry.register(ImageGenNode)
 node_registry.register(HttpRequestNode)
 node_registry.register(WebhookTriggerNode)
 node_registry.register(DelayNode)

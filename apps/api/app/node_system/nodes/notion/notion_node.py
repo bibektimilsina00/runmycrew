@@ -12,6 +12,7 @@ logger = get_logger(__name__)
 
 
 class NotionProperties(BaseModel):
+    credential: str | None = None
     operation: str = "create_page"
     database_id: str | None = None
     page_id: str | None = None

@@ -12,6 +12,7 @@ logger = get_logger(__name__)
 
 
 class GitHubProperties(BaseModel):
+    credential: str | None = None
     operation: str = "create_issue"
     owner: str | None = None
     repo: str | None = None
@@ -114,15 +115,8 @@ class GitHubNode(BaseNode[GitHubProperties]):
                     "name": "title",
                     "label": "Title",
                     "type": "string",
-                    "required": True,
-                    "condition": {"field": "operation", "value": "create_issue"},
-                },
-                {
-                    "name": "title",
-                    "label": "Title",
-                    "type": "string",
-                    "required": False,
-                    "condition": {"field": "operation", "value": "update_issue"},
+                    "condition": {"field": "operation", "value": ["create_issue", "update_issue"]},
+                    "description": "Required for create_issue, optional for update_issue",
                 },
                 {
                     "name": "body",

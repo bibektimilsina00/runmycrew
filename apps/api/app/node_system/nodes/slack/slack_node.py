@@ -13,6 +13,7 @@ logger = get_logger(__name__)
 
 class SlackProperties(BaseModel):
     authentication: str = "fuse_bot"
+    credential: str | None = None
     bot_token: str | None = None
     selectBy: str = "channel"
     messageFormat: str = "text"

@@ -42,6 +42,22 @@ class APIKeyProvider:
 
 
 PROVIDERS = {
+    "perplexity": APIKeyProvider(
+        id="perplexity_api_key",
+        name="Perplexity",
+        description="Perplexity Sonar — web search + LLM with live internet access",
+        icon_url="https://cdn.brandfetch.io/perplexity.ai/icon",
+        hint="pplx-...",
+        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="pplx-...")],
+    ),
+    "elevenlabs": APIKeyProvider(
+        id="elevenlabs_api_key",
+        name="ElevenLabs",
+        description="High-quality text-to-speech with voice cloning",
+        icon_url="https://cdn.brandfetch.io/elevenlabs.io/icon",
+        hint="API Key",
+        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")],
+    ),
     "notion": APIKeyProvider(
         id="notion_api_key",
         name="Notion",
