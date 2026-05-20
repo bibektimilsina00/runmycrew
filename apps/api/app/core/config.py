@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_ID: str = ""
     GITHUB_CLIENT_SECRET: str = ""
 
+    NOTION_CLIENT_ID: str = ""
+    NOTION_CLIENT_SECRET: str = ""
+
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).resolve().parents[4] / ".env"),
         case_sensitive=True,

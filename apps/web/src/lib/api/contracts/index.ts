@@ -118,7 +118,7 @@ export const NodePropertySchema = z.object({
   options: z.array(z.object({ label: z.string(), value: z.any() })).optional(),
   placeholder: z.string().optional(),
   condition: z.any().optional(),
-  credentialType: z.string().optional(),
+  credentialType: z.union([z.string(), z.array(z.string())]).optional(),
   credentialTypeByField: z.object({
     field: z.string(),
     values: z.record(z.string(), z.string()),
@@ -154,7 +154,7 @@ export const ApiNodeDefinitionSchema = z.object({
     type: z.string(),
   }).passthrough()).optional(),
   allow_error: z.boolean().optional(),
-  credential_type: z.string().nullable().optional(),
+  credential_type: z.union([z.string(), z.array(z.string())]).nullable().optional(),
   tools: z.array(z.string()).nullable().optional(),
   operation_tool_map: z.record(z.string()).nullable().optional(),
 })

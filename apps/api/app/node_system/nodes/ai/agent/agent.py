@@ -157,24 +157,35 @@ class AgentNode(BaseNode[AgentProperties]):
                     "mode": "advanced",
                     "options": [
                         {"label": "None", "value": "none"},
-                        {"label": "Workflow", "value": "workflow"},
+                        {"label": "Workflow (in-execution only)", "value": "workflow"},
+                        {"label": "Redis (persists across runs)", "value": "redis"},
                     ],
                 },
                 {
                     "name": "memoryKey",
                     "label": "Memory Key",
                     "type": "string",
-                    "placeholder": "customer-123",
+                    "placeholder": "user-{{trigger.user_id}}",
                     "mode": "advanced",
-                    "condition": {"field": "memoryType", "value": "workflow"},
+                    "condition": {"field": "memoryType", "value": ["workflow", "redis"]},
+                    "description": "Unique key scoping this memory. Use interpolation to make it per-user.",
                 },
                 {
                     "name": "memoryLimit",
-                    "label": "Memory Limit",
+                    "label": "Message History Limit",
                     "type": "number",
                     "default": 10,
                     "mode": "advanced",
-                    "condition": {"field": "memoryType", "value": "workflow"},
+                    "condition": {"field": "memoryType", "value": ["workflow", "redis"]},
+                },
+                {
+                    "name": "memoryTTL",
+                    "label": "Memory TTL (seconds)",
+                    "type": "number",
+                    "default": 86400,
+                    "mode": "advanced",
+                    "condition": {"field": "memoryType", "value": "redis"},
+                    "description": "How long to keep memory in Redis. Default 86400 = 24 hours.",
                 },
                 {
                     "name": "temperature",
@@ -1743,6 +1754,12 @@ class AgentNode(BaseNode[AgentProperties]):
 
     def _get_provider(self, context: NodeContext) -> Any:
         from apps.api.app.node_system.nodes.ai.agent.memory.providers import get_memory_provider
+        # memoryType drives backend selection (workflow → workflow, redis → redis)
+        backend = self.props.memoryBackend
+        if self.props.memoryType == "redis":
+            backend = "redis"
+        elif self.props.memoryType == "workflow":
+            backend = "workflow"
         # Extract OpenAI API key for embedding (used by Pinecone/Qdrant)
         openai_key = ""
         for cred in (context.credentials or []):
@@ -1750,7 +1767,7 @@ class AgentNode(BaseNode[AgentProperties]):
                 openai_key = (cred.get("data") or {}).get("api_key", "")
                 break
         return get_memory_provider(
-            self.props.memoryBackend,
+            backend,
             context,
             ttl_seconds=self.props.memoryTTL,
             pinecone_api_key=self.props.pineconeApiKey or "",

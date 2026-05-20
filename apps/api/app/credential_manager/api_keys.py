@@ -42,6 +42,21 @@ class APIKeyProvider:
 
 
 PROVIDERS = {
+    "notion": APIKeyProvider(
+        id="notion_api_key",
+        name="Notion",
+        description="Connect to Notion using an Internal Integration Token",
+        icon_url="https://cdn.brandfetch.io/notion.so/icon",
+        hint="secret_...",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Integration Token",
+                type="password",
+                placeholder="secret_...",
+            )
+        ],
+    ),
     "openai": APIKeyProvider(
         id="openai_api_key",
         name="OpenAI",

@@ -9,7 +9,9 @@ from apps.api.app.node_system.base.node_result import NodeResult
 
 
 class WebhookTriggerProperties(BaseModel):
-    path: str = "webhook-id"
+    path: str = ""
+    require_signature: bool = False
+    secret: str | None = None
 
 
 class WebhookTriggerNode(BaseNode[WebhookTriggerProperties]):
@@ -31,18 +33,37 @@ class WebhookTriggerNode(BaseNode[WebhookTriggerProperties]):
                     "name": "path",
                     "label": "Webhook Path",
                     "type": "string",
-                    "default": "webhook-id",
                     "required": True,
-                }
+                    "placeholder": "my-webhook",
+                    "description": "Unique path. Webhook URL: /api/v1/webhooks/{path}",
+                },
+                {
+                    "name": "require_signature",
+                    "label": "Require Signature",
+                    "type": "boolean",
+                    "default": False,
+                    "description": "Reject requests without a valid X-Fuse-Signature header",
+                },
+                {
+                    "name": "secret",
+                    "label": "Signing Secret",
+                    "type": "string",
+                    "secret": True,
+                    "placeholder": "Click generate to create a secret",
+                    "mode": "advanced",
+                    "condition": {"field": "require_signature", "value": True},
+                    "description": "HMAC-SHA256 secret. Sign with: sha256=HMAC(secret, raw_body)",
+                },
             ],
             inputs=0,
             outputs=1,
+            outputs_schema=[
+                {"label": "body", "type": "object"},
+                {"label": "headers", "type": "object"},
+                {"label": "query", "type": "object"},
+                {"label": "method", "type": "string"},
+            ],
         )
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
-        # For a trigger, the input_data is the webhook payload.
-        # We just pass it through.
-        return NodeResult(
-            success=True,
-            output_data=input_data,
-        )
+        return NodeResult(success=True, output_data=input_data)

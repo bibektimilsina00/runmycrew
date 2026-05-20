@@ -1,0 +1,88 @@
+from apps.api.app.core.celery import celery_app
+from apps.api.app.core.logger import get_logger
+
+logger = get_logger(__name__)
+
+REDIS_KEY_PREFIX = "fuse:cron:last_run"
+
+
+@celery_app.task(name="check_cron_triggers")
+def check_cron_triggers():
+    import asyncio
+    asyncio.run(_check_and_fire())
+
+
+async def _check_and_fire():
+    from datetime import datetime, timezone
+
+    from croniter import croniter
+
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.core.redis import get_redis
+    from apps.api.app.execution_engine.engine import execution_engine
+    from apps.api.app.repositories.workflow_repository import WorkflowRepository
+
+    now = datetime.now(timezone.utc)
+
+    async with AsyncSessionLocal() as db:
+        repo = WorkflowRepository(db)
+        workflows = await repo.find_by_trigger_type("trigger.cron")
+
+    redis = await get_redis()
+
+    for workflow in workflows:
+        nodes = workflow.graph.get("nodes", [])
+        for node in nodes:
+            if node.get("type") != "trigger.cron":
+                continue
+
+            props = node.get("data", {}).get("properties", {})
+            cron_expr = props.get("cron_expression", "").strip()
+            if not cron_expr:
+                continue
+
+            node_id = node.get("id", "unknown")
+            redis_key = f"{REDIS_KEY_PREFIX}:{workflow.id}:{node_id}"
+
+            try:
+                if not croniter.is_valid(cron_expr):
+                    logger.warning(f"Invalid cron expression '{cron_expr}' on workflow {workflow.id}")
+                    continue
+
+                citer = croniter(cron_expr, now)
+                last_expected: datetime = citer.get_prev(datetime)
+
+                last_run_str = await redis.get(redis_key)
+                if last_run_str:
+                    last_run = datetime.fromisoformat(last_run_str.decode())
+                    if last_run >= last_expected:
+                        continue  # already fired for this window
+
+                logger.info(f"Firing cron trigger on workflow {workflow.id} (expr: {cron_expr})")
+
+                async with AsyncSessionLocal() as db:
+                    wf_repo = WorkflowRepository(db)
+                    fresh_workflow = await wf_repo.get_by_id(workflow.id)
+                    if not fresh_workflow:
+                        continue
+
+                    await execution_engine.trigger_workflow(
+                        workflow_id=fresh_workflow.id,
+                        graph=fresh_workflow.graph,
+                        trigger_type="trigger.cron",
+                        input_data={
+                            "fired_at": now.isoformat(),
+                            "scheduled_time": last_expected.isoformat(),
+                            "workflow_id": str(fresh_workflow.id),
+                            "cron_expression": cron_expr,
+                        },
+                    )
+
+                # Mark as fired — TTL of 2 minutes (safe overlap buffer)
+                await redis.set(redis_key, now.isoformat(), ex=120)
+
+            except Exception as e:
+                logger.error(
+                    f"Cron scheduler error for workflow {workflow.id} node {node_id}: {e}",
+                    exc_info=True,
+                )

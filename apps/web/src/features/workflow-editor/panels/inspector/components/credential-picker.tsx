@@ -8,7 +8,7 @@ import { useCredentialPicker } from '@/features/workflow-editor/panels/inspector
 interface CredentialPickerProps {
   value: string // credential ID
   onChange: (value: string) => void
-  credentialType?: string // e.g. 'slack_oauth'
+  credentialType?: string | string[]
   placeholder?: string
 }
 

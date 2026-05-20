@@ -2,6 +2,10 @@ from typing import Any
 
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
+from apps.api.app.node_system.nodes.ai.knowledge.knowledge_node import KnowledgeNode
+from apps.api.app.node_system.nodes.ai.memory.memory_node import MemoryNode
+from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
+from apps.api.app.node_system.nodes.ai.llm.llm import LLMNode
 from apps.api.app.node_system.nodes.ai.a2a.a2a import A2ANode
 from apps.api.app.node_system.nodes.ai.evaluator.evaluator import EvaluatorNode
 from apps.api.app.node_system.nodes.ai.thinking.thinking import ThinkingNode
@@ -22,9 +26,12 @@ from apps.api.app.node_system.nodes.common.json_transform.json_transform import 
 from apps.api.app.node_system.nodes.common.merge.merge import MergeNode
 from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetVariableNode
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
+from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
+from apps.api.app.node_system.nodes.github.github_node import GitHubNode
+from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 
@@ -50,13 +57,20 @@ node_registry = NodeRegistry()
 
 # Register builtin nodes
 node_registry.register(TriggerNode)
+node_registry.register(CronTriggerNode)
 node_registry.register(AgentNode)
+node_registry.register(LLMNode)
+node_registry.register(KnowledgeNode)
+node_registry.register(VisionNode)
+node_registry.register(MemoryNode)
 node_registry.register(HttpRequestNode)
 node_registry.register(WebhookTriggerNode)
 node_registry.register(DelayNode)
 node_registry.register(ConditionNode)
 node_registry.register(SlackNode)
 node_registry.register(SlackTriggerNode)
+node_registry.register(GitHubNode)
+node_registry.register(NotionNode)
 node_registry.register(SetVariableNode)
 node_registry.register(JsonTransformNode)
 node_registry.register(MergeNode)

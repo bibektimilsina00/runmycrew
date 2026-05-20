@@ -18,6 +18,10 @@ class CredentialRepository:
         )
         return list(result.scalars().all())
 
+    async def get_by_id(self, credential_id: uuid.UUID) -> Credential | None:
+        result = await self.db.execute(select(Credential).where(Credential.id == credential_id))
+        return result.scalar_one_or_none()
+
     async def get_by_id_and_user(
         self, credential_id: uuid.UUID, user_id: uuid.UUID
     ) -> Credential | None:

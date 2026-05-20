@@ -1,4 +1,4 @@
-.PHONY: setup dev build lint lint-py lint-js test clean db-up migrate docker-build docker-up
+.PHONY: setup dev build lint lint-py lint-js test clean db-up migrate docker-build docker-up beat
 
 setup:
 	pnpm install
@@ -19,6 +19,9 @@ api:
 
 worker:
 	cd apps/worker && PYTHONPATH=../.. uv run celery -A app.jobs.tasks worker --loglevel=info
+
+beat:
+	cd apps/api && PYTHONPATH=../.. uv run celery -A apps.api.app.core.celery beat --loglevel=info
 
 dev-all:
 	make db-up

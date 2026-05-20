@@ -13,6 +13,7 @@ import { CustomToolsSettings, SkillsSettings, MCPToolsSettings } from '@/feature
 import { FuseKeysSettings } from '@/features/settings/pages/FuseKeysSettings'
 import { MCPServersSettings } from '@/features/settings/pages/MCPServersSettings'
 import { RecentlyDeletedSettings } from '@/features/settings/pages/RecentlyDeletedSettings'
+import { KnowledgePage } from '@/features/knowledge/KnowledgePage'
 import LoginPage from '@/features/auth/login-page'
 import SignupPage from '@/features/auth/signup-page'
 import ResetPasswordPage from '@/features/auth/reset-password-page'
@@ -65,6 +66,10 @@ export const router = createBrowserRouter([
       {
         path: 'executions',
         element: <div className="p-8 text-text-muted">Execution history coming soon...</div>,
+      },
+      {
+        path: 'kb',
+        element: <KnowledgePage />,
       },
       {
         path: 'workflows/:id',

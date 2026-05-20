@@ -15,6 +15,6 @@ class NodeMetadata(BaseModel):
     color: str = "#3b82f6"
     outputs_schema: list[dict[str, Any]] = []
     allow_error: bool = False
-    credential_type: str | None = None
+    credential_type: str | list[str] | None = None
     tools: list[str] | None = None
     operation_tool_map: dict[str, str] | None = None
