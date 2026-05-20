@@ -40,8 +40,13 @@ interface WorkflowState {
   // Workflow metadata
   workflowId: string | null
   workflowName: string | null
+  workflowVersion: number
+  isDirty: boolean
   isActive: boolean
   setIsActive: (active: boolean) => void
+  markDirty: () => void
+  markSaved: (version: number) => void
+  applyRemoteGraphPatch: (patch: GraphPatch) => void
   // Canvas lock — prevents editing (dragging, connecting, selecting)
   workflowLocked: boolean
   setWorkflowLocked: (locked: boolean) => void
@@ -55,14 +60,38 @@ interface WorkflowState {
   canRedo: () => boolean
 }
 
+export type GraphPatch =
+  | { operation: 'node.position'; nodeId: string; position: { x: number; y: number } }
+  | { operation: 'graph.replace'; nodes: Node[]; edges: Edge[]; version?: number }
+
 export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   nodes: [],
   edges: [],
   nodeDefinitions: [],
   workflowId: null,
   workflowName: null,
+  workflowVersion: 0,
+  isDirty: false,
   isActive: true,
   setIsActive: (active) => set({ isActive: active }),
+  markDirty: () => set({ isDirty: true }),
+  markSaved: (workflowVersion) => set({ workflowVersion, isDirty: false }),
+  applyRemoteGraphPatch: (patch) => {
+    if (patch.operation === 'node.position') {
+      set(state => ({
+        nodes: state.nodes.map(node => (
+          node.id === patch.nodeId ? { ...node, position: patch.position } : node
+        )),
+      }))
+      return
+    }
+    set({
+      nodes: patch.nodes,
+      edges: patch.edges,
+      workflowVersion: patch.version ?? get().workflowVersion,
+      isDirty: false,
+    })
+  },
   workflowLocked: false,
   setWorkflowLocked: (locked) => set({ workflowLocked: locked }),
   undoStack: [],
@@ -100,16 +129,16 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   canUndo: () => get().undoStack.length > 0,
   canRedo: () => get().redoStack.length > 0,
   onNodesChange: (changes: NodeChange[]) => {
-    set({ nodes: applyNodeChanges(changes, get().nodes) })
+    set({ nodes: applyNodeChanges(changes, get().nodes), isDirty: true })
   },
   onEdgesChange: (changes: EdgeChange[]) => {
-    set({ edges: applyEdgeChanges(changes, get().edges) })
+    set({ edges: applyEdgeChanges(changes, get().edges), isDirty: true })
   },
   onConnect: (connection: Connection) => {
-    set({ edges: addEdge(connection, get().edges) })
+    set({ edges: addEdge(connection, get().edges), isDirty: true })
   },
-  setNodes: (nodes) => set(state => ({ nodes: typeof nodes === 'function' ? nodes(state.nodes) : nodes })),
-  setEdges: (edges) => set(state => ({ edges: typeof edges === 'function' ? edges(state.edges) : edges })),
+  setNodes: (nodes) => set(state => ({ nodes: typeof nodes === 'function' ? nodes(state.nodes) : nodes, isDirty: true })),
+  setEdges: (edges) => set(state => ({ edges: typeof edges === 'function' ? edges(state.edges) : edges, isDirty: true })),
   setNodeDefinitions: (nodeDefinitions: NodeDefinition[]) => set({ nodeDefinitions }),
   addNode: (node: Node) => set({ nodes: [...get().nodes, node] }),
   updateNodeData: (id: string, data: any) => {
@@ -220,6 +249,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       nodeSelectionTimestamp: Date.now(),
       workflowId: workflow.id ?? null,
       workflowName: workflow.name ?? null,
+      workflowVersion: workflow.version_vector ?? 0,
+      isDirty: false,
       isActive: workflow.is_active !== false,
     })
   }

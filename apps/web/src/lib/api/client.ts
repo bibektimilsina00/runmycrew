@@ -1,6 +1,7 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import { z } from 'zod'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import { logger } from '@/lib/logger'
 
 /**
@@ -14,28 +15,29 @@ const apiClient = axios.create({
   },
 })
 
-// Inject Auth Token into every request
+// Inject Auth Token + Workspace context into every request
 apiClient.interceptors.request.use((config) => {
-  // Try to get token from state first (most up-to-date)
   const token = useAuthStore.getState().token
-  
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
-    return config
+  } else {
+    // Fallback to localStorage (for cold starts)
+    try {
+      const storage = localStorage.getItem('fuse-auth-storage')
+      if (storage) {
+        const { state } = JSON.parse(storage)
+        if (state.token) config.headers.Authorization = `Bearer ${state.token}`
+      }
+    } catch { /* silent */ }
   }
 
-  // Fallback to localStorage (for cold starts)
-  const storage = localStorage.getItem('fuse-auth-storage')
-  if (storage) {
-    try {
-      const { state } = JSON.parse(storage)
-      if (state.token) {
-        config.headers.Authorization = `Bearer ${state.token}`
-      }
-    } catch {
-      // Silent fail
-    }
+  // Inject workspace context — all scoped API calls need this
+  const workspaceId = useWorkspaceStore.getState().currentWorkspaceId
+  if (workspaceId) {
+    config.headers['X-Workspace-ID'] = workspaceId
   }
+
   return config
 })
 

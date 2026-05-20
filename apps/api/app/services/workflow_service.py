@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.api.app.core.logger import logger
 from apps.api.app.models.user import User
 from apps.api.app.models.workflow import Workflow
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.repositories.workflow_repository import WorkflowRepository
 from apps.api.app.schemas.workflow import WorkflowBatchUpdate, WorkflowCreate, WorkflowUpdate
 
@@ -15,36 +16,25 @@ class WorkflowService:
     def __init__(self, db: AsyncSession):
         self.repository = WorkflowRepository(db)
 
-    async def list_workflows(self, user: User) -> list[Workflow]:
-        return await self.repository.list_by_user(user.id)
+    async def list_workflows(self, user: User, workspace: Workspace) -> list[Workflow]:
+        workflows = await self.repository.list_by_workspace(workspace.id)
+        if workflows:
+            return workflows
+        return [await self.ensure_default_workflow(workspace)]
 
-    async def get_workflow(self, workflow_id: uuid.UUID, user: User) -> Workflow:
-        workflow = await self.repository.get_by_id_and_user(workflow_id, user.id)
+    async def get_workflow(self, workflow_id: uuid.UUID, user: User, workspace: Workspace) -> Workflow:
+        workflow = await self.repository.get_by_id_and_workspace(workflow_id, workspace.id)
         if not workflow:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workflow not found")
         return workflow
 
-    async def create_workflow(self, data: WorkflowCreate, user: User) -> Workflow:
-        # Auto-initialize graph with a Starter node if it's empty
-        graph = data.graph
-        if not graph or not graph.get("nodes"):
-            graph = {
-                "nodes": [
-                    {
-                        "id": str(uuid.uuid4()),
-                        "type": "trigger.manual",
-                        "data": {"name": "Start", "properties": {"startWorkflow": "manual"}},
-                        "position": {"x": 100, "y": 100},
-                    }
-                ],
-                "edges": [],
-            }
-
+    async def create_workflow(self, data: WorkflowCreate, user: User, workspace: Workspace) -> Workflow:
         workflow = Workflow(
             user_id=user.id,
+            workspace_id=workspace.id,
             name=data.name,
             description=data.description,
-            graph=graph,
+            graph=self._initial_graph(data.graph),
             folder_id=data.folder_id,
             position=data.position,
             color=data.color,
@@ -52,18 +42,43 @@ class WorkflowService:
         )
         return await self.repository.create(workflow)
 
+    async def ensure_default_workflow(self, workspace: Workspace) -> Workflow:
+        workflow = Workflow(
+            user_id=workspace.owner_id,
+            workspace_id=workspace.id,
+            name="Getting Started",
+            description="Default workflow for this workspace",
+            graph=self._initial_graph(None),
+            position=0,
+            color="#22c55e",
+        )
+        return await self.repository.create(workflow)
+
     async def update_workflow(
-        self, workflow_id: uuid.UUID, data: WorkflowUpdate, user: User
+        self, workflow_id: uuid.UUID, data: WorkflowUpdate, user: User, workspace: Workspace
     ) -> Workflow:
-        workflow = await self.get_workflow(workflow_id, user)
-        update_data = data.model_dump(exclude_unset=True)
+        workflow = await self.get_workflow(workflow_id, user, workspace)
+        if data.expected_version is not None and workflow.version_vector != data.expected_version:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": "version_conflict",
+                    "current_version": workflow.version_vector,
+                    "your_version": data.expected_version,
+                },
+            )
+        update_data = data.model_dump(exclude_unset=True, exclude={"expected_version"})
+        if "graph" in update_data:
+            update_data["version_vector"] = workflow.version_vector + 1
         return await self.repository.update(workflow, update_data)
 
-    async def batch_update_workflows(self, data: WorkflowBatchUpdate, user: User) -> None:
+    async def batch_update_workflows(
+        self, data: WorkflowBatchUpdate, user: User, workspace: Workspace
+    ) -> None:
         logger.info(f"Batch updating {len(data.updates)} workflows for user {user.id}")
         updates = []
         for item in data.updates:
-            workflow = await self.repository.get_by_id_and_user(item.id, user.id)
+            workflow = await self.repository.get_by_id_and_workspace(item.id, workspace.id)
             if workflow:
                 update_dict = item.model_dump(exclude_unset=True, exclude={"id"})
                 logger.info(f"Updating workflow {workflow.id} with {update_dict}")
@@ -75,9 +90,24 @@ class WorkflowService:
             await self.repository.batch_update(updates)
             logger.info(f"Successfully committed batch update for {len(updates)} workflows")
 
-    async def delete_workflow(self, workflow_id: uuid.UUID, user: User) -> None:
-        workflow = await self.get_workflow(workflow_id, user)
+    async def delete_workflow(self, workflow_id: uuid.UUID, user: User, workspace: Workspace) -> None:
+        workflow = await self.get_workflow(workflow_id, user, workspace)
         await self.repository.delete(workflow)
+
+    def _initial_graph(self, graph: dict | None) -> dict:
+        if graph and graph.get("nodes"):
+            return graph
+        return {
+            "nodes": [
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "trigger.manual",
+                    "data": {"name": "Start", "properties": {"startWorkflow": "manual"}},
+                    "position": {"x": 100, "y": 100},
+                }
+            ],
+            "edges": [],
+        }
 
     async def trigger_workflows(
         self,

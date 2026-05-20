@@ -8,10 +8,12 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
 from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
 from apps.api.app.models.secret import Secret
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 
 router = APIRouter()
 _enc = AESEncryptionService()
@@ -37,11 +39,12 @@ class SecretOut(BaseModel):
 @router.get("/", response_model=list[SecretOut])
 async def list_secrets(
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         sa.select(Secret)
-        .where(Secret.user_id == current_user.id)
+        .where(Secret.workspace_id == workspace.id)
         .order_by(Secret.name)
     )
     secrets = result.scalars().all()
@@ -55,21 +58,22 @@ async def list_secrets(
 async def create_secret(
     body: SecretCreate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     name = body.name.strip().upper().replace(" ", "_")
     if not name:
         raise HTTPException(status_code=400, detail="Secret name is required.")
 
-    # Check uniqueness per user
     existing = await db.execute(
-        sa.select(Secret).where(Secret.user_id == current_user.id, Secret.name == name)
+        sa.select(Secret).where(Secret.workspace_id == workspace.id, Secret.name == name)
     )
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail=f"Secret '{name}' already exists.")
 
     secret = Secret(
         user_id=current_user.id,
+        workspace_id=workspace.id,
         name=name,
         encrypted_value=_enc.encrypt(body.value),
     )
@@ -84,10 +88,11 @@ async def update_secret(
     secret_id: uuid.UUID,
     body: SecretUpdate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        sa.select(Secret).where(Secret.id == secret_id, Secret.user_id == current_user.id)
+        sa.select(Secret).where(Secret.id == secret_id, Secret.workspace_id == workspace.id)
     )
     secret = result.scalar_one_or_none()
     if not secret:
@@ -107,10 +112,11 @@ async def update_secret(
 async def delete_secret(
     secret_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        sa.select(Secret).where(Secret.id == secret_id, Secret.user_id == current_user.id)
+        sa.select(Secret).where(Secret.id == secret_id, Secret.workspace_id == workspace.id)
     )
     secret = result.scalar_one_or_none()
     if not secret:

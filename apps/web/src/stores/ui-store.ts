@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, type PersistOptions } from 'zustand/middleware'
 
 export type InspectorTabType = 'Copilot' | 'Toolbar' | 'Editor' | 'Test'
 export type LogViewMode = 'structured' | 'raw'
@@ -31,6 +31,9 @@ interface UIState {
   setCopilotAutoPrompt: (prompt: string | null) => void
 }
 
+type UIPersistedState = Pick<UIState, 'theme'>
+type UIPersistOptions = PersistOptions<UIState, UIPersistedState>
+
 export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
@@ -57,7 +60,7 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: 'fuse-ui',
-      partialState: (state) => ({ theme: state.theme }),
-    } as any,
+      partialize: (state) => ({ theme: state.theme }),
+    } satisfies UIPersistOptions,
   ),
 )

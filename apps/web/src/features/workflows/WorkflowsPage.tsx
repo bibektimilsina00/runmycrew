@@ -6,6 +6,8 @@ import { z } from 'zod'
 import { requestJson } from '@/lib/api/client'
 import { useCreateWorkflow, useDeleteWorkflow, useUpdateWorkflow, useDuplicateWorkflow } from '@/features/dashboard/hooks/use-workflows'
 import { cn } from '@/lib/utils'
+import { workflowKeys } from '@/features/dashboard/hooks/keys'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
 const WorkflowWithStatsSchema = z.object({
   id: z.string(),
@@ -21,9 +23,11 @@ const WorkflowWithStatsSchema = z.object({
 type WorkflowWithStats = z.infer<typeof WorkflowWithStatsSchema>
 
 function useWorkflowsWithStats() {
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
   return useQuery({
-    queryKey: ['workflows', 'with-stats'],
+    queryKey: [...workflowKeys.lists(workspaceId), 'with-stats'],
     queryFn: () => requestJson(z.array(WorkflowWithStatsSchema), { url: '/workflows/with-stats', method: 'GET' }),
+    enabled: !!workspaceId,
     staleTime: 30_000,
   })
 }
@@ -188,7 +192,7 @@ export const WorkflowsPage: React.FC = () => {
               <Upload className="w-4 h-4" /> Import
             </button>
             <button
-              onClick={() => createWorkflow.mutate()}
+              onClick={() => createWorkflow.mutate(undefined)}
               className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-[13px] font-medium rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" /> New Workflow
@@ -234,7 +238,7 @@ export const WorkflowsPage: React.FC = () => {
           <div className="text-center py-24">
             <p className="text-[14px] text-[var(--text-muted)]">{search ? 'No workflows match your search' : 'No workflows yet'}</p>
             {!search && (
-              <button onClick={() => createWorkflow.mutate()} className="mt-3 text-[13px] text-indigo-400 hover:text-indigo-300 transition-colors">
+              <button onClick={() => createWorkflow.mutate(undefined)} className="mt-3 text-[13px] text-indigo-400 hover:text-indigo-300 transition-colors">
                 Create your first workflow →
               </button>
             )}

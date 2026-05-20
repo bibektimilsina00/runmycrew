@@ -6,10 +6,12 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
 from apps.api.app.credential_manager.api_keys import PROVIDERS as API_KEY_PROVIDERS
 from apps.api.app.credential_manager.oauth.flow import PROVIDERS as OAUTH_PROVIDERS
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.schemas.credential import (
     CredentialCreate,
     CredentialOut,
@@ -61,16 +63,18 @@ async def list_providers():
 @router.get("/", response_model=list[CredentialOut])
 async def list_credentials(
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = CredentialService(db)
-    return await service.list_credentials(current_user)
+    return await service.list_credentials(current_user, workspace)
 
 
 @router.post("/", response_model=CredentialOut, status_code=status.HTTP_201_CREATED)
 async def create_credential(
     data: CredentialCreate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = CredentialService(db)
@@ -79,6 +83,7 @@ async def create_credential(
         type=data.type,
         data=data.data,
         user=current_user,
+        workspace=workspace,
     )
 
 
@@ -86,10 +91,11 @@ async def create_credential(
 async def delete_credential(
     credential_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = CredentialService(db)
-    await service.delete_credential(credential_id, current_user)
+    await service.delete_credential(credential_id, current_user, workspace)
 
 
 @router.get("/oauth/{service_name}/url", response_model=OAuthUrlResponse)
@@ -98,6 +104,7 @@ async def get_oauth_url(
     name: str | None = None,
     description: str | None = None,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
 ):
     try:
         from apps.api.app.credential_manager.oauth.flow import get_oauth_provider
@@ -119,6 +126,7 @@ async def get_oauth_url(
             "name": name,
             "description": description,
             "user_id": str(current_user.id),
+            "workspace_id": str(workspace.id),
         }
 
         # Add PKCE for Slack
@@ -164,14 +172,18 @@ async def oauth_callback(
             custom_description = state_data.get("description")
             code_verifier = state_data.get("code_verifier")
             user_id = state_data.get("user_id")
+            workspace_id = state_data.get("workspace_id")
         except (binascii.Error, UnicodeDecodeError, ValueError):
             custom_name = None
             custom_description = None
             code_verifier = None
             user_id = None
+            workspace_id = None
 
         if not user_id:
             raise HTTPException(status_code=400, detail="Invalid state: user_id missing")
+        if not workspace_id:
+            raise HTTPException(status_code=400, detail="Invalid state: workspace_id missing")
 
         from sqlalchemy import select
 
@@ -182,12 +194,17 @@ async def oauth_callback(
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
+        from apps.api.app.services.workspace_service import WorkspaceService
+
+        workspace = await WorkspaceService(db).resolve_workspace(user, uuid.UUID(workspace_id))
+
         from apps.api.app.credential_manager.oauth.callback import handle_oauth_callback
 
         await handle_oauth_callback(
             service_name=service_name,
             code=code,
             user=user,
+            workspace=workspace,
             db=db,
             custom_name=custom_name,
             custom_description=custom_description,

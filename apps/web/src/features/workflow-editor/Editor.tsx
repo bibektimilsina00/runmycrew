@@ -13,10 +13,12 @@ import 'reactflow/dist/style.css'
 import { EditorInspector } from '@/features/workflow-editor/panels/inspector/EditorInspector'
 import { EditorLogs } from '@/features/workflow-editor/panels/logs-panel/EditorLogs'
 import { WorkflowControls } from '@/features/workflow-editor/controls/WorkflowControls'
+import { CollaborationOverlay } from '@/features/workflow-editor/components/CollaborationOverlay'
 import { ContextMenu, NODE_CONTEXT_ITEMS, PANE_CONTEXT_ITEMS } from '@/features/workflow-editor/components/context-menu/ContextMenu'
 import { useWorkflow } from '@/features/workflow-editor/hooks/use-workflow'
 import { useAutoSave } from '@/features/workflow-editor/hooks/use-auto-save'
 import { useWorkflowData } from '@/features/workflow-editor/hooks/use-workflow-data'
+import { useWorkflowCollaboration } from '@/features/workflow-editor/hooks/use-workflow-collaboration'
 import { useResizable } from '@/features/workflow-editor/hooks/use-resizable'
 import { useNodes } from '@/hooks/nodes/queries'
 import { useWorkflowStore } from '@/stores/workflow-store'
@@ -114,8 +116,11 @@ function EditorContent() {
     mode,
     setMode,
   } = useWorkflow()
+  const workflowId = useWorkflowStore(s => s.workflowId)
+  const selectedNodeId = useWorkflowStore(s => s.selectedNodeId)
+  const collaboration = useWorkflowCollaboration(workflowId)
 
-  const { fitView, setNodes: rfSetNodes } = useReactFlow()
+  const { fitView, setNodes: rfSetNodes, screenToFlowPosition, getViewport } = useReactFlow()
   const setNodesStore = useWorkflowStore(s => s.setNodes)
 
   const runAutoLayout = useCallback(() => {
@@ -150,6 +155,10 @@ function EditorContent() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [undo, redo])
+
+  useEffect(() => {
+    collaboration.sendSelection(selectedNodeId)
+  }, [collaboration, selectedNodeId])
   const { setInspectorTab: switchTab } = useUIStore()
   const location = useLocation()
 
@@ -211,7 +220,16 @@ function EditorContent() {
 
   return (
     <div className="h-full flex flex-col min-w-0 bg-[var(--bg)] relative overflow-hidden">
-      <div className="flex-1 relative" ref={reactFlowWrapper}>
+      <div
+        className="flex-1 relative"
+        ref={reactFlowWrapper}
+        onMouseMove={event => {
+          // Convert screen coords → flow coords so cursors align correctly at any zoom/pan
+          const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY })
+          const vp = getViewport()
+          collaboration.sendCursor({ x: flowPos.x, y: flowPos.y, viewport: vp })
+        }}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -224,7 +242,10 @@ function EditorContent() {
           onDragOver={onDragOver}
           onDrop={onDrop}
           onNodeDrag={onNodeDrag}
-          onNodeDragStop={onNodeDragStop}
+          onNodeDragStop={(event, node) => {
+            onNodeDragStop(event, node)
+            collaboration.sendNodePosition(node)
+          }}
           onNodeContextMenu={onNodeContextMenu}
           onPaneContextMenu={onPaneContextMenu}
           onConnectStart={onConnectStart}
@@ -255,6 +276,7 @@ function EditorContent() {
         >
           <Background color="#222" gap={20} />
         </ReactFlow>
+        <CollaborationOverlay />
         <WorkflowControls mode={mode} onModeChange={setMode} />
       </div>
       <EditorLogs />

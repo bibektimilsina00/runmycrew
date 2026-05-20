@@ -11,6 +11,7 @@ from apps.api.app.models.user import User
 from apps.api.app.repositories.user_repository import UserRepository
 from apps.api.app.schemas.auth import UserLogin, UserRegister
 from apps.api.app.services.base import BaseService
+from apps.api.app.services.workspace_service import WorkspaceService
 
 ph = PasswordHasher()
 
@@ -46,8 +47,17 @@ class AuthService(BaseService):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
             )
 
-        user = User(email=user_in.email, hashed_password=self.get_password_hash(user_in.password))
-        return await self.user_repo.create(user)
+        full_name = user_in.full_name.strip() if user_in.full_name else None
+        user = User(
+            email=user_in.email,
+            hashed_password=self.get_password_hash(user_in.password),
+            full_name=full_name or None,
+        )
+        self.db.add(user)
+        await self.db.flush()
+        await WorkspaceService(self.db).create_personal_workspace(user)
+        await self.db.refresh(user)
+        return user
 
     async def authenticate(self, user_login: UserLogin) -> User | None:
         user = await self.user_repo.get_by_email(user_login.email)

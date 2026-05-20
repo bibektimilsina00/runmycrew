@@ -5,8 +5,10 @@ from fastapi import APIRouter, Body, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.schemas.workflow import (
     WorkflowBatchUpdate,
     WorkflowCreate,
@@ -14,6 +16,7 @@ from apps.api.app.schemas.workflow import (
     WorkflowUpdate,
 )
 from apps.api.app.services.workflow_service import WorkflowService
+from apps.api.app.services.workspace_service import WorkspaceService
 
 router = APIRouter()
 
@@ -21,18 +24,20 @@ router = APIRouter()
 @router.get("/with-stats")
 async def list_workflows_with_stats(
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = WorkflowService(db)
-    workflows = await service.list_workflows(current_user)
+    workflows = await service.list_workflows(current_user, workspace)
     from apps.api.app.repositories.execution_repository import ExecutionRepository
     repo = ExecutionRepository(db)
     counts = await repo.count_by_workflow([w.id for w in workflows])
     return [
         {
-            **w.model_dump(),
+            **WorkflowOut.model_validate(w).model_dump(mode="json"),
             "id": str(w.id),
             "user_id": str(w.user_id),
+            "workspace_id": str(w.workspace_id),
             "folder_id": str(w.folder_id) if w.folder_id else None,
             "created_at": w.created_at.isoformat(),
             "updated_at": w.updated_at.isoformat(),
@@ -45,30 +50,34 @@ async def list_workflows_with_stats(
 @router.get("/", response_model=list[WorkflowOut])
 async def list_workflows(
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = WorkflowService(db)
-    return await service.list_workflows(current_user)
+    return await service.list_workflows(current_user, workspace)
 
 
 @router.post("/", response_model=WorkflowOut, status_code=status.HTTP_201_CREATED)
 async def create_workflow(
     data: WorkflowCreate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
     service = WorkflowService(db)
-    return await service.create_workflow(data, current_user)
+    return await service.create_workflow(data, current_user, workspace)
 
 
 @router.get("/{workflow_id}", response_model=WorkflowOut)
 async def get_workflow(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = WorkflowService(db)
-    return await service.get_workflow(workflow_id, current_user)
+    return await service.get_workflow(workflow_id, current_user, workspace)
 
 
 @router.put("/{workflow_id}", response_model=WorkflowOut)
@@ -76,21 +85,25 @@ async def update_workflow(
     workflow_id: uuid.UUID,
     data: WorkflowUpdate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
     service = WorkflowService(db)
-    workflow = await service.get_workflow(workflow_id, current_user)
+    workflow = await service.get_workflow(workflow_id, current_user, workspace)
 
     # Auto-snapshot before saving if graph is changing
     if data.graph is not None and data.graph != workflow.graph:
         await _create_version(db, workflow_id, workflow.graph)
 
-    return await service.update_workflow(workflow_id, data, current_user)
+    return await service.update_workflow(workflow_id, data, current_user, workspace)
 
 
 async def _create_version(db, workflow_id: uuid.UUID, graph: dict) -> None:
     import json as _json
+
     import sqlalchemy as sa
+
     from apps.api.app.models.workflow_version import WorkflowVersion
 
     result = await db.execute(
@@ -110,13 +123,15 @@ async def _create_version(db, workflow_id: uuid.UUID, graph: dict) -> None:
 async def list_versions(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     import sqlalchemy as sa
+
     from apps.api.app.models.workflow_version import WorkflowVersion
 
     service = WorkflowService(db)
-    await service.get_workflow(workflow_id, current_user)  # ownership check
+    await service.get_workflow(workflow_id, current_user, workspace)
 
     result = await db.execute(
         sa.select(WorkflowVersion)
@@ -141,14 +156,18 @@ async def restore_version(
     workflow_id: uuid.UUID,
     version_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     import json as _json
+
     import sqlalchemy as sa
+
     from apps.api.app.models.workflow_version import WorkflowVersion
 
     service = WorkflowService(db)
-    workflow = await service.get_workflow(workflow_id, current_user)
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
+    workflow = await service.get_workflow(workflow_id, current_user, workspace)
 
     result = await db.execute(
         sa.select(WorkflowVersion).where(
@@ -165,43 +184,50 @@ async def restore_version(
     await _create_version(db, workflow_id, workflow.graph)
 
     graph = _json.loads(v.graph)
-    return await service.update_workflow(workflow_id, WorkflowUpdate(graph=graph), current_user)
+    return await service.update_workflow(workflow_id, WorkflowUpdate(graph=graph), current_user, workspace)
 
 
 @router.patch("/batch", status_code=status.HTTP_204_NO_CONTENT)
 async def batch_update_workflows(
     data: WorkflowBatchUpdate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     from apps.api.app.core.logger import logger
 
     logger.info(f"Received batch update request: {data.model_dump_json()}")
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
     service = WorkflowService(db)
-    await service.batch_update_workflows(data, current_user)
+    await service.batch_update_workflows(data, current_user, workspace)
 
 
 @router.delete("/{workflow_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_workflow(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
     service = WorkflowService(db)
-    await service.delete_workflow(workflow_id, current_user)
+    await service.delete_workflow(workflow_id, current_user, workspace)
 
 
 @router.post("/{workflow_id}/duplicate", response_model=WorkflowOut)
 async def duplicate_workflow(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = WorkflowService(db)
-    source = await service.get_workflow(workflow_id, current_user)
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
+    source = await service.get_workflow(workflow_id, current_user, workspace)
+
+    import copy
 
     from apps.api.app.schemas.workflow import WorkflowCreate
-    import copy
 
     data = WorkflowCreate(
         name=f"{source.name} (copy)",
@@ -210,18 +236,20 @@ async def duplicate_workflow(
         graph=copy.deepcopy(source.graph),
         color=source.color,
     )
-    return await service.create_workflow(data, current_user)
+    return await service.create_workflow(data, current_user, workspace)
 
 
 @router.post("/{workflow_id}/run")
 async def run_workflow(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
     graph: dict[str, Any] | None = Body(default=None),
 ):
     service = WorkflowService(db)
-    workflow = await service.get_workflow(workflow_id, current_user)
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
+    workflow = await service.get_workflow(workflow_id, current_user, workspace)
 
     from apps.api.app.execution_engine.engine import execution_engine
 

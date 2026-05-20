@@ -9,7 +9,7 @@ import { useUpdateWorkflow } from '@/features/dashboard/hooks/use-workflows'
  */
 export function useAutoSave() {
   const { id } = useParams<{ id: string }>()
-  const { nodes, edges } = useWorkflowStore()
+  const { nodes, edges, workflowVersion, markSaved } = useWorkflowStore()
   const { mutate } = useUpdateWorkflow()
   
   const lastSavedRef = useRef<string>('')
@@ -33,13 +33,18 @@ export function useAutoSave() {
       mutate({
         id,
         graph: { nodes, edges },
+        expected_version: workflowVersion,
         silent: true // Custom flag to prevent UI refreshes
+      }, {
+        onSuccess: (workflow) => {
+          markSaved(workflow.version_vector ?? workflowVersion)
+          lastSavedRef.current = currentGraph
+        },
       })
-      lastSavedRef.current = currentGraph
     }, 1500)
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [id, nodes, edges, mutate])
+  }, [id, nodes, edges, mutate, workflowVersion, markSaved])
 }

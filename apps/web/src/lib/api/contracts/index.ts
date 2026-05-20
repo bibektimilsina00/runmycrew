@@ -20,6 +20,7 @@ export function defineRouteContract<
 export const WorkflowSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid().optional(),
+  workspace_id: z.string().uuid().optional(),
   name: z.string().min(1),
   description: z.string().optional().nullable(),
   schema_version: z.string().optional(),
@@ -29,6 +30,7 @@ export const WorkflowSchema = z.object({
   position: z.number().optional(),
   color: z.string().optional().nullable(),
   graph: z.any().optional(),
+  version_vector: z.number().optional(),
   created_at: z.string(),
   updated_at: z.string(),
 })
@@ -156,7 +158,7 @@ export const ApiNodeDefinitionSchema = z.object({
   allow_error: z.boolean().optional(),
   credential_type: z.union([z.string(), z.array(z.string())]).nullable().optional(),
   tools: z.array(z.string()).nullable().optional(),
-  operation_tool_map: z.record(z.string()).nullable().optional(),
+  operation_tool_map: z.record(z.string(), z.string()).nullable().optional(),
   default_width: z.number().nullable().optional(),
   default_height: z.number().nullable().optional(),
 })
@@ -164,3 +166,61 @@ export const ApiNodeDefinitionSchema = z.object({
 export const ApiNodeDefinitionListSchema = z.array(ApiNodeDefinitionSchema)
 
 export type ApiNodeDefinition = z.infer<typeof ApiNodeDefinitionSchema>
+
+// ── Workspace schemas ─────────────────────────────────────────────────────────
+
+export const WorkspaceRoleSchema = z.enum(['owner', 'admin', 'member', 'viewer'])
+export type WorkspaceRole = z.infer<typeof WorkspaceRoleSchema>
+
+export const WorkspaceSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  slug: z.string(),
+  owner_id: z.string().uuid(),
+  is_personal: z.boolean(),
+  avatar_url: z.string().nullable(),
+  plan: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+})
+export type WorkspaceContract = z.infer<typeof WorkspaceSchema>
+
+export const WorkspaceWithRoleSchema = WorkspaceSchema.extend({
+  role: WorkspaceRoleSchema,
+  member_count: z.number(),
+})
+export type WorkspaceWithRoleContract = z.infer<typeof WorkspaceWithRoleSchema>
+
+export const WorkspaceMemberSchema = z.object({
+  id: z.string().uuid(),
+  workspace_id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  role: WorkspaceRoleSchema,
+  invited_by: z.string().uuid().nullable().optional(),
+  joined_at: z.string(),
+  user: z.object({
+    id: z.string().uuid(),
+    email: z.string(),
+    full_name: z.string().nullable().optional(),
+    avatar_url: z.string().nullable().optional(),
+  }),
+})
+export type WorkspaceMemberContract = z.infer<typeof WorkspaceMemberSchema>
+
+export const WorkspaceInviteSchema = z.object({
+  id: z.string().uuid(),
+  workspace_id: z.string().uuid(),
+  email: z.string(),
+  role: WorkspaceRoleSchema,
+  token: z.string(),
+  invite_url: z.string(),
+  expires_at: z.string(),
+  accepted_at: z.string().nullable().optional(),
+  created_at: z.string(),
+  invited_by_user: z.object({
+    id: z.string().uuid(),
+    email: z.string(),
+    full_name: z.string().nullable().optional(),
+  }).optional(),
+})
+export type WorkspaceInviteContract = z.infer<typeof WorkspaceInviteSchema>

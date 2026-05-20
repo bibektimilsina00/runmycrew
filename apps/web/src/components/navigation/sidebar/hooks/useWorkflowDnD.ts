@@ -13,6 +13,7 @@ import { useBatchUpdateWorkflows } from '@/features/dashboard/hooks/use-workflow
 import { haptics } from '@/lib/haptics'
 import { logger } from '@/lib/logger'
 import type { Workflow } from '@/lib/api/contracts'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
 interface UseWorkflowDnDProps {
   workflows: Workflow[]
@@ -21,6 +22,8 @@ interface UseWorkflowDnDProps {
 
 export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
   const queryClient = useQueryClient()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
+  const workflowListKey = useMemo(() => workflowKeys.lists(workspaceId), [workspaceId])
   const { mutate: batchUpdate } = useBatchUpdateWorkflows()
   const batchUpdateRef = useRef(batchUpdate)
 
@@ -51,12 +54,12 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
 
   const handleDragStart = useCallback(({ active }: { active: any }) => {
     const activeId = active.id.toString().replace('workflow-', '')
-    const snap = queryClient.getQueryData<Workflow[]>(workflowKeys.lists()) || []
+    const snap = queryClient.getQueryData<Workflow[]>(workflowListKey) || []
     dragStartWorkflowRef.current = snap.find(w => w.id === activeId) || null
     lastOverRef.current = null
     setActiveDragId(active.id.toString())
     haptics.tick()
-  }, [queryClient])
+  }, [queryClient, workflowListKey])
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
     const { active, over } = event
@@ -105,7 +108,7 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
     const isActiveInOverContainer = (workflow.folder_id ?? null) === overContainerId
 
     if (!isActiveInOverContainer || (overWorkflow && active.id !== over.id)) {
-      queryClient.setQueryData(workflowKeys.lists(), (old: Workflow[] | undefined) => {
+      queryClient.setQueryData(workflowListKey, (old: Workflow[] | undefined) => {
         if (!old) return []
         const updated = [...old]
         const activeIdx = updated.findIndex(w => w.id === workflow.id)
@@ -123,7 +126,7 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
         return updated
       })
     }
-  }, [expandedFolders, queryClient, toggleFolder])
+  }, [expandedFolders, queryClient, toggleFolder, workflowListKey])
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     if (hoverTimeoutRef.current) {
@@ -142,7 +145,7 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
       logger.warn('DnD: Drop outside droppable, reverting')
       const snapshot = dragStartWorkflowRef.current
       if (snapshot) {
-        queryClient.setQueryData(workflowKeys.lists(), (old: Workflow[] | undefined) => {
+        queryClient.setQueryData(workflowListKey, (old: Workflow[] | undefined) => {
           if (!old) return []
           return old.map(w => (w.id === snapshot.id ? snapshot : w))
         })
@@ -173,7 +176,7 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
       targetFolderId = dragStartWorkflowRef.current?.folder_id ?? null
     }
 
-    const currentWorkflows = queryClient.getQueryData<Workflow[]>(workflowKeys.lists()) || []
+    const currentWorkflows = queryClient.getQueryData<Workflow[]>(workflowListKey) || []
     const movedWorkflow = currentWorkflows.find(w => w.id === activeId)
 
     if (!movedWorkflow) {
@@ -220,7 +223,7 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
     ]
 
     // Apply to cache
-    queryClient.setQueryData(workflowKeys.lists(), (old: Workflow[] | undefined) => {
+    queryClient.setQueryData(workflowListKey, (old: Workflow[] | undefined) => {
       if (!old) return []
       return old.map(w => finalUpdates.find(u => u.id === w.id) ?? w)
     })
@@ -237,14 +240,14 @@ export function useWorkflowDnD({ workflows, folders }: UseWorkflowDnDProps) {
       {
         onError: (err) => {
           logger.error('DnD: Batch update failed, reverting', { error: String(err) })
-          queryClient.invalidateQueries({ queryKey: workflowKeys.lists() })
+          queryClient.invalidateQueries({ queryKey: workflowListKey })
         },
       }
     )
 
     dragStartWorkflowRef.current = null
     lastOverRef.current = null
-  }, [queryClient])
+  }, [queryClient, workflowListKey])
 
   const rootWorkflows = useMemo(() => workflows.filter(w => !w.folder_id), [workflows])
   const workflowsByFolder = useMemo(() => {

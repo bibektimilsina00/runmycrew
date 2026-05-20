@@ -8,11 +8,15 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
+from apps.api.app.core.logger import get_logger
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.node_system.registry.registry import node_registry
 
 router = APIRouter()
+logger = get_logger(__name__)
 
 
 @router.get("/")
@@ -32,31 +36,31 @@ class NodeTestRequest(BaseModel):
 async def test_node(
     body: NodeTestRequest,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     """Execute a single node with custom input — no full workflow run needed."""
-    from apps.api.app.node_system.base.node_context import NodeContext
     from apps.api.app.execution_engine.engine.node_executor import node_executor
+    from apps.api.app.node_system.base.node_context import NodeContext
     from apps.api.app.services.credential_service import CredentialService
 
     credential_service = CredentialService(db)
-    credentials = await credential_service.list_decrypted_for_user(current_user.id)
+    credentials = await credential_service.list_decrypted_for_workspace(workspace.id)
 
     # Load user secrets for {{secrets.KEY}} interpolation
     secrets: dict[str, str] = {}
-    try:
-        import sqlalchemy as sa
-        from apps.api.app.models.secret import Secret
-        from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
-        _enc = AESEncryptionService()
-        result = await db.execute(sa.select(Secret).where(Secret.user_id == current_user.id))
-        for s in result.scalars().all():
-            try:
-                secrets[s.name] = _enc.decrypt(s.encrypted_value)
-            except Exception:
-                pass
-    except Exception:
-        pass
+    import sqlalchemy as sa
+
+    from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
+    from apps.api.app.models.secret import Secret
+
+    _enc = AESEncryptionService()
+    result = await db.execute(sa.select(Secret).where(Secret.workspace_id == workspace.id))
+    for s in result.scalars().all():
+        try:
+            secrets[s.name] = _enc.decrypt(s.encrypted_value)
+        except Exception as exc:
+            logger.warning("Failed to decrypt secret %s for node test: %s", s.id, exc)
 
     async with httpx.AsyncClient(timeout=120.0) as http_client:
         context = NodeContext(

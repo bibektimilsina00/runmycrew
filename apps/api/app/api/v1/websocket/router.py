@@ -11,9 +11,22 @@ from apps.api.app.core.logger import get_logger
 from apps.api.app.core.redis import get_redis
 from apps.api.app.core.security import get_current_user_from_token
 from apps.api.app.repositories.execution_repository import ExecutionRepository
+from apps.api.app.services.collaboration_service import CollaborationService
 
 logger = get_logger(__name__)
 router = APIRouter()
+
+
+@router.websocket("/workflows/{workflow_id}/collaboration")
+async def workflow_collaboration_websocket(
+    websocket: WebSocket,
+    workflow_id: UUID,
+    token: str = Query(...),
+    workspace_id: UUID = Query(...),
+):
+    async with AsyncSessionLocal() as db:
+        service = CollaborationService(db)
+        await service.run_socket(websocket, workflow_id, token, workspace_id)
 
 
 @router.websocket("/executions/{execution_id}")

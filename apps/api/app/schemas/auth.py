@@ -10,6 +10,7 @@ class UserBase(BaseModel):
 
 class UserRegister(UserBase):
     password: str = Field(..., min_length=8)
+    full_name: str | None = Field(default=None, max_length=200)
 
 
 class UserLogin(UserBase):
@@ -18,6 +19,8 @@ class UserLogin(UserBase):
 
 class UserOut(UserBase):
     id: UUID
+    full_name: str | None = None
+    avatar_url: str | None = None
     is_active: bool
     created_at: datetime
 

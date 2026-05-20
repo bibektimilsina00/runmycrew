@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.credential_manager.oauth.flow import get_oauth_provider
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.services.credential_service import CredentialService
 
 
@@ -9,6 +10,7 @@ async def handle_oauth_callback(
     service_name: str,
     code: str,
     user: User,
+    workspace: Workspace,
     db: AsyncSession,
     custom_name: str | None = None,
     custom_description: str | None = None,
@@ -30,6 +32,7 @@ async def handle_oauth_callback(
         type=f"{service_name}_oauth",
         data=token_data,
         user=user,
+        workspace=workspace,
         meta={
             "description": custom_description,
             "team_name": token_data.get("team_name"),

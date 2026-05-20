@@ -10,6 +10,7 @@ from apps.api.app.credential_manager.encryption.aes import encryption_service
 from apps.api.app.credential_manager.oauth.flow import get_oauth_provider
 from apps.api.app.models.credential import Credential
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.repositories.credential_repository import CredentialRepository
 
 REFRESH_SKEW = timedelta(minutes=5)
@@ -19,8 +20,8 @@ class CredentialService:
     def __init__(self, db: AsyncSession):
         self.repo = CredentialRepository(db)
 
-    async def list_credentials(self, user: User) -> list[Credential]:
-        return await self.repo.list_by_user(user.id)
+    async def list_credentials(self, user: User, workspace: Workspace) -> list[Credential]:
+        return await self.repo.list_by_workspace(workspace.id)
 
     async def store_credential(
         self,
@@ -28,11 +29,13 @@ class CredentialService:
         type: str,
         data: dict,
         user: User,
+        workspace: Workspace,
         meta: dict | None = None,
     ) -> Credential:
         encrypted_data = encryption_service.encrypt(json.dumps(data))
         credential = Credential(
             user_id=user.id,
+            workspace_id=workspace.id,
             name=name,
             type=type,
             encrypted_data=encrypted_data,
@@ -40,8 +43,8 @@ class CredentialService:
         )
         return await self.repo.create(credential)
 
-    async def get_decrypted(self, credential_id: uuid.UUID, user: User) -> dict:
-        credential = await self.repo.get_by_id_and_user(credential_id, user.id)
+    async def get_decrypted(self, credential_id: uuid.UUID, user: User, workspace: Workspace) -> dict:
+        credential = await self.repo.get_by_id_and_workspace(credential_id, workspace.id)
         if not credential:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -64,14 +67,21 @@ class CredentialService:
 
     async def list_decrypted_for_user(self, user_id: uuid.UUID) -> list[dict[str, Any]]:
         credentials = await self.repo.list_by_user(user_id)
+        return await self._decrypt_credentials(credentials)
+
+    async def list_decrypted_for_workspace(self, workspace_id: uuid.UUID) -> list[dict[str, Any]]:
+        credentials = await self.repo.list_by_workspace(workspace_id)
+        return await self._decrypt_credentials(credentials)
+
+    async def _decrypt_credentials(self, credentials: list[Credential]) -> list[dict[str, Any]]:
         decrypted: list[dict[str, Any]] = []
         for credential in credentials:
             data = await self.get_decrypted_credential(credential)
             decrypted.append({"id": str(credential.id), "type": credential.type, "data": data})
         return decrypted
 
-    async def delete_credential(self, credential_id: uuid.UUID, user: User) -> None:
-        credential = await self.repo.get_by_id_and_user(credential_id, user.id)
+    async def delete_credential(self, credential_id: uuid.UUID, user: User, workspace: Workspace) -> None:
+        credential = await self.repo.get_by_id_and_workspace(credential_id, workspace.id)
         if not credential:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

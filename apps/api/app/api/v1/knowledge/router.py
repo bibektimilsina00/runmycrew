@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
 from apps.api.app.core.logger import get_logger
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.repositories.credential_repository import CredentialRepository
 from apps.api.app.repositories.knowledge_repository import KnowledgeRepository
 from apps.api.app.services.credential_service import CredentialService
@@ -96,11 +98,12 @@ async def _require_kb(kb_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession):
 @router.get("/list-options")
 async def list_kb_options(
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     """loadOptions endpoint for the Knowledge node dropdown."""
     repo = KnowledgeRepository(db)
-    kbs = await repo.list_kbs(current_user.id)
+    kbs = await repo.list_kbs(workspace.id)
     return {"ok": True, "data": [{"label": kb.name, "value": str(kb.id)} for kb in kbs]}
 
 
@@ -108,12 +111,14 @@ async def list_kb_options(
 async def create_kb(
     body: KBCreate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     repo = KnowledgeRepository(db)
     svc = KnowledgeService(repo)
     kb = await svc.create_kb(
         user_id=current_user.id,
+        workspace_id=workspace.id,
         name=body.name,
         description=body.description,
         embedding_model=body.embedding_model,
@@ -133,10 +138,11 @@ async def create_kb(
 @router.get("/")
 async def list_kbs(
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     repo = KnowledgeRepository(db)
-    kbs = await repo.list_kbs(current_user.id)
+    kbs = await repo.list_kbs(workspace.id)
     result = []
     for kb in kbs:
         docs = await repo.list_documents(kb.id)
@@ -156,9 +162,10 @@ async def list_kbs(
 async def get_kb(
     kb_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    kb = await _require_kb(kb_id, current_user.id, db)
+    kb = await _require_kb(kb_id, workspace.id, db)
     repo = KnowledgeRepository(db)
     docs = await repo.list_documents(kb.id)
     return {
@@ -187,9 +194,10 @@ async def update_kb(
     kb_id: uuid.UUID,
     body: KBCreate,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    kb = await _require_kb(kb_id, current_user.id, db)
+    kb = await _require_kb(kb_id, workspace.id, db)
     repo = KnowledgeRepository(db)
     kb = await repo.update_kb(
         kb,
@@ -205,9 +213,10 @@ async def update_kb(
 async def delete_kb(
     kb_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    kb = await _require_kb(kb_id, current_user.id, db)
+    kb = await _require_kb(kb_id, workspace.id, db)
     repo = KnowledgeRepository(db)
     await repo.delete_kb(kb)
 
@@ -219,9 +228,10 @@ async def add_text_document(
     kb_id: uuid.UUID,
     body: AddTextRequest,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    kb = await _require_kb(kb_id, current_user.id, db)
+    kb = await _require_kb(kb_id, workspace.id, db)
     api_key = await _get_api_key(kb, db, current_user.id)
     repo = KnowledgeRepository(db)
     svc = KnowledgeService(repo)
@@ -229,7 +239,7 @@ async def add_text_document(
         doc = await svc.add_document_from_text(kb, body.name, body.text, api_key)
     except Exception as e:
         logger.error(f"Text document ingestion failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
     return {"id": str(doc.id), "name": doc.name, "chunk_count": doc.chunk_count}
 
 
@@ -238,9 +248,10 @@ async def upload_document(
     kb_id: uuid.UUID,
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    kb = await _require_kb(kb_id, current_user.id, db)
+    kb = await _require_kb(kb_id, workspace.id, db)
     api_key = await _get_api_key(kb, db, current_user.id)
 
     content = await file.read()
@@ -256,7 +267,7 @@ async def upload_document(
             doc = await svc.add_document_from_text(kb, filename, text, api_key)
     except Exception as e:
         logger.error(f"File upload ingestion failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
     return {"id": str(doc.id), "name": doc.name, "chunk_count": doc.chunk_count}
 
@@ -266,9 +277,10 @@ async def delete_document(
     kb_id: uuid.UUID,
     doc_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    await _require_kb(kb_id, current_user.id, db)
+    await _require_kb(kb_id, workspace.id, db)
     repo = KnowledgeRepository(db)
     doc = await repo.get_document(doc_id, kb_id)
     if not doc:
@@ -283,14 +295,15 @@ async def search(
     kb_id: uuid.UUID,
     body: SearchRequest,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    kb = await _require_kb(kb_id, current_user.id, db)
+    kb = await _require_kb(kb_id, workspace.id, db)
     api_key = await _get_api_key(kb, db, current_user.id)
     repo = KnowledgeRepository(db)
     svc = KnowledgeService(repo)
     try:
         results = await svc.search(kb, body.query, api_key, body.top_k)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
     return {"query": body.query, "results": results, "count": len(results)}

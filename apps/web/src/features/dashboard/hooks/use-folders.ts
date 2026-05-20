@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requestJson } from '@/lib/api/client'
 import { FolderSchema, type Folder, type Workflow } from '@/lib/api/contracts'
 import { folderKeys, workflowKeys } from '@/features/dashboard/hooks/keys'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
 const FolderListSchema = z.array(FolderSchema)
 
@@ -10,8 +11,9 @@ const FolderListSchema = z.array(FolderSchema)
  * Hook to fetch all folders for the dashboard.
  */
 export function useFolders() {
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
   return useQuery({
-    queryKey: folderKeys.lists(),
+    queryKey: folderKeys.lists(workspaceId),
     queryFn: async ({ signal }) => {
       return requestJson(FolderListSchema, {
         url: '/folders/',
@@ -19,6 +21,7 @@ export function useFolders() {
         signal,
       })
     },
+    enabled: !!workspaceId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
@@ -28,6 +31,7 @@ export function useFolders() {
  */
 export function useCreateFolder() {
   const queryClient = useQueryClient()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
     mutationFn: async (name: string) => {
@@ -38,7 +42,7 @@ export function useCreateFolder() {
       })
     },
     onSuccess: (newFolder) => {
-      queryClient.setQueryData(folderKeys.lists(), (oldData: Folder[] | undefined) => {
+      queryClient.setQueryData(folderKeys.lists(workspaceId), (oldData: Folder[] | undefined) => {
         return oldData ? [...oldData, newFolder] : [newFolder]
       })
     },
@@ -50,6 +54,7 @@ export function useCreateFolder() {
  */
 export function useDeleteFolder() {
   const queryClient = useQueryClient()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -59,18 +64,14 @@ export function useDeleteFolder() {
       })
     },
     onSuccess: (_, id) => {
-      // 1. Remove folder from cache
-      queryClient.setQueryData(folderKeys.lists(), (oldData: Folder[] | undefined) => {
+      queryClient.setQueryData(folderKeys.lists(workspaceId), (oldData: Folder[] | undefined) => {
         return oldData?.filter((folder) => folder.id !== id)
       })
       
-      // 2. Remove affected workflows from cache (recursively if needed)
-      // Since we know the backend deleted them, we sync the frontend cache
-      queryClient.setQueryData(workflowKeys.lists(), (oldData: Workflow[] | undefined) => {
+      queryClient.setQueryData(workflowKeys.lists(workspaceId), (oldData: Workflow[] | undefined) => {
         if (!oldData) return []
         
-        // Helper to find all IDs to be deleted (folder + subfolders)
-        const allFolders = queryClient.getQueryData<Folder[]>(folderKeys.lists()) || []
+        const allFolders = queryClient.getQueryData<Folder[]>(folderKeys.lists(workspaceId)) || []
         const getChildFolderIds = (parentFolderId: string): string[] => {
           const children = allFolders.filter(f => f.parent_id === parentFolderId)
           return [parentFolderId, ...children.flatMap(c => getChildFolderIds(c.id))]
@@ -79,6 +80,7 @@ export function useDeleteFolder() {
         const deletedFolderIds = getChildFolderIds(id)
         return oldData.filter(w => !w.folder_id || !deletedFolderIds.includes(w.folder_id))
       })
+      queryClient.invalidateQueries({ queryKey: workflowKeys.lists(workspaceId) })
     },
   })
 }
@@ -87,6 +89,7 @@ export function useDeleteFolder() {
  */
 export function useUpdateFolder() {
   const queryClient = useQueryClient()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
@@ -97,7 +100,7 @@ export function useUpdateFolder() {
       })
     },
     onSuccess: (updatedFolder) => {
-      queryClient.setQueryData(folderKeys.lists(), (oldData: Folder[] | undefined) => {
+      queryClient.setQueryData(folderKeys.lists(workspaceId), (oldData: Folder[] | undefined) => {
         return oldData?.map((f) => (f.id === updatedFolder.id ? updatedFolder : f))
       })
     },

@@ -25,10 +25,29 @@ class WorkflowRepository:
         )
         return result.scalar_one_or_none()
 
+    async def get_by_id_and_workspace(
+        self, workflow_id: uuid.UUID, workspace_id: uuid.UUID
+    ) -> Workflow | None:
+        result = await self.db.execute(
+            select(Workflow).where(
+                Workflow.id == workflow_id,
+                Workflow.workspace_id == workspace_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def list_by_user(self, user_id: uuid.UUID) -> list[Workflow]:
         result = await self.db.execute(
             select(Workflow)
             .where(Workflow.user_id == user_id)
+            .order_by(Workflow.position.asc(), Workflow.created_at.desc())
+        )
+        return list(result.scalars().all())
+
+    async def list_by_workspace(self, workspace_id: uuid.UUID) -> list[Workflow]:
+        result = await self.db.execute(
+            select(Workflow)
+            .where(Workflow.workspace_id == workspace_id)
             .order_by(Workflow.position.asc(), Workflow.created_at.desc())
         )
         return list(result.scalars().all())

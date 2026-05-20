@@ -20,10 +20,14 @@ import { ExecutionDetailPage } from '@/features/executions/ExecutionDetailPage'
 import LoginPage from '@/features/auth/login-page'
 import SignupPage from '@/features/auth/signup-page'
 import ResetPasswordPage from '@/features/auth/reset-password-page'
+import { TeamSettingsPage } from '@/features/workspaces/TeamSettingsPage'
+import { InviteAcceptPage } from '@/features/workspaces/InviteAcceptPage'
+import { RouteError } from '@/components/ErrorBoundary'
 
 export const router = createBrowserRouter([
   {
     path: '/login',
+    errorElement: <RouteError />,
     element: (
       <PublicRoute>
         <LoginPage />
@@ -32,6 +36,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/signup',
+    errorElement: <RouteError />,
     element: (
       <PublicRoute>
         <SignupPage />
@@ -40,6 +45,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/reset-password',
+    errorElement: <RouteError />,
     element: (
       <PublicRoute>
         <ResetPasswordPage />
@@ -48,6 +54,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
+    errorElement: <RouteError />,
     element: (
       <ProtectedRoute>
         <MainLayout />
@@ -61,6 +68,10 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <DashboardPage />,
+      },
+      {
+        path: 'invites/:token',
+        element: <InviteAcceptPage />,
       },
       {
         path: 'workflows',
@@ -80,6 +91,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'workflows/:id',
+        errorElement: <RouteError />,
         element: <Editor />,
       },
       {
@@ -93,6 +105,10 @@ export const router = createBrowserRouter([
           {
             path: 'general',
             element: <GeneralSettings />,
+          },
+          {
+            path: 'team',
+            element: <TeamSettingsPage />,
           },
           {
             path: 'integrations',

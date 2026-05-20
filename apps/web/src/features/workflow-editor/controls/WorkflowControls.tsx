@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { IconButton, Tooltip } from '@/components/ui'
 import { useWorkflowStore } from '@/stores/workflow-store'
 import { useUpdateWorkflow } from '@/features/dashboard/hooks/use-workflows'
-import { VersionHistory } from './VersionHistory'
+import { PresenceAvatars } from '../components/PresenceAvatars'
 
 interface WorkflowControlsProps {
   mode: 'select' | 'pan'
@@ -71,7 +71,8 @@ export const WorkflowControls: React.FC<WorkflowControlsProps> = ({ mode, onMode
 
       <div className="mx-1 h-[20px] w-[1px] bg-[var(--border-default)]" />
 
-      <VersionHistory />
+      {/* Presence avatars — other users viewing this workflow */}
+      <PresenceAvatars />
 
       <div className="mx-1 h-[20px] w-[1px] bg-[var(--border-default)]" />
 

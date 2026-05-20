@@ -15,7 +15,8 @@ import {
   Server,
   Trash2,
   Cpu,
-  Bot
+  Bot,
+  Users
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -58,6 +59,7 @@ export const SETTINGS_NAV: NavSection[] = [
     label: "Account",
     items: [
       { id: "general", label: "General", href: "/settings/general", icon: User },
+      { id: "team", label: "Team", href: "/settings/team", icon: Users },
       { id: "integrations", label: "Integrations", href: "/settings/integrations", icon: Puzzle },
       { id: "secrets", label: "Secrets", href: "/settings/secrets", icon: Key },
     ]

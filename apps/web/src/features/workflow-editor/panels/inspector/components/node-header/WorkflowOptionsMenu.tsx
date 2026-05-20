@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { MoreHorizontal, LayoutDashboard, Code2, Lock, Unlock, Download, Copy, Trash2 } from 'lucide-react'
+import { MoreHorizontal, LayoutDashboard, Lock, Unlock, Download, Copy, Trash2, History } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useReactFlow } from 'reactflow'
 import { cn } from '@/lib/utils'
 import { IconButton } from '@/components/ui'
 import { useUpdateWorkflow, useDuplicateWorkflow, useDeleteWorkflow } from '@/features/dashboard/hooks/use-workflows'
 import { useWorkflowStore } from '@/stores/workflow-store'
+import { VersionHistoryPanel } from '@/features/workflow-editor/controls/VersionHistory'
 
 interface MenuItem {
   label: string
@@ -72,6 +73,7 @@ const Menu: React.FC<{ items: MenuItem[]; anchorRect: DOMRect; onClose: () => vo
 
 export const WorkflowOptionsMenu: React.FC = () => {
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const { id: workflowId } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -105,6 +107,11 @@ export const WorkflowOptionsMenu: React.FC = () => {
       label: 'Auto-layout',
       icon: <LayoutDashboard className="w-3.5 h-3.5" />,
       onClick: () => fitView({ duration: 400, padding: 0.2 }),
+    },
+    {
+      label: 'Version history',
+      icon: <History className="w-3.5 h-3.5" />,
+      onClick: () => setShowVersionHistory(v => !v),
     },
     {
       label: workflowLocked ? 'Unlock workflow' : 'Lock workflow',
@@ -150,6 +157,9 @@ export const WorkflowOptionsMenu: React.FC = () => {
           anchorRect={anchorRect}
           onClose={() => setAnchorRect(null)}
         />
+      )}
+      {showVersionHistory && (
+        <VersionHistoryPanel onClose={() => setShowVersionHistory(false)} />
       )}
     </>
   )

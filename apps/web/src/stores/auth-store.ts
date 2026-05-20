@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface User {
+export interface AuthUser {
   id: string
   email: string
   full_name?: string
@@ -10,11 +10,11 @@ interface User {
 
 interface AuthState {
   token: string | null
-  user: User | null
-  setToken: (token: string | null) => void
-  setUser: (user: User | null) => void
-  logout: () => void
+  user: AuthUser | null
   isAuthenticated: boolean
+  setToken: (token: string | null) => void
+  setUser: (user: AuthUser | null) => void
+  logout: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,16 +23,17 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isAuthenticated: false,
-      setToken: (token) => {
-        set({ token, isAuthenticated: !!token })
-      },
+      setToken: (token) => set({ token, isAuthenticated: !!token }),
       setUser: (user) => set({ user }),
       logout: () => {
         set({ token: null, user: null, isAuthenticated: false })
+        // Clear workspace + collaboration state
+        Promise.all([
+          import('@/stores/workspace-store').then(m => m.useWorkspaceStore.getState().clearWorkspace()),
+          import('@/stores/collaboration-store').then(m => m.useCollaborationStore.getState().reset()),
+        ])
       },
     }),
-    {
-      name: 'fuse-auth-storage',
-    }
+    { name: 'fuse-auth-storage' }
   )
 )

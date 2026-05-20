@@ -13,9 +13,12 @@ class FolderService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create_folder(self, user_id: uuid.UUID, schema: FolderCreate) -> Folder:
+    async def create_folder(
+        self, user_id: uuid.UUID, workspace_id: uuid.UUID, schema: FolderCreate
+    ) -> Folder:
         folder = Folder(
             user_id=user_id,
+            workspace_id=workspace_id,
             name=schema.name,
             parent_id=schema.parent_id,
         )
@@ -24,20 +27,20 @@ class FolderService:
         await self.db.refresh(folder)
         return folder
 
-    async def get_folders(self, user_id: uuid.UUID) -> Sequence[Folder]:
-        stmt = select(Folder).where(Folder.user_id == user_id)
+    async def get_folders(self, workspace_id: uuid.UUID) -> Sequence[Folder]:
+        stmt = select(Folder).where(Folder.workspace_id == workspace_id)
         result = await self.db.execute(stmt)
         return result.scalars().all()
 
-    async def get_folder(self, user_id: uuid.UUID, folder_id: uuid.UUID) -> Folder | None:
-        stmt = select(Folder).where(Folder.id == folder_id, Folder.user_id == user_id)
+    async def get_folder(self, workspace_id: uuid.UUID, folder_id: uuid.UUID) -> Folder | None:
+        stmt = select(Folder).where(Folder.id == folder_id, Folder.workspace_id == workspace_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 
     async def update_folder(
-        self, user_id: uuid.UUID, folder_id: uuid.UUID, schema: FolderUpdate
+        self, workspace_id: uuid.UUID, folder_id: uuid.UUID, schema: FolderUpdate
     ) -> Folder | None:
-        folder = await self.get_folder(user_id, folder_id)
+        folder = await self.get_folder(workspace_id, folder_id)
         if not folder:
             return None
 
@@ -50,12 +53,14 @@ class FolderService:
         await self.db.refresh(folder)
         return folder
 
-    async def delete_folder(self, user_id: uuid.UUID, folder_id: uuid.UUID) -> bool:
-        folder = await self.get_folder(user_id, folder_id)
+    async def delete_folder(self, workspace_id: uuid.UUID, folder_id: uuid.UUID) -> bool:
+        folder = await self.get_folder(workspace_id, folder_id)
         if not folder:
             return False
 
-        await self.db.execute(delete(Workflow).where(Workflow.folder_id == folder_id))
+        await self.db.execute(
+            delete(Workflow).where(Workflow.folder_id == folder_id, Workflow.workspace_id == workspace_id)
+        )
 
         await self.db.delete(folder)
         await self.db.commit()

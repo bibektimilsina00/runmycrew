@@ -16,7 +16,10 @@ if TYPE_CHECKING:
 
 class Skill(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = mapped_column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("workspace.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     description: Mapped[str] = mapped_column(String(1024), nullable=False, default="")
     icon: Mapped[str] = mapped_column(String(64), nullable=False, default="BookOpen")

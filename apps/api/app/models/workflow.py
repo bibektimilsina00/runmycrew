@@ -64,9 +64,13 @@ class Workflow(Base):
     position: Mapped[int] = mapped_column(Integer, default=0)
     color: Mapped[str | None] = mapped_column(String, nullable=True)
     env: Mapped[dict[str, str] | None] = mapped_column(JSON, nullable=True, default=None)
+    version_vector: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+    )
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("workspace.id", ondelete="CASCADE"), nullable=False, index=True
     )
     folder_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("folder.id", ondelete="CASCADE"), nullable=True

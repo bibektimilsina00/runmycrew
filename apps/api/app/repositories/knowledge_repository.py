@@ -21,18 +21,18 @@ class KnowledgeRepository:
         await self.db.refresh(kb)
         return kb
 
-    async def get_kb(self, kb_id: uuid.UUID, user_id: uuid.UUID) -> KnowledgeBase | None:
+    async def get_kb(self, kb_id: uuid.UUID, workspace_id: uuid.UUID) -> KnowledgeBase | None:
         result = await self.db.execute(
             sa.select(KnowledgeBase).where(
-                KnowledgeBase.id == kb_id, KnowledgeBase.user_id == user_id
+                KnowledgeBase.id == kb_id, KnowledgeBase.workspace_id == workspace_id
             )
         )
         return result.scalar_one_or_none()
 
-    async def list_kbs(self, user_id: uuid.UUID) -> list[KnowledgeBase]:
+    async def list_kbs(self, workspace_id: uuid.UUID) -> list[KnowledgeBase]:
         result = await self.db.execute(
             sa.select(KnowledgeBase)
-            .where(KnowledgeBase.user_id == user_id)
+            .where(KnowledgeBase.workspace_id == workspace_id)
             .order_by(KnowledgeBase.created_at.desc())
         )
         return list(result.scalars().all())

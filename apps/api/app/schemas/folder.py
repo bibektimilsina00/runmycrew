@@ -21,6 +21,7 @@ class FolderUpdate(BaseModel):
 class FolderOut(FolderBase):
     id: uuid.UUID
     user_id: uuid.UUID
+    workspace_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
 

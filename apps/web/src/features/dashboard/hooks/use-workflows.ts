@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { requestJson } from '@/lib/api/client'
 import { WorkflowSchema, type Workflow, type WorkflowBatchUpdate } from '@/lib/api/contracts'
 import { workflowKeys } from '@/features/dashboard/hooks/keys'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
 const WorkflowListSchema = z.array(WorkflowSchema)
 
@@ -12,8 +13,9 @@ const WorkflowListSchema = z.array(WorkflowSchema)
  * Hook to fetch all workflows for the dashboard list.
  */
 export function useWorkflows() {
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
   return useQuery({
-    queryKey: workflowKeys.lists(),
+    queryKey: workflowKeys.lists(workspaceId),
     queryFn: async ({ signal }) => {
       const workflows = await requestJson(WorkflowListSchema, {
         url: '/workflows/',
@@ -29,6 +31,7 @@ export function useWorkflows() {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       })
     },
+    enabled: !!workspaceId,
     staleTime: 1000 * 60,
   })
 }
@@ -48,6 +51,7 @@ const NOUNS = [
 export function useCreateWorkflow() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
     mutationFn: async (name?: string) => {
@@ -58,7 +62,7 @@ export function useCreateWorkflow() {
         finalName = `${adj} ${noun}`
       }
 
-      const workflows = queryClient.getQueryData<Workflow[]>(workflowKeys.lists()) || []
+      const workflows = queryClient.getQueryData<Workflow[]>(workflowKeys.lists(workspaceId)) || []
       const minPos = workflows.length > 0 ? Math.min(...workflows.map(w => w.position ?? 0)) : 0
       const position = minPos - 1
 
@@ -69,10 +73,10 @@ export function useCreateWorkflow() {
       })
     },
     onSuccess: (newWorkflow) => {
-      // Instantly update the cache so it appears at the top of the sidebar immediately
-      queryClient.setQueryData(workflowKeys.lists(), (oldData: Workflow[] | undefined) => {
+      queryClient.setQueryData(workflowKeys.lists(workspaceId), (oldData: Workflow[] | undefined) => {
         return oldData ? [newWorkflow, ...oldData] : [newWorkflow]
       })
+      queryClient.setQueryData(workflowKeys.detail(newWorkflow.id, workspaceId), newWorkflow)
       
       navigate(`/workflows/${newWorkflow.id}`)
     },
@@ -82,11 +86,18 @@ export function useCreateWorkflow() {
 /**
  * Hook to update an existing workflow.
  */
+type WorkflowUpdateInput = Partial<Workflow> & {
+  id: string
+  silent?: boolean
+  expected_version?: number
+}
+
 export function useUpdateWorkflow() {
   const queryClient = useQueryClient()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
-    mutationFn: async ({ id, silent, ...data }: Partial<Workflow> & { id: string, silent?: boolean }) => {
+    mutationFn: async ({ id, silent, ...data }: WorkflowUpdateInput) => {
       const result = await requestJson(WorkflowSchema, {
         url: `/workflows/${id}`,
         method: 'PUT',
@@ -97,9 +108,10 @@ export function useUpdateWorkflow() {
     onSuccess: (updatedWorkflow) => {
       if (updatedWorkflow.silent) return
       
-      queryClient.setQueryData(workflowKeys.lists(), (oldData: Workflow[] | undefined) => {
+      queryClient.setQueryData(workflowKeys.lists(workspaceId), (oldData: Workflow[] | undefined) => {
         return oldData?.map((w) => (w.id === updatedWorkflow.id ? updatedWorkflow : w))
       })
+      queryClient.setQueryData(workflowKeys.detail(updatedWorkflow.id, workspaceId), updatedWorkflow)
     },
   })
 }
@@ -110,6 +122,7 @@ export function useUpdateWorkflow() {
 export function useDuplicateWorkflow() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -119,9 +132,10 @@ export function useDuplicateWorkflow() {
       })
     },
     onSuccess: (newWorkflow) => {
-      queryClient.setQueryData(workflowKeys.lists(), (old: Workflow[] | undefined) =>
+      queryClient.setQueryData(workflowKeys.lists(workspaceId), (old: Workflow[] | undefined) =>
         old ? [newWorkflow, ...old] : [newWorkflow]
       )
+      queryClient.setQueryData(workflowKeys.detail(newWorkflow.id, workspaceId), newWorkflow)
       navigate(`/workflows/${newWorkflow.id}`)
     },
   })
@@ -147,6 +161,7 @@ export function useBatchUpdateWorkflows() {
  */
 export function useDeleteWorkflow() {
   const queryClient = useQueryClient()
+  const workspaceId = useWorkspaceStore(s => s.currentWorkspaceId)
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -156,9 +171,11 @@ export function useDeleteWorkflow() {
       })
     },
     onSuccess: (_, id) => {
-      queryClient.setQueryData(workflowKeys.lists(), (oldData: Workflow[] | undefined) => {
+      queryClient.setQueryData(workflowKeys.lists(workspaceId), (oldData: Workflow[] | undefined) => {
         return oldData?.filter((w) => w.id !== id)
       })
+      queryClient.removeQueries({ queryKey: workflowKeys.detail(id, workspaceId) })
+      queryClient.invalidateQueries({ queryKey: workflowKeys.lists(workspaceId) })
     },
   })
 }

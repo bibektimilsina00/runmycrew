@@ -18,15 +18,37 @@ class SkillRepository:
         )
         return list(result.scalars().all())
 
+    async def list_by_workspace(self, workspace_id: uuid.UUID) -> list[Skill]:
+        result = await self.db.execute(
+            select(Skill).where(Skill.workspace_id == workspace_id).order_by(Skill.created_at.desc())
+        )
+        return list(result.scalars().all())
+
     async def get_by_id_and_user(self, skill_id: uuid.UUID, user_id: uuid.UUID) -> Skill | None:
         result = await self.db.execute(
             select(Skill).where(Skill.id == skill_id, Skill.user_id == user_id)
         )
         return result.scalar_one_or_none()
 
+    async def get_by_id_and_workspace(
+        self, skill_id: uuid.UUID, workspace_id: uuid.UUID
+    ) -> Skill | None:
+        result = await self.db.execute(
+            select(Skill).where(Skill.id == skill_id, Skill.workspace_id == workspace_id)
+        )
+        return result.scalar_one_or_none()
+
     async def get_by_name_and_user(self, name: str, user_id: uuid.UUID) -> Skill | None:
         result = await self.db.execute(
             select(Skill).where(Skill.name == name, Skill.user_id == user_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_by_name_and_workspace(
+        self, name: str, workspace_id: uuid.UUID
+    ) -> Skill | None:
+        result = await self.db.execute(
+            select(Skill).where(Skill.name == name, Skill.workspace_id == workspace_id)
         )
         return result.scalar_one_or_none()
 
@@ -37,6 +59,16 @@ class SkillRepository:
             return []
         result = await self.db.execute(
             select(Skill).where(Skill.id.in_(skill_ids), Skill.user_id == user_id)
+        )
+        return list(result.scalars().all())
+
+    async def get_by_ids_and_workspace(
+        self, skill_ids: list[uuid.UUID], workspace_id: uuid.UUID
+    ) -> list[Skill]:
+        if not skill_ids:
+            return []
+        result = await self.db.execute(
+            select(Skill).where(Skill.id.in_(skill_ids), Skill.workspace_id == workspace_id)
         )
         return list(result.scalars().all())
 

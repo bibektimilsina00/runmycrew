@@ -8,8 +8,10 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
 from apps.api.app.repositories.execution_repository import ExecutionRepository
 from apps.api.app.schemas.execution import ExecutionOut
 
@@ -25,6 +27,7 @@ class ResumeRequest(BaseModel):
 async def rerun_execution(
     execution_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     """Re-trigger the same workflow with the same input data as a previous execution."""
@@ -33,11 +36,11 @@ async def rerun_execution(
     if not execution:
         raise HTTPException(status_code=404, detail="Execution not found")
 
-    from apps.api.app.repositories.workflow_repository import WorkflowRepository
     from apps.api.app.execution_engine.engine import execution_engine
+    from apps.api.app.repositories.workflow_repository import WorkflowRepository
 
     wf_repo = WorkflowRepository(db)
-    workflow = await wf_repo.get_by_id_and_user(execution.workflow_id, current_user.id)
+    workflow = await wf_repo.get_by_id_and_workspace(execution.workflow_id, workspace.id)
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow not found")
 
@@ -48,7 +51,6 @@ async def rerun_execution(
         input_data=execution.input_data or {},
     )
     return {"execution_id": str(new_execution_id), "workflow_id": str(workflow.id)}
-    input: dict[str, Any] = {}
 
 
 @router.get("/all")
@@ -58,11 +60,12 @@ async def list_all_executions(
     status: str | None = None,
     workflow_id: uuid.UUID | None = None,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     repo = ExecutionRepository(db)
-    rows, total = await repo.list_by_user(
-        current_user.id, limit=limit, offset=offset, status=status, workflow_id=workflow_id
+    rows, total = await repo.list_by_workspace(
+        workspace.id, limit=limit, offset=offset, status=status, workflow_id=workflow_id
     )
     return {
         "executions": [
@@ -92,8 +95,14 @@ async def list_all_executions(
 async def list_executions(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
+    from apps.api.app.repositories.workflow_repository import WorkflowRepository
+
+    workflow = await WorkflowRepository(db).get_by_id_and_workspace(workflow_id, workspace.id)
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Workflow not found")
     repo = ExecutionRepository(db)
     return await repo.list_by_workflow(workflow_id)
 
@@ -102,11 +111,17 @@ async def list_executions(
 async def get_execution(
     execution_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     repo = ExecutionRepository(db)
     execution = await repo.get_by_id(execution_id)
     if not execution:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Execution not found")
+    from apps.api.app.repositories.workflow_repository import WorkflowRepository
+
+    workflow = await WorkflowRepository(db).get_by_id_and_workspace(execution.workflow_id, workspace.id)
+    if not workflow:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Execution not found")
     return execution
 

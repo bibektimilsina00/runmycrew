@@ -23,6 +23,7 @@ class WorkflowUpdate(BaseModel):
     is_active: bool | None = None
     color: str | None = None
     env: dict[str, str] | None = None
+    expected_version: int | None = None
 
 
 class WorkflowBatchItem(BaseModel):
@@ -39,6 +40,7 @@ class WorkflowBatchUpdate(BaseModel):
 class WorkflowOut(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
+    workspace_id: uuid.UUID
     folder_id: uuid.UUID | None = None
     name: str
     description: str | None
@@ -48,6 +50,7 @@ class WorkflowOut(BaseModel):
     position: int
     color: str | None = None
     env: dict[str, str] | None = None
+    version_vector: int = 0
     created_at: datetime
     updated_at: datetime
 

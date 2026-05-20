@@ -162,7 +162,7 @@ export const useWorkflow = () => {
 
   /** Real-time resize + header clamp while dragging a child node */
   const onNodeDrag = useCallback(
-    (_event: MouseEvent, draggedNode: any) => {
+    (_event: React.MouseEvent<Element, MouseEvent>, draggedNode: any) => {
       if (!draggedNode.parentNode) return;
       const parentLoop = nodes.find(n => n.id === draggedNode.parentNode && n.type === 'logic.loop');
       if (!parentLoop) return;
@@ -212,7 +212,7 @@ export const useWorkflow = () => {
 
   /** Drag stop — mirrors Sim's batchUpdateBlocksWithParent */
   const onNodeDragStop = useCallback(
-    (_event: MouseEvent, draggedNode: any) => {
+    (_event: React.MouseEvent<Element, MouseEvent>, draggedNode: any) => {
       if (draggedNode.type === 'logic.loop') return;
 
       // Get absolute position of dragged node

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
 import httpx
 
@@ -55,6 +54,7 @@ class KnowledgeService:
     async def create_kb(
         self,
         user_id: uuid.UUID,
+        workspace_id: uuid.UUID,
         name: str,
         description: str | None = None,
         embedding_model: str = "text-embedding-3-small",
@@ -62,6 +62,7 @@ class KnowledgeService:
     ) -> KnowledgeBase:
         kb = KnowledgeBase(
             user_id=user_id,
+            workspace_id=workspace_id,
             name=name,
             description=description,
             embedding_model=embedding_model,
@@ -99,7 +100,7 @@ class KnowledgeService:
                 chunk_index=i,
                 embedding=emb,
             )
-            for i, (chunk_text, emb) in enumerate(zip(chunks_text, embeddings))
+            for i, (chunk_text, emb) in enumerate(zip(chunks_text, embeddings, strict=True))
         ]
         await self.repo.bulk_insert_chunks(chunks)
         await self.repo.update_chunk_count(doc.id, len(chunks))
@@ -113,8 +114,9 @@ class KnowledgeService:
         pdf_bytes: bytes,
         api_key: str,
     ) -> KBDocument:
-        from pypdf import PdfReader
         import io
+
+        from pypdf import PdfReader
 
         reader = PdfReader(io.BytesIO(pdf_bytes))
         pages = [page.extract_text() or "" for page in reader.pages]

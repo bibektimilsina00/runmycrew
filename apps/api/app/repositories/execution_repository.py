@@ -4,7 +4,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -114,6 +114,40 @@ class ExecutionRepository:
             )
             .join(Workflow, Execution.workflow_id == Workflow.id)
             .where(Workflow.user_id == user_id)
+        )
+        if status:
+            q = q.where(Execution.status == status)
+        if workflow_id:
+            q = q.where(Execution.workflow_id == workflow_id)
+
+        total_result = await self.db.execute(select(func.count()).select_from(q.subquery()))
+        total = total_result.scalar() or 0
+
+        q = q.order_by(Execution.started_at.desc()).limit(limit).offset(offset)
+        rows = await self.db.execute(q)
+        return [dict(r._mapping) for r in rows.fetchall()], total
+
+    async def list_by_workspace(
+        self,
+        workspace_id: uuid.UUID,
+        limit: int = 50,
+        offset: int = 0,
+        status: str | None = None,
+        workflow_id: uuid.UUID | None = None,
+    ) -> tuple[list[dict], int]:
+        q = (
+            select(
+                Execution.id,
+                Execution.workflow_id,
+                Execution.status,
+                Execution.trigger_type,
+                Execution.started_at,
+                Execution.finished_at,
+                Workflow.name.label("workflow_name"),
+                Workflow.color.label("workflow_color"),
+            )
+            .join(Workflow, Execution.workflow_id == Workflow.id)
+            .where(Workflow.workspace_id == workspace_id)
         )
         if status:
             q = q.where(Execution.status == status)
