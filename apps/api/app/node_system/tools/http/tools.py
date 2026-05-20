@@ -91,7 +91,7 @@ tool_registry.register(
             'method': ToolParam(
                 type='string',
                 visibility='user-only',
-                description='HTTP method (GET, POST, PUT, DELETE, PATCH)',
+                description='HTTP method (GET, POST, PUT, DELETE, PATCH). Defaults to GET if not set.',
             ),
             'headers': ToolParam(
                 type='json',

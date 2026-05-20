@@ -50,87 +50,78 @@ tool_registry.register(
     ToolDefinition(
         id='slack',
         name='Slack',
-        description='Use Slack to send, update, delete, list, or inspect channels.',
+        description=(
+            'Perform Slack operations: send/update/delete messages, list channels, '
+            'manage users, add reactions, and more. '
+            'Always set "operation" to one of the supported values.'
+        ),
         params={
             'operation': ToolParam(
                 type='string',
-                visibility='user-only',
-                description='Slack operation to execute',
+                required=True,
+                visibility='user-or-llm',
+                description=(
+                    'Operation to perform. Must be one of: '
+                    'send_message, update_message, delete_message, send_ephemeral, '
+                    'list_channels, get_channel_info, create_channel, list_members, '
+                    'invite_to_channel, list_users, get_user_info, get_user_presence, '
+                    'add_reaction, remove_reaction, get_message'
+                ),
             ),
             'channel': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Channel ID',
-            ),
-            'channelId': ToolParam(
-                type='string',
-                visibility='user-or-llm',
-                description='Channel ID',
-            ),
-            'user': ToolParam(
-                type='string',
-                visibility='user-or-llm',
-                description='User ID',
+                description='Channel ID (e.g. C1234567890) — required for most operations',
             ),
             'text': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Message text',
+                description='Message text — required for send_message, update_message, send_ephemeral',
             ),
             'ts': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Message timestamp',
+                description='Message timestamp — required for update_message, delete_message, get_message',
             ),
             'thread_ts': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Thread timestamp to reply to',
+                description='Thread timestamp to reply into an existing thread',
             ),
-            'blocks': ToolParam(
-                type='json',
+            'user': ToolParam(
+                type='string',
                 visibility='user-or-llm',
-                description='Block Kit blocks JSON',
-            ),
-            'limit': ToolParam(
-                type='number',
-                visibility='user-only',
-                description='Maximum number of channels to return',
+                description='User ID — required for send_ephemeral, get_user_info, get_user_presence, invite_to_channel',
             ),
             'name': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Channel name or emoji name, depending on the operation',
+                description='New channel name for create_channel; emoji name (without colons) for add_reaction/remove_reaction',
             ),
             'users': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Comma-separated user IDs',
+                description='Comma-separated user IDs for invite_to_channel',
+            ),
+            'blocks': ToolParam(
+                type='json',
+                visibility='user-or-llm',
+                description='Slack Block Kit JSON array — optional, for rich message formatting',
             ),
             'trigger_id': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Slack trigger ID for modal operations',
+                description='Trigger ID for modal operations (open_view, push_view)',
             ),
             'view': ToolParam(
                 type='json',
                 visibility='user-or-llm',
-                description='Slack Block Kit view payload',
+                description='Block Kit view payload for modal operations',
             ),
             'view_id': ToolParam(
                 type='string',
                 visibility='user-or-llm',
-                description='Slack view ID',
-            ),
-            'external_id': ToolParam(
-                type='string',
-                visibility='user-or-llm',
-                description='Slack external view ID',
-            ),
-            'hash': ToolParam(
-                type='string',
-                visibility='user-or-llm',
-                description='Slack view hash',
+                description='View ID for update_view',
             ),
         },
     ),

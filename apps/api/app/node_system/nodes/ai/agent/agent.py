@@ -363,6 +363,7 @@ class AgentNode(BaseNode[AgentProperties]):
             used_forced: set[str] = set()
             seen_tool_calls: set[tuple[str, str]] = set()
             max_iterations_reached = False
+            consecutive_blocked = 0
 
             try:
                 for _iteration in range(max(self.props.maxIterations, 1)):
@@ -499,17 +500,19 @@ class AgentNode(BaseNode[AgentProperties]):
 
                     # Execute each tool call and append results
                     from apps.api.app.node_system.tools.base import ToolResult as _TR
+                    blocked_this_iteration = 0
                     for tc in tool_calls:
                         tool_id = tc["name"]
                         llm_args = tc.get("arguments") or {}
                         user_params = tool_user_params.get(tool_id, {})
 
-                        # Merge: user_params provide defaults; llm_args override for user-or-llm params
-                        merged_params = {**user_params, **llm_args}
+                        # Merge: LLM fills blanks, but user-configured values are locked (can't be overridden)
+                        merged_params = {**llm_args, **user_params}
 
                         # Duplicate call detection — block same (tool, args) from re-executing
                         call_sig = (tool_id, json.dumps(llm_args, sort_keys=True, default=str))
                         if call_sig in seen_tool_calls:
+                            blocked_this_iteration += 1
                             result = _TR(
                                 success=False,
                                 error=(
@@ -552,6 +555,24 @@ class AgentNode(BaseNode[AgentProperties]):
                         messages.append(
                             self._build_tool_result_message(tc, result, ai_provider.ai_api_type)
                         )
+
+                    # All calls blocked: model is looping on already-fetched data.
+                    # Inject one redirect hint — don't break, let the model try remaining tasks.
+                    # (Sim doesn't deduplicate at all; we keep dedup but allow one recovery turn.)
+                    if blocked_this_iteration == len(tool_calls):
+                        consecutive_blocked += 1
+                        if consecutive_blocked >= 2:
+                            break
+                        messages.append({
+                            "role": "user",
+                            "content": (
+                                "All your tool calls were duplicates — those results are already above. "
+                                "Do not repeat them. Use the data you already have and complete "
+                                "your remaining tasks now."
+                            ),
+                        })
+                    else:
+                        consecutive_blocked = 0
                 else:
                     max_iterations_reached = True
 
@@ -559,18 +580,32 @@ class AgentNode(BaseNode[AgentProperties]):
                 # make one more LLM call (no tools) so the agent always returns content.
                 # Must run inside try so the HTTP client is still open.
                 if not final_content and all_tool_calls:
-                    summary_note = (
-                        "You have reached the maximum number of iterations. "
-                        if max_iterations_reached else ""
+                    # Explicitly recap successful tool results so weak models don't ask for input
+                    successful_results = [
+                        tc for tc in all_tool_calls
+                        if tc["success"] and not str(tc.get("result", "")).startswith("Duplicate")
+                    ]
+                    recap_lines = ["Here are the tool results from this run:"]
+                    for tc in successful_results:
+                        recap_lines.append(
+                            f"- {tc['name']}({json.dumps(tc['arguments'])})"
+                            f" → {json.dumps(tc['result'])}"
+                        )
+                    failed_results = [tc for tc in all_tool_calls if not tc["success"]]
+                    for tc in failed_results:
+                        error = (tc.get("result") or {}).get("error", "")
+                        if "Duplicate call blocked" not in error:
+                            recap_lines.append(f"- {tc['name']} failed: {error}")
+                    if max_iterations_reached:
+                        recap_lines.append("(Maximum iterations reached.)")
+                    recap_lines.append(
+                        "Complete any remaining tasks now using your available tools. "
+                        "Do not ask for more input — use what was returned above."
                     )
-                    messages.append({
-                        "role": "user",
-                        "content": (
-                            summary_note
-                            + "Please provide your final response based on the tool results above."
-                        ),
-                    })
+                    messages.append({"role": "user", "content": "\n".join(recap_lines)})
                     try:
+                        # Pass tools so model can still call them (e.g. send Slack after HTTP fetch).
+                        # Without tools, Gemini falls back to Python pseudo-code output.
                         if ai_provider.ai_api_type == "openai_compatible":
                             summary_raw = await self._call_llm_openai_compatible(
                                 client=client,
@@ -578,9 +613,9 @@ class AgentNode(BaseNode[AgentProperties]):
                                 api_key=api_key,
                                 model=model,
                                 messages=messages,
-                                tool_specs=[],
+                                tool_specs=tool_specs,
                             )
-                            final_content, _ = self._extract_openai_content_and_tools(summary_raw)
+                            final_content, summary_tool_calls = self._extract_openai_content_and_tools(summary_raw)
                         elif ai_provider.ai_api_type == "anthropic":
                             summary_raw = await self._call_llm_anthropic(
                                 client=client,
@@ -588,9 +623,9 @@ class AgentNode(BaseNode[AgentProperties]):
                                 api_key=api_key,
                                 model=model,
                                 messages=messages,
-                                tool_specs=[],
+                                tool_specs=tool_specs,
                             )
-                            final_content, _ = self._extract_anthropic_content_and_tools(summary_raw)
+                            final_content, summary_tool_calls = self._extract_anthropic_content_and_tools(summary_raw)
                         elif ai_provider.ai_api_type == "google":
                             summary_raw = await self._call_llm_google(
                                 client=client,
@@ -598,15 +633,44 @@ class AgentNode(BaseNode[AgentProperties]):
                                 api_key=api_key,
                                 model=model,
                                 messages=messages,
-                                tool_specs=[],
+                                tool_specs=tool_specs,
                             )
-                            final_content, _ = self._extract_google_content_and_tools(summary_raw)
+                            final_content, summary_tool_calls = self._extract_google_content_and_tools(summary_raw)
+
+                        # If the summarization response itself has tool calls, execute them.
+                        # This is the common case: model wants to call Slack after seeing HTTP data.
+                        if summary_tool_calls:
+                            messages.append(
+                                self._build_assistant_message(final_content, summary_tool_calls, ai_provider.ai_api_type)
+                            )
+                            for tc in summary_tool_calls:
+                                tool_id = tc["name"]
+                                llm_args = tc.get("arguments") or {}
+                                user_params = tool_user_params.get(tool_id, {})
+                                merged = {**llm_args, **user_params}
+                                result = await tool_registry.execute(tool_id, merged, context)
+                                all_tool_calls.append({
+                                    "name": tool_id,
+                                    "arguments": llm_args,
+                                    "result": result.output if result.success else {"error": result.error},
+                                    "success": result.success,
+                                })
+                            # If only tool calls and no text, set a brief summary
+                            if not final_content:
+                                final_content = f"Completed: {', '.join(tc['name'] for tc in summary_tool_calls)}"
                     except Exception as _e:
                         logger.warning(f"Final summarization call failed: {_e}")
-                        final_content = (
-                            f"Agent completed {len(all_tool_calls)} tool call(s) "
-                            "but could not generate a final summary."
-                        )
+
+                    # Hard fallback — API returned success but empty text
+                    if not final_content:
+                        successful = [tc for tc in all_tool_calls if tc["success"]]
+                        failed = [tc for tc in all_tool_calls if not tc["success"] and "Duplicate call blocked" not in str(tc.get("result", ""))]
+                        parts = [f"Agent completed {len(all_tool_calls)} tool call(s)."]
+                        if successful:
+                            parts.append(f"{len(successful)} succeeded.")
+                        if failed:
+                            parts.append(f"{len(failed)} failed: " + "; ".join(tc["name"] for tc in failed))
+                        final_content = " ".join(parts)
 
             finally:
                 if not context.http_client:

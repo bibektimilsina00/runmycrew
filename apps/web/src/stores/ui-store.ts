@@ -22,6 +22,11 @@ interface UIState {
   // Theme
   theme: ThemeMode
   setTheme: (theme: ThemeMode) => void
+  // Copilot panel state
+  copilotView: 'chat' | 'history'
+  setCopilotView: (view: 'chat' | 'history') => void
+  copilotNewChatTrigger: number
+  triggerCopilotNewChat: () => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -41,6 +46,10 @@ export const useUIStore = create<UIState>()(
       setLogOpenOnRun: (open) => set({ logOpenOnRun: open }),
       theme: 'dark',
       setTheme: (theme) => set({ theme }),
+      copilotView: 'chat',
+      setCopilotView: (view) => set({ copilotView: view }),
+      copilotNewChatTrigger: 0,
+      triggerCopilotNewChat: () => set((s) => ({ copilotNewChatTrigger: s.copilotNewChatTrigger + 1 })),
     }),
     {
       name: 'fuse-ui',

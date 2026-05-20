@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from apps.api.app.api.v1.a2a.router import router as a2a_router
+from apps.api.app.api.v1.copilot.router import router as copilot_router
 from apps.api.app.api.v1.ai.router import router as ai_router
 from apps.api.app.api.v1.skills.router import router as skills_router
 from apps.api.app.api.v1.assets.router import router as assets_router
@@ -28,4 +29,5 @@ router.include_router(nodes_router, prefix="/nodes", tags=["nodes"])
 router.include_router(assets_router, prefix="/assets", tags=["assets"])
 router.include_router(skills_router, prefix="/skills", tags=["skills"])
 router.include_router(a2a_router, prefix="/a2a", tags=["a2a"])
+router.include_router(copilot_router, prefix="/copilot", tags=["copilot"])
 router.include_router(webhooks_router)

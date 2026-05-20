@@ -2,7 +2,7 @@ import React from 'react'
 import { Search, Plus, BookOpen, History, Pencil } from 'lucide-react'
 import { IconButton } from '@/components/ui'
 import { getIcon } from '@/features/workflow-editor/utils/icon-map'
-import type { InspectorTabType } from '@/stores/ui-store'
+import { useUIStore, type InspectorTabType } from '@/stores/ui-store'
 
 interface NodeHeaderProps {
   activeTab: InspectorTabType
@@ -19,6 +19,7 @@ export const NodeHeader: React.FC<NodeHeaderProps> = ({
   activeTab, selectedNode, definition, isEditingName, editNameValue, onEditNameChange, onEditClick, onNameSave,
 }) => {
   const showNodeInfo = activeTab === 'Editor' && selectedNode && definition
+  const { copilotView, setCopilotView, triggerCopilotNewChat } = useUIStore()
 
   return (
     <div className="flex items-center justify-between px-4 py-2.5 mt-2 border-y border-[var(--border-default)] min-h-[45px]">
@@ -59,8 +60,13 @@ export const NodeHeader: React.FC<NodeHeaderProps> = ({
       <div className="flex items-center gap-1 flex-shrink-0">
         {activeTab === 'Copilot' && (
           <>
-            <IconButton icon={<Plus />} tooltip="New chat" size="sm" />
-            <IconButton icon={<History />} tooltip="Chat history" size="sm" />
+            <IconButton icon={<Plus />} tooltip="New chat" size="sm" onClick={triggerCopilotNewChat} />
+            <IconButton
+              icon={<History />}
+              tooltip="Chat history"
+              size="sm"
+              onClick={() => setCopilotView(copilotView === 'history' ? 'chat' : 'history')}
+            />
           </>
         )}
         {activeTab === 'Toolbar' && (

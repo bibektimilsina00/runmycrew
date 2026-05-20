@@ -162,11 +162,17 @@ body {
 }
 
 /* Node execution state */
-@keyframes node-border-spin {
-  to { transform: rotate(360deg); }
+@property --node-border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
-/* Running: green light sweeps around a gray border */
+@keyframes node-border-rotate {
+  to { --node-border-angle: 360deg; }
+}
+
+/* Running: green light travels around the border perimeter */
 .node-running-wrapper {
   isolation: isolate;
 }
@@ -174,19 +180,25 @@ body {
 .node-running-wrapper::before {
   content: '';
   position: absolute;
-  inset: -1.5px;
-  border-radius: 9px;
+  inset: -2px;
+  border-radius: 10px;
+  padding: 2px;
   background: conic-gradient(
-    from 0deg,
-    transparent      0deg,
-    transparent      45deg,
-    rgba(51,196,130,0.12) 65deg,
-    rgba(51,196,130,0.9)  90deg,
-    rgba(51,196,130,0.12) 115deg,
-    transparent      135deg,
-    transparent      360deg
+    from var(--node-border-angle),
+    transparent           0deg,
+    transparent           30deg,
+    rgba(51,196,130,0.1)  50deg,
+    rgba(51,196,130,0.95) 90deg,
+    rgba(51,196,130,0.1)  130deg,
+    transparent           150deg,
+    transparent           360deg
   );
-  animation: node-border-spin 1.6s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: node-border-rotate 1.6s linear infinite;
   z-index: 0;
 }
 
