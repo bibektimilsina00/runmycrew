@@ -139,6 +139,7 @@ class PineconeMemoryProvider:
     async def append(self, key: str, messages: list[dict[str, Any]], limit: int) -> None:
         try:
             import uuid
+
             from pinecone import Pinecone  # type: ignore[import]
             pc = Pinecone(api_key=self._api_key)
             index = pc.Index(self._index_name)
@@ -212,6 +213,7 @@ class QdrantMemoryProvider:
     async def append(self, key: str, messages: list[dict[str, Any]], limit: int) -> None:
         try:
             import uuid
+
             import httpx
             async with httpx.AsyncClient(timeout=30) as client:
                 points = []

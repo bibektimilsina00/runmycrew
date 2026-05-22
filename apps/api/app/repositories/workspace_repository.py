@@ -140,5 +140,16 @@ class WorkspaceRepository:
         return result.scalar_one()
 
     async def delete_member(self, member: WorkspaceMember) -> None:
-        self.db.delete(member)  # synchronous — AsyncSession.delete() has no await
+        await self.db.delete(member)
+        await self.db.commit()
+
+    async def update_workspace(self, workspace: Workspace, name: str, slug: str) -> Workspace:
+        workspace.name = name
+        workspace.slug = slug
+        await self.db.commit()
+        await self.db.refresh(workspace)
+        return workspace
+
+    async def delete_workspace(self, workspace: Workspace) -> None:
+        await self.db.delete(workspace)
         await self.db.commit()

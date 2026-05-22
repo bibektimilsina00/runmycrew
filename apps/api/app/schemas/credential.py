@@ -30,6 +30,10 @@ class CredentialOut(CredentialBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class CredentialRename(BaseModel):
+    name: str
+
+
 class OAuthUrlResponse(BaseModel):
     url: str
     state: str

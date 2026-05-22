@@ -43,52 +43,72 @@ async def _run_workflow(
 ):
     from apps.api.app.core.database import AsyncSessionLocal
     from apps.api.app.execution_engine.engine.event_emitter import RedisEventEmitter
-    from apps.api.app.execution_engine.engine.workflow_runner import CancelledException, PauseSignal, WorkflowRunner
+    from apps.api.app.execution_engine.engine.workflow_runner import (
+        CancelledException,
+        PauseSignal,
+        WorkflowRunner,
+    )
     from apps.api.app.repositories.execution_repository import ExecutionRepository
     from apps.api.app.repositories.workflow_repository import WorkflowRepository
     from apps.api.app.services.credential_service import CredentialService
 
-    emitter = RedisEventEmitter(execution_id)
     credentials_list: list[dict[str, Any]] = []
+    secrets_dict: dict[str, str] = {}
+    workspace_id_str: str | None = None
+    workflow_name = workflow_id
 
     async with AsyncSessionLocal() as db:
-        exec_repo = ExecutionRepository(db)
         wf_repo = WorkflowRepository(db)
-
-        await exec_repo.update_status(uuid.UUID(execution_id), "running")
-        await exec_repo.add_log(uuid.UUID(execution_id), "Workflow execution started", level="info")
-        await emitter.emit("execution_started", {})
-
         workflow = await wf_repo.get_by_id(uuid.UUID(workflow_id))
-        secrets_dict: dict[str, str] = {}
         if workflow:
+            workspace_id_str = str(workflow.workspace_id)
+            workflow_name = workflow.name
             credential_service = CredentialService(db)
             credentials_list = await credential_service.list_decrypted_for_user(workflow.user_id)
             # Load user secrets for {{secrets.KEY}} interpolation
             try:
                 import sqlalchemy as sa
-                from apps.api.app.models.secret import Secret
+
                 from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
+                from apps.api.app.models.secret import Secret
                 _enc = AESEncryptionService()
                 result = await db.execute(sa.select(Secret).where(Secret.user_id == workflow.user_id))
+                from contextlib import suppress
                 for s in result.scalars().all():
-                    try:
+                    with suppress(Exception):
                         secrets_dict[s.name] = _enc.decrypt(s.encrypted_value)
-                    except Exception:
-                        pass
             except Exception as e:
                 logger.warning(f"Failed to load secrets for workflow {workflow_id}: {e}")
         else:
             logger.error(f"Workflow {workflow_id} not found when fetching credentials")
 
-    async def on_log(
+    emitter = RedisEventEmitter(execution_id, workspace_id=workspace_id_str)
+
+    async def log_and_emit(
         message: str, level: str = "info", node_id: str | None = None, payload: Any = None
     ) -> None:
+        from datetime import UTC, datetime
         async with AsyncSessionLocal() as db:
             repo = ExecutionRepository(db)
             await repo.add_log(
                 uuid.UUID(execution_id), message, level=level, node_id=node_id, payload=payload
             )
+        await emitter.emit("log_synced", {
+            "type": "log_synced",
+            "node_id": node_id,
+            "lvl": "err" if level == "error" else ("warn" if level == "warn" else "info"),
+            "src": workflow_name,
+            "msg": message,
+            "payload": payload,
+            "t": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+        })
+
+    async with AsyncSessionLocal() as db:
+        exec_repo = ExecutionRepository(db)
+        await exec_repo.update_status(uuid.UUID(execution_id), "running")
+    
+    await log_and_emit("Workflow execution started", level="info")
+    await emitter.emit("execution_started", {})
 
     try:
         async with AsyncSessionLocal() as db:
@@ -97,7 +117,7 @@ async def _run_workflow(
                 execution_id=execution_id,
                 graph=graph,
                 db=db,
-                on_log=on_log,
+                on_log=log_and_emit,
                 credentials=credentials_list,
                 emitter=emitter,
             )
@@ -118,15 +138,17 @@ async def _run_workflow(
         async with AsyncSessionLocal() as db:
             repo = ExecutionRepository(db)
             await repo.update_status(uuid.UUID(execution_id), "completed", output_data=output)
-            await repo.add_log(uuid.UUID(execution_id), "Workflow execution completed", level="info")
-            await emitter.emit("execution_completed", {"status": "completed", "output": output})
+        
+        await log_and_emit("Workflow execution completed", level="info")
+        await emitter.emit("execution_completed", {"status": "completed", "output": output})
 
     except CancelledException:
         async with AsyncSessionLocal() as db:
             repo = ExecutionRepository(db)
             await repo.update_status(uuid.UUID(execution_id), "cancelled")
-            await repo.add_log(uuid.UUID(execution_id), "Execution cancelled by user", level="warn")
-            await emitter.emit("execution_cancelled", {"status": "cancelled"})
+        
+        await log_and_emit("Execution cancelled by user", level="warn")
+        await emitter.emit("execution_cancelled", {"status": "cancelled"})
         logger.info(f"Execution {execution_id} cancelled")
 
     except PauseSignal as pause:
@@ -160,6 +182,7 @@ async def _run_workflow(
         async with AsyncSessionLocal() as db:
             repo = ExecutionRepository(db)
             await repo.update_status(uuid.UUID(execution_id), "failed")
-            await repo.add_log(uuid.UUID(execution_id), error_msg, level="error")
-            await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
+        
+        await log_and_emit(error_msg, level="error")
+        await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
         raise

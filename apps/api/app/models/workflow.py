@@ -86,7 +86,7 @@ class Workflow(Base):
 class Execution(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     workflow_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("workflow.id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("workflow.id", ondelete="CASCADE"), nullable=False
     )
     status: Mapped[str] = mapped_column(
         String, default="pending"
@@ -111,7 +111,7 @@ class Execution(Base):
 class ExecutionLog(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     execution_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("execution.id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("execution.id", ondelete="CASCADE"), nullable=False
     )
     node_id: Mapped[str | None] = mapped_column(String, nullable=True)
     level: Mapped[str] = mapped_column(String, default="info")  # info, warn, error

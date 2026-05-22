@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import json
-import httpx
 from typing import Any
 
+import httpx
+
+from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.tools.base import ToolDefinition, ToolParam, ToolResult
 from apps.api.app.node_system.tools.registry import tool_registry
-from apps.api.app.node_system.base.node_context import NodeContext
 
 
 async def _execute_http_request(params: dict[str, Any], context: NodeContext) -> ToolResult:

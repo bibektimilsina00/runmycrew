@@ -1,8 +1,11 @@
 import secrets
 import uuid
+from typing import Any
 
+import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
@@ -11,16 +14,38 @@ from apps.api.app.core.database import get_db
 from apps.api.app.credential_manager.api_keys import PROVIDERS as API_KEY_PROVIDERS
 from apps.api.app.credential_manager.oauth.flow import PROVIDERS as OAUTH_PROVIDERS
 from apps.api.app.models.user import User
-from apps.api.app.models.workspace import Workspace
+from apps.api.app.models.workspace import Workspace, WorkspaceMember
 from apps.api.app.schemas.credential import (
     CredentialCreate,
     CredentialOut,
+    CredentialRename,
     OAuthUrlResponse,
     ProviderOut,
 )
+from apps.api.app.services.audit_service import AuditService
 from apps.api.app.services.credential_service import CredentialService
 
 router = APIRouter()
+
+MANAGE_ROLES = {"owner", "admin"}
+
+
+async def _require_manage_credentials(
+    current_user: User, workspace: Workspace, db: AsyncSession
+) -> None:
+    """Only owners and admins can create/rename/delete workspace connections."""
+    result = await db.execute(
+        sa.select(WorkspaceMember.role).where(
+            WorkspaceMember.workspace_id == workspace.id,
+            WorkspaceMember.user_id == current_user.id,
+        )
+    )
+    role = result.scalar_one_or_none()
+    if role not in MANAGE_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only workspace owners and admins can manage connections.",
+        )
 
 
 @router.get("/providers", response_model=list[ProviderOut])
@@ -70,6 +95,45 @@ async def list_credentials(
     return await service.list_credentials(current_user, workspace)
 
 
+class AuditLogOut(BaseModel):
+    id: str
+    action: str
+    resource_type: str
+    resource_id: str
+    resource_name: str
+    meta: dict[str, Any] | None
+    created_at: str
+    user_email: str | None
+    user_name: str | None
+
+
+@router.get("/audit", response_model=list[AuditLogOut])
+async def list_audit_log(
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    entries = await AuditService(db).list_for_workspace(
+        workspace_id=workspace.id,
+        resource_type="credential",
+        limit=100,
+    )
+    return [
+        AuditLogOut(
+            id=str(e.id),
+            action=e.action,
+            resource_type=e.resource_type,
+            resource_id=e.resource_id,
+            resource_name=e.resource_name,
+            meta=e.meta,
+            created_at=e.created_at.isoformat(),
+            user_email=e.user.email if e.user else None,
+            user_name=e.user.full_name if e.user else None,
+        )
+        for e in entries
+    ]
+
+
 @router.post("/", response_model=CredentialOut, status_code=status.HTTP_201_CREATED)
 async def create_credential(
     data: CredentialCreate,
@@ -77,14 +141,52 @@ async def create_credential(
     workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
+    await _require_manage_credentials(current_user, workspace, db)
     service = CredentialService(db)
-    return await service.store_credential(
+    credential = await service.store_credential(
         name=data.name,
         type=data.type,
         data=data.data,
         user=current_user,
         workspace=workspace,
     )
+    await AuditService(db).log(
+        workspace_id=workspace.id,
+        user_id=current_user.id,
+        action="credential.created",
+        resource_type="credential",
+        resource_id=str(credential.id),
+        resource_name=credential.name,
+        meta={"type": credential.type},
+    )
+    await db.commit()
+    return credential
+
+
+@router.patch("/{credential_id}", response_model=CredentialOut)
+async def rename_credential(
+    credential_id: uuid.UUID,
+    data: CredentialRename,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    await _require_manage_credentials(current_user, workspace, db)
+    service = CredentialService(db)
+    old = await service.repo.get_by_id_and_workspace(credential_id, workspace.id)
+    old_name = old.name if old else str(credential_id)
+    credential = await service.rename_credential(credential_id, data.name, current_user, workspace)
+    await AuditService(db).log(
+        workspace_id=workspace.id,
+        user_id=current_user.id,
+        action="credential.renamed",
+        resource_type="credential",
+        resource_id=str(credential.id),
+        resource_name=credential.name,
+        meta={"old_name": old_name, "new_name": credential.name},
+    )
+    await db.commit()
+    return credential
 
 
 @router.delete("/{credential_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -94,8 +196,22 @@ async def delete_credential(
     workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
+    await _require_manage_credentials(current_user, workspace, db)
     service = CredentialService(db)
+    cred = await service.repo.get_by_id_and_workspace(credential_id, workspace.id)
+    cred_name = cred.name if cred else str(credential_id)
+    cred_type = cred.type if cred else ""
     await service.delete_credential(credential_id, current_user, workspace)
+    await AuditService(db).log(
+        workspace_id=workspace.id,
+        user_id=current_user.id,
+        action="credential.deleted",
+        resource_type="credential",
+        resource_id=str(credential_id),
+        resource_name=cred_name,
+        meta={"type": cred_type},
+    )
+    await db.commit()
 
 
 @router.get("/oauth/{service_name}/url", response_model=OAuthUrlResponse)
@@ -105,7 +221,9 @@ async def get_oauth_url(
     description: str | None = None,
     current_user: User = Depends(get_current_user),
     workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
 ):
+    await _require_manage_credentials(current_user, workspace, db)
     try:
         from apps.api.app.credential_manager.oauth.flow import get_oauth_provider
 

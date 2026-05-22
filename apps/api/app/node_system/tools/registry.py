@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import re
-from typing import Any, Callable, Awaitable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
-from apps.api.app.node_system.tools.base import ToolDefinition, ToolResult, ToolParam
 from apps.api.app.node_system.base.node_context import NodeContext
+from apps.api.app.node_system.tools.base import ToolDefinition, ToolResult
 
 
 class ToolRegistry:

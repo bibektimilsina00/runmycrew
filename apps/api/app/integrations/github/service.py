@@ -1,8 +1,9 @@
-import httpx
 from typing import Any
 
-from apps.api.app.integrations.github.client import GitHubClient
+import httpx
+
 from apps.api.app.core.logger import get_logger
+from apps.api.app.integrations.github.client import GitHubClient
 
 logger = get_logger(__name__)
 

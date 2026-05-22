@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -25,7 +25,7 @@ async def validate_cron(
     if not croniter.is_valid(expr):
         raise HTTPException(status_code=400, detail=f"Invalid cron expression: '{expr}'")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     citer = croniter(expr, now)
     next_runs = [citer.get_next(datetime).isoformat() for _ in range(min(body.count, 10))]
 
@@ -48,7 +48,7 @@ async def get_next_runs(
     if not croniter.is_valid(expr):
         raise HTTPException(status_code=400, detail=f"Invalid cron expression: '{expr}'")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     citer = croniter(expr, now)
     next_runs = [citer.get_next(datetime).isoformat() for _ in range(count)]
 

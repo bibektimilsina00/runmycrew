@@ -6,7 +6,6 @@ import httpx
 from pydantic import BaseModel
 
 from apps.api.app.core.logger import get_logger
-from apps.api.app.credential_manager.api_keys import get_ai_provider
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata

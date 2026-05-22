@@ -127,3 +127,50 @@ async def execution_websocket(
         logger.error(f"Failed to initialize WebSocket for {execution_id}: {e}", exc_info=True)
         with suppress(Exception):
             await websocket.close(code=1011)
+
+
+@router.websocket("/workspaces/{workspace_id}/logs")
+async def workspace_logs_websocket(
+    websocket: WebSocket,
+    workspace_id: UUID,
+    token: str = Query(...),
+):
+    """
+    WebSocket endpoint for streaming workspace-wide log events.
+    Verifies the user via JWT token before accepting.
+    Subscribes to Redis pub/sub for the specific workspace logs channel.
+    """
+    try:
+        user = await get_current_user_from_token(token)
+        if not user:
+            await websocket.close(code=4001)  # Unauthorized
+            return
+
+        await websocket.accept()
+        logger.info(f"WebSocket connected for workspace {workspace_id} logs")
+
+        redis = await get_redis()
+        pubsub = redis.pubsub()
+        channel = f"workspace:{workspace_id}:logs"
+
+        await pubsub.subscribe(channel)
+        logger.info(f"Subscribed to Redis channel: {channel}")
+
+        try:
+            async for message in pubsub.listen():
+                if message["type"] == "message":
+                    # Forward the Redis message directly to the WebSocket
+                    await websocket.send_text(message["data"])
+        except WebSocketDisconnect:
+            logger.info(f"WebSocket disconnected for workspace {workspace_id} logs")
+        except Exception as e:
+            logger.error(f"WebSocket error for workspace {workspace_id}: {e}", exc_info=True)
+        finally:
+            await pubsub.unsubscribe(channel)
+            if websocket.client_state != WebSocketState.DISCONNECTED:
+                await websocket.close(code=1000)
+
+    except Exception as e:
+        logger.error(f"Failed to initialize WebSocket for workspace {workspace_id}: {e}", exc_info=True)
+        with suppress(Exception):
+            await websocket.close(code=1011)

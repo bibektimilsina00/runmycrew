@@ -52,7 +52,9 @@ class WorkspaceMember(Base):
     joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     workspace: Mapped["Workspace"] = relationship("Workspace", back_populates="members")
-    user: Mapped["User"] = relationship("User", foreign_keys=[user_id])
+    user: Mapped["User"] = relationship(
+        "User", foreign_keys=[user_id], back_populates="workspace_memberships"
+    )
 
     __table_args__ = (UniqueConstraint("workspace_id", "user_id", name="uq_workspace_member"),)
 

@@ -146,6 +146,36 @@ class WorkspaceService:
         self._assert_can_manage_target(actor_member, target, role)
         return await self.repo.update_member_role(target, role)
 
+    async def update_workspace(
+        self,
+        workspace_id: uuid.UUID,
+        name: str,
+        actor: User,
+    ) -> Workspace:
+        workspace = await self.repo.get(workspace_id)
+        if workspace is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
+        member = await self.repo.get_member(workspace_id, actor.id)
+        if not member or member.role != "owner":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only owners can rename the workspace")
+        new_slug = await self._unique_slug_for_rename(name, workspace.slug)
+        return await self.repo.update_workspace(workspace, name.strip(), new_slug)
+
+    async def delete_workspace(
+        self,
+        workspace_id: uuid.UUID,
+        actor: User,
+    ) -> None:
+        workspace = await self.repo.get(workspace_id)
+        if workspace is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
+        if workspace.is_personal:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete personal workspace")
+        member = await self.repo.get_member(workspace_id, actor.id)
+        if not member or member.role != "owner":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only owners can delete the workspace")
+        await self.repo.delete_workspace(workspace)
+
     async def remove_member(
         self,
         workspace_id: uuid.UUID,
@@ -158,6 +188,18 @@ class WorkspaceService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not found")
         self._assert_can_manage_target(actor_member, target, None)
         await self.repo.delete_member(target)
+
+    async def _unique_slug_for_rename(self, name: str, current_slug: str) -> str:
+        base = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:80] or "workspace"
+        # If the new base matches the current slug (ignoring numeric suffix), keep it
+        if current_slug == base or current_slug.startswith(base + "-"):
+            return current_slug
+        slug = base
+        suffix = 2
+        while await self.repo.slug_exists(slug):
+            slug = f"{base}-{suffix}"
+            suffix += 1
+        return slug
 
     async def _unique_slug(self, name: str) -> str:
         base = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:80] or "workspace"

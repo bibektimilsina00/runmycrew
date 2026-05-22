@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 ToolParamVisibility = Literal['user-or-llm', 'user-only', 'llm-only', 'hidden']
 

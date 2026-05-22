@@ -80,5 +80,9 @@ class WorkspaceInvitePreviewOut(BaseModel):
     accepted_at: datetime | None = None
 
 
+class WorkspaceUpdate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+
+
 class WorkspaceMemberUpdate(BaseModel):
     role: WorkspaceRole

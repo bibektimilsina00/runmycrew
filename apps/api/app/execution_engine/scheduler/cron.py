@@ -1,3 +1,5 @@
+from datetime import UTC
+
 from apps.api.app.core.celery import celery_app
 from apps.api.app.core.logger import get_logger
 
@@ -13,7 +15,7 @@ def check_cron_triggers():
 
 
 async def _check_and_fire():
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from croniter import croniter
 
@@ -22,7 +24,7 @@ async def _check_and_fire():
     from apps.api.app.execution_engine.engine import execution_engine
     from apps.api.app.repositories.workflow_repository import WorkflowRepository
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     async with AsyncSessionLocal() as db:
         repo = WorkflowRepository(db)

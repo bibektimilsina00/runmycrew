@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
@@ -39,6 +38,7 @@ app.add_middleware(
 async def health_check():
     """Check API, DB, Redis and Celery worker connectivity."""
     import asyncio
+
     from apps.api.app.core.celery import celery_app
 
     status: dict = {"api": "ok", "db": "unknown", "redis": "unknown", "worker": "unknown"}
@@ -47,6 +47,7 @@ async def health_check():
     # DB check
     try:
         import sqlalchemy as sa
+
         from apps.api.app.core.database import AsyncSessionLocal
         async with AsyncSessionLocal() as db:
             await db.execute(sa.text("SELECT 1"))

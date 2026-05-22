@@ -2,7 +2,6 @@ from typing import Any
 
 from pydantic import BaseModel
 
-
 _RETRY_PROPERTIES: list[dict[str, Any]] = [
     {
         "name": "retries",

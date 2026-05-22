@@ -13,6 +13,7 @@ from apps.api.app.schemas.workspace import (
     WorkspaceInvitePreviewOut,
     WorkspaceMemberOut,
     WorkspaceMemberUpdate,
+    WorkspaceUpdate,
     WorkspaceWithRoleOut,
 )
 from apps.api.app.services.workspace_service import WorkspaceService
@@ -126,3 +127,27 @@ async def delete_member(
     db: AsyncSession = Depends(get_db),
 ):
     await WorkspaceService(db).remove_member(workspace_id, user_id, current_user)
+
+
+@router.patch("/{workspace_id}", response_model=WorkspaceWithRoleOut)
+async def update_workspace(
+    workspace_id: uuid.UUID,
+    data: WorkspaceUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = WorkspaceService(db)
+    workspace = await svc.update_workspace(workspace_id, data.name, current_user)
+    rows = await svc.list_workspaces(current_user)
+    updated = next((r for r in rows if r[0].id == workspace.id), None)
+    role, count = (updated[1], updated[2]) if updated else ("owner", 1)
+    return _workspace_with_role(workspace, role, count)
+
+
+@router.delete("/{workspace_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_workspace(
+    workspace_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    await WorkspaceService(db).delete_workspace(workspace_id, current_user)

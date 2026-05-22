@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import io
 import json
-import sys
 import textwrap
 from contextlib import redirect_stderr, redirect_stdout
 from typing import Any
@@ -125,7 +124,7 @@ class CodeNode(BaseNode[CodeProperties]):
                 )
             else:
                 return NodeResult(success=False, error=f"Unsupported language: {self.props.language}")
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return NodeResult(success=False, error=f"Code execution timed out after {timeout}s.")
         except Exception as e:
             return NodeResult(success=False, error=str(e))

@@ -78,8 +78,8 @@ class SubWorkflowNode(BaseNode[SubWorkflowProperties]):
 
         try:
             from apps.api.app.core.database import AsyncSessionLocal
-            from apps.api.app.repositories.workflow_repository import WorkflowRepository
             from apps.api.app.execution_engine.engine.workflow_runner import WorkflowRunner
+            from apps.api.app.repositories.workflow_repository import WorkflowRepository
 
             async with AsyncSessionLocal() as db:
                 repo = WorkflowRepository(db)

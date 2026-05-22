@@ -50,9 +50,8 @@ class ExecutionRepository:
             execution.status = status
             if status == "running":
                 execution.started_at = datetime.now(UTC)
-            elif status in ("completed", "failed", "cancelled", "cancelling"):
-                if status in ("completed", "failed", "cancelled"):
-                    execution.finished_at = datetime.now(UTC)
+            elif status in ("completed", "failed", "cancelled"):
+                execution.finished_at = datetime.now(UTC)
             if output_data is not None:
                 execution.output_data = output_data
             await self.db.commit()
@@ -182,3 +181,42 @@ class ExecutionRepository:
             )
         )
         return result.scalar_one_or_none()
+
+    async def get_logs_by_workspace(
+        self,
+        workspace_id: uuid.UUID,
+        limit: int = 100,
+        level: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Retrieve execution logs across all workflows in a workspace."""
+        q = (
+            select(
+                ExecutionLog.id,
+                ExecutionLog.timestamp,
+                ExecutionLog.level,
+                ExecutionLog.message,
+                Workflow.name.label("workflow_name"),
+            )
+            .join(Execution, ExecutionLog.execution_id == Execution.id)
+            .join(Workflow, Execution.workflow_id == Workflow.id)
+            .where(Workflow.workspace_id == workspace_id)
+        )
+        if level:
+            q = q.where(ExecutionLog.level == level)
+        
+        q = q.order_by(ExecutionLog.timestamp.desc()).limit(limit)
+        
+        result = await self.db.execute(q)
+        rows = result.fetchall()
+        
+        return [
+            {
+                "id": str(r.id),
+                "t": r.timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3] if r.timestamp else "",
+                "lvl": "err" if r.level == "error" else ("warn" if r.level == "warn" else "info"),
+                "src": r.workflow_name,
+                "msg": r.message,
+            }
+            for r in rows
+        ]
+

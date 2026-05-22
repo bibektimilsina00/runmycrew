@@ -1,3 +1,4 @@
+import random
 import uuid
 from typing import Any
 
@@ -10,6 +11,17 @@ from apps.api.app.models.workflow import Workflow
 from apps.api.app.models.workspace import Workspace
 from apps.api.app.repositories.workflow_repository import WorkflowRepository
 from apps.api.app.schemas.workflow import WorkflowBatchUpdate, WorkflowCreate, WorkflowUpdate
+
+CURATED_COLORS = [
+    "#6366f1",  # Indigo
+    "#10b981",  # Emerald
+    "#f59e0b",  # Amber
+    "#f43f5e",  # Rose
+    "#0ea5e9",  # Sky
+    "#8b5cf6",  # Violet
+    "#ec4899",  # Pink
+    "#3b82f6",  # Blue
+]
 
 
 class WorkflowService:
@@ -29,6 +41,7 @@ class WorkflowService:
         return workflow
 
     async def create_workflow(self, data: WorkflowCreate, user: User, workspace: Workspace) -> Workflow:
+        color = data.color if data.color is not None else random.choice(CURATED_COLORS)
         workflow = Workflow(
             user_id=user.id,
             workspace_id=workspace.id,
@@ -37,7 +50,7 @@ class WorkflowService:
             graph=self._initial_graph(data.graph),
             folder_id=data.folder_id,
             position=data.position,
-            color=data.color,
+            color=color,
             env=data.env,
         )
         return await self.repository.create(workflow)

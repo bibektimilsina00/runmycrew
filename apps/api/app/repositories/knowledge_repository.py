@@ -84,6 +84,26 @@ class KnowledgeRepository:
 
     # ── KBChunk ────────────────────────────────────────────────────────────────
 
+    async def count_chunks_for_kb(self, kb_id: uuid.UUID) -> int:
+        result = await self.db.execute(
+            sa.select(sa.func.count(KBChunk.id)).where(KBChunk.knowledge_base_id == kb_id)
+        )
+        return result.scalar_one() or 0
+
+    async def list_chunks_for_document(self, doc_id: uuid.UUID) -> list[KBChunk]:
+        result = await self.db.execute(
+            sa.select(KBChunk)
+            .where(KBChunk.document_id == doc_id)
+            .order_by(KBChunk.chunk_index)
+        )
+        return list(result.scalars().all())
+
+    async def get_chunk(self, chunk_id: uuid.UUID, kb_id: uuid.UUID) -> KBChunk | None:
+        result = await self.db.execute(
+            sa.select(KBChunk).where(KBChunk.id == chunk_id, KBChunk.knowledge_base_id == kb_id)
+        )
+        return result.scalar_one_or_none()
+
     async def bulk_insert_chunks(self, chunks: list[KBChunk]) -> None:
         self.db.add_all(chunks)
         await self.db.commit()
@@ -95,7 +115,7 @@ class KnowledgeRepository:
         top_k: int = 5,
     ) -> list[dict]:
         from pgvector.sqlalchemy import Vector
-        vec_literal = sa.cast(embedding, Vector(1536))
+        vec_literal = sa.cast(embedding, Vector())
 
         result = await self.db.execute(
             sa.select(
@@ -105,7 +125,11 @@ class KnowledgeRepository:
                 KBChunk.chunk_index,
                 (1 - KBChunk.embedding.cosine_distance(vec_literal)).label("score"),
             )
-            .where(KBChunk.knowledge_base_id == kb_id, KBChunk.embedding.is_not(None))
+            .where(
+                KBChunk.knowledge_base_id == kb_id,
+                KBChunk.embedding.is_not(None),
+                sa.func.vector_dims(KBChunk.embedding) == len(embedding),
+            )
             .order_by(KBChunk.embedding.cosine_distance(vec_literal))
             .limit(top_k)
         )

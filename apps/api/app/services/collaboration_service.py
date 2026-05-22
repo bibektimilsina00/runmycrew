@@ -129,7 +129,7 @@ class CollaborationService:
         while True:
             try:
                 raw = await asyncio.wait_for(websocket.receive_text(), timeout=RECEIVE_TIMEOUT)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.info(f"[collab] session {session.session_id} timed out — removing presence")
                 return  # causes run_socket finally to clean up
 

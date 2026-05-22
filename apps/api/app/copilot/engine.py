@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Any
 
 import httpx
 
@@ -103,15 +104,16 @@ async def run_copilot(
     db: Any,
     session_id: str | None = None,
     user_id: str = "",
-) -> AsyncGenerator[str, None]:
+) -> AsyncGenerator[str]:
     """
     Run the Fuse Copilot agentic loop (Sim-style).
     Yields SSE-formatted strings.
     """
-    from apps.api.app.repositories.workflow_repository import WorkflowRepository
-    from apps.api.app.repositories.copilot_session_repository import CopilotSessionRepository
-    from apps.api.app.models.copilot_session import CopilotSession as CopilotSessionModel
     import uuid as _uuid
+
+    from apps.api.app.models.copilot_session import CopilotSession as CopilotSessionModel
+    from apps.api.app.repositories.copilot_session_repository import CopilotSessionRepository
+    from apps.api.app.repositories.workflow_repository import WorkflowRepository
 
     known_types = {m["type"] for m in node_metadata}
     system_prompt = build_system_prompt(graph, node_metadata)

@@ -63,6 +63,17 @@ class CredentialRepository:
         )
         return result.scalar_one_or_none()
 
+    async def get_first_by_type_and_workspace(
+        self, credential_type: str, workspace_id: uuid.UUID
+    ) -> Credential | None:
+        result = await self.db.execute(
+            select(Credential).where(
+                Credential.type == credential_type,
+                Credential.workspace_id == workspace_id,
+            ).limit(1)
+        )
+        return result.scalar_one_or_none()
+
     async def create(self, credential: Credential) -> Credential:
         self.db.add(credential)
         await self.db.commit()

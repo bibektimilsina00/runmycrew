@@ -80,6 +80,15 @@ class CredentialService:
             decrypted.append({"id": str(credential.id), "type": credential.type, "data": data})
         return decrypted
 
+    async def rename_credential(
+        self, credential_id: uuid.UUID, name: str, user: User, workspace: Workspace
+    ) -> Credential:
+        credential = await self.repo.get_by_id_and_workspace(credential_id, workspace.id)
+        if not credential:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Credential not found")
+        credential.name = name.strip()
+        return await self.repo.update(credential)
+
     async def delete_credential(self, credential_id: uuid.UUID, user: User, workspace: Workspace) -> None:
         credential = await self.repo.get_by_id_and_workspace(credential_id, workspace.id)
         if not credential:

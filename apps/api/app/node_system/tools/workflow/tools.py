@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.tools.base import ToolDefinition, ToolParam, ToolResult
 from apps.api.app.node_system.tools.registry import tool_registry
-from apps.api.app.node_system.base.node_context import NodeContext
 
 
 async def _execute_workflow(params: dict[str, Any], context: NodeContext) -> ToolResult:
@@ -15,8 +15,8 @@ async def _execute_workflow(params: dict[str, Any], context: NodeContext) -> Too
         return ToolResult(success=False, error="Database context required for workflow execution")
 
     try:
-        from apps.api.app.repositories.workflow_repository import WorkflowRepository
         from apps.api.app.execution_engine.engine.workflow_runner import WorkflowRunner
+        from apps.api.app.repositories.workflow_repository import WorkflowRepository
 
         repo = WorkflowRepository(context.db)
         workflow = await repo.get_by_id(workflow_id)

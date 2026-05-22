@@ -26,8 +26,10 @@ class KnowledgeBase(Base):
     embedding_model: Mapped[str] = mapped_column(String(100), default="text-embedding-3-small")
     embedding_provider: Mapped[str] = mapped_column(String(50), default="openai")
     embedding_credential_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
-    chunk_size: Mapped[int] = mapped_column(Integer, default=1000, nullable=False)
-    chunk_overlap: Mapped[int] = mapped_column(Integer, default=200, nullable=False)
+    min_chunk_size: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
+    chunk_size: Mapped[int] = mapped_column(Integer, default=4096, nullable=False)   # max chars (1024 tokens × 4)
+    chunk_overlap: Mapped[int] = mapped_column(Integer, default=800, nullable=False)  # chars (200 tokens × 4)
+    chunking_strategy: Mapped[str] = mapped_column(String(50), default="auto", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
 
@@ -40,6 +42,9 @@ class KBDocument(Base):
     name: Mapped[str] = mapped_column(String(500), nullable=False)
     source_type: Mapped[str] = mapped_column(String(50), default="text")  # text | file | url
     chunk_count: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
+    # Allowed values: pending | indexed | failed | partial
+    raw_content: Mapped[str | None] = mapped_column(Text, nullable=True)  # stored for re-indexing
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     knowledge_base: Mapped["KnowledgeBase"] = relationship("KnowledgeBase", back_populates="documents")
@@ -52,6 +57,6 @@ class KBChunk(Base):
     knowledge_base_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("knowledgebase.id", ondelete="CASCADE"), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     chunk_index: Mapped[int] = mapped_column(Integer, default=0)
-    embedding: Mapped[list[float] | None] = mapped_column(Vector(1536), nullable=True)
+    embedding: Mapped[list[float] | None] = mapped_column(Vector(), nullable=True)
 
     document: Mapped["KBDocument"] = relationship("KBDocument", back_populates="chunks")

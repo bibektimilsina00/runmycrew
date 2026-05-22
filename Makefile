@@ -1,4 +1,4 @@
-.PHONY: setup dev build lint lint-py lint-js test clean db-up migrate docker-build docker-up beat
+.PHONY: setup dev dev-v2 build-v2 lint-v2 typecheck-v2 build lint lint-py lint-js test clean db-up migrate docker-build docker-up beat
 
 setup:
 	pnpm install
@@ -7,6 +7,9 @@ setup:
 
 dev:
 	pnpm dev
+
+dev-v2:
+	pnpm --filter web_v2 run dev
 
 db-up:
 	docker-compose up -d db redis
@@ -41,6 +44,15 @@ lint-js:
 
 type-check:
 	pnpm --filter web exec tsc --noEmit
+
+build-v2:
+	pnpm --filter web_v2 run build
+
+lint-v2:
+	pnpm --filter web_v2 run lint
+
+typecheck-v2:
+	pnpm --filter web_v2 exec tsc --noEmit
 
 docker-build:
 	docker-compose build

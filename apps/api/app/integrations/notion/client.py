@@ -1,5 +1,6 @@
-import httpx
 from typing import Any
+
+import httpx
 
 from apps.api.app.core.logger import get_logger
 

@@ -55,7 +55,16 @@ async def test_node(
     from apps.api.app.models.secret import Secret
 
     _enc = AESEncryptionService()
-    result = await db.execute(sa.select(Secret).where(Secret.workspace_id == workspace.id))
+    # Load workspace-scoped secrets + personal secrets belonging to this user
+    result = await db.execute(
+        sa.select(Secret).where(
+            Secret.workspace_id == workspace.id,
+            sa.or_(
+                Secret.scope == "workspace",
+                sa.and_(Secret.scope == "personal", Secret.user_id == current_user.id),
+            ),
+        )
+    )
     for s in result.scalars().all():
         try:
             secrets[s.name] = _enc.decrypt(s.encrypted_value)
