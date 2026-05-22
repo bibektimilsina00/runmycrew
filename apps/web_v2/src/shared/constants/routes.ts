@@ -76,6 +76,17 @@ export const API_ROUTES = {
   ASSET_VIEW: (id: string) => `/assets/${id}/view`,
   ASSET_DOWNLOAD: (id: string) => `/assets/${id}/download`,
 
+  // Tables
+  TABLES_LIST: '/tables/',
+  TABLES_IMPORT_CSV: '/tables/import.csv',
+  TABLE: (id: string) => `/tables/${id}`,
+  TABLE_COLUMNS: (id: string) => `/tables/${id}/columns`,
+  TABLE_COLUMN: (tableId: string, columnId: string) => `/tables/${tableId}/columns/${columnId}`,
+  TABLE_ROWS: (id: string) => `/tables/${id}/rows`,
+  TABLE_ROW: (tableId: string, rowId: string) => `/tables/${tableId}/rows/${rowId}`,
+  TABLE_IMPORT_ROWS_CSV: (id: string) => `/tables/${id}/import.csv`,
+  TABLE_EXPORT_CSV: (id: string) => `/tables/${id}/export.csv`,
+
   // User / Account
   USER_ME: '/users/me',
   USER_API_KEYS: '/users/api-keys',
