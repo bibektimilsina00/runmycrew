@@ -26,12 +26,6 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@18.3.1)
-      '@fuse/node-definitions':
-        specifier: workspace:*
-        version: link:../../packages/node-definitions
-      '@fuse/workflow-schema':
-        specifier: workspace:*
-        version: link:../../packages/workflow-schema
       '@icons-pack/react-simple-icons':
         specifier: ^13.13.0
         version: 13.13.0(react@18.3.1)
@@ -292,18 +286,6 @@ importers:
       vite:
         specifier: ^8.0.12
         version: 8.0.13(@types/node@24.12.4)(jiti@1.21.7)
-
-  packages/node-definitions:
-    devDependencies:
-      typescript:
-        specifier: ^5.2.2
-        version: 5.9.3
-
-  packages/workflow-schema:
-    dependencies:
-      zod:
-        specifier: ^3.23.8
-        version: 3.25.76
 
 packages:
 

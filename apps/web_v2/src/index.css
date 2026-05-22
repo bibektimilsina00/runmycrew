@@ -479,3 +479,32 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* run-trigger */
 .run-trigger { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--text-mute); }
 .run-trigger svg { width: 12px; height: 12px; color: var(--text-dim); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WORKFLOW NODE — execution status
+══════════════════════════════════════════════════════════════════════════════ */
+.node-status-completed { border-color: var(--ok) !important; }
+.node-status-failed    { border-color: var(--err) !important; }
+
+.node-running-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 13px;
+  background: conic-gradient(var(--accent) 0deg, transparent 120deg);
+  animation: node-spin 1.2s linear infinite;
+  z-index: 10;
+  pointer-events: none;
+}
+.node-running-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 11px;
+  background: var(--bg);
+  z-index: 11;
+  pointer-events: none;
+}
+.node-running-wrapper > div { z-index: 12 !important; }
+
+@keyframes node-spin { to { transform: rotate(360deg); } }

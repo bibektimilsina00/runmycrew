@@ -1,6 +1,6 @@
 import { requestJson } from '@/shared/utils/apiClient'
 import { API_ROUTES } from '@/shared/constants/routes'
-import { WorkflowDetailSchema } from '../types/editorTypes'
+import { WorkflowDetailSchema, ApiNodeDefinitionListSchema } from '../types/editorTypes'
 import { z } from 'zod'
 
 export const editorAPI = {
@@ -35,5 +35,12 @@ export const editorAPI = {
     requestJson(z.object({ execution_id: z.string() }), {
       url: API_ROUTES.WORKFLOW_RUN(id),
       method: 'POST',
+    }),
+
+  getNodeDefinitions: (signal?: AbortSignal) =>
+    requestJson(ApiNodeDefinitionListSchema, {
+      url: API_ROUTES.NODES_LIST,
+      method: 'GET',
+      signal,
     }),
 }

@@ -1,14 +1,39 @@
 import { useEffect, useCallback, useRef } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNodesState, useEdgesState } from 'reactflow'
+import type { ApiNodeDefinition, NodeDefinition } from '../types/editorTypes'
+
 import { editorAPI } from '../services/editorAPI'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 
 const AUTOSAVE_DELAY = 1500 // ms
 
+function normalizeDefinition(d: ApiNodeDefinition): NodeDefinition {
+  return {
+    ...d,
+    allowError: d.allow_error,
+    outputsSchema: d.outputs_schema,
+    credentialType: (d.credential_type as string | undefined) ?? undefined,
+  }
+}
+
 export function useWorkflowEditor(workflowId: string) {
   const store = useWorkflowEditorStore()
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // ── Fetch node definitions (shared, long-lived cache) ─────────────────────
+  const { data: rawDefinitions } = useQuery({
+    queryKey: ['node-definitions'],
+    queryFn: ({ signal }) => editorAPI.getNodeDefinitions(signal),
+    staleTime: 1000 * 60 * 10, // 10 min
+  })
+
+  useEffect(() => {
+    if (rawDefinitions && rawDefinitions.length > 0) {
+      store.setNodeDefinitions(rawDefinitions.map(normalizeDefinition))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawDefinitions])
 
   // ── Fetch workflow ────────────────────────────────────────────────────────
   const { data: workflow, isLoading, error } = useQuery({
@@ -30,7 +55,7 @@ export function useWorkflowEditor(workflowId: string) {
     const graph = workflow.graph ?? { nodes: [], edges: [] }
     setNodes(graph.nodes ?? [])
     setEdges(graph.edges ?? [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workflow?.id])
 
   // ── Auto-save ─────────────────────────────────────────────────────────────
@@ -68,7 +93,7 @@ export function useWorkflowEditor(workflowId: string) {
   useEffect(() => {
     if (!workflow) return
     triggerSave(nodes, edges)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, edges])
 
   // ── Run ───────────────────────────────────────────────────────────────────
@@ -94,7 +119,7 @@ export function useWorkflowEditor(workflowId: string) {
   useEffect(() => () => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
     store.reset()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return {
@@ -109,7 +134,7 @@ export function useWorkflowEditor(workflowId: string) {
     setNodes,
     setEdges,
     // Actions
-    run:    runMutation.mutate,
+    run: runMutation.mutate,
     rename: renameMutation.mutate,
     toggle: toggleMutation.mutate,
     isRunning: runMutation.isPending,

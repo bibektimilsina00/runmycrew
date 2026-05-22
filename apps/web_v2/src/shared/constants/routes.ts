@@ -42,6 +42,9 @@ export const API_ROUTES = {
   FORGOT_PASSWORD: '/auth/forgot-password',
   RESET_PASSWORD: '/auth/reset-password',
 
+  // Nodes
+  NODES_LIST: '/nodes/',
+
   // Workflows / Automations
   WORKFLOWS_WITH_STATS: '/workflows/with-stats',
   WORKFLOW_CREATE: '/workflows/',
