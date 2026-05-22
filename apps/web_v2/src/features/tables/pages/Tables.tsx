@@ -1,18 +1,11 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { Button, Input, Modal, useConfirm, useToast } from '@/shared/components'
 import { Icons } from '@/shared/components/icons'
 import { useCreateTable, useDeleteTable, useImportTableCsv, useTables } from '../hooks/useTables'
-import { TablesTable } from '../components/TablesTable'
 import { TableEditor } from '../components/TableEditor'
-import type { DataTable, TableFilter, TableSort } from '../types/tablesTypes'
+import type { DataTable } from '../types/tablesTypes'
 import { formatCount } from '../utils/tableFormat'
-
-const FILTERS: { id: TableFilter; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'live', label: 'Live' },
-  { id: 'static', label: 'Static' },
-  { id: 'archived', label: 'Archived' },
-]
+import { cn } from '@/lib/cn'
 
 export function Tables() {
   const { toast } = useToast()
@@ -22,39 +15,26 @@ export function Tables() {
   const createTable = useCreateTable()
   const importCsv = useImportTableCsv()
   const deleteTable = useDeleteTable()
-  const [filter, setFilter] = useState<TableFilter>('all')
   const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<TableSort>('updated_desc')
   const [createOpen, setCreateOpen] = useState(false)
   const [tableName, setTableName] = useState('')
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
 
   const visibleItems = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
-    const filtered = items.filter(table => {
-      const isImported = table.source.toLowerCase().includes('csv')
-      const matchesFilter =
-        filter === 'all' ||
-        (filter === 'static' && !isImported) ||
-        (filter === 'live' && isImported)
-      const matchesSearch =
+    return items
+      .filter(table =>
         !normalizedSearch ||
         table.name.toLowerCase().includes(normalizedSearch) ||
         table.source.toLowerCase().includes(normalizedSearch) ||
-        table.owner.toLowerCase().includes(normalizedSearch)
-      return matchesFilter && matchesSearch
-    })
-
-    return [...filtered].sort((a, b) => {
-      if (sort === 'name_asc') return a.name.localeCompare(b.name)
-      if (sort === 'rows_desc') return b.row_count - a.row_count
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    })
-  }, [filter, items, search, sort])
+        table.owner.toLowerCase().includes(normalizedSearch),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [items, search])
 
   const selectedTable = items.find(table => table.id === selectedTableId) ?? null
 
-  const handleCreate = async (event: React.FormEvent) => {
+  const handleCreate = async (event: FormEvent) => {
     event.preventDefault()
     if (!tableName.trim()) return
     try {
@@ -102,29 +82,37 @@ export function Tables() {
     }
   }
 
-  const cycleSort = () => {
-    setSort(current => {
-      if (current === 'updated_desc') return 'name_asc'
-      if (current === 'name_asc') return 'rows_desc'
-      return 'updated_desc'
-    })
-  }
-
   const totalRows = items.reduce((sum, table) => sum + table.row_count, 0)
 
   return (
-    <div className="view-body min-h-full">
-      <div className="page-head">
-        <div>
-          <span className="eyebrow">Data · {items.length} tables · {formatCount(totalRows)} rows</span>
-          <h1>Tables</h1>
-        </div>
-        <div className="btn-group">
-          <button className="btn btn-secondary" onClick={() => fileInputRef.current?.click()}>
-            <Icons.Download /> {importCsv.isPending ? 'Importing...' : 'Import CSV'}
+    <div className="h-full min-h-0 flex overflow-hidden bg-[var(--bg)]">
+      <aside className="w-48 shrink-0 border-r border-[var(--border-faint)] flex flex-col overflow-hidden bg-[var(--bg)]">
+        <div className="flex items-center justify-between border-b border-[var(--border-faint)] px-3 py-3">
+          <div className="min-w-0">
+            <span className="block text-[12px] font-semibold text-[var(--text)]">Tables</span>
+            <span className="block truncate text-[10px] text-[var(--text-faint)]">
+              {items.length} tables · {formatCount(totalRows)} rows
+            </span>
+          </div>
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="flex h-7 w-7 items-center justify-center rounded-[7px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)]"
+            title="New table"
+          >
+            <Icons.Plus className="h-3.5 w-3.5" />
           </button>
-          <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
-            <Icons.Plus /> New table
+        </div>
+
+        <div className="border-b border-[var(--border-faint)] p-2">
+          <div className="cmd-search inline-search h-8">
+            <Icons.Search />
+            <input placeholder="Search" value={search} onChange={event => setSearch(event.target.value)} />
+          </div>
+          <button
+            className="mt-2 flex w-full items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-left text-[12px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)]"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Icons.Download className="h-3.5 w-3.5" /> {importCsv.isPending ? 'Importing...' : 'Import CSV'}
           </button>
           <input
             ref={fileInputRef}
@@ -134,30 +122,67 @@ export function Tables() {
             onChange={event => handleImport(event.target.files)}
           />
         </div>
-      </div>
 
-      <div className="filter-bar">
-        <div className="filter-tabs">
-          {FILTERS.map(item => (
-            <button key={item.id} className={`filter-tab${filter === item.id ? ' active' : ''}`} onClick={() => setFilter(item.id)}>
-              {item.label}
+        <div className="flex-1 overflow-y-auto py-1">
+          {isLoading ? (
+            <div className="px-3 py-2 text-[12px] text-[var(--text-faint)]">Loading...</div>
+          ) : visibleItems.length === 0 ? (
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)]"
+            >
+              <Icons.Plus className="h-3.5 w-3.5" /> New table
             </button>
-          ))}
+          ) : (
+            visibleItems.map(table => (
+              <div key={table.id} className="group relative">
+                <button
+                  onClick={() => handleOpen(table)}
+                  className={cn(
+                    'flex w-full items-center gap-2 px-3 py-2 pr-8 text-left text-[12px] transition-colors',
+                    table.id === selectedTable?.id
+                      ? 'bg-[var(--surface)] text-[var(--text)]'
+                      : 'text-[var(--text-faint)] hover:bg-[var(--surface)] hover:text-[var(--text)]',
+                  )}
+                >
+                  <Icons.Table className="h-3.5 w-3.5 shrink-0" />
+                  <span className="min-w-0 flex-1 truncate">{table.name}</span>
+                </button>
+                <button
+                  type="button"
+                  title="Delete table"
+                  onClick={() => handleDelete(table)}
+                  className="absolute right-2 top-1/2 hidden h-5 w-5 -translate-y-1/2 items-center justify-center rounded text-[var(--text-faint)] transition-colors hover:text-[var(--err)] group-hover:flex"
+                >
+                  <Icons.Trash className="h-3 w-3" />
+                </button>
+              </div>
+            ))
+          )}
         </div>
-        <div className="filter-tools">
-          <div className="cmd-search inline-search">
-            <Icons.Search />
-            <input placeholder="Search tables" value={search} onChange={event => setSearch(event.target.value)} />
-          </div>
-          <button className="icon-btn" title={`Sort: ${sortLabel(sort)}`} onClick={cycleSort}><Icons.Sort /></button>
-        </div>
-      </div>
+      </aside>
 
-      {selectedTable ? (
-        <TableEditor table={selectedTable} onClose={() => setSelectedTableId(null)} />
-      ) : (
-        <TablesTable items={visibleItems} isLoading={isLoading} onOpen={handleOpen} onDelete={handleDelete} />
-      )}
+      <main className="min-w-0 flex-1 overflow-hidden">
+        {selectedTable ? (
+          <TableEditor table={selectedTable} onClose={() => setSelectedTableId(null)} />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+            <Icons.Table className="mx-auto mb-3 h-10 w-10 text-[var(--text-faint)] opacity-40" />
+            <p className="mb-1 text-[14px] font-medium text-[var(--text)]">No table selected</p>
+            <p className="mb-4 text-[13px] text-[var(--text-faint)]">
+              {items.length === 0 ? 'Create your first table to get started' : 'Select a table from the sidebar'}
+            </p>
+            {items.length === 0 && (
+              <button
+                onClick={() => setCreateOpen(true)}
+                className="flex items-center gap-1.5 rounded-[8px] border border-[var(--border-faint)] px-4 py-2 text-[13px] text-[var(--text-faint)] transition-colors hover:border-[var(--border-soft)] hover:text-[var(--text)]"
+              >
+                <Icons.Plus className="h-3.5 w-3.5" /> New table
+              </button>
+            )}
+          </div>
+        )}
+      </main>
 
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="New table">
         <form onSubmit={handleCreate} className="flex flex-col gap-4 p-6">
@@ -180,10 +205,4 @@ export function Tables() {
       </Modal>
     </div>
   )
-}
-
-function sortLabel(sort: TableSort): string {
-  if (sort === 'name_asc') return 'Name'
-  if (sort === 'rows_desc') return 'Rows'
-  return 'Updated'
 }
