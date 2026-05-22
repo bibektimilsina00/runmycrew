@@ -28,30 +28,30 @@ interface RecentRunsProps {
 
 export function RecentRuns({ items = defaultRuns, onOpenRun, onViewAll }: RecentRunsProps) {
   return (
-    <div className="panel">
+    <div className="bg-[var(--bg)] border border-[var(--border-faint)] rounded-[12px] overflow-hidden flex flex-col">
       <PanelHead
         icon={<Icons.Activity className="w-3.5 h-3.5" />}
         title="Recent runs"
         count="1,284 today"
         action={
-          <button className="link-btn" onClick={onViewAll}>
+          <button className="text-[12px] text-[var(--text-mute)] py-[4px] px-[8px] rounded-[6px] transition-colors duration-120 inline-flex items-center gap-[4px] hover:text-[var(--text)] hover:bg-[var(--surface)]" onClick={onViewAll}>
             <span>View all</span>
             <Icons.CaretRight className="w-3 h-3" />
           </button>
         }
       />
-      <div className="runs">
+      <div className="flex flex-col">
         {items.map((r, i) => (
-          <div key={i} className="run-row" onClick={() => onOpenRun(r, i)}>
+          <div key={i} className="grid grid-cols-[22px_1fr_180px_80px_80px_22px] gap-[12px] items-center py-[10px] px-[16px] border-b border-[var(--border-faint)] text-[13px] cursor-pointer transition-colors duration-100 last:border-b-0 hover:bg-[var(--surface)]" onClick={() => onOpenRun(r, i)}>
             <span className={`status-dot ${r.status}`} />
-            <span className="run-name">{r.name}</span>
-            <span className="run-trigger">
+            <span className="font-medium whitespace-nowrap overflow-hidden text-ellipsis">{r.name}</span>
+            <span className="inline-flex items-center gap-[6px] font-mono text-[11px] text-[var(--text-mute)]">
               <Icons.Bolt className="w-2.5 h-2.5" />
               <span>{r.trigger}</span>
             </span>
-            <span className="run-meta">{r.duration}</span>
-            <span className="run-meta">{r.ago}</span>
-            <span className="caret">
+            <span className="font-mono text-[11px] text-[var(--text-faint)]">{r.duration}</span>
+            <span className="font-mono text-[11px] text-[var(--text-faint)]">{r.ago}</span>
+            <span className="text-[var(--text-dim)] inline-flex">
               <Icons.CaretRight className="w-3.5 h-3.5" />
             </span>
           </div>

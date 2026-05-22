@@ -5,6 +5,17 @@ import { Login, Register, ForgotPassword, ResetPassword } from '@/features/auth'
 import { Dashboard } from '@/features/dashboard'
 import { Settings } from '@/features/settings'
 import { Showcase } from '@/features/showcase'
+import { Automations } from '@/features/automations'
+import { Templates } from '@/features/templates'
+import { Runs } from '@/features/runs'
+import { Schedules } from '@/features/schedules'
+import { Logs } from '@/features/logs'
+import { Tables } from '@/features/tables'
+import { Files } from '@/features/files'
+import { Knowledge } from '@/features/knowledge'
+import { Variables } from '@/features/variables'
+import { Connections } from '@/features/connections'
+import { WorkspaceSettings, InviteAccept } from '@/features/workspaces'
 
 export default function App() {
   return (
@@ -23,8 +34,22 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path={APP_ROUTES.DASHBOARD} element={<Dashboard />} />
             <Route path={APP_ROUTES.SETTINGS} element={<Settings />} />
+            <Route path={APP_ROUTES.AUTOMATIONS} element={<Automations />} />
+            <Route path={APP_ROUTES.TEMPLATES} element={<Templates />} />
+            <Route path={APP_ROUTES.RUNS} element={<Runs />} />
+            <Route path={APP_ROUTES.SCHEDULES} element={<Schedules />} />
+            <Route path={APP_ROUTES.LOGS} element={<Logs />} />
+            <Route path={APP_ROUTES.TABLES} element={<Tables />} />
+            <Route path={APP_ROUTES.FILES} element={<Files />} />
+            <Route path={APP_ROUTES.KNOWLEDGE} element={<Knowledge />} />
+            <Route path={APP_ROUTES.VARIABLES} element={<Variables />} />
+            <Route path={APP_ROUTES.CONNECTIONS} element={<Connections />} />
+            <Route path={APP_ROUTES.WORKSPACE_SETTINGS} element={<WorkspaceSettings />} />
           </Route>
         </Route>
+
+        {/* Public invite accept — needs auth check inside the page */}
+        <Route path="/invite/:token" element={<InviteAccept />} />
 
         {/* Showcase page - public but using AppLayout */}
         <Route element={<AppLayout />}>

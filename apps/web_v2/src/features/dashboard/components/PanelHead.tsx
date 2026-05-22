@@ -9,13 +9,13 @@ interface PanelHeadProps {
 
 export function PanelHead({ icon, title, count, action }: PanelHeadProps) {
   return (
-    <div className="panel-head">
-      <div className="panel-title">
+    <div className="flex items-center justify-between py-[12px] px-[16px] border-b border-[var(--border-faint)]">
+      <div className="flex items-center gap-[8px] text-[13px] font-medium">
         {icon}
         <span>{title}</span>
-        {count && <span className="count">{count}</span>}
+        {count && <span className="font-mono text-[11px] text-[var(--text-faint)] bg-[var(--surface)] py-[2px] px-[6px] pb-[1px] rounded-[4px] border border-[var(--border-faint)]">{count}</span>}
       </div>
-      {action && <div className="panel-actions">{action}</div>}
+      {action && <div className="flex items-center gap-[4px]">{action}</div>}
     </div>
   )
 }

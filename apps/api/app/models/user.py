@@ -40,5 +40,5 @@ class User(Base):
         "Skill", back_populates="user", cascade="all, delete-orphan"
     )
     workspace_memberships: Mapped[list["WorkspaceMember"]] = relationship(
-        "WorkspaceMember", foreign_keys="WorkspaceMember.user_id", lazy="select"
+        "WorkspaceMember", foreign_keys="WorkspaceMember.user_id", back_populates="user", lazy="select"
     )

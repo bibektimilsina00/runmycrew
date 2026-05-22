@@ -8,10 +8,6 @@ import { SchedulePanel } from '../components/SchedulePanel'
 import type { ScheduleItem } from '../components/SchedulePanel'
 import { ConnectionsPanel } from '../components/ConnectionsPanel'
 
-/**
- * Dashboard page displaying systems health, operational metrics, AI prompt card, recent runs feed,
- * upcoming schedules, and active integration statuses.
- */
 export function Dashboard() {
   const { toast } = useToast()
 
@@ -53,36 +49,21 @@ export function Dashboard() {
   }
 
   return (
-    <div className="body">
-      {/* Greeting Row */}
-      <GreetingRow
-        onNewAutomation={handleNewAutomation}
-        onConnectApp={handleConnectApp}
-      />
-
-      {/* Stats Cards strip */}
+    <div className="p-[24px_28px_28px] flex flex-col gap-[24px] max-w-[1240px] w-full mx-auto flex-1">
+      <GreetingRow onNewAutomation={handleNewAutomation} onConnectApp={handleConnectApp} />
       <StatsGrid />
-
-      {/* AI Prompt Generator Card */}
       <PromptCard onSubmit={handlePromptSubmit} />
-
-      {/* Split section */}
-      <div className="split">
-        {/* Left Side: Recent Runs */}
+      <div className="grid grid-cols-[minmax(0,1fr)_320px] gap-[24px]">
         <RecentRuns
           onOpenRun={handleOpenRun}
           onViewAll={() => toast('Recent runs overview', { description: 'Opening full streaming execution feeds logs...' })}
         />
-
-        {/* Right Side Stack: Schedule and Connections */}
-        <div className="side-stack">
+        <div className="flex flex-col gap-[16px]">
           <SchedulePanel
             onOpenSchedule={handleOpenSchedule}
             onViewAll={() => toast('All schedules overview', { description: 'Showing weekly scheduled rotations...' })}
           />
-          <ConnectionsPanel
-            onManageConnections={handleConnectApp}
-          />
+          <ConnectionsPanel onManageConnections={handleConnectApp} />
         </div>
       </div>
     </div>
