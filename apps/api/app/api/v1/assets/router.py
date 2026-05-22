@@ -1,112 +1,111 @@
-import os
-import shutil
 import uuid
-from pathlib import Path
 
-import sqlalchemy as sa
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile, status
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.api.v1.auth.dependencies import get_current_user
+from apps.api.app.api.v1.workspaces.dependencies import get_current_workspace
 from apps.api.app.core.database import get_db
 from apps.api.app.models.asset import Asset
 from apps.api.app.models.user import User
+from apps.api.app.models.workspace import Workspace
+from apps.api.app.schemas.asset import AssetOut, AssetStats, AssetUpdate
+from apps.api.app.services.asset_service import AssetService
 
 router = APIRouter()
 
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
+
+def _asset_out(asset: Asset) -> AssetOut:
+    return AssetOut(
+        id=asset.id,
+        workspace_id=asset.workspace_id,
+        user_id=asset.user_id,
+        name=asset.name,
+        file_type=asset.file_type,
+        file_size=asset.file_size,
+        source_type=asset.source_type,
+        created_at=asset.created_at,
+        updated_at=asset.updated_at,
+        url=f"/api/v1/assets/{asset.id}/view",
+        download_url=f"/api/v1/assets/{asset.id}/download",
+    )
 
 
-@router.post("/upload")
+@router.get("/", response_model=list[AssetOut])
+async def list_assets(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+):
+    assets = await AssetService(db).list_assets(workspace)
+    return [_asset_out(asset) for asset in assets]
+
+
+@router.get("/stats", response_model=AssetStats)
+async def get_asset_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+):
+    return await AssetService(db).get_stats(workspace)
+
+
+@router.post("/upload", response_model=AssetOut, status_code=status.HTTP_201_CREATED)
 async def upload_asset(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
 ):
-    asset_id = uuid.uuid4()
-    file_extension = os.path.splitext(file.filename or "")[1]
-    file_name = f"{asset_id}{file_extension}"
-    file_path = UPLOAD_DIR / file_name
-
-    try:
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Could not save file: {exc}") from exc
-
-    asset = Asset(
-        id=asset_id,
-        name=file.filename,
-        file_path=str(file_path),
-        file_type=file.content_type,
-        file_size=os.path.getsize(file_path),
-        user_id=current_user.id,
-    )
-
-    db.add(asset)
-    await db.commit()
-    await db.refresh(asset)
-
-    return {
-        "id": str(asset.id),
-        "name": asset.name,
-        "type": asset.file_type,
-        "size": asset.file_size,
-        "url": f"/api/v1/assets/{asset.id}/view",
-    }
+    asset = await AssetService(db).upload_asset(file, current_user, workspace)
+    return _asset_out(asset)
 
 
-@router.get("/")
-async def list_assets(
+@router.patch("/{asset_id}", response_model=AssetOut)
+async def update_asset(
+    asset_id: uuid.UUID,
+    data: AssetUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
 ):
-    result = await db.execute(
-        sa.select(Asset)
-        .where(Asset.user_id == current_user.id)
-        .order_by(Asset.created_at.desc())
-    )
-    assets = result.scalars().all()
-    return [
-        {
-            "id": str(a.id),
-            "name": a.name,
-            "type": a.file_type,
-            "size": a.file_size,
-            "created_at": a.created_at.isoformat() if a.created_at else None,
-            "url": f"/api/v1/assets/{a.id}/view",
-        }
-        for a in assets
-    ]
+    asset = await AssetService(db).update_asset(asset_id, workspace, data)
+    return _asset_out(asset)
 
 
-@router.delete("/{asset_id}", status_code=204)
+@router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_asset(
     asset_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
 ):
-    asset = await db.get(Asset, asset_id)
-    if not asset or asset.user_id != current_user.id:
-        raise HTTPException(status_code=404, detail="Asset not found")
-    # Remove file from disk
-    try:
-        Path(str(asset.file_path)).unlink(missing_ok=True)
-    except Exception:
-        pass
-    await db.delete(asset)
-    await db.commit()
+    await AssetService(db).delete_asset(asset_id, workspace)
 
 
 @router.get("/{asset_id}/view")
-async def view_asset(asset_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
-    asset = await db.get(Asset, asset_id)
-    if not asset:
-        raise HTTPException(status_code=404, detail="Asset not found")
+async def view_asset(
+    asset_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+):
+    asset = await AssetService(db).get_asset(asset_id, workspace)
+    return FileResponse(asset.file_path, media_type=asset.file_type, filename=asset.name)
 
-    from fastapi.responses import FileResponse
 
+@router.get("/{asset_id}/download")
+async def download_asset(
+    asset_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+):
+    asset = await AssetService(db).get_asset(asset_id, workspace)
     return FileResponse(
-        str(asset.file_path), media_type=str(asset.file_type), filename=str(asset.name)
+        asset.file_path,
+        media_type=asset.file_type,
+        filename=asset.name,
+        headers={"Content-Disposition": f'attachment; filename="{asset.name}"'},
     )

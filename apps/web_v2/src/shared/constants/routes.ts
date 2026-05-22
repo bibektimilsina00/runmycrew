@@ -68,6 +68,14 @@ export const API_ROUTES = {
   VARIABLE: (id: string) => `/secrets/${id}`,
   VARIABLE_REVEAL: (id: string) => `/secrets/${id}/reveal`,
 
+  // Files / assets
+  ASSETS: '/assets/',
+  ASSET_STATS: '/assets/stats',
+  ASSET_UPLOAD: '/assets/upload',
+  ASSET: (id: string) => `/assets/${id}`,
+  ASSET_VIEW: (id: string) => `/assets/${id}/view`,
+  ASSET_DOWNLOAD: (id: string) => `/assets/${id}/download`,
+
   // User / Account
   USER_ME: '/users/me',
   USER_API_KEYS: '/users/api-keys',

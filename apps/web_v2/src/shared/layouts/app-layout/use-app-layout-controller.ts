@@ -17,6 +17,7 @@ import {
   useWorkflowDnD,
   useWorkflows,
 } from '@/features/workflows'
+import { useFileStats } from '@/features/files/hooks/useFiles'
 import { useKBList } from '@/features/knowledge/hooks/useKnowledge'
 import { useWorkspaces, useWorkspaceStore } from '@/features/workspaces'
 import { useConfirm, useToast } from '@/shared/components'
@@ -36,6 +37,7 @@ export function useAppLayoutController() {
   const { data: folders = [], isLoading: isLoadingFolders } = useFolders()
   const { data: workflows = [], isLoading: isLoadingWorkflows } = useWorkflows()
   const { data: knowledgeBases = [] } = useKBList()
+  const { data: fileStats } = useFileStats()
   const createFolder = useCreateFolder()
   const updateFolder = useUpdateFolder()
   const deleteFolder = useDeleteFolder()
@@ -278,6 +280,7 @@ export function useAppLayoutController() {
 
   const pageName = location.pathname.substring(1) || 'dashboard'
   const navItemCounts: Record<string, string> = {
+    files: String(fileStats?.count ?? 0),
     knowledge: String(knowledgeBases.length),
   }
 

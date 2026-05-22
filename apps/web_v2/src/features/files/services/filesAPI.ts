@@ -1,16 +1,43 @@
-import type { FileItem } from '../types/filesTypes'
+import { z } from 'zod'
+import apiClient, { requestJson } from '@/shared/utils/apiClient'
+import { API_ROUTES } from '@/shared/constants/routes'
+import { FileAssetSchema, FileStatsSchema } from '../types/filesTypes'
 
-const MOCK_FILES: FileItem[] = [
-  { id: 1, name: 'Q2_refund_report.pdf',        ext: 'pdf',  size: '1.2 MB', uploaded: '2h ago',  source: 'Invoice triage agent' },
-  { id: 2, name: 'leads_export_may22.csv',       ext: 'csv',  size: '842 KB', uploaded: '4h ago',  source: 'Lead enrichment flow' },
-  { id: 3, name: 'rfp_acme_corp.docx',           ext: 'doc',  size: '312 KB', uploaded: '1d ago',  source: 'RFP classifier agent' },
-  { id: 4, name: 'metrics_digest_w20.pdf',       ext: 'pdf',  size: '2.1 MB', uploaded: '5d ago',  source: 'Weekly metrics agent' },
-  { id: 5, name: 'churn_signals_export.csv',     ext: 'csv',  size: '218 KB', uploaded: '6h ago',  source: 'Churn-risk watchlist' },
-  { id: 6, name: 'pipeline_data.json',           ext: 'json', size: '94 KB',  uploaded: '2d ago',  source: 'HubSpot sync' },
-  { id: 7, name: 'support_export_q2.xls',        ext: 'xls',  size: '1.8 MB', uploaded: '1d ago',  source: 'Zendesk export' },
-  { id: 8, name: 'brand_assets_pack.img',        ext: 'img',  size: '14.3 MB', uploaded: '3d ago', source: 'Manual upload' },
-]
+const FileAssetListSchema = z.array(FileAssetSchema)
 
 export const filesAPI = {
-  getAll: async (): Promise<FileItem[]> => MOCK_FILES,
+  list: (signal?: AbortSignal) =>
+    requestJson(FileAssetListSchema, { url: API_ROUTES.ASSETS, method: 'GET', signal }),
+
+  stats: (signal?: AbortSignal) =>
+    requestJson(FileStatsSchema, { url: API_ROUTES.ASSET_STATS, method: 'GET', signal }),
+
+  upload: async (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    const response = await apiClient.post(API_ROUTES.ASSET_UPLOAD, form, {
+      headers: { 'Content-Type': undefined },
+    })
+    return FileAssetSchema.parse(response.data)
+  },
+
+  rename: (id: string, name: string) =>
+    requestJson(FileAssetSchema, { url: API_ROUTES.ASSET(id), method: 'PATCH', data: { name } }),
+
+  delete: (id: string) =>
+    requestJson(z.unknown(), { url: API_ROUTES.ASSET(id), method: 'DELETE' }),
+
+  downloadBlob: async (id: string) => {
+    const response = await apiClient.get<Blob>(API_ROUTES.ASSET_DOWNLOAD(id), {
+      responseType: 'blob',
+    })
+    return response.data
+  },
+
+  viewBlob: async (id: string) => {
+    const response = await apiClient.get<Blob>(API_ROUTES.ASSET_VIEW(id), {
+      responseType: 'blob',
+    })
+    return response.data
+  },
 }
