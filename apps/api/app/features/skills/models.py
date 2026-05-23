@@ -1,0 +1,28 @@
+from __future__ import annotations
+
+import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy.orm import relationship
+from sqlmodel import Field, Relationship
+
+from apps.api.app.shared.sqlmodel import SQLModelBase, utc_now
+
+if TYPE_CHECKING:
+    from apps.api.app.features.users.models import User
+
+
+class Skill(SQLModelBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    workspace_id: uuid.UUID = Field(foreign_key="workspace.id", ondelete="CASCADE", index=True)
+    name: str = Field(max_length=64)
+    description: str = Field(default="", max_length=1024)
+    icon: str = Field(default="BookOpen", max_length=64)
+    color: str = Field(default="#8b5cf6", max_length=32)
+    content: str = Field()
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now, sa_column_kwargs={"onupdate": utc_now})
+
+    user: User | None = Relationship(sa_relationship=relationship("User", back_populates="skills"))
