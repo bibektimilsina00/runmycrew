@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -9,54 +9,72 @@ import ReactFlow, {
   type OnConnect,
   ConnectionLineType,
   useReactFlow,
-} from 'reactflow'
-import 'reactflow/dist/style.css'
-import { useShallow } from 'zustand/react/shallow'
-import { buildNodeTypes } from '../../constants/nodeTypes'
-import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
-import { CustomEdge } from '../edges/CustomEdge'
+} from "reactflow";
+import "reactflow/dist/style.css";
+import { useShallow } from "zustand/react/shallow";
+import { buildNodeTypes } from "../../constants/nodeTypes";
+import { useWorkflowEditorStore } from "../../stores/workflowEditorStore";
+import { CustomEdge } from "../edges/CustomEdge";
 
 interface Props {
-  nodes: Node[]
-  edges: Edge[]
-  onNodesChange: OnNodesChange
-  onEdgesChange: OnEdgesChange
-  onConnect?: OnConnect
-  onSelectNode?: (nodeId: string) => void
+  nodes: Node[];
+  edges: Edge[];
+  onNodesChange: OnNodesChange;
+  onEdgesChange: OnEdgesChange;
+  onConnect?: OnConnect;
+  onSelectNode?: (nodeId: string) => void;
 }
 
-function Flow({ nodes, edges, onNodesChange, onEdgesChange, onConnect, onSelectNode }: Props) {
-  const nodeDefinitions = useWorkflowEditorStore(useShallow(s => s.nodeDefinitions))
-  const setInspectorTab = useWorkflowEditorStore(s => s.setInspectorTab)
-  const { screenToFlowPosition, addNodes } = useReactFlow()
+function Flow({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onSelectNode,
+}: Props) {
+  const nodeDefinitions = useWorkflowEditorStore(
+    useShallow((s) => s.nodeDefinitions),
+  );
+  const setInspectorTab = useWorkflowEditorStore((s) => s.setInspectorTab);
+  const workflowLocked = useWorkflowEditorStore((s) => s.workflowLocked);
+  const { screenToFlowPosition, addNodes } = useReactFlow();
 
-  const nodeTypes = useMemo(() => buildNodeTypes(nodeDefinitions), [nodeDefinitions])
-  const edgeTypes = useMemo(() => ({ custom: CustomEdge }), [])
+  const nodeTypes = useMemo(
+    () => buildNodeTypes(nodeDefinitions),
+    [nodeDefinitions],
+  );
+  const edgeTypes = useMemo(() => ({ custom: CustomEdge }), []);
 
   const handleConnect: OnConnect = useCallback(
-    (connection) => { if (onConnect) onConnect(connection) },
+    (connection) => {
+      if (onConnect) onConnect(connection);
+    },
     [onConnect],
-  )
+  );
 
   const onDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-  }, [])
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }, []);
 
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    const type = e.dataTransfer.getData('application/reactflow')
-    if (!type) return
-    const def = nodeDefinitions.find(d => d.type === type)
-    if (!def) return
-    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY })
-    addNodes({
-      id: crypto.randomUUID(),
-      type,
-      position,
-      data: { label: def.name, properties: {} },
-    })
-  }, [nodeDefinitions, screenToFlowPosition, addNodes])
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const type = e.dataTransfer.getData("application/reactflow");
+      if (!type) return;
+      const def = nodeDefinitions.find((d) => d.type === type);
+      if (!def) return;
+      const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      addNodes({
+        id: crypto.randomUUID(),
+        type,
+        position,
+        data: { label: def.name, properties: {} },
+      });
+    },
+    [nodeDefinitions, screenToFlowPosition, addNodes],
+  );
 
   return (
     <ReactFlow
@@ -64,10 +82,12 @@ function Flow({ nodes, edges, onNodesChange, onEdgesChange, onConnect, onSelectN
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
-      onConnect={handleConnect}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
+      onConnect={workflowLocked ? undefined : handleConnect}
+      onDragOver={workflowLocked ? undefined : onDragOver}
+      onDrop={workflowLocked ? undefined : onDrop}
       onNodeClick={(_, node) => onSelectNode?.(node.id)}
+      nodesDraggable={!workflowLocked}
+      nodesConnectable={!workflowLocked}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       fitView
@@ -75,21 +95,21 @@ function Flow({ nodes, edges, onNodesChange, onEdgesChange, onConnect, onSelectN
       minZoom={0.1}
       maxZoom={2}
       defaultEdgeOptions={{
-        type: 'custom',
+        type: "custom",
         animated: false,
-        style: { stroke: 'var(--border)', strokeWidth: 2 },
+        style: { stroke: "var(--border)", strokeWidth: 2 },
       }}
       connectionLineType={ConnectionLineType.SmoothStep}
-      connectionLineStyle={{ stroke: 'var(--border)', strokeWidth: 2 }}
+      connectionLineStyle={{ stroke: "var(--border)", strokeWidth: 2 }}
       proOptions={{ hideAttribution: true }}
-      style={{ background: 'var(--bg)' }}
+      style={{ background: "var(--bg)" }}
     >
       <Background
         variant={BackgroundVariant.Dots}
         gap={24}
         size={1}
         color="oklch(0.32 0.004 250)"
-        style={{ background: 'var(--bg)' }}
+        style={{ background: "var(--bg)" }}
       />
 
       {nodes.length === 0 && (
@@ -98,38 +118,48 @@ function Flow({ nodes, edges, onNodesChange, onEdgesChange, onConnect, onSelectN
           style={{ zIndex: 4 }}
         >
           <button
-            onClick={() => setInspectorTab('library')}
+            onClick={() => setInspectorTab("library")}
             className="flex w-[48px] h-[48px] rounded-[12px] bg-[var(--surface)] border border-[var(--border-faint)] items-center justify-center transition-colors hover:bg-[var(--surface-2)] hover:border-[var(--border-soft)]"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-mute)" strokeWidth="1.5">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--text-mute)"
+              strokeWidth="1.5"
+            >
               <path d="M12 5v14M5 12h14" strokeLinecap="round" />
             </svg>
           </button>
           <div className="text-center pointer-events-none">
-            <p className="text-[13.5px] font-medium text-[var(--text-mute)]">Empty canvas</p>
+            <p className="text-[13.5px] font-medium text-[var(--text-mute)]">
+              Empty canvas
+            </p>
             <p className="text-[12px] text-[var(--text-faint)] mt-0.5">
-              Click <strong className="text-[var(--text-mute)] font-medium">+</strong> to browse nodes, or drag from the Library
+              Click{" "}
+              <strong className="text-[var(--text-mute)] font-medium">+</strong>{" "}
+              to browse nodes, or drag from the Library
             </p>
           </div>
         </div>
       )}
     </ReactFlow>
-  )
+  );
 }
 
 export function EditorCanvas(props: Props) {
-  const ready = useWorkflowEditorStore(s => s.nodeDefinitions.length > 0)
+  const ready = useWorkflowEditorStore((s) => s.nodeDefinitions.length > 0);
 
   return (
     <div className="flex-1 min-h-0 min-w-0 relative">
-      {ready
-        ? <Flow {...props} />
-        : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-7 h-7 border-2 border-border border-t-text-mute rounded-full animate-spin" />
-          </div>
-        )
-      }
+      {ready ? (
+        <Flow {...props} />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-7 h-7 border-2 border-border border-t-text-mute rounded-full animate-spin" />
+        </div>
+      )}
     </div>
-  )
+  );
 }

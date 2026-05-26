@@ -1,38 +1,52 @@
-import { createPortal } from 'react-dom'
+import { createPortal } from "react-dom";
 import {
-  MoreHorizontal, MessageCircle, Send, Play, Loader2,
-  LayoutDashboard, Lock, Download, Copy, Trash2,
-} from 'lucide-react'
-import { cn } from '@/lib/cn'
-import { Button } from '@/shared/components'
-import { useEditorActionBar } from '../../hooks/useEditorActionBar'
+  MoreHorizontal,
+  MessageCircle,
+  Send,
+  Play,
+  Loader2,
+  LayoutDashboard,
+  Lock,
+  Unlock,
+  Download,
+  Copy,
+  Trash2,
+} from "lucide-react";
+import { cn } from "@/lib/cn";
+import { Button } from "@/shared/components";
+import { useEditorActionBar } from "../../hooks/useEditorActionBar";
 
 interface EditorActionBarProps {
-  onRun: () => void
-  isRunning: boolean
+  onRun: () => void;
+  isRunning: boolean;
 }
 
 // ── Portalled dropdown ────────────────────────────────────────────────────────
 
 interface DropdownItem {
-  label: string
-  icon: React.ReactNode
-  onClick: () => void
-  variant?: 'danger'
-  dividerBefore?: boolean
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  variant?: "danger";
+  dividerBefore?: boolean;
 }
 
-function OptionsDropdown({ anchorRect, items, onClose }: {
-  anchorRect: DOMRect
-  items: DropdownItem[]
-  onClose: () => void
+function OptionsDropdown({
+  anchorRect,
+  items,
+  onClose,
+}: {
+  anchorRect: DOMRect;
+  items: DropdownItem[];
+  onClose: () => void;
 }) {
-  const menuW = 220
-  const menuH = items.length * 34 + 16
-  const left  = anchorRect.right - menuW
-  const top   = anchorRect.bottom + 4 + menuH > window.innerHeight
-    ? anchorRect.top - menuH - 4
-    : anchorRect.bottom + 4
+  const menuW = 220;
+  const menuH = items.length * 34 + 16;
+  const left = anchorRect.right - menuW;
+  const top =
+    anchorRect.bottom + 4 + menuH > window.innerHeight
+      ? anchorRect.top - menuH - 4
+      : anchorRect.bottom + 4;
 
   return createPortal(
     <>
@@ -43,14 +57,19 @@ function OptionsDropdown({ anchorRect, items, onClose }: {
       >
         {items.map((item, i) => (
           <div key={i}>
-            {item.dividerBefore && <div className="my-1 mx-1 h-px bg-[var(--border-faint)]" />}
+            {item.dividerBefore && (
+              <div className="my-1 mx-1 h-px bg-[var(--border-faint)]" />
+            )}
             <button
-              onClick={() => { item.onClick(); onClose() }}
+              onClick={() => {
+                item.onClick();
+                onClose();
+              }}
               className={cn(
-                'flex w-full items-center gap-2.5 rounded-[7px] px-3 py-2 text-[12.5px] font-medium transition-colors [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0',
-                item.variant === 'danger'
-                  ? 'text-[var(--err)] hover:bg-[var(--badge-err-bg)] [&_svg]:text-[var(--err)]'
-                  : 'text-[var(--text)] hover:bg-[var(--surface)] [&_svg]:text-[var(--text-mute)]',
+                "flex w-full items-center gap-2.5 rounded-[7px] px-3 py-2 text-[12.5px] font-medium transition-colors [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0",
+                item.variant === "danger"
+                  ? "text-[var(--err)] hover:bg-[var(--badge-err-bg)] [&_svg]:text-[var(--err)]"
+                  : "text-[var(--text)] hover:bg-[var(--surface)] [&_svg]:text-[var(--text-mute)]",
               )}
             >
               {item.icon}
@@ -61,25 +80,43 @@ function OptionsDropdown({ anchorRect, items, onClose }: {
       </div>
     </>,
     document.body,
-  )
+  );
 }
 
 // ── Action bar ────────────────────────────────────────────────────────────────
 
 export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
   const {
-    btnRef, anchorRect,
-    openMenu, closeMenu, openCopilot,
-    exportWorkflow, autoLayout, deleteWorkflow,
-  } = useEditorActionBar()
+    btnRef,
+    anchorRect,
+    openMenu,
+    closeMenu,
+    openCopilot,
+    exportWorkflow,
+    autoLayout,
+    deleteWorkflow,
+    workflowLocked,
+    toggleWorkflowLock,
+  } = useEditorActionBar();
 
   const menuItems: DropdownItem[] = [
-    { label: 'Auto layout',        icon: <LayoutDashboard />, onClick: autoLayout },
-    { label: 'Lock workflow',      icon: <Lock />,            onClick: () => {}, dividerBefore: true },
-    { label: 'Export workflow',    icon: <Download />,        onClick: exportWorkflow },
-    { label: 'Duplicate workflow', icon: <Copy />,            onClick: () => {} },
-    { label: 'Delete workflow',    icon: <Trash2 />,          onClick: deleteWorkflow, variant: 'danger', dividerBefore: true },
-  ]
+    { label: "Auto layout", icon: <LayoutDashboard />, onClick: autoLayout },
+    {
+      label: workflowLocked ? "Unlock workflow" : "Lock workflow",
+      icon: workflowLocked ? <Unlock /> : <Lock />,
+      onClick: toggleWorkflowLock,
+      dividerBefore: true,
+    },
+    { label: "Export workflow", icon: <Download />, onClick: exportWorkflow },
+    { label: "Duplicate workflow", icon: <Copy />, onClick: () => {} },
+    {
+      label: "Delete workflow",
+      icon: <Trash2 />,
+      onClick: deleteWorkflow,
+      variant: "danger",
+      dividerBefore: true,
+    },
+  ];
 
   return (
     <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--border-faint)] px-3 py-2.5">
@@ -88,9 +125,9 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
           ref={btnRef}
           onClick={openMenu}
           className={cn(
-            'flex h-7 w-7 items-center justify-center rounded-[7px] text-[var(--text-mute)] transition-colors',
-            'hover:bg-[var(--surface)] hover:text-[var(--text)]',
-            anchorRect && 'bg-[var(--surface)] text-[var(--text)]',
+            "flex h-7 w-7 items-center justify-center rounded-[7px] text-[var(--text-mute)] transition-colors",
+            "hover:bg-[var(--surface)] hover:text-[var(--text)]",
+            anchorRect && "bg-[var(--surface)] text-[var(--text)]",
           )}
           title="Workflow options"
         >
@@ -107,7 +144,11 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="secondary" size="sm" leftIcon={<Send className="text-[var(--accent)]" />}>
+        <Button
+          variant="secondary"
+          size="sm"
+          leftIcon={<Send className="text-[var(--accent)]" />}
+        >
           Deploy
         </Button>
         <Button
@@ -115,15 +156,25 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
           size="sm"
           onClick={onRun}
           disabled={isRunning}
-          leftIcon={isRunning ? <Loader2 className="animate-spin" /> : <Play className="fill-current" />}
+          leftIcon={
+            isRunning ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Play className="fill-current" />
+            )
+          }
         >
-          {isRunning ? 'Running' : 'Run'}
+          {isRunning ? "Running" : "Run"}
         </Button>
       </div>
 
       {anchorRect && (
-        <OptionsDropdown anchorRect={anchorRect} items={menuItems} onClose={closeMenu} />
+        <OptionsDropdown
+          anchorRect={anchorRect}
+          items={menuItems}
+          onClose={closeMenu}
+        />
       )}
     </div>
-  )
+  );
 }

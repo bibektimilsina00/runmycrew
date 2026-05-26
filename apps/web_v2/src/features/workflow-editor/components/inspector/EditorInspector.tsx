@@ -1,19 +1,24 @@
-import { SlidersHorizontal, ChevronDown } from 'lucide-react'
-import type { Node } from 'reactflow'
-import { Empty } from '@/shared/components'
-import { cn } from '@/lib/cn'
-import { useInspectorNode } from './hooks/use-inspector-node'
-import { InspectorHeader } from './components/inspector-header'
-import { PropertyGroupList } from './components/property-group-list'
-import { OutputSchemaSection } from './components/output-schema-section'
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
+import type { Node } from "reactflow";
+import { Empty } from "@/shared/components";
+import { cn } from "@/lib/cn";
+import { useInspectorNode } from "./hooks/use-inspector-node";
+import { useInspectorHeaderMenu } from "./hooks/use-inspector-header-menu";
+import { InspectorHeader } from "./components/inspector-header";
+import { PropertyGroupList } from "./components/property-group-list";
+import { OutputSchemaSection } from "./components/output-schema-section";
 
 interface EditorInspectorProps {
-  nodes: Node[]
-  updateNodeData: (nodeId: string, data: Record<string, unknown>) => void
-  className?: string
+  nodes: Node[];
+  updateNodeData: (nodeId: string, data: Record<string, unknown>) => void;
+  className?: string;
 }
 
-export function EditorInspector({ nodes, updateNodeData, className }: EditorInspectorProps) {
+export function EditorInspector({
+  nodes,
+  updateNodeData,
+  className,
+}: EditorInspectorProps) {
   const {
     selectedNode,
     definition,
@@ -25,12 +30,20 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
     updateProperty,
     updateLabel,
     closeInspector,
-  } = useInspectorNode({ nodes, updateNodeData })
+  } = useInspectorNode({ nodes, updateNodeData });
+
+  const {
+    workflowLocked,
+    onAutoLayout,
+    onLockWorkflow,
+    onExportWorkflow,
+    onDeleteWorkflow,
+  } = useInspectorHeaderMenu();
 
   return (
     <aside
       className={cn(
-        'flex h-full w-full flex-col overflow-hidden bg-[var(--bg-2)]',
+        "flex h-full w-full flex-col overflow-hidden bg-[var(--bg-2)]",
         className,
       )}
     >
@@ -45,10 +58,18 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
         <>
           <InspectorHeader
             nodeId={selectedNode.id}
-            label={(selectedNode.data?.label as string | undefined) || definition.name}
+            label={
+              (selectedNode.data?.label as string | undefined) ||
+              definition.name
+            }
             definition={definition}
             onLabelChange={updateLabel}
             onClose={closeInspector}
+            workflowLocked={workflowLocked}
+            onAutoLayout={onAutoLayout}
+            onLockWorkflow={onLockWorkflow}
+            onExportWorkflow={onExportWorkflow}
+            onDeleteWorkflow={onDeleteWorkflow}
           />
 
           {/* Scrollable body */}
@@ -79,9 +100,12 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
                     >
                       <div className="h-px flex-1 border-b border-dashed border-[var(--border-faint)]" />
                       <span className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--text-mute)] transition-colors group-hover:text-[var(--text)]">
-                        {showAdvanced ? 'Hide advanced' : 'Show advanced'}
+                        {showAdvanced ? "Hide advanced" : "Show advanced"}
                         <ChevronDown
-                          className={cn('h-3.5 w-3.5 transition-transform duration-200', showAdvanced && 'rotate-180')}
+                          className={cn(
+                            "h-3.5 w-3.5 transition-transform duration-200",
+                            showAdvanced && "rotate-180",
+                          )}
                         />
                       </span>
                       <div className="h-px flex-1 border-b border-dashed border-[var(--border-faint)]" />
@@ -104,9 +128,12 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
           </div>
 
           {/* Output schema — pinned footer, collapsible */}
-          <OutputSchemaSection nodeId={selectedNode.id} outputs={definition.outputsSchema} />
+          <OutputSchemaSection
+            nodeId={selectedNode.id}
+            outputs={definition.outputsSchema}
+          />
         </>
       )}
     </aside>
-  )
+  );
 }

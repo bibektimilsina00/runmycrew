@@ -1,52 +1,46 @@
-import { useRef, useState } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactFlow } from "reactflow";
 import { useMutation } from "@tanstack/react-query";
 import { useConfirm } from "@/shared/components/ConfirmModal";
 import { APP_ROUTES } from "@/shared/constants/routes";
-import { useWorkflowEditorStore } from "../stores/workflowEditorStore";
-import { editorAPI } from "../services/editorAPI";
+import { useWorkflowEditorStore } from "../../../stores/workflowEditorStore";
+import { editorAPI } from "../../../services/editorAPI";
 
-export function useEditorActionBar() {
-  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
-
+export function useInspectorHeaderMenu() {
   const navigate = useNavigate();
   const { fitView } = useReactFlow();
   const confirm = useConfirm();
 
   const workflow = useWorkflowEditorStore((s) => s.workflow);
-  const setTab = useWorkflowEditorStore((s) => s.setInspectorTab);
-  const nodes = useWorkflowEditorStore((s) => s.nodes);
-  const edges = useWorkflowEditorStore((s) => s.edges);
   const workflowLocked = useWorkflowEditorStore((s) => s.workflowLocked);
   const toggleWorkflowLock = useWorkflowEditorStore(
     (s) => s.toggleWorkflowLock,
   );
 
-  const openMenu = () =>
-    setAnchorRect(btnRef.current?.getBoundingClientRect() ?? null);
-  const closeMenu = () => setAnchorRect(null);
-  const openCopilot = () => setTab("copilot");
-  const autoLayout = () => fitView({ duration: 400, padding: 0.2 });
+  const onAutoLayout = useCallback(() => {
+    fitView({ padding: 0.15, duration: 400 });
+  }, [fitView]);
 
-  const exportWorkflow = () => {
-    const data = JSON.stringify({ nodes, edges }, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
+  const onExportWorkflow = useCallback(() => {
+    if (!workflow) return;
+    const blob = new Blob([JSON.stringify(workflow, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `workflow-${workflow?.id ?? "export"}.json`;
+    a.download = `${workflow.name ?? "workflow"}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
+  }, [workflow]);
 
   const deleteMutation = useMutation({
     mutationFn: () => editorAPI.deleteWorkflow(workflow!.id),
     onSuccess: () => navigate(APP_ROUTES.AUTOMATIONS),
   });
 
-  const deleteWorkflow = async () => {
+  const onDeleteWorkflow = useCallback(async () => {
     const ok = await confirm({
       title: "Delete workflow",
       message: `"${workflow?.name ?? "This workflow"}" will be permanently deleted and cannot be recovered.`,
@@ -54,18 +48,14 @@ export function useEditorActionBar() {
       variant: "danger",
     });
     if (ok) deleteMutation.mutate();
-  };
+  }, [confirm, workflow, deleteMutation]);
 
   return {
-    btnRef,
-    anchorRect,
-    openMenu,
-    closeMenu,
-    openCopilot,
-    exportWorkflow,
-    autoLayout,
-    deleteWorkflow,
     workflowLocked,
-    toggleWorkflowLock,
+    onAutoLayout,
+    onLockWorkflow: toggleWorkflowLock,
+    onExportWorkflow,
+    onDeleteWorkflow,
+    isDeleting: deleteMutation.isPending,
   };
 }
