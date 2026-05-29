@@ -24,7 +24,7 @@ export const CredentialSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   type: z.string(),
-  meta: z.record(z.unknown()).nullable().optional(),
+  meta: z.record(z.string(), z.unknown()).nullable().optional(),
   created_at: z.string(),
   updated_at: z.string(),
 })
@@ -39,7 +39,7 @@ export const AuditLogSchema = z.object({
   resource_type: z.string(),
   resource_id: z.string(),
   resource_name: z.string(),
-  meta: z.record(z.unknown()).nullable().optional(),
+  meta: z.record(z.string(), z.unknown()).nullable().optional(),
   created_at: z.string(),
   user_email: z.string().nullable().optional(),
   user_name: z.string().nullable().optional(),

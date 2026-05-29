@@ -16,6 +16,11 @@ updates:
     groups:
       frontend:
         patterns: ["*"]
+    # Major bumps (zod 3->4, tailwind 3->4, react-router 6->7) are breaking and
+    # must be done deliberately with UI verification — not auto-merged.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   # Backend Python (uv projects)
   - package-ecosystem: "pip"

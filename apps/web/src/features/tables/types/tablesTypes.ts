@@ -33,13 +33,13 @@ export const TableColumnSchema = z.object({
   name: z.string(),
   col_type: TableColumnTypeSchema,
   position: z.number().int(),
-  options: z.record(z.unknown()).nullable().optional(),
+  options: z.record(z.string(), z.unknown()).nullable().optional(),
 })
 export type TableColumn = z.infer<typeof TableColumnSchema>
 
 export const TableRowSchema = z.object({
   id: z.string().uuid(),
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
   position: z.number().int().nullable().optional(),
 })
 export type TableRow = z.infer<typeof TableRowSchema>
