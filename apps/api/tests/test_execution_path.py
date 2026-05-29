@@ -81,6 +81,24 @@ async def test_execution_budget_bounds_runaway_graphs():
         await runner.run(trigger_data={})
 
 
+@pytest.mark.anyio
+async def test_error_edge_routes_failure_to_recovery_node():
+    """A node failure follows an `error` edge to a recovery node instead of
+    failing the whole run."""
+    graph = {
+        "nodes": [
+            _code_node("boom", "raise RuntimeError('explode')"),
+            _code_node("recover", "output = {'recovered': True}"),
+        ],
+        "edges": [{"source": "boom", "target": "recover", "sourceHandle": "error"}],
+    }
+    runner = WorkflowRunner(workflow_id="wf", execution_id="exec", graph=graph)
+    result = await runner.run(trigger_data={})
+
+    assert runner._outputs["recover"]["recovered"] is True
+    assert result["recovered"] is True
+
+
 def test_worker_runtime_imports_resolve():
     """The worker imports these lazily inside _run_workflow, so a stale path only
     surfaces at execution time. Importing them here fails fast in CI instead."""

@@ -18,7 +18,7 @@ openssl rand -hex 32   # set ENCRYPTION_KEY in .env
 ```bash
 make db-up        # Postgres + Redis via docker compose
 make migrate      # alembic upgrade head
-make dev          # frontend (Vite)        — http://localhost:5173
+make dev          # frontend (Vite)        — http://localhost:3001
 make api          # FastAPI                — http://localhost:8000
 make worker       # Celery worker (separate terminal)
 make beat         # Celery beat (schedules) (separate terminal)

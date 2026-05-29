@@ -91,5 +91,8 @@ jobs:
       - name: Lint
         run: pnpm --filter web lint
 
+      - name: Test
+        run: pnpm --filter web test
+
       - name: Build
         run: pnpm --filter web build
