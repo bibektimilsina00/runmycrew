@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useNodesState, useEdgesState } from 'reactflow'
+import { addEdge, type Connection, type Edge } from 'reactflow'
 import type { ApiNodeDefinition, NodeDefinition } from '../types/editorTypes'
 
 import { editorAPI } from '../services/editorAPI'
@@ -18,7 +18,22 @@ function normalizeDefinition(d: ApiNodeDefinition): NodeDefinition {
 }
 
 export function useWorkflowEditor(workflowId: string) {
-  const store = useWorkflowEditorStore()
+  const storeWorkflow = useWorkflowEditorStore(s => s.workflow)
+  const saveState = useWorkflowEditorStore(s => s.saveState)
+  const setWorkflow = useWorkflowEditorStore(s => s.setWorkflow)
+  const setNodeDefinitions = useWorkflowEditorStore(s => s.setNodeDefinitions)
+  const nodes = useWorkflowEditorStore(s => s.nodes)
+  const edges = useWorkflowEditorStore(s => s.edges)
+  const setNodes = useWorkflowEditorStore(s => s.setNodes)
+  const setEdges = useWorkflowEditorStore(s => s.setEdges)
+  const onNodesChange = useWorkflowEditorStore(s => s.onNodesChange)
+  const onEdgesChange = useWorkflowEditorStore(s => s.onEdgesChange)
+  const setSaveState = useWorkflowEditorStore(s => s.setSaveState)
+  const setVersionVector = useWorkflowEditorStore(s => s.setVersionVector)
+  const setSelectedNodeId = useWorkflowEditorStore(s => s.setSelectedNodeId)
+  const setInspectorOpen = useWorkflowEditorStore(s => s.setInspectorOpen)
+  const setInspectorTab = useWorkflowEditorStore(s => s.setInspectorTab)
+  const resetEditorStore = useWorkflowEditorStore(s => s.reset)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── Fetch node definitions (shared, long-lived cache) ─────────────────────
@@ -30,10 +45,9 @@ export function useWorkflowEditor(workflowId: string) {
 
   useEffect(() => {
     if (rawDefinitions && rawDefinitions.length > 0) {
-      store.setNodeDefinitions(rawDefinitions.map(normalizeDefinition))
+      setNodeDefinitions(rawDefinitions.map(normalizeDefinition))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawDefinitions])
+  }, [rawDefinitions, setNodeDefinitions])
 
   // ── Fetch workflow ────────────────────────────────────────────────────────
   const { data: workflow, isLoading, error } = useQuery({
@@ -42,19 +56,15 @@ export function useWorkflowEditor(workflowId: string) {
     staleTime: Infinity, // editor owns the data
   })
 
-  // ── ReactFlow state ───────────────────────────────────────────────────────
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
-
-  // Populate graph when workflow loads
+  // Populate the store graph when the workflow loads
   useEffect(() => {
     if (!workflow) return
-    store.setWorkflow(workflow)
-    store.setVersionVector(workflow.version_vector ?? 0)
+    setWorkflow(workflow)
+    setVersionVector(workflow.version_vector ?? 0)
 
     const graph = workflow.graph ?? { nodes: [], edges: [] }
     setNodes(graph.nodes ?? [])
-    setEdges(graph.edges ?? [])
+    setEdges((graph.edges ?? []).map((e: Edge) => ({ ...e, type: 'custom' })))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workflow?.id])
 
@@ -62,39 +72,58 @@ export function useWorkflowEditor(workflowId: string) {
   const saveMutation = useMutation({
     mutationFn: ({ graph, version }: { graph: object; version: number }) =>
       editorAPI.saveGraph(workflowId, graph, version),
-    onMutate: () => store.setSaveState('saving'),
+    onMutate: () => setSaveState('saving'),
     onSuccess: (updated) => {
-      store.setSaveState('saved')
-      store.setVersionVector(updated.version_vector ?? 0)
+      setSaveState('saved')
+      setVersionVector(updated.version_vector ?? 0)
     },
-    onError: () => store.setSaveState('error'),
+    onError: () => setSaveState('error'),
   })
 
   const triggerSave = useCallback((newNodes: typeof nodes, newEdges: typeof edges) => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
-    useWorkflowEditorStore.getState().setSaveState('unsaved')
+    setSaveState('unsaved')
     saveTimer.current = setTimeout(() => {
       saveMutation.mutate({
         graph: { nodes: newNodes, edges: newEdges },
         version: useWorkflowEditorStore.getState().versionVector,
       })
     }, AUTOSAVE_DELAY)
-  }, [saveMutation])
+  }, [saveMutation, setSaveState])
 
-  const handleNodesChange = useCallback((changes: Parameters<typeof onNodesChange>[0]) => {
-    onNodesChange(changes)
-  }, [onNodesChange])
-
-  const handleEdgesChange = useCallback((changes: Parameters<typeof onEdgesChange>[0]) => {
-    onEdgesChange(changes)
-  }, [onEdgesChange])
-
-  // Trigger save on graph changes
+  // Trigger save whenever the store graph changes
   useEffect(() => {
     if (!workflow) return
     triggerSave(nodes, edges)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, edges])
+
+  const updateNodeData = useCallback((nodeId: string, data: Record<string, unknown>) => {
+    setNodes(currentNodes =>
+      currentNodes.map(node =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, ...data } }
+          : node,
+      ),
+    )
+  }, [setNodes])
+
+  const onConnect = useCallback((connection: Connection) => {
+    setEdges(eds => addEdge({
+      ...connection,
+      type: 'custom',
+      animated: false,
+      style: { stroke: 'var(--border)', strokeWidth: 2 },
+    }, eds))
+  }, [setEdges])
+
+  // Only open inspector on explicit node click — never clear on deselect
+  const selectNode = useCallback((nodeId: string) => {
+    const current = useWorkflowEditorStore.getState()
+    if (current.selectedNodeId !== nodeId) setSelectedNodeId(nodeId)
+    if (!current.inspectorOpen) setInspectorOpen(true)
+    setInspectorTab('config')
+  }, [setInspectorOpen, setSelectedNodeId, setInspectorTab])
 
   // ── Run ───────────────────────────────────────────────────────────────────
   const runMutation = useMutation({
@@ -104,23 +133,22 @@ export function useWorkflowEditor(workflowId: string) {
   // ── Rename ────────────────────────────────────────────────────────────────
   const renameMutation = useMutation({
     mutationFn: (name: string) => editorAPI.rename(workflowId, name),
-    onSuccess: (updated) => store.setWorkflow(updated),
+    onSuccess: (updated) => setWorkflow(updated),
   })
 
   // ── Toggle active ─────────────────────────────────────────────────────────
   const toggleMutation = useMutation({
     mutationFn: () => editorAPI.toggleActive(workflowId),
     onSuccess: (res) => {
-      if (store.workflow) store.setWorkflow({ ...store.workflow, is_active: res.is_active })
+      if (storeWorkflow) setWorkflow({ ...storeWorkflow, is_active: res.is_active })
     },
   })
 
   // Cleanup on unmount
   useEffect(() => () => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
-    store.reset()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    resetEditorStore()
+  }, [resetEditorStore])
 
   return {
     workflow,
@@ -129,15 +157,18 @@ export function useWorkflowEditor(workflowId: string) {
     // Graph
     nodes,
     edges,
-    onNodesChange: handleNodesChange,
-    onEdgesChange: handleEdgesChange,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
     setNodes,
     setEdges,
+    updateNodeData,
+    selectNode,
     // Actions
     run: runMutation.mutate,
     rename: renameMutation.mutate,
     toggle: toggleMutation.mutate,
     isRunning: runMutation.isPending,
-    saveState: store.saveState,
+    saveState,
   }
 }

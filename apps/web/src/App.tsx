@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ProtectedRoute, PublicRoute } from '@/shared/components'
-import { AppLayout } from '@/shared/layouts'
+import { AppLayout, EditorLayout } from '@/shared/layouts'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { Login, Register, ForgotPassword, ResetPassword } from '@/features/auth'
 import { Dashboard } from '@/features/dashboard'
@@ -55,9 +55,11 @@ export default function App() {
         {/* Public invite accept — needs auth check inside the page */}
         <Route path="/invite/:token" element={<InviteAccept />} />
 
-        {/* Workflow editor — full screen, inside ProtectedRoute but outside AppLayout */}
+        {/* Workflow editor — app sidebar via EditorLayout, full-bleed canvas + right panel */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/workflows/:id" element={<WorkflowEditor />} />
+          <Route element={<EditorLayout />}>
+            <Route path="/workflows/:id" element={<WorkflowEditor />} />
+          </Route>
         </Route>
 
         {/* Showcase page - public but using AppLayout */}
@@ -72,4 +74,3 @@ export default function App() {
     </BrowserRouter>
   )
 }
-

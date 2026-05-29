@@ -27,14 +27,50 @@ export type WorkflowDetail = z.infer<typeof WorkflowDetailSchema>
 
 export type SaveState = 'saved' | 'saving' | 'unsaved' | 'error'
 
-// ── Node domain types ─────────────────────────────────────────────────────────
+// ── Node property types ───────────────────────────────────────────────────────
 
 export type KnownNodePropertyType =
-  | 'string' | 'number' | 'boolean' | 'json' | 'options' | 'credential'
-  | 'key-value' | 'list' | 'messages' | 'schema' | 'file-list'
-  | 'tool-selector' | 'skill-selector'
+  | 'string' | 'number' | 'boolean' | 'json' | 'options' | 'multi-options'
+  | 'credential' | 'key-value' | 'list' | 'messages' | 'schema' | 'file-list'
+  | 'tool-selector' | 'skill-selector' | 'code' | 'collection' | 'fixed-collection'
 
 export type NodePropertyType = KnownNodePropertyType | (string & {})
+
+// Per-type renderer configuration
+export interface TypeOptions {
+  // string
+  multiline?: boolean
+  rows?: number
+  password?: boolean
+  maxLength?: number
+  // number
+  min?: number
+  max?: number
+  step?: number
+  precision?: number
+  // code
+  language?: string
+  // options / multi-options
+  searchable?: boolean
+  allowCustom?: boolean
+  // collection
+  multipleValues?: boolean
+  addButtonText?: string
+  sortable?: boolean
+  [key: string]: unknown
+}
+
+// Display conditions (replaces legacy `condition`)
+export interface DisplayOptions {
+  show?: Record<string, unknown[]>  // show when ALL field conditions match
+  hide?: Record<string, unknown[]>  // hide when ANY field condition matches
+}
+
+export interface NodePropertyOption {
+  label: string
+  value: unknown
+  description?: string
+}
 
 export interface NodeProperty {
   name: string
@@ -42,10 +78,17 @@ export interface NodeProperty {
   type: NodePropertyType
   description?: string
   default?: unknown
-  required?: boolean | { field: string; value?: unknown }
-  options?: { label: string; value?: unknown }[]
+  required?: boolean | { field: string; value: unknown }
+  options?: NodePropertyOption[]
   placeholder?: string
+  // New: replaces legacy `condition`
+  displayOptions?: DisplayOptions
+  // Legacy: kept for backward compat
   condition?: unknown
+  // Per-type renderer config
+  typeOptions?: TypeOptions
+  // Sub-properties (for collection / fixed-collection)
+  properties?: NodeProperty[]
   credentialType?: string | string[] | null
   credentialTypeByField?: { field: string; values: Record<string, string> }
   dependsOn?: string[] | { all?: string[]; any?: string[] }
@@ -77,26 +120,38 @@ export interface NodeDefinition {
 
 // ── Node definitions (from backend /nodes/) ───────────────────────────────────
 
-const NodePropertySchema = z.object({
-  name:        z.string(),
-  label:       z.string(),
-  type:        z.string(),
-  description: z.string().optional(),
-  default:     z.any().optional(),
-  required:    z.union([z.boolean(), z.object({ field: z.string(), value: z.any() })]).optional(),
-  options:     z.array(z.object({ label: z.string(), value: z.any() })).optional(),
-  placeholder: z.string().optional(),
-  condition:   z.any().optional(),
-  credentialType: z.union([z.string(), z.array(z.string())]).nullable().optional(),
-  dependsOn:   z.union([z.array(z.string()), z.object({ all: z.array(z.string()).optional(), any: z.array(z.string()).optional() })]).optional(),
-  loadOptions: z.string().optional(),
-  loadOptionsDependsOn: z.array(z.string()).optional(),
-  mode:        z.enum(['basic', 'advanced', 'both']).optional(),
-  secret:      z.boolean().optional(),
-  visibility:  z.enum(['user-or-llm', 'user-only', 'hidden']).optional(),
-  canonicalId: z.string().optional(),
-  group:       z.string().optional(),
-}).passthrough()
+const NodePropertySchema: z.ZodType<NodeProperty> = z.lazy(() =>
+  z.object({
+    name:        z.string(),
+    label:       z.string(),
+    type:        z.string(),
+    description: z.string().optional(),
+    default:     z.any().optional(),
+    required:    z.union([z.boolean(), z.object({ field: z.string(), value: z.any() })]).optional(),
+    options:     z.array(z.object({ label: z.string(), value: z.any(), description: z.string().optional() })).optional(),
+    placeholder: z.string().optional(),
+    displayOptions: z.object({
+      show: z.record(z.string(), z.array(z.any())).optional(),
+      hide: z.record(z.string(), z.array(z.any())).optional(),
+    }).optional(),
+    condition:   z.any().optional(),
+    typeOptions: z.record(z.string(), z.any()).optional(),
+    properties:  z.array(NodePropertySchema).optional(),
+    credentialType: z.union([z.string(), z.array(z.string())]).nullable().optional(),
+    credentialTypeByField: z.object({
+      field: z.string(),
+      values: z.record(z.string(), z.string()),
+    }).optional(),
+    dependsOn:   z.union([z.array(z.string()), z.object({ all: z.array(z.string()).optional(), any: z.array(z.string()).optional() })]).optional(),
+    loadOptions: z.string().optional(),
+    loadOptionsDependsOn: z.array(z.string()).optional(),
+    mode:        z.enum(['basic', 'advanced', 'both']).optional(),
+    secret:      z.boolean().optional(),
+    visibility:  z.enum(['user-or-llm', 'user-only', 'hidden']).optional(),
+    canonicalId: z.string().optional(),
+    group:       z.string().optional(),
+  }).passthrough()
+)
 
 export const ApiNodeDefinitionSchema = z.object({
   type:          z.string(),

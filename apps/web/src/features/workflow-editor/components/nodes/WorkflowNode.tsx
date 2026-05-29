@@ -6,7 +6,7 @@ import { NodeToolbar } from './components/node-toolbar'
 import { NodeHeader } from './components/node-header'
 import { NodeProperty } from './components/node-property'
 import { NodeHandles } from './components/node-handles'
-import { getPropValuePreview, getDynamicLabel, shouldShowProperty } from '../../utils/nodeUtils'
+import { getPropValuePreview, getDynamicLabel, getVisibleNodeProperties } from '../../utils/nodeUtils'
 import { useNodeExecutionStatus } from '../../hooks/useNodeExecutionStatus'
 
 export function WorkflowNode({ id, type, data, selected }: NodeProps) {
@@ -26,10 +26,9 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
   if (!definition) return null
 
   const properties: Record<string, unknown> = data.properties ?? {}
+  const showAdvanced = (data?.showAdvanced as boolean | undefined) ?? false
 
-  const visibleProps = definition.properties
-    .filter(p => p.visibility !== 'hidden')
-    .filter(p => shouldShowProperty(p, properties))
+  const visibleProps = getVisibleNodeProperties(definition.properties, properties, showAdvanced)
 
   const hasErrorHandle = !!definition.allowError
 
@@ -39,7 +38,7 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
         role="button"
         tabIndex={0}
         className={cn(
-          'workflow-drag-handle relative z-[20] w-[200px] select-none rounded-[10px] border bg-bg2 transition-colors',
+          'workflow-drag-handle relative z-[20] w-[168px] select-none rounded-[10px] border bg-bg2 transition-colors',
           !isLocked ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
           executionStatus === 'completed' && 'node-status-completed',
           executionStatus === 'failed'    && 'node-status-failed',

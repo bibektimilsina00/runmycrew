@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Node, Edge } from 'reactflow'
+import { applyNodeChanges, applyEdgeChanges, type Node, type Edge, type OnNodesChange, type OnEdgesChange } from 'reactflow'
 import type { NodeDefinition } from '../types/editorTypes'
 import type { SaveState, WorkflowDetail } from '../types/editorTypes'
 
@@ -12,13 +12,13 @@ interface WorkflowEditorState {
   nodeDefinitions: NodeDefinition[]
   setNodeDefinitions: (defs: NodeDefinition[]) => void
 
-  // ReactFlow graph state
+  // ReactFlow graph state — the store is the single source of truth.
   nodes: Node[]
   edges: Edge[]
-  setNodes: (nodes: Node[]) => void
-  setEdges: (edges: Edge[]) => void
-  onNodesChange: ((changes: unknown[]) => void) | null
-  onEdgesChange: ((changes: unknown[]) => void) | null
+  setNodes: (nodes: Node[] | ((nodes: Node[]) => Node[])) => void
+  setEdges: (edges: Edge[] | ((edges: Edge[]) => Edge[])) => void
+  onNodesChange: OnNodesChange
+  onEdgesChange: OnEdgesChange
 
   // Node mutations
   removeNode: (id: string) => void
@@ -37,6 +37,8 @@ interface WorkflowEditorState {
   setSelectedNodeId: (id: string | null) => void
   inspectorOpen: boolean
   setInspectorOpen: (open: boolean) => void
+  inspectorTab: 'config' | 'copilot' | 'library' | 'logs' | 'test'
+  setInspectorTab: (tab: WorkflowEditorState['inspectorTab']) => void
 
   // Reset when leaving editor
   reset: () => void
@@ -51,10 +53,10 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => 
 
   nodes: [],
   edges: [],
-  setNodes: (nodes) => set({ nodes }),
-  setEdges: (edges) => set({ edges }),
-  onNodesChange: null,
-  onEdgesChange: null,
+  setNodes: (nodes) => set(s => ({ nodes: typeof nodes === 'function' ? nodes(s.nodes) : nodes })),
+  setEdges: (edges) => set(s => ({ edges: typeof edges === 'function' ? edges(s.edges) : edges })),
+  onNodesChange: (changes) => set(s => ({ nodes: applyNodeChanges(changes, s.nodes) })),
+  onEdgesChange: (changes) => set(s => ({ edges: applyEdgeChanges(changes, s.edges) })),
 
   removeNode: (id) => set(s => ({
     nodes: s.nodes.filter(n => n.id !== id),
@@ -102,6 +104,8 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => 
   setSelectedNodeId: (selectedNodeId) => set({ selectedNodeId }),
   inspectorOpen: false,
   setInspectorOpen: (inspectorOpen) => set({ inspectorOpen }),
+  inspectorTab: 'config',
+  setInspectorTab: (inspectorTab) => set({ inspectorTab }),
 
   reset: () => set({
     workflow: null,
@@ -112,5 +116,6 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => 
     versionVector: 0,
     selectedNodeId: null,
     inspectorOpen: false,
+    inspectorTab: 'config',
   }),
 }))

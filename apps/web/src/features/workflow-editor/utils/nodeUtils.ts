@@ -26,3 +26,15 @@ export const shouldShowProperty = (
   if (Array.isArray(value)) return value.includes(current)
   return current === value
 }
+
+// Properties shown on the canvas node: never hidden, advanced ones only when
+// the node is expanded (data.showAdvanced), and conditional ones only when met.
+export const getVisibleNodeProperties = (
+  properties: NodeProperty[],
+  values: Record<string, unknown>,
+  showAdvanced: boolean,
+): NodeProperty[] =>
+  properties
+    .filter(p => p.visibility !== 'hidden')
+    .filter(p => p.mode !== 'advanced' || showAdvanced)
+    .filter(p => shouldShowProperty(p, values))

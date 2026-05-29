@@ -1,7 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { ReactFlowProvider } from 'reactflow'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useWorkflowEditor } from '../hooks/useWorkflowEditor'
 import { EditorCanvas } from '../components/canvas/EditorCanvas'
+import { EditorRightPanel } from '../components/right-panel/EditorRightPanel'
 import { EditorLoading } from '../components/overlays/EditorLoading'
 import { EditorError } from '../components/overlays/EditorError'
 
@@ -17,26 +19,34 @@ export function WorkflowEditor() {
     edges,
     onNodesChange,
     onEdgesChange,
+    onConnect,
+    updateNodeData,
+    selectNode,
+    run,
+    isRunning,
   } = useWorkflowEditor(id ?? '')
 
-  if (isLoading) {
-    return <EditorLoading />
-  }
-
-  if (error || !workflow) {
-    return <EditorError onBack={() => navigate(APP_ROUTES.AUTOMATIONS)} />
-  }
+  if (isLoading) return <EditorLoading />
+  if (error || !workflow) return <EditorError onBack={() => navigate(APP_ROUTES.AUTOMATIONS)} />
 
   return (
-    <div className="flex flex-col h-full w-full bg-[var(--bg)] overflow-hidden">
-      <div className="flex flex-1 min-h-0">
-        <EditorCanvas
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-        />
-      </div>
+    <ReactFlowProvider>
+    <div className="flex h-full w-full overflow-hidden bg-[var(--bg)]">
+      <EditorCanvas
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onSelectNode={selectNode}
+      />
+      <EditorRightPanel
+        nodes={nodes}
+        updateNodeData={updateNodeData}
+        onRun={() => run()}
+        isRunning={isRunning}
+      />
     </div>
+    </ReactFlowProvider>
   )
 }

@@ -33,7 +33,7 @@ export const NodeProperty = ({
     : { top: '50%' }
 
   return (
-    <div className="relative flex items-center gap-2 px-3 h-[22px]">
+    <div className="relative flex items-center gap-2 px-2.5 h-[20px]">
       <span
         className={cn('min-w-0 truncate text-[11px] font-medium text-text-faint capitalize', labelClass)}
         title={label}
