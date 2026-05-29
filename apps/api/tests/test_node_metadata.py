@@ -7,11 +7,7 @@ def _metadata_by_type() -> dict[str, dict]:
 
 def _advanced_fields(node_type: str) -> set[str]:
     metadata = _metadata_by_type()[node_type]
-    return {
-        prop["name"]
-        for prop in metadata["properties"]
-        if prop.get("mode") == "advanced"
-    }
+    return {prop["name"] for prop in metadata["properties"] if prop.get("mode") == "advanced"}
 
 
 def test_advanced_fields_are_declared_by_backend_metadata():

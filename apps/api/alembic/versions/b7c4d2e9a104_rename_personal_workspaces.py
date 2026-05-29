@@ -7,6 +7,7 @@ Create Date: 2026-05-21
 Rename legacy personal workspaces from the placeholder name to the owner's
 first-name workspace label.
 """
+
 from collections.abc import Sequence
 
 import sqlalchemy as sa

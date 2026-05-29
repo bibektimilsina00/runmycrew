@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 
+from apps.api.app.credential_manager.api_keys import get_ai_provider, get_ai_providers
 from apps.api.app.features.copilot.engine_core.engine import run_copilot
 from apps.api.app.features.copilot.schemas import (
     CopilotChatRequest,
@@ -12,7 +13,6 @@ from apps.api.app.features.copilot.schemas import (
     SessionListResponse,
 )
 from apps.api.app.features.copilot.service import CopilotService, get_copilot_service
-from apps.api.app.features.credentials.manager.api_keys import get_ai_provider, get_ai_providers
 from apps.api.app.features.users.models import User
 from apps.api.app.node_system.registry.registry import node_registry
 from apps.api.app.shared.dependencies import get_current_user

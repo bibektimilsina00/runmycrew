@@ -15,8 +15,8 @@ from apps.api.app.node_system.base.node_result import NodeResult
 logger = get_logger(__name__)
 
 BROWSER_USE_BASE = "https://api.browser-use.com/api/v2"
-POLL_INTERVAL = 5.0       # seconds between status checks
-MAX_WAIT = 300.0          # 5 minute timeout
+POLL_INTERVAL = 5.0  # seconds between status checks
+MAX_WAIT = 300.0  # 5 minute timeout
 TERMINAL_STATES = {"finished", "failed", "stopped"}
 
 
@@ -27,8 +27,8 @@ class BrowserUseProperties(BaseModel):
     model: str = "claude-sonnet-4-5"
     max_steps: int = 50
     allowed_domains: str | None = None
-    secrets: Any | None = None             # JSON key-value pairs for injecting into browser
-    structured_output: str | None = None   # JSON schema string for structured response
+    secrets: Any | None = None  # JSON key-value pairs for injecting into browser
+    structured_output: str | None = None  # JSON schema string for structured response
     system_prompt_extension: str | None = None
     vision: bool = True
     flash_mode: bool = False
@@ -192,6 +192,7 @@ class BrowserUseNode(BaseNode[BrowserUseProperties]):
 
         if self.props.structured_output and self.props.structured_output.strip():
             import json as _json
+
             try:
                 body["structured_output_json"] = _json.loads(self.props.structured_output)
             except Exception:
@@ -217,7 +218,10 @@ class BrowserUseNode(BaseNode[BrowserUseProperties]):
 
             task_id = task_data.get("id") or task_data.get("task_id")
             if not task_id:
-                return NodeResult(success=False, error=f"Browser Use API did not return a task ID. Response: {task_data}")
+                return NodeResult(
+                    success=False,
+                    error=f"Browser Use API did not return a task ID. Response: {task_data}",
+                )
 
             logger.info(f"Browser Use task created: {task_id}")
 
@@ -243,11 +247,16 @@ class BrowserUseNode(BaseNode[BrowserUseProperties]):
                         consecutive_errors += 1
                         logger.warning(f"Browser Use poll error ({consecutive_errors}): {poll_err}")
                         if consecutive_errors >= 3:
-                            return NodeResult(success=False, error=f"Polling failed after 3 consecutive errors: {poll_err}")
+                            return NodeResult(
+                                success=False,
+                                error=f"Polling failed after 3 consecutive errors: {poll_err}",
+                            )
                         continue
 
                     status = result_data.get("status", "")
-                    logger.info(f"Browser Use task {task_id} status: {status} ({elapsed:.0f}s elapsed)")
+                    logger.info(
+                        f"Browser Use task {task_id} status: {status} ({elapsed:.0f}s elapsed)"
+                    )
 
                     if status in TERMINAL_STATES:
                         break
@@ -259,24 +268,33 @@ class BrowserUseNode(BaseNode[BrowserUseProperties]):
             share_url = result_data.get("share_url") or result_data.get("shareUrl")
 
             if status == "finished":
-                return NodeResult(success=True, output_data={
-                    "output": output,
-                    "steps": steps,
-                    "task_id": task_id,
-                    "live_url": live_url,
-                    "share_url": share_url,
-                    "status": status,
-                    "step_count": len(steps),
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "output": output,
+                        "steps": steps,
+                        "task_id": task_id,
+                        "live_url": live_url,
+                        "share_url": share_url,
+                        "status": status,
+                        "step_count": len(steps),
+                    },
+                )
             elif status == "failed":
                 error_msg = result_data.get("error") or output or "Task failed"
                 return NodeResult(success=False, error=f"Browser task failed: {error_msg}")
             else:
                 # Timeout or stopped
-                return NodeResult(success=False, error=f"Browser task did not complete (status: {status}, elapsed: {elapsed:.0f}s)")
+                return NodeResult(
+                    success=False,
+                    error=f"Browser task did not complete (status: {status}, elapsed: {elapsed:.0f}s)",
+                )
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"Browser Use API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False,
+                error=f"Browser Use API error {e.response.status_code}: {e.response.text[:300]}",
+            )
         except Exception as e:
             logger.error(f"BrowserUseNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -285,7 +303,15 @@ class BrowserUseNode(BaseNode[BrowserUseProperties]):
         credentials = context.credentials or []
         cred = None
         if self.props.credential:
-            cred = next((c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == "browser_use_api_key"), None)
+            cred = next(
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential)
+                    and c.get("type") == "browser_use_api_key"
+                ),
+                None,
+            )
         if cred is None:
             cred = next((c for c in credentials if c.get("type") == "browser_use_api_key"), None)
         data = cred.get("data") if cred else None

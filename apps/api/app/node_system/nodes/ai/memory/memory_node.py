@@ -134,10 +134,13 @@ class MemoryNode(BaseNode[MemoryProperties]):
 
             if op == "get":
                 messages = await provider.get(key, self.props.limit)
-                return NodeResult(success=True, output_data={
-                    "messages": messages,
-                    "count": len(messages),
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "messages": messages,
+                        "count": len(messages),
+                    },
+                )
 
             elif op == "append":
                 if not self.props.content.strip():
@@ -145,19 +148,25 @@ class MemoryNode(BaseNode[MemoryProperties]):
                 message = {"role": self.props.role, "content": self.props.content}
                 await provider.append(key, [message], self.props.limit)
                 messages = await provider.get(key, self.props.limit)
-                return NodeResult(success=True, output_data={
-                    "messages": messages,
-                    "count": len(messages),
-                    "appended": True,
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "messages": messages,
+                        "count": len(messages),
+                        "appended": True,
+                    },
+                )
 
             elif op == "clear":
                 await _clear_memory(provider, key, self.props.backend)
-                return NodeResult(success=True, output_data={
-                    "messages": [],
-                    "count": 0,
-                    "cleared": True,
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "messages": [],
+                        "count": 0,
+                        "cleared": True,
+                    },
+                )
 
             else:
                 return NodeResult(success=False, error=f"Unknown operation: {op}")
@@ -172,6 +181,7 @@ async def _clear_memory(provider: Any, key: str, backend: str) -> None:
     if backend == "redis":
         try:
             from apps.api.app.core.redis import get_redis
+
             redis = await get_redis()
             await redis.delete(f"fuse:agent_memory:{key}")
         except Exception as e:

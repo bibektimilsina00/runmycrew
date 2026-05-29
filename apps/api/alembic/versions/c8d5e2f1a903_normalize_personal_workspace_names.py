@@ -6,6 +6,7 @@ Create Date: 2026-05-21
 
 Recompute personal workspace labels after preserving registration full names.
 """
+
 from collections.abc import Sequence
 
 import sqlalchemy as sa

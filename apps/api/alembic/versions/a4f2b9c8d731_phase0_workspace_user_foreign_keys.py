@@ -6,6 +6,7 @@ Create Date: 2026-05-20
 
 Add user foreign keys for workspace ownership and invitations.
 """
+
 from collections.abc import Sequence
 
 from alembic import op

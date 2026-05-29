@@ -72,12 +72,14 @@ class MCPClient:
                     visibility="user-or-llm",
                 )
 
-            definitions.append(ToolDefinition(
-                id=self._tool_id(name),
-                name=f"{self.server_name}: {name}",
-                description=description,
-                params=params,
-            ))
+            definitions.append(
+                ToolDefinition(
+                    id=self._tool_id(name),
+                    name=f"{self.server_name}: {name}",
+                    description=description,
+                    params=params,
+                )
+            )
         return definitions
 
     async def call_tool(self, tool_name: str, arguments: dict[str, Any]) -> ToolResult:
@@ -118,6 +120,9 @@ class MCPClient:
                 output={"content": "\n".join(output_parts), "raw": content},
             )
         except httpx.HTTPStatusError as e:
-            return ToolResult(success=False, error=f"MCP HTTP error {e.response.status_code}: {e.response.text[:200]}")
+            return ToolResult(
+                success=False,
+                error=f"MCP HTTP error {e.response.status_code}: {e.response.text[:200]}",
+            )
         except Exception as e:
             return ToolResult(success=False, error=f"MCP call failed: {e}")

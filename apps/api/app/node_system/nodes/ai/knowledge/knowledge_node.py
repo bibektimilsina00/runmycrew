@@ -101,13 +101,18 @@ class KnowledgeNode(BaseNode[KnowledgeProperties]):
             import sqlalchemy as sa
 
             from apps.api.app.features.knowledge.models import KnowledgeBase
-            result = await context.db.execute(sa.select(KnowledgeBase).where(KnowledgeBase.id == kb_id))
+
+            result = await context.db.execute(
+                sa.select(KnowledgeBase).where(KnowledgeBase.id == kb_id)
+            )
             kb = result.scalar_one_or_none()
             if not kb:
                 return NodeResult(success=False, error=f"Knowledge base {kb_id} not found.")
 
             if not kb.embedding_credential_id:
-                return NodeResult(success=False, error="Knowledge base has no embedding credential set.")
+                return NodeResult(
+                    success=False, error="Knowledge base has no embedding credential set."
+                )
 
             cred_repo = CredentialRepository(context.db)
             cred = await cred_repo.get_by_id(kb.embedding_credential_id)
@@ -124,17 +129,24 @@ class KnowledgeNode(BaseNode[KnowledgeProperties]):
             top_k = max(1, min(self.props.top_k, 20))
             chunks = await svc.search(kb, self.props.query.strip(), api_key, top_k)
 
-            results = chunks if self.props.include_scores else [
-                {"id": c["id"], "content": c["content"], "document_id": c["document_id"]}
-                for c in chunks
-            ]
+            results = (
+                chunks
+                if self.props.include_scores
+                else [
+                    {"id": c["id"], "content": c["content"], "document_id": c["document_id"]}
+                    for c in chunks
+                ]
+            )
             context_text = "\n\n---\n\n".join(c["content"] for c in chunks)
 
-            return NodeResult(success=True, output_data={
-                "results": results,
-                "context": context_text,
-                "count": len(results),
-            })
+            return NodeResult(
+                success=True,
+                output_data={
+                    "results": results,
+                    "context": context_text,
+                    "count": len(results),
+                },
+            )
 
         except Exception as e:
             logger.error(f"KnowledgeNode failed: {e}", exc_info=True)

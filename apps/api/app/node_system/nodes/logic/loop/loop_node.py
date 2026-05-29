@@ -58,7 +58,10 @@ class LoopNode(BaseNode[LoopProperties]):
                         {"label": "For Each — iterate over array items", "value": "for_each"},
                         {"label": "For — fixed number of iterations", "value": "for"},
                         {"label": "While — run while condition is true", "value": "while"},
-                        {"label": "Do While — run at least once, then check condition", "value": "do_while"},
+                        {
+                            "label": "Do While — run at least once, then check condition",
+                            "value": "do_while",
+                        },
                     ],
                 },
                 # For Each
@@ -163,12 +166,16 @@ class LoopNode(BaseNode[LoopProperties]):
             except Exception:
                 return NodeResult(success=False, error=f"items must be an array, got: {raw!r}")
         if not isinstance(raw, list):
-            return NodeResult(success=False, error=f"items must be an array, got {type(raw).__name__}")
+            return NodeResult(
+                success=False, error=f"items must be an array, got {type(raw).__name__}"
+            )
 
         items = raw[:_MAX_ITERATIONS]
         total = len(items)
         if total == 0:
-            return NodeResult(success=True, output_data={"results": [], "count": 0}, handled_successors=True)
+            return NodeResult(
+                success=True, output_data={"results": [], "count": 0}, handled_successors=True
+            )
 
         async def run_item(i: int, item: Any) -> dict[str, Any]:
             loop_vars = {"item": item, "index": i, "total": total, "items": items}
@@ -180,7 +187,9 @@ class LoopNode(BaseNode[LoopProperties]):
         else:
             results = [await run_item(i, it) for i, it in enumerate(items)]
 
-        return NodeResult(success=True, output_data={"results": results, "count": total}, handled_successors=True)
+        return NodeResult(
+            success=True, output_data={"results": results, "count": total}, handled_successors=True
+        )
 
     # ── For ───────────────────────────────────────────────────────────────────
 
@@ -192,7 +201,9 @@ class LoopNode(BaseNode[LoopProperties]):
         total = len(values)
 
         if total == 0:
-            return NodeResult(success=True, output_data={"results": [], "count": 0}, handled_successors=True)
+            return NodeResult(
+                success=True, output_data={"results": [], "count": 0}, handled_successors=True
+            )
 
         async def run_iter(i: int, value: int) -> dict[str, Any]:
             loop_vars = {"index": i, "value": value, "total": total}
@@ -204,7 +215,9 @@ class LoopNode(BaseNode[LoopProperties]):
         else:
             results = [await run_iter(i, v) for i, v in enumerate(values)]
 
-        return NodeResult(success=True, output_data={"results": results, "count": total}, handled_successors=True)
+        return NodeResult(
+            success=True, output_data={"results": results, "count": total}, handled_successors=True
+        )
 
     # ── While ─────────────────────────────────────────────────────────────────
 
@@ -217,20 +230,24 @@ class LoopNode(BaseNode[LoopProperties]):
         iteration = 0
 
         while iteration < max_iter:
-            resolver = TemplateResolver(
-                node_outputs={}, trigger_data=current_input, variables={}
-            )
+            resolver = TemplateResolver(node_outputs={}, trigger_data=current_input, variables={})
             if not resolver.evaluate_condition(self.props.condition):
                 break
 
             loop_vars = {"iteration": iteration, "total": max_iter}
-            sub = await context.run_downstream({**current_input, "iteration": iteration}, loop_data=loop_vars)
+            sub = await context.run_downstream(
+                {**current_input, "iteration": iteration}, loop_data=loop_vars
+            )
             iteration_result = sub[0] if sub else {}
             results.append(iteration_result)
             current_input = iteration_result
             iteration += 1
 
-        return NodeResult(success=True, output_data={"results": results, "iterations": iteration}, handled_successors=True)
+        return NodeResult(
+            success=True,
+            output_data={"results": results, "iterations": iteration},
+            handled_successors=True,
+        )
 
     # ── Do While ─────────────────────────────────────────────────────────────
 
@@ -244,16 +261,20 @@ class LoopNode(BaseNode[LoopProperties]):
 
         while iteration < max_iter:
             loop_vars = {"iteration": iteration, "total": max_iter}
-            sub = await context.run_downstream({**current_input, "iteration": iteration}, loop_data=loop_vars)
+            sub = await context.run_downstream(
+                {**current_input, "iteration": iteration}, loop_data=loop_vars
+            )
             iteration_result = sub[0] if sub else {}
             results.append(iteration_result)
             current_input = iteration_result
             iteration += 1
 
-            resolver = TemplateResolver(
-                node_outputs={}, trigger_data=current_input, variables={}
-            )
+            resolver = TemplateResolver(node_outputs={}, trigger_data=current_input, variables={})
             if not resolver.evaluate_condition(self.props.condition):
                 break
 
-        return NodeResult(success=True, output_data={"results": results, "iterations": iteration}, handled_successors=True)
+        return NodeResult(
+            success=True,
+            output_data={"results": results, "iterations": iteration},
+            handled_successors=True,
+        )

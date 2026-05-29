@@ -1,11 +1,11 @@
 import pytest
 
+from apps.api.app.credential_manager.api_keys import get_ai_provider_ids
 from apps.api.app.features.ai.router import (
     list_ai_models,
     list_ai_providers,
 )
 from apps.api.app.features.ai.service import AIService
-from apps.api.app.features.credentials.manager.api_keys import get_ai_provider_ids
 
 
 @pytest.fixture
@@ -46,9 +46,7 @@ async def test_list_ai_providers_uses_api_key_catalog():
         "together",
         "fireworks",
     }
-    assert {
-        provider["value"]: provider["credentialType"] for provider in result["data"]
-    } == {
+    assert {provider["value"]: provider["credentialType"] for provider in result["data"]} == {
         "openai": "openai_api_key",
         "anthropic": "anthropic_api_key",
         "google": "google_api_key",

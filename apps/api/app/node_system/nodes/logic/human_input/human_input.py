@@ -57,7 +57,14 @@ class HumanInputNode(BaseNode[HumanInputProperties]):
                     "name": "fields",
                     "label": "Input Fields",
                     "type": "json",
-                    "default": [{"name": "approved", "label": "Approved?", "type": "boolean", "required": True}],
+                    "default": [
+                        {
+                            "name": "approved",
+                            "label": "Approved?",
+                            "type": "boolean",
+                            "required": True,
+                        }
+                    ],
                     "description": "Fields the human must fill. Each: {name, label, type, required}.",
                 },
                 {

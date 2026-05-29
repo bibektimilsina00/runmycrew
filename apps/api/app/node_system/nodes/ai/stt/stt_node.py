@@ -70,8 +70,14 @@ class STTNode(BaseNode[STTProperties]):
                     "options": [
                         {"label": "whisper-1 (OpenAI)", "value": "whisper-1"},
                         {"label": "whisper-large-v3 (Groq)", "value": "whisper-large-v3"},
-                        {"label": "whisper-large-v3-turbo (Groq, fast)", "value": "whisper-large-v3-turbo"},
-                        {"label": "distil-whisper-large-v3-en (Groq, English)", "value": "distil-whisper-large-v3-en"},
+                        {
+                            "label": "whisper-large-v3-turbo (Groq, fast)",
+                            "value": "whisper-large-v3-turbo",
+                        },
+                        {
+                            "label": "distil-whisper-large-v3-en (Groq, English)",
+                            "value": "distil-whisper-large-v3-en",
+                        },
                     ],
                 },
                 {
@@ -127,7 +133,10 @@ class STTNode(BaseNode[STTProperties]):
         try:
             async with httpx.AsyncClient(timeout=180.0) as client:
                 files = {"file": (filename, audio_bytes, "audio/mpeg")}
-                data: dict[str, Any] = {"model": self.props.model, "response_format": "verbose_json"}
+                data: dict[str, Any] = {
+                    "model": self.props.model,
+                    "response_format": "verbose_json",
+                }
                 if self.props.language:
                     data["language"] = self.props.language
                 if self.props.prompt:
@@ -142,15 +151,20 @@ class STTNode(BaseNode[STTProperties]):
                 resp.raise_for_status()
                 result = resp.json()
 
-            return NodeResult(success=True, output_data={
-                "transcript": result.get("text", ""),
-                "language": result.get("language"),
-                "duration": result.get("duration"),
-                "segments": result.get("segments") or [],
-            })
+            return NodeResult(
+                success=True,
+                output_data={
+                    "transcript": result.get("text", ""),
+                    "language": result.get("language"),
+                    "duration": result.get("duration"),
+                    "segments": result.get("segments") or [],
+                },
+            )
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+            )
         except Exception as e:
             logger.error(f"STTNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -175,11 +189,20 @@ class STTNode(BaseNode[STTProperties]):
             "groq": "https://api.groq.com/openai/v1/audio/transcriptions",
         }
         cred_type = type_map.get(self.props.provider, "openai_api_key")
-        endpoint = endpoint_map.get(self.props.provider, "https://api.openai.com/v1/audio/transcriptions")
+        endpoint = endpoint_map.get(
+            self.props.provider, "https://api.openai.com/v1/audio/transcriptions"
+        )
         credentials = context.credentials or []
         cred = None
         if self.props.credential:
-            cred = next((c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == cred_type), None)
+            cred = next(
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential) and c.get("type") == cred_type
+                ),
+                None,
+            )
         if cred is None:
             cred = next((c for c in credentials if c.get("type") == cred_type), None)
         data = cred.get("data") if cred else None

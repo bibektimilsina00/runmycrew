@@ -54,17 +54,20 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
                     "type": "credential",
                     "required": True,
                     "dependsOn": ["provider"],
-                    "credentialTypeByField": {"field": "provider", "values": {
-                        "anthropic": "anthropic_api_key",
-                        "openai": "openai_api_key",
-                        "groq": "groq_api_key",
-                        "openrouter": "openrouter_api_key",
-                        "deepseek": "deepseek_api_key",
-                        "mistral": "mistral_api_key",
-                        "xai": "xai_api_key",
-                        "together": "together_api_key",
-                        "fireworks": "fireworks_api_key",
-                    }},
+                    "credentialTypeByField": {
+                        "field": "provider",
+                        "values": {
+                            "anthropic": "anthropic_api_key",
+                            "openai": "openai_api_key",
+                            "groq": "groq_api_key",
+                            "openrouter": "openrouter_api_key",
+                            "deepseek": "deepseek_api_key",
+                            "mistral": "mistral_api_key",
+                            "xai": "xai_api_key",
+                            "together": "together_api_key",
+                            "fireworks": "fireworks_api_key",
+                        },
+                    },
                 },
                 {
                     "name": "model",
@@ -127,14 +130,23 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
                         client, ai_provider.chat_completions_url or "", api_key, model, budget
                     )
                 else:
-                    return NodeResult(success=False, error="Thinking node supports Anthropic and OpenAI reasoning models.")
+                    return NodeResult(
+                        success=False,
+                        error="Thinking node supports Anthropic and OpenAI reasoning models.",
+                    )
 
             return NodeResult(
                 success=True,
-                output_data={"thinking": thinking_content, "response": response_text, "tokens": tokens},
+                output_data={
+                    "thinking": thinking_content,
+                    "response": response_text,
+                    "tokens": tokens,
+                },
             )
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:200]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:200]}"
+            )
         except Exception as e:
             return NodeResult(success=False, error=str(e))
 
@@ -150,7 +162,11 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
         }
         response = await client.post(
             url,
-            headers={"x-api-key": api_key, "anthropic-version": "2023-06-01", "Content-Type": "application/json"},
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "Content-Type": "application/json",
+            },
             json=payload,
         )
         response.raise_for_status()
@@ -195,7 +211,9 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
             "prompt_tokens": usage.get("prompt_tokens"),
             "completion_tokens": usage.get("completion_tokens"),
             "total_tokens": usage.get("total_tokens"),
-            "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get("reasoning_tokens"),
+            "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get(
+                "reasoning_tokens"
+            ),
         }
         return "", message.get("content") or "", tokens
 
@@ -205,9 +223,12 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
             return None
         credentials = context.credentials or []
         cred = next(
-            (c for c in credentials
-             if c.get("type") == ai_provider.id and
-             (not self.props.credential or str(c.get("id")) == str(self.props.credential))),
+            (
+                c
+                for c in credentials
+                if c.get("type") == ai_provider.id
+                and (not self.props.credential or str(c.get("id")) == str(self.props.credential))
+            ),
             None,
         )
         if not cred:

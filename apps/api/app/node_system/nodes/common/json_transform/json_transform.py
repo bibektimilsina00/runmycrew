@@ -12,8 +12,10 @@ from apps.api.app.node_system.base.node_result import NodeResult
 
 logger = get_logger(__name__)
 
+
 class JsonTransformProperties(BaseModel):
     template: Any
+
 
 class JsonTransformNode(BaseNode[JsonTransformProperties]):
     @classmethod
@@ -33,7 +35,7 @@ class JsonTransformNode(BaseNode[JsonTransformProperties]):
                     "label": "Output Template (JSON)",
                     "type": "json",
                     "required": True,
-                    "placeholder": '{"name": "{{ input.name }}", "email": "{{ input.email }}"}'
+                    "placeholder": '{"name": "{{ input.name }}", "email": "{{ input.email }}"}',
                 },
             ],
             allow_error=False,
@@ -57,14 +59,14 @@ class JsonTransformNode(BaseNode[JsonTransformProperties]):
             # Render jinja2 template with input_data as context
             env = Environment(loader=BaseLoader())
             tmpl = env.from_string(template_str)
-            
+
             # Provide 'input' for convenience, and also spread input_data for direct access
             render_context = {
                 "input": input_data,
                 **input_data,
                 "variables": context.variables,
             }
-            
+
             rendered = tmpl.render(**render_context)
 
             try:

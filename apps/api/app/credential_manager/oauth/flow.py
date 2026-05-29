@@ -79,13 +79,15 @@ class SlackOAuthProvider:
         if not access_token:
             raise ValueError("Slack response missing access_token")
 
-        return with_expiry_metadata({
-            "access_token": access_token,
-            "refresh_token": data.get("refresh_token"),
-            "expires_in": data.get("expires_in"),
-            "team_id": data.get("team", {}).get("id"),
-            "team_name": data.get("team", {}).get("name"),
-        })
+        return with_expiry_metadata(
+            {
+                "access_token": access_token,
+                "refresh_token": data.get("refresh_token"),
+                "expires_in": data.get("expires_in"),
+                "team_id": data.get("team", {}).get("id"),
+                "team_name": data.get("team", {}).get("name"),
+            }
+        )
 
     async def refresh_access_token(self, refresh_token: str):
         import httpx
@@ -156,14 +158,16 @@ class GitHubOAuthProvider:
         if "error" in data:
             raise ValueError(f"GitHub OAuth failed: {data.get('error_description')}")
 
-        return with_expiry_metadata({
-            "access_token": data["access_token"],
-            "refresh_token": data.get("refresh_token"),
-            "expires_in": data.get("expires_in"),
-            "refresh_token_expires_in": data.get("refresh_token_expires_in"),
-            "token_type": data["token_type"],
-            "scope": data["scope"],
-        })
+        return with_expiry_metadata(
+            {
+                "access_token": data["access_token"],
+                "refresh_token": data.get("refresh_token"),
+                "expires_in": data.get("expires_in"),
+                "refresh_token_expires_in": data.get("refresh_token_expires_in"),
+                "token_type": data["token_type"],
+                "scope": data["scope"],
+            }
+        )
 
     async def refresh_access_token(self, refresh_token: str):
         import httpx
@@ -232,7 +236,9 @@ class NotionOAuthProvider:
             )
         data = response.json()
         if "error" in data:
-            raise ValueError(f"Notion OAuth failed: {data.get('error_description') or data['error']}")
+            raise ValueError(
+                f"Notion OAuth failed: {data.get('error_description') or data['error']}"
+            )
 
         return {
             "access_token": data["access_token"],
@@ -257,6 +263,7 @@ class GoogleOAuthProvider:
 
     def get_authorization_url(self, state, code_challenge=None):
         from urllib.parse import urlencode
+
         params = {
             "client_id": settings.GOOGLE_CLIENT_ID if hasattr(settings, "GOOGLE_CLIENT_ID") else "",
             "redirect_uri": REDIRECT_URI.format(service="google"),
@@ -270,12 +277,17 @@ class GoogleOAuthProvider:
 
     async def exchange_code(self, code, code_verifier=None):
         import httpx
+
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://oauth2.googleapis.com/token",
                 data={
-                    "client_id": settings.GOOGLE_CLIENT_ID if hasattr(settings, "GOOGLE_CLIENT_ID") else "",
-                    "client_secret": settings.GOOGLE_CLIENT_SECRET if hasattr(settings, "GOOGLE_CLIENT_SECRET") else "",
+                    "client_id": settings.GOOGLE_CLIENT_ID
+                    if hasattr(settings, "GOOGLE_CLIENT_ID")
+                    else "",
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET
+                    if hasattr(settings, "GOOGLE_CLIENT_SECRET")
+                    else "",
                     "code": code,
                     "grant_type": "authorization_code",
                     "redirect_uri": REDIRECT_URI.format(service="google"),
@@ -288,19 +300,26 @@ class GoogleOAuthProvider:
 
     async def refresh_access_token(self, refresh_token: str):
         import httpx
+
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://oauth2.googleapis.com/token",
                 data={
-                    "client_id": settings.GOOGLE_CLIENT_ID if hasattr(settings, "GOOGLE_CLIENT_ID") else "",
-                    "client_secret": settings.GOOGLE_CLIENT_SECRET if hasattr(settings, "GOOGLE_CLIENT_SECRET") else "",
+                    "client_id": settings.GOOGLE_CLIENT_ID
+                    if hasattr(settings, "GOOGLE_CLIENT_ID")
+                    else "",
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET
+                    if hasattr(settings, "GOOGLE_CLIENT_SECRET")
+                    else "",
                     "refresh_token": refresh_token,
                     "grant_type": "refresh_token",
                 },
             )
         data = response.json()
         if "error" in data:
-            raise ValueError(f"Google token refresh failed: {data.get('error_description', data['error'])}")
+            raise ValueError(
+                f"Google token refresh failed: {data.get('error_description', data['error'])}"
+            )
         return with_expiry_metadata(data)
 
 

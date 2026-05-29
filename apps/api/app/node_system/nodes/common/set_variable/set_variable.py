@@ -10,9 +10,11 @@ from apps.api.app.node_system.base.node_result import NodeResult
 
 logger = get_logger(__name__)
 
+
 class SetVariableProperties(BaseModel):
     key: str
     value: Any
+
 
 class SetVariableNode(BaseNode[SetVariableProperties]):
     @classmethod
@@ -32,14 +34,14 @@ class SetVariableNode(BaseNode[SetVariableProperties]):
                     "label": "Variable Name",
                     "type": "string",
                     "required": True,
-                    "placeholder": "myVariable"
+                    "placeholder": "myVariable",
                 },
                 {
                     "name": "value",
                     "label": "Value",
                     "type": "string",
                     "required": True,
-                    "placeholder": "Enter value or use {{ interpolation }}"
+                    "placeholder": "Enter value or use {{ interpolation }}",
                 },
             ],
             allow_error=False,

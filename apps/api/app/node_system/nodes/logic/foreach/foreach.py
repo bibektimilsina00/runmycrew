@@ -69,7 +69,9 @@ class ForEachNode(BaseNode[ForEachProperties]):
                 return NodeResult(success=False, error=f"items must be an array, got: {raw!r}")
 
         if not isinstance(raw, list):
-            return NodeResult(success=False, error=f"items must be an array, got {type(raw).__name__}")
+            return NodeResult(
+                success=False, error=f"items must be an array, got {type(raw).__name__}"
+            )
 
         items = raw[:_MAX_ITERATIONS]
         total = len(items)

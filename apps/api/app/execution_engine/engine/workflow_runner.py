@@ -11,6 +11,11 @@ from apps.api.app.node_system.base.node_context import NodeContext
 
 logger = get_logger(__name__)
 
+# Bound total work so a cyclic graph or runaway loop fails fast instead of
+# hanging the worker (guards against accidental or malicious infinite loops).
+_MAX_NODE_EXECUTIONS = 10_000
+_MAX_SUBGRAPH_DEPTH = 50
+
 
 class PauseSignal(Exception):
     """Raised by a node to pause execution at this point."""
@@ -23,6 +28,7 @@ class PauseSignal(Exception):
 
 class CancelledException(Exception):
     """Raised when a cancellation signal is detected in Redis."""
+
     pass
 
 
@@ -36,6 +42,8 @@ class WorkflowRunner:
         on_log: Any = None,
         credentials: list[dict[str, Any]] | None = None,
         emitter: Any = None,
+        _depth: int = 0,
+        _budget: dict[str, int] | None = None,
     ):
         self.workflow_id = workflow_id
         self.execution_id = execution_id
@@ -53,10 +61,13 @@ class WorkflowRunner:
 
         # Parallel-safe shared state
         self._lock = asyncio.Lock()
-        self._executed: dict[str, Any] = {}   # node_id → NodeResult
+        self._executed: dict[str, Any] = {}  # node_id → NodeResult
         self._outputs: dict[str, dict[str, Any]] = {}  # node_id → output_data
         self._failed = asyncio.Event()
         self._error_message: str | None = None
+        self._depth = _depth
+        # Shared across sub-runners so the whole run draws from one budget.
+        self._budget = _budget if _budget is not None else {"remaining": _MAX_NODE_EXECUTIONS}
 
     # ------------------------------------------------------------------
     # Public entry point
@@ -72,9 +83,7 @@ class WorkflowRunner:
             return {}
 
         try:
-            await asyncio.gather(
-                *[self._execute_node(n, trigger_data) for n in start_nodes]
-            )
+            await asyncio.gather(*[self._execute_node(n, trigger_data) for n in start_nodes])
         except PauseSignal:
             raise  # propagate to Celery task
         except CancelledException:
@@ -98,6 +107,7 @@ class WorkflowRunner:
     async def _is_cancelled(self) -> bool:
         try:
             from apps.api.app.core.redis import get_redis
+
             redis = await get_redis()
             result = await redis.get(f"execution:cancel:{self.execution_id}")
             return result is not None
@@ -124,10 +134,18 @@ class WorkflowRunner:
             logger.warning(f"Node {node_id} not found in graph, skipping")
             return
 
+        self._budget["remaining"] -= 1
+        if self._budget["remaining"] < 0:
+            raise RuntimeError(
+                f"Execution exceeded the maximum of {_MAX_NODE_EXECUTIONS} node runs "
+                "(possible infinite loop)"
+            )
+
         label = node_data.get("data", {}).get("label") or node_data["type"]
         await self._log(label, node_id=node_id)
 
         from apps.api.app.execution_engine.engine.template_resolver import TemplateResolver
+
         resolver = TemplateResolver(
             node_outputs=self._outputs,
             trigger_data=self._trigger_data,
@@ -141,12 +159,14 @@ class WorkflowRunner:
         )
 
         from apps.api.app.core.http import get_http_client
+
         http_client = await get_http_client()
 
         # Build run_downstream callback for nodes that handle their own successors (e.g. ForEach).
         # Pre-bind the successor node IDs for this specific node.
         _successor_ids = [
-            e["target"] for e in self.edges
+            e["target"]
+            for e in self.edges
             if e["source"] == node_id and e.get("sourceHandle") != "error"
         ]
 
@@ -154,6 +174,10 @@ class WorkflowRunner:
             item_input: dict[str, Any],
             loop_data: dict[str, Any] | None = None,
         ) -> list[dict[str, Any]]:
+            if self._depth + 1 > _MAX_SUBGRAPH_DEPTH:
+                raise RuntimeError(
+                    f"Execution exceeded the maximum sub-workflow depth ({_MAX_SUBGRAPH_DEPTH})"
+                )
             results: list[dict[str, Any]] = []
             for start_id in _successor_ids:
                 sub_runner = WorkflowRunner(
@@ -164,6 +188,8 @@ class WorkflowRunner:
                     on_log=self.on_log,
                     credentials=self.credentials,
                     emitter=self.emitter,
+                    _depth=self._depth + 1,
+                    _budget=self._budget,
                 )
                 sub_runner.variables = self.variables
                 sub_runner.env = self.env
@@ -193,11 +219,14 @@ class WorkflowRunner:
             pause=pause_execution,
         )
 
-        await self._emit("node_started", {
-            "node_id": node_id,
-            "node_type": node_data.get("type"),
-            "label": label,
-        })
+        await self._emit(
+            "node_started",
+            {
+                "node_id": node_id,
+                "node_type": node_data.get("type"),
+                "label": label,
+            },
+        )
 
         # Retry config — read from resolved properties
         max_retries = int(resolved_properties.get("retries") or 0)
@@ -236,11 +265,15 @@ class WorkflowRunner:
                 self._outputs[node_id] = result.output_data
 
             await self._emit("node_completed", {"node_id": node_id, "output": result.output_data})
-            await self._log(label, node_id=node_id, payload={
-                "input": resolved_properties,
-                "data_in": input_data,
-                "output": result.output_data,
-            })
+            await self._log(
+                label,
+                node_id=node_id,
+                payload={
+                    "input": resolved_properties,
+                    "data_in": input_data,
+                    "output": result.output_data,
+                },
+            )
 
             # If node handled its own successors, don't dispatch edges
             if result.handled_successors:
@@ -248,39 +281,49 @@ class WorkflowRunner:
 
             branch = result.output_data.get("branch")
             active_edges = [
-                e for e in next_edges
+                e
+                for e in next_edges
                 if e.get("sourceHandle") != "error"
                 and not (branch and e.get("sourceHandle") and e.get("sourceHandle") != branch)
             ]
 
             if active_edges:
-                await asyncio.gather(*[
-                    self._execute_node(e["target"], result.output_data)
-                    for e in active_edges
-                ])
+                await asyncio.gather(
+                    *[self._execute_node(e["target"], result.output_data) for e in active_edges]
+                )
 
         else:
             await self._emit("node_failed", {"node_id": node_id, "error": result.error})
-            await self._log(label, level="error", node_id=node_id, payload={
-                "input": resolved_properties,
-                "data_in": input_data,
-                "error": result.error,
-            })
+            await self._log(
+                label,
+                level="error",
+                node_id=node_id,
+                payload={
+                    "input": resolved_properties,
+                    "data_in": input_data,
+                    "error": result.error,
+                },
+            )
 
             error_edges = [e for e in next_edges if e.get("sourceHandle") == "error"]
             if error_edges:
-                error_payload = {"input": resolved_properties, "data_in": input_data, "error": result.error}
-                await asyncio.gather(*[
-                    self._execute_node(e["target"], error_payload)
-                    for e in error_edges
-                ])
+                error_payload = {
+                    "input": resolved_properties,
+                    "data_in": input_data,
+                    "error": result.error,
+                }
+                await asyncio.gather(
+                    *[self._execute_node(e["target"], error_payload) for e in error_edges]
+                )
             else:
                 self._failed.set()
                 error = result.error or "Unknown error"
                 self._error_message = error if "Node" in error else f"Node {label} failed: {error}"
                 logger.error(f"Execution failed at node {node_id}: {result.error}")
 
-    async def _resume_from(self, paused_node_id: str, resume_input: dict[str, Any]) -> dict[str, Any]:
+    async def _resume_from(
+        self, paused_node_id: str, resume_input: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resume execution after a pause, injecting resume_input as the paused node's output."""
         # Treat paused node as completed with resume_input as its output
         async with self._lock:
@@ -290,10 +333,9 @@ class WorkflowRunner:
         # Follow outgoing edges from the paused node
         next_edges = [e for e in self.edges if e["source"] == paused_node_id]
         if next_edges:
-            await asyncio.gather(*[
-                self._execute_node(e["target"], resume_input)
-                for e in next_edges
-            ])
+            await asyncio.gather(
+                *[self._execute_node(e["target"], resume_input) for e in next_edges]
+            )
 
         if self._failed.is_set():
             raise Exception(self._error_message or "Execution failed")
@@ -302,7 +344,9 @@ class WorkflowRunner:
             return self._outputs[list(self._outputs.keys())[-1]]
         return {}
 
-    async def _execute_subgraph(self, start_node_id: str, input_data: dict[str, Any]) -> dict[str, Any]:
+    async def _execute_subgraph(
+        self, start_node_id: str, input_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute a sub-graph starting from start_node_id. Used by ForEach."""
         await self._execute_node(start_node_id, input_data)
         if start_node_id in self._outputs:

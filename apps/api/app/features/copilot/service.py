@@ -5,6 +5,8 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
+from apps.api.app.credential_manager.api_keys import get_ai_providers
+from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
 from apps.api.app.features.copilot.repository import CopilotSessionRepository
 from apps.api.app.features.copilot.schemas import (
     CopilotCredential,
@@ -15,8 +17,6 @@ from apps.api.app.features.copilot.schemas import (
     SessionItem,
     SessionListResponse,
 )
-from apps.api.app.features.credentials.manager.api_keys import get_ai_providers
-from apps.api.app.features.credentials.manager.encryption.aes import AESEncryptionService
 from apps.api.app.features.credentials.repository import CredentialRepository
 from apps.api.app.features.users.models import User
 from apps.api.app.features.workflows.repository import WorkflowRepository

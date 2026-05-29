@@ -18,6 +18,7 @@ class MemoryProvider(Protocol):
 # Workflow-variable memory (default — no external deps)
 # ---------------------------------------------------------------------------
 
+
 class WorkflowMemoryProvider:
     def __init__(self, context: NodeContext):
         self._ctx = context
@@ -29,17 +30,18 @@ class WorkflowMemoryProvider:
         raw = self._ctx.variables.get(self._var_key(key), [])
         if not isinstance(raw, list):
             return []
-        return raw[-max(limit, 1):]
+        return raw[-max(limit, 1) :]
 
     async def append(self, key: str, messages: list[dict[str, Any]], limit: int) -> None:
         existing = await self.get(key, limit)
-        combined = [*existing, *messages][-max(limit, 1):]
+        combined = [*existing, *messages][-max(limit, 1) :]
         self._ctx.variables[self._var_key(key)] = combined
 
 
 # ---------------------------------------------------------------------------
 # Redis memory (short-term, TTL-backed)
 # ---------------------------------------------------------------------------
+
 
 class RedisMemoryProvider:
     def __init__(self, ttl_seconds: int = 86400):
@@ -51,6 +53,7 @@ class RedisMemoryProvider:
     async def get(self, key: str, limit: int, query: str | None = None) -> list[dict[str, Any]]:
         try:
             from apps.api.app.core.redis import get_redis
+
             redis = await get_redis()
             raw = await redis.get(self._redis_key(key))
             if not raw:
@@ -58,7 +61,7 @@ class RedisMemoryProvider:
             messages = json.loads(raw)
             if not isinstance(messages, list):
                 return []
-            return messages[-max(limit, 1):]
+            return messages[-max(limit, 1) :]
         except Exception as e:
             logger.warning(f"Redis memory get failed: {e}")
             return []
@@ -66,11 +69,12 @@ class RedisMemoryProvider:
     async def append(self, key: str, messages: list[dict[str, Any]], limit: int) -> None:
         try:
             from apps.api.app.core.redis import get_redis
+
             redis = await get_redis()
             rkey = self._redis_key(key)
             raw = await redis.get(rkey)
             existing = json.loads(raw) if raw else []
-            combined = [*existing, *messages][-max(limit, 1):]
+            combined = [*existing, *messages][-max(limit, 1) :]
             await redis.set(rkey, json.dumps(combined), ex=self._ttl)
         except Exception as e:
             logger.warning(f"Redis memory append failed: {e}")
@@ -80,6 +84,7 @@ class RedisMemoryProvider:
 # Pinecone vector memory
 # ---------------------------------------------------------------------------
 
+
 class PineconeMemoryProvider:
     def __init__(self, api_key: str, index_name: str, namespace: str = "agent"):
         self._api_key = api_key
@@ -88,6 +93,7 @@ class PineconeMemoryProvider:
 
     async def _embed(self, text: str) -> list[float]:
         import httpx
+
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
                 "https://api.openai.com/v1/embeddings",
@@ -100,6 +106,7 @@ class PineconeMemoryProvider:
     async def get(self, key: str, limit: int, query: str | None = None) -> list[dict[str, Any]]:
         try:
             from pinecone import Pinecone  # type: ignore[import]
+
             pc = Pinecone(api_key=self._api_key)
             index = pc.Index(self._index_name)
 
@@ -141,6 +148,7 @@ class PineconeMemoryProvider:
             import uuid
 
             from pinecone import Pinecone  # type: ignore[import]
+
             pc = Pinecone(api_key=self._api_key)
             index = pc.Index(self._index_name)
             ns = f"{self._namespace}:{key}"
@@ -151,11 +159,16 @@ class PineconeMemoryProvider:
                     continue
                 vector = await self._embed(str(text))
                 index.upsert(
-                    vectors=[{
-                        "id": str(uuid.uuid4()),
-                        "values": vector,
-                        "metadata": {"content": json.dumps(msg), "role": msg.get("role", "user")},
-                    }],
+                    vectors=[
+                        {
+                            "id": str(uuid.uuid4()),
+                            "values": vector,
+                            "metadata": {
+                                "content": json.dumps(msg),
+                                "role": msg.get("role", "user"),
+                            },
+                        }
+                    ],
                     namespace=ns,
                 )
         except ImportError:
@@ -168,6 +181,7 @@ class PineconeMemoryProvider:
 # Qdrant vector memory
 # ---------------------------------------------------------------------------
 
+
 class QdrantMemoryProvider:
     def __init__(self, url: str, collection: str, openai_api_key: str):
         self._url = url.rstrip("/")
@@ -176,6 +190,7 @@ class QdrantMemoryProvider:
 
     async def _embed(self, text: str) -> list[float]:
         import httpx
+
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
                 "https://api.openai.com/v1/embeddings",
@@ -188,6 +203,7 @@ class QdrantMemoryProvider:
     async def get(self, key: str, limit: int, query: str | None = None) -> list[dict[str, Any]]:
         try:
             import httpx
+
             query_vec = await self._embed(query or "conversation history")
             async with httpx.AsyncClient(timeout=30) as client:
                 resp = await client.post(
@@ -215,6 +231,7 @@ class QdrantMemoryProvider:
             import uuid
 
             import httpx
+
             async with httpx.AsyncClient(timeout=30) as client:
                 points = []
                 for msg in messages:
@@ -222,15 +239,17 @@ class QdrantMemoryProvider:
                     if not text:
                         continue
                     vector = await self._embed(str(text))
-                    points.append({
-                        "id": str(uuid.uuid4()),
-                        "vector": vector,
-                        "payload": {
-                            "memory_key": key,
-                            "content": json.dumps(msg),
-                            "role": msg.get("role", "user"),
-                        },
-                    })
+                    points.append(
+                        {
+                            "id": str(uuid.uuid4()),
+                            "vector": vector,
+                            "payload": {
+                                "memory_key": key,
+                                "content": json.dumps(msg),
+                                "role": msg.get("role", "user"),
+                            },
+                        }
+                    )
                 if points:
                     resp = await client.put(
                         f"{self._url}/collections/{self._collection}/points",
@@ -245,6 +264,7 @@ class QdrantMemoryProvider:
 # mem0 memory (intelligent persistent memory)
 # ---------------------------------------------------------------------------
 
+
 class Mem0MemoryProvider:
     def __init__(self, api_key: str):
         self._api_key = api_key
@@ -252,6 +272,7 @@ class Mem0MemoryProvider:
     async def get(self, key: str, limit: int, query: str | None = None) -> list[dict[str, Any]]:
         try:
             from mem0 import AsyncMemoryClient  # type: ignore[import]
+
             client = AsyncMemoryClient(api_key=self._api_key)
             if query:
                 results = await client.search(query=query, user_id=key, limit=limit)
@@ -271,6 +292,7 @@ class Mem0MemoryProvider:
     async def append(self, key: str, messages: list[dict[str, Any]], limit: int) -> None:
         try:
             from mem0 import AsyncMemoryClient  # type: ignore[import]
+
             client = AsyncMemoryClient(api_key=self._api_key)
             for msg in messages:
                 await client.add(
@@ -286,6 +308,7 @@ class Mem0MemoryProvider:
 # ---------------------------------------------------------------------------
 # Factory
 # ---------------------------------------------------------------------------
+
 
 def get_memory_provider(
     memory_type: str,

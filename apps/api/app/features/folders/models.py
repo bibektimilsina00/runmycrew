@@ -22,14 +22,11 @@ class Folder(SQLModelBase, table=True):
 
     user: "User" = Relationship(back_populates="folders")
     parent: "Folder" = Relationship(
-        back_populates="children",
-        sa_relationship_kwargs={"remote_side": "Folder.id"}
+        back_populates="children", sa_relationship_kwargs={"remote_side": "Folder.id"}
     )
     children: list["Folder"] = Relationship(
-        back_populates="parent",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="parent", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     workflows: list["Workflow"] = Relationship(
-        back_populates="folder",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="folder", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )

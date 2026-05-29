@@ -12,9 +12,7 @@ logger = get_logger(__name__)
 TEMPLATE_PATTERN = re.compile(r"\{\{([^}]+)\}\}")
 
 # Comparison pattern: {{path}} OP value  e.g. {{variables.count}} < 10
-_CMP_PATTERN = re.compile(
-    r"^\s*\{\{([^}]+)\}\}\s*(==|!=|<=|>=|<|>)\s*(.+?)\s*$"
-)
+_CMP_PATTERN = re.compile(r"^\s*\{\{([^}]+)\}\}\s*(==|!=|<=|>=|<|>)\s*(.+?)\s*$")
 
 
 class TemplateResolver:
@@ -34,7 +32,8 @@ class TemplateResolver:
             "variables": variables,
             "env": env or {},
             "secrets": secrets or {},
-            "loop": loop_data or {},   # {{loop.item}}, {{loop.index}}, {{loop.total}}, {{loop.value}}
+            "loop": loop_data
+            or {},  # {{loop.item}}, {{loop.index}}, {{loop.total}}, {{loop.value}}
             **{node_id: {"output": output} for node_id, output in node_outputs.items()},
         }
 

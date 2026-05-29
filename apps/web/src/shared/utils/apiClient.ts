@@ -60,10 +60,10 @@ apiClient.interceptors.request.use((config) => {
  * @param config - Axios request configuration
  * @returns The validated and typed response data
  */
-export async function requestJson<T>(
-  schema: z.ZodSchema<T>,
+export async function requestJson<S extends z.ZodTypeAny>(
+  schema: S,
   config: AxiosRequestConfig
-): Promise<T> {
+): Promise<z.output<S>> {
   try {
     const response = await apiClient.request(config)
     

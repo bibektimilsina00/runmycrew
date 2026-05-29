@@ -72,7 +72,7 @@ export function useWorkflowEditor(workflowId: string) {
 
   const triggerSave = useCallback((newNodes: typeof nodes, newEdges: typeof edges) => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
-    store.setSaveState('unsaved')
+    useWorkflowEditorStore.getState().setSaveState('unsaved')
     saveTimer.current = setTimeout(() => {
       saveMutation.mutate({
         graph: { nodes: newNodes, edges: newEdges },

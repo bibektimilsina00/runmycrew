@@ -61,18 +61,21 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                     "type": "credential",
                     "required": True,
                     "dependsOn": ["provider"],
-                    "credentialTypeByField": {"field": "provider", "values": {
-                        "openai": "openai_api_key",
-                        "anthropic": "anthropic_api_key",
-                        "google": "google_api_key",
-                        "groq": "groq_api_key",
-                        "openrouter": "openrouter_api_key",
-                        "deepseek": "deepseek_api_key",
-                        "mistral": "mistral_api_key",
-                        "xai": "xai_api_key",
-                        "together": "together_api_key",
-                        "fireworks": "fireworks_api_key",
-                    }},
+                    "credentialTypeByField": {
+                        "field": "provider",
+                        "values": {
+                            "openai": "openai_api_key",
+                            "anthropic": "anthropic_api_key",
+                            "google": "google_api_key",
+                            "groq": "groq_api_key",
+                            "openrouter": "openrouter_api_key",
+                            "deepseek": "deepseek_api_key",
+                            "mistral": "mistral_api_key",
+                            "xai": "xai_api_key",
+                            "together": "together_api_key",
+                            "fireworks": "fireworks_api_key",
+                        },
+                    },
                 },
                 {
                     "name": "model",
@@ -95,8 +98,18 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                     "type": "json",
                     "required": True,
                     "default": [
-                        {"name": "relevance", "description": "How relevant is the content?", "min": 0, "max": 10},
-                        {"name": "clarity", "description": "How clear and readable?", "min": 0, "max": 10},
+                        {
+                            "name": "relevance",
+                            "description": "How relevant is the content?",
+                            "min": 0,
+                            "max": 10,
+                        },
+                        {
+                            "name": "clarity",
+                            "description": "How clear and readable?",
+                            "min": 0,
+                            "max": 10,
+                        },
                     ],
                     "description": "Array of {name, description, min, max} metrics.",
                 },
@@ -138,9 +151,7 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
         return metrics
 
     def _build_prompt(self, metrics: list[EvaluatorMetric]) -> tuple[str, dict[str, Any]]:
-        metric_lines = "\n".join(
-            f"- {m.name} ({m.min}–{m.max}): {m.description}" for m in metrics
-        )
+        metric_lines = "\n".join(f"- {m.name} ({m.min}–{m.max}): {m.description}" for m in metrics)
         system = (
             "You are an objective evaluator. Score the provided content on each metric "
             "and return a JSON object with exactly the keys listed. "
@@ -208,14 +219,19 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                     }
                     response = await client.post(
                         ai_provider.chat_completions_url or "",
-                        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                        headers={
+                            "Authorization": f"Bearer {api_key}",
+                            "Content-Type": "application/json",
+                        },
                         json=payload,
                     )
                     response.raise_for_status()
                     data = response.json()
                     raw_content = data["choices"][0]["message"]["content"]
                 else:
-                    return NodeResult(success=False, error="Evaluator supports openai_compatible providers only.")
+                    return NodeResult(
+                        success=False, error="Evaluator supports openai_compatible providers only."
+                    )
 
             result = json.loads(raw_content)
             scores = {m.name: result.get(m.name, m.min) for m in metrics}
@@ -233,7 +249,9 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                 },
             )
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:200]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:200]}"
+            )
         except Exception as e:
             return NodeResult(success=False, error=str(e))
 
@@ -243,9 +261,12 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
             return None
         credentials = context.credentials or []
         cred = next(
-            (c for c in credentials
-             if c.get("type") == ai_provider.id and
-             (not self.props.credential or str(c.get("id")) == str(self.props.credential))),
+            (
+                c
+                for c in credentials
+                if c.get("type") == ai_provider.id
+                and (not self.props.credential or str(c.get("id")) == str(self.props.credential))
+            ),
             None,
         )
         if not cred:

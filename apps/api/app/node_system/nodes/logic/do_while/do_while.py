@@ -69,7 +69,9 @@ class DoWhileNode(BaseNode[DoWhileProperties]):
 
         while iteration < max_iter:
             loop_vars = {"iteration": iteration, "total": max_iter}
-            sub = await context.run_downstream({**current_input, "iteration": iteration}, loop_data=loop_vars)
+            sub = await context.run_downstream(
+                {**current_input, "iteration": iteration}, loop_data=loop_vars
+            )
             iteration_result = sub[0] if sub else {}
             results.append(iteration_result)
             current_input = iteration_result

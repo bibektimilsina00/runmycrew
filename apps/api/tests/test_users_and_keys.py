@@ -130,7 +130,9 @@ async def test_get_current_user_with_x_api_key():
     )
 
     with (
-        patch.object(ApiKeyRepository, "get_by_hash", return_value=mock_key_record) as mock_get_hash,
+        patch.object(
+            ApiKeyRepository, "get_by_hash", return_value=mock_key_record
+        ) as mock_get_hash,
         patch.object(UserRepository, "get_by_id", return_value=mock_user) as mock_get_user,
     ):
         # Act

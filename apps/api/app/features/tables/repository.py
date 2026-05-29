@@ -14,7 +14,9 @@ class TableRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_table_by_id(self, table_id: uuid.UUID, workspace_id: uuid.UUID) -> DataTable | None:
+    async def get_table_by_id(
+        self, table_id: uuid.UUID, workspace_id: uuid.UUID
+    ) -> DataTable | None:
         """Retrieve a DataTable by ID within a workspace, preloading columns."""
         result = await self.db.execute(
             sa.select(DataTable)
@@ -23,7 +25,9 @@ class TableRepository:
         )
         return result.scalar_one_or_none()
 
-    async def list_tables_summary(self, workspace_id: uuid.UUID) -> list[tuple[DataTable, int, int]]:
+    async def list_tables_summary(
+        self, workspace_id: uuid.UUID
+    ) -> list[tuple[DataTable, int, int]]:
         """List tables in a workspace along with row and column counts."""
         row_counts = (
             sa.select(TableRow.table_id, sa.func.count(TableRow.id).label("row_count"))

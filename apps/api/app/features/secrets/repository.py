@@ -44,9 +44,7 @@ class SecretRepository:
         )
         return result.scalar_one_or_none()
 
-    async def list_by_workspace(
-        self, workspace_id: uuid.UUID, user_id: uuid.UUID
-    ) -> list[Secret]:
+    async def list_by_workspace(self, workspace_id: uuid.UUID, user_id: uuid.UUID) -> list[Secret]:
         """List secrets in a workspace, including workspace scope and caller's personal scope.
 
         Args:

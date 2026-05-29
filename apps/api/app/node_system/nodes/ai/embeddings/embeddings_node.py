@@ -67,11 +67,23 @@ class EmbeddingsNode(BaseNode[EmbeddingsProperties]):
                     "type": "options",
                     "default": "text-embedding-3-small",
                     "options": [
-                        {"label": "text-embedding-3-small (OpenAI, 1536d)", "value": "text-embedding-3-small"},
-                        {"label": "text-embedding-3-large (OpenAI, 3072d)", "value": "text-embedding-3-large"},
-                        {"label": "text-embedding-ada-002 (OpenAI, legacy)", "value": "text-embedding-ada-002"},
+                        {
+                            "label": "text-embedding-3-small (OpenAI, 1536d)",
+                            "value": "text-embedding-3-small",
+                        },
+                        {
+                            "label": "text-embedding-3-large (OpenAI, 3072d)",
+                            "value": "text-embedding-3-large",
+                        },
+                        {
+                            "label": "text-embedding-ada-002 (OpenAI, legacy)",
+                            "value": "text-embedding-ada-002",
+                        },
                         {"label": "mistral-embed (Mistral, 1024d)", "value": "mistral-embed"},
-                        {"label": "togethercomputer/m2-bert-80M-8k-retrieval", "value": "togethercomputer/m2-bert-80M-8k-retrieval"},
+                        {
+                            "label": "togethercomputer/m2-bert-80M-8k-retrieval",
+                            "value": "togethercomputer/m2-bert-80M-8k-retrieval",
+                        },
                     ],
                 },
                 {
@@ -115,15 +127,22 @@ class EmbeddingsNode(BaseNode[EmbeddingsProperties]):
 
             embedding = data["data"][0]["embedding"]
             usage = data.get("usage") or {}
-            return NodeResult(success=True, output_data={
-                "embedding": embedding,
-                "dimensions": len(embedding),
-                "model": data.get("model", self.props.model),
-                "tokens": {"total_tokens": usage.get("total_tokens") or usage.get("prompt_tokens")},
-            })
+            return NodeResult(
+                success=True,
+                output_data={
+                    "embedding": embedding,
+                    "dimensions": len(embedding),
+                    "model": data.get("model", self.props.model),
+                    "tokens": {
+                        "total_tokens": usage.get("total_tokens") or usage.get("prompt_tokens")
+                    },
+                },
+            )
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+            )
         except Exception as e:
             logger.error(f"EmbeddingsNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -132,23 +151,37 @@ class EmbeddingsNode(BaseNode[EmbeddingsProperties]):
         provider = self.props.provider
         if provider == "mistral":
             return "https://api.mistral.ai/v1/embeddings", {
-                "Authorization": f"Bearer {api_key}", "Content-Type": "application/json"
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
             }
         if provider == "together":
             return "https://api.together.ai/v1/embeddings", {
-                "Authorization": f"Bearer {api_key}", "Content-Type": "application/json"
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
             }
         return "https://api.openai.com/v1/embeddings", {
-            "Authorization": f"Bearer {api_key}", "Content-Type": "application/json"
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
         }
 
     def _get_api_key(self, context: NodeContext) -> str | None:
-        type_map = {"openai": "openai_api_key", "mistral": "mistral_api_key", "together": "together_api_key"}
+        type_map = {
+            "openai": "openai_api_key",
+            "mistral": "mistral_api_key",
+            "together": "together_api_key",
+        }
         cred_type = type_map.get(self.props.provider, "openai_api_key")
         credentials = context.credentials or []
         cred = None
         if self.props.credential:
-            cred = next((c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == cred_type), None)
+            cred = next(
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential) and c.get("type") == cred_type
+                ),
+                None,
+            )
         if cred is None:
             cred = next((c for c in credentials if c.get("type") == cred_type), None)
         data = cred.get("data") if cred else None

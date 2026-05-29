@@ -1,5 +1,3 @@
-
-
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
@@ -40,8 +38,7 @@ class Workflow(SQLModelBase, table=True):
     user: "User" = Relationship(back_populates="workflows")
     folder: "Folder" = Relationship(back_populates="workflows")
     executions: list["Execution"] = Relationship(
-        back_populates="workflow",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="workflow", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 
@@ -52,4 +49,3 @@ class WorkflowVersion(SQLModelBase, table=True):
     label: str | None = Field(default=None, max_length=200)
     graph: str = Field()
     created_at: datetime = created_at_field()
-

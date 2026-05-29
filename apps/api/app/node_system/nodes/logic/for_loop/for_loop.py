@@ -34,10 +34,35 @@ class ForLoopNode(BaseNode[ForLoopProperties]):
             icon="Hash",
             color="#6366f1",
             properties=[
-                {"name": "count", "label": "Count", "type": "number", "required": True, "default": 10, "description": "Number of iterations."},
-                {"name": "start", "label": "Start", "type": "number", "default": 0, "mode": "advanced"},
-                {"name": "step", "label": "Step", "type": "number", "default": 1, "mode": "advanced"},
-                {"name": "parallel", "label": "Run in parallel", "type": "boolean", "default": False, "mode": "advanced"},
+                {
+                    "name": "count",
+                    "label": "Count",
+                    "type": "number",
+                    "required": True,
+                    "default": 10,
+                    "description": "Number of iterations.",
+                },
+                {
+                    "name": "start",
+                    "label": "Start",
+                    "type": "number",
+                    "default": 0,
+                    "mode": "advanced",
+                },
+                {
+                    "name": "step",
+                    "label": "Step",
+                    "type": "number",
+                    "default": 1,
+                    "mode": "advanced",
+                },
+                {
+                    "name": "parallel",
+                    "label": "Run in parallel",
+                    "type": "boolean",
+                    "default": False,
+                    "mode": "advanced",
+                },
             ],
             inputs=1,
             outputs=1,
@@ -59,7 +84,9 @@ class ForLoopNode(BaseNode[ForLoopProperties]):
         total = len(values)
 
         if total == 0:
-            return NodeResult(success=True, output_data={"results": [], "count": 0}, handled_successors=True)
+            return NodeResult(
+                success=True, output_data={"results": [], "count": 0}, handled_successors=True
+            )
 
         import asyncio
 
@@ -69,7 +96,9 @@ class ForLoopNode(BaseNode[ForLoopProperties]):
             return sub[0] if sub else {}
 
         if self.props.parallel:
-            results = list(await asyncio.gather(*[run_iteration(i, v) for i, v in enumerate(values)]))
+            results = list(
+                await asyncio.gather(*[run_iteration(i, v) for i, v in enumerate(values)])
+            )
         else:
             results = [await run_iteration(i, v) for i, v in enumerate(values)]
 

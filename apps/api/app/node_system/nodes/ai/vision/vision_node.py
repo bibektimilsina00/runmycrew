@@ -17,7 +17,14 @@ logger = get_logger(__name__)
 # Vision-capable models per provider
 VISION_MODELS = {
     "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4-vision-preview"],
-    "anthropic": ["claude-opus-4-5", "claude-sonnet-4-5", "claude-haiku-4-5", "claude-3-5-sonnet-latest", "claude-3-5-haiku-latest", "claude-opus-4-7"],
+    "anthropic": [
+        "claude-opus-4-5",
+        "claude-sonnet-4-5",
+        "claude-haiku-4-5",
+        "claude-3-5-sonnet-latest",
+        "claude-3-5-haiku-latest",
+        "claude-opus-4-7",
+    ],
     "google": ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"],
 }
 
@@ -131,18 +138,31 @@ class VisionNode(BaseNode[VisionProperties]):
         try:
             async with httpx.AsyncClient(timeout=120.0) as client:
                 if ai_provider.ai_api_type == "openai_compatible":
-                    text, tokens = await self._call_openai(client, ai_provider.chat_completions_url or "", api_key, model)
+                    text, tokens = await self._call_openai(
+                        client, ai_provider.chat_completions_url or "", api_key, model
+                    )
                 elif ai_provider.ai_api_type == "anthropic":
-                    text, tokens = await self._call_anthropic(client, ai_provider.chat_completions_url or "", api_key, model)
+                    text, tokens = await self._call_anthropic(
+                        client, ai_provider.chat_completions_url or "", api_key, model
+                    )
                 elif ai_provider.ai_api_type == "google":
-                    text, tokens = await self._call_google(client, ai_provider.chat_completions_url or "", api_key, model)
+                    text, tokens = await self._call_google(
+                        client, ai_provider.chat_completions_url or "", api_key, model
+                    )
                 else:
-                    return NodeResult(success=False, error=f"Provider {self.props.provider} does not support vision.")
+                    return NodeResult(
+                        success=False,
+                        error=f"Provider {self.props.provider} does not support vision.",
+                    )
 
-            return NodeResult(success=True, output_data={"text": text, "model": model, "tokens": tokens})
+            return NodeResult(
+                success=True, output_data={"text": text, "model": model, "tokens": tokens}
+            )
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+            )
         except Exception as e:
             logger.error(f"VisionNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -162,7 +182,10 @@ class VisionNode(BaseNode[VisionProperties]):
                 # data:image/jpeg;base64,<data>
                 header, data = url.split(",", 1)
                 media_type = header.split(";")[0].replace("data:", "")
-                return {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": data}}
+                return {
+                    "type": "image",
+                    "source": {"type": "base64", "media_type": media_type, "data": data},
+                }
             return {"type": "image", "source": {"type": "url", "url": url}}
 
         if provider == "google":
@@ -174,7 +197,9 @@ class VisionNode(BaseNode[VisionProperties]):
 
         return url
 
-    async def _call_openai(self, client: httpx.AsyncClient, url: str, api_key: str, model: str) -> tuple[str, dict]:
+    async def _call_openai(
+        self, client: httpx.AsyncClient, url: str, api_key: str, model: str
+    ) -> tuple[str, dict]:
         payload: dict[str, Any] = {
             "model": model,
             "messages": [
@@ -205,7 +230,9 @@ class VisionNode(BaseNode[VisionProperties]):
             "total_tokens": usage.get("total_tokens"),
         }
 
-    async def _call_anthropic(self, client: httpx.AsyncClient, url: str, api_key: str, model: str) -> tuple[str, dict]:
+    async def _call_anthropic(
+        self, client: httpx.AsyncClient, url: str, api_key: str, model: str
+    ) -> tuple[str, dict]:
         payload: dict[str, Any] = {
             "model": model,
             "max_tokens": self.props.max_tokens or 1024,
@@ -221,7 +248,11 @@ class VisionNode(BaseNode[VisionProperties]):
         }
         resp = await client.post(
             url,
-            headers={"x-api-key": api_key, "anthropic-version": "2023-06-01", "Content-Type": "application/json"},
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "Content-Type": "application/json",
+            },
             json=payload,
         )
         resp.raise_for_status()
@@ -235,7 +266,9 @@ class VisionNode(BaseNode[VisionProperties]):
             "total_tokens": (usage.get("input_tokens") or 0) + (usage.get("output_tokens") or 0),
         }
 
-    async def _call_google(self, client: httpx.AsyncClient, url_template: str, api_key: str, model: str) -> tuple[str, dict]:
+    async def _call_google(
+        self, client: httpx.AsyncClient, url_template: str, api_key: str, model: str
+    ) -> tuple[str, dict]:
         image_part = self._image_content("google")
         parts: list[Any] = [image_part, {"text": self.props.prompt}]
 
@@ -250,7 +283,9 @@ class VisionNode(BaseNode[VisionProperties]):
         model_path = model if model.startswith("models/") else f"models/{model}"
         url = url_template.format(model=model_path)
 
-        resp = await client.post(url, params={"key": api_key}, headers={"Content-Type": "application/json"}, json=payload)
+        resp = await client.post(
+            url, params={"key": api_key}, headers={"Content-Type": "application/json"}, json=payload
+        )
         resp.raise_for_status()
         data = resp.json()
         candidates = data.get("candidates") or []
@@ -273,7 +308,12 @@ class VisionNode(BaseNode[VisionProperties]):
         cred = None
         if self.props.credential:
             cred = next(
-                (c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == ai_provider.id),
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential)
+                    and c.get("type") == ai_provider.id
+                ),
                 None,
             )
         if cred is None:
@@ -286,4 +326,6 @@ class VisionNode(BaseNode[VisionProperties]):
 
 
 def _default_model(provider: str) -> str:
-    return {"openai": "gpt-4o", "anthropic": "claude-sonnet-4-5", "google": "gemini-1.5-flash"}.get(provider, "gpt-4o")
+    return {"openai": "gpt-4o", "anthropic": "claude-sonnet-4-5", "google": "gemini-1.5-flash"}.get(
+        provider, "gpt-4o"
+    )

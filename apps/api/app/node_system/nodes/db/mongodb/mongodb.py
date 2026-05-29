@@ -17,8 +17,8 @@ class MongoDBProperties(BaseModel):
     database: str = ""
     collection: str = ""
     operation: str = "find"  # find | findOne | insertOne | updateOne | deleteOne | aggregate
-    query: Any = None          # filter / document depending on operation
-    update: Any = None         # update document for updateOne
+    query: Any = None  # filter / document depending on operation
+    update: Any = None  # update document for updateOne
     limit: int = 100
 
 
@@ -144,25 +144,38 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
             elif op == "findOne":
                 doc = await coll.find_one(query)
                 doc = self._serialize_doc(doc) if doc else None
-                return NodeResult(success=True, output_data={"documents": [doc] if doc else [], "count": 1 if doc else 0})
+                return NodeResult(
+                    success=True,
+                    output_data={"documents": [doc] if doc else [], "count": 1 if doc else 0},
+                )
 
             elif op == "insertOne":
                 result = await coll.insert_one(query)
-                return NodeResult(success=True, output_data={
-                    "documents": [], "count": 1,
-                    "insertedId": str(result.inserted_id),
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "documents": [],
+                        "count": 1,
+                        "insertedId": str(result.inserted_id),
+                    },
+                )
 
             elif op == "updateOne":
                 result = await coll.update_one(query, update)
-                return NodeResult(success=True, output_data={
-                    "documents": [], "count": result.modified_count,
-                    "matchedCount": result.matched_count,
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "documents": [],
+                        "count": result.modified_count,
+                        "matchedCount": result.matched_count,
+                    },
+                )
 
             elif op == "deleteOne":
                 result = await coll.delete_one(query)
-                return NodeResult(success=True, output_data={"documents": [], "count": result.deleted_count})
+                return NodeResult(
+                    success=True, output_data={"documents": [], "count": result.deleted_count}
+                )
 
             elif op == "aggregate":
                 pipeline = query if isinstance(query, list) else []

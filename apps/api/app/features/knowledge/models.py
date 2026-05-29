@@ -25,8 +25,7 @@ class KnowledgeBase(SQLModelBase, table=True):
     updated_at: datetime = updated_at_field()
 
     documents: list["KBDocument"] = Relationship(
-        back_populates="knowledge_base",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="knowledge_base", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 
@@ -42,8 +41,7 @@ class KBDocument(SQLModelBase, table=True):
 
     knowledge_base: "KnowledgeBase" = Relationship(back_populates="documents")
     chunks: list["KBChunk"] = Relationship(
-        back_populates="document",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="document", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 

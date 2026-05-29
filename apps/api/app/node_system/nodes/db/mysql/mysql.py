@@ -105,7 +105,9 @@ class MySQLNode(BaseNode[MySQLProperties]):
         try:
             import aiomysql
         except ImportError:
-            return NodeResult(success=False, error="aiomysql not installed. Run: pip install aiomysql")
+            return NodeResult(
+                success=False, error="aiomysql not installed. Run: pip install aiomysql"
+            )
 
         params = self._parse_params()
         dsn = self._parse_dsn()
@@ -116,10 +118,14 @@ class MySQLNode(BaseNode[MySQLProperties]):
                     await cur.execute(self.props.sql, params or None)
                     if self.props.operation == "query":
                         rows = list(await cur.fetchall())
-                        return NodeResult(success=True, output_data={"rows": rows, "rowCount": len(rows)})
+                        return NodeResult(
+                            success=True, output_data={"rows": rows, "rowCount": len(rows)}
+                        )
                     else:
                         await conn.commit()
-                        return NodeResult(success=True, output_data={"rows": [], "rowCount": cur.rowcount})
+                        return NodeResult(
+                            success=True, output_data={"rows": [], "rowCount": cur.rowcount}
+                        )
             finally:
                 conn.close()
         except Exception as e:

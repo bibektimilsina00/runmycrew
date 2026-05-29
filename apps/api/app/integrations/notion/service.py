@@ -13,10 +13,13 @@ class NotionService:
         self._client = NotionClient(api_key=api_key, client=client)
 
     async def list_databases(self) -> list:
-        result = await self._client.post("/search", json={
-            "filter": {"value": "database", "property": "object"},
-            "sort": {"direction": "descending", "timestamp": "last_edited_time"},
-        })
+        result = await self._client.post(
+            "/search",
+            json={
+                "filter": {"value": "database", "property": "object"},
+                "sort": {"direction": "descending", "timestamp": "last_edited_time"},
+            },
+        )
         return result.get("results", [])
 
     async def get_database(self, database_id: str) -> dict:
@@ -47,9 +50,7 @@ class NotionService:
         content: list | None = None,
     ) -> dict:
         page_properties: dict[str, Any] = {
-            "title": {
-                "title": [{"type": "text", "text": {"content": title}}]
-            }
+            "title": {"title": [{"type": "text", "text": {"content": title}}]}
         }
         if properties:
             page_properties.update(properties)

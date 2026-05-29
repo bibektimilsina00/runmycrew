@@ -10,9 +10,11 @@ from apps.api.app.node_system.base.node_result import NodeResult
 
 logger = get_logger(__name__)
 
+
 class SwitchProperties(BaseModel):
     field: str
     cases: list[dict[str, Any]] | None = None
+
 
 class SwitchNode(BaseNode[SwitchProperties]):
     @classmethod
@@ -25,21 +27,21 @@ class SwitchNode(BaseNode[SwitchProperties]):
             icon="Split",
             color="#f59e0b",
             inputs=1,
-            outputs=2, # Static 2 for now
+            outputs=2,  # Static 2 for now
             properties=[
                 {
                     "name": "field",
                     "label": "Field to Check",
                     "type": "string",
                     "required": True,
-                    "placeholder": "status"
+                    "placeholder": "status",
                 },
                 {
                     "name": "cases",
                     "label": "Cases",
                     "type": "json",
                     "required": False,
-                    "placeholder": '[{"value":"success","label":"Success"},{"value":"error","label":"Error"}]'
+                    "placeholder": '[{"value":"success","label":"Success"},{"value":"error","label":"Error"}]',
                 },
             ],
             allow_error=False,

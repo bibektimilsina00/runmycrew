@@ -10,8 +10,10 @@ from apps.api.app.node_system.base.node_result import NodeResult
 
 logger = get_logger(__name__)
 
+
 class MergeProperties(BaseModel):
     mode: str = "shallow"
+
 
 class MergeNode(BaseNode[MergeProperties]):
     @classmethod
@@ -34,7 +36,7 @@ class MergeNode(BaseNode[MergeProperties]):
                     "options": [
                         {"label": "Shallow merge (last wins)", "value": "shallow"},
                         {"label": "Deep merge (coming soon)", "value": "deep"},
-                    ]
+                    ],
                 },
             ],
             allow_error=False,

@@ -3,15 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-ToolParamVisibility = Literal['user-or-llm', 'user-only', 'llm-only', 'hidden']
+ToolParamVisibility = Literal["user-or-llm", "user-only", "llm-only", "hidden"]
 
 
 @dataclass
 class ToolParam:
     type: str  # 'string', 'number', 'boolean', 'json'
     required: bool = False
-    visibility: ToolParamVisibility = 'user-or-llm'
-    description: str = ''
+    visibility: ToolParamVisibility = "user-or-llm"
+    description: str = ""
 
 
 @dataclass

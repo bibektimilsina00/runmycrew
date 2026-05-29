@@ -127,4 +127,4 @@ node_registry.register(SalesforceNode)
 node_registry.register(SubWorkflowNode)
 
 # Load tool definitions (side-effect: registers all tools in tool_registry)
-import apps.api.app.node_system.tools.loader  # noqa: F401
+import apps.api.app.node_system.tools.loader  # noqa: E402, F401

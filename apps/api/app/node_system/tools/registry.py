@@ -33,7 +33,7 @@ class ToolRegistry:
     # ------------------------------------------------------------------
 
     def _strip_version_suffix(self, tool_id: str) -> str:
-        return re.sub(r'_v\d+$', '', tool_id)
+        return re.sub(r"_v\d+$", "", tool_id)
 
     def resolve_tool_id(self, name: str) -> str:
         if name in self._tools:
@@ -44,7 +44,7 @@ class ToolRegistry:
             return name
 
         def version_num(id_: str) -> int:
-            m = re.search(r'_v(\d+)$', id_)
+            m = re.search(r"_v(\d+)$", id_)
             return int(m.group(1)) if m else 1
 
         return max(matches, key=version_num)
@@ -54,13 +54,13 @@ class ToolRegistry:
     # ------------------------------------------------------------------
 
     def _resolve_oauth_token(self, credential_type: str, context: NodeContext) -> str | None:
-        for cred in (context.credentials or []):
+        for cred in context.credentials or []:
             if not isinstance(cred, dict):
                 continue
-            if cred.get('type') == credential_type:
-                data = cred.get('data', {})
+            if cred.get("type") == credential_type:
+                data = cred.get("data", {})
                 if isinstance(data, dict):
-                    token = data.get('access_token') or data.get('bot_token') or data.get('api_key')
+                    token = data.get("access_token") or data.get("bot_token") or data.get("api_key")
                     if isinstance(token, str) and token.strip():
                         return token
         return None
@@ -87,7 +87,7 @@ class ToolRegistry:
                     success=False,
                     error=f"Credential '{defn.oauth.credential_type}' not found",
                 )
-            params = {**params, '_oauth_token': token}
+            params = {**params, "_oauth_token": token}
 
         # Retry logic
         retry_cfg = defn.retry
@@ -122,28 +122,28 @@ class ToolRegistry:
         properties: dict[str, Any] = {}
         required: list[str] = []
         for name, param in defn.params.items():
-            if param.visibility in ('user-or-llm', 'llm-only'):
-                prop: dict[str, Any] = {'type': self._to_json_type(param.type)}
+            if param.visibility in ("user-or-llm", "llm-only"):
+                prop: dict[str, Any] = {"type": self._to_json_type(param.type)}
                 if param.description:
-                    prop['description'] = param.description
+                    prop["description"] = param.description
                 properties[name] = prop
-                if param.required and param.visibility == 'user-or-llm':
+                if param.required and param.visibility == "user-or-llm":
                     required.append(name)
         return {
-            'type': 'function',
-            'function': {
-                'name': tool_id,
-                'description': defn.description,
-                'parameters': {
-                    'type': 'object',
-                    'properties': properties,
+            "type": "function",
+            "function": {
+                "name": tool_id,
+                "description": defn.description,
+                "parameters": {
+                    "type": "object",
+                    "properties": properties,
                     **({"required": required} if required else {}),
                 },
             },
         }
 
     def _to_json_type(self, tool_type: str) -> str:
-        return {'number': 'number', 'boolean': 'boolean'}.get(tool_type, 'string')
+        return {"number": "number", "boolean": "boolean"}.get(tool_type, "string")
 
 
 tool_registry = ToolRegistry()

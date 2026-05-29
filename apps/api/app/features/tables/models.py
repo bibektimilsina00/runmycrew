@@ -22,11 +22,10 @@ class DataTable(SQLModelBase, table=True):
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
             "order_by": "TableColumn.position",
-        }
+        },
     )
     rows: list["TableRow"] = Relationship(
-        back_populates="table",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="table", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 

@@ -174,7 +174,9 @@ class TTSNode(BaseNode[TTSProperties]):
             else:
                 return NodeResult(success=False, error=f"Unknown provider: {self.props.provider}")
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+            )
         except Exception as e:
             logger.error(f"TTSNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -201,16 +203,27 @@ class TTSNode(BaseNode[TTSProperties]):
 
         fmt = self.props.response_format
         b64 = base64.b64encode(audio_bytes).decode()
-        mime = {"mp3": "audio/mpeg", "opus": "audio/ogg", "aac": "audio/aac", "flac": "audio/flac", "wav": "audio/wav"}.get(fmt, "audio/mpeg")
-        return NodeResult(success=True, output_data={
-            "audio_base64": b64,
-            "audio_data_uri": f"data:{mime};base64,{b64}",
-            "format": fmt,
-            "provider": "openai",
-        })
+        mime = {
+            "mp3": "audio/mpeg",
+            "opus": "audio/ogg",
+            "aac": "audio/aac",
+            "flac": "audio/flac",
+            "wav": "audio/wav",
+        }.get(fmt, "audio/mpeg")
+        return NodeResult(
+            success=True,
+            output_data={
+                "audio_base64": b64,
+                "audio_data_uri": f"data:{mime};base64,{b64}",
+                "format": fmt,
+                "provider": "openai",
+            },
+        )
 
     async def _elevenlabs_tts(self, context: NodeContext) -> NodeResult:
-        api_key = self._get_cred_key(context, "elevenlabs_api_key", self.props.elevenlabs_credential)
+        api_key = self._get_cred_key(
+            context, "elevenlabs_api_key", self.props.elevenlabs_credential
+        )
         if not api_key:
             return NodeResult(success=False, error="ElevenLabs credential required.")
         if not self.props.elevenlabs_voice_id.strip():
@@ -226,18 +239,30 @@ class TTSNode(BaseNode[TTSProperties]):
             audio_bytes = resp.content
 
         b64 = base64.b64encode(audio_bytes).decode()
-        return NodeResult(success=True, output_data={
-            "audio_base64": b64,
-            "audio_data_uri": f"data:audio/mpeg;base64,{b64}",
-            "format": "mp3",
-            "provider": "elevenlabs",
-        })
+        return NodeResult(
+            success=True,
+            output_data={
+                "audio_base64": b64,
+                "audio_data_uri": f"data:audio/mpeg;base64,{b64}",
+                "format": "mp3",
+                "provider": "elevenlabs",
+            },
+        )
 
-    def _get_cred_key(self, context: NodeContext, cred_type: str, selected_id: str | None) -> str | None:
+    def _get_cred_key(
+        self, context: NodeContext, cred_type: str, selected_id: str | None
+    ) -> str | None:
         credentials = context.credentials or []
         cred = None
         if selected_id:
-            cred = next((c for c in credentials if str(c.get("id")) == str(selected_id) and c.get("type") == cred_type), None)
+            cred = next(
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(selected_id) and c.get("type") == cred_type
+                ),
+                None,
+            )
         if cred is None:
             cred = next((c for c in credentials if c.get("type") == cred_type), None)
         data = cred.get("data") if cred else None

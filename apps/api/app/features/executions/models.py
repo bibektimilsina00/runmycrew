@@ -27,8 +27,7 @@ class Execution(SQLModelBase, table=True):
 
     workflow: "Workflow" = Relationship(back_populates="executions")
     logs: list["ExecutionLog"] = Relationship(
-        back_populates="execution",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="execution", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 

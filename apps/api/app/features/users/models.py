@@ -1,5 +1,3 @@
-
-
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -27,31 +25,23 @@ class User(SQLModelBase, table=True):
     created_at: datetime = created_at_field()
 
     workflows: list["Workflow"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     folders: list["Folder"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     credentials: list["Credential"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     skills: list["Skill"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     api_keys: list["ApiKey"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     workspace_memberships: list["WorkspaceMember"] = Relationship(
         back_populates="user",
-        sa_relationship_kwargs={
-            "foreign_keys": "[WorkspaceMember.user_id]",
-            "lazy": "select"
-        }
+        sa_relationship_kwargs={"foreign_keys": "[WorkspaceMember.user_id]", "lazy": "select"},
     )
 
 

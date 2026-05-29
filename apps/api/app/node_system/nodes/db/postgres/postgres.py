@@ -94,7 +94,9 @@ class PostgresNode(BaseNode[PostgresProperties]):
         try:
             import asyncpg
         except ImportError:
-            return NodeResult(success=False, error="asyncpg not installed. Run: pip install asyncpg")
+            return NodeResult(
+                success=False, error="asyncpg not installed. Run: pip install asyncpg"
+            )
 
         params = self._parse_params()
         try:
@@ -103,13 +105,17 @@ class PostgresNode(BaseNode[PostgresProperties]):
                 if self.props.operation == "query":
                     records = await conn.fetch(self.props.sql, *params)
                     rows = [dict(r) for r in records]
-                    return NodeResult(success=True, output_data={"rows": rows, "rowCount": len(rows)})
+                    return NodeResult(
+                        success=True, output_data={"rows": rows, "rowCount": len(rows)}
+                    )
                 else:
                     status = await conn.execute(self.props.sql, *params)
                     # status format: "INSERT 0 5" or "UPDATE 3"
                     parts = status.split()
                     count = int(parts[-1]) if parts and parts[-1].isdigit() else 0
-                    return NodeResult(success=True, output_data={"rows": [], "rowCount": count, "status": status})
+                    return NodeResult(
+                        success=True, output_data={"rows": [], "rowCount": count, "status": status}
+                    )
             finally:
                 await conn.close()
         except Exception as e:

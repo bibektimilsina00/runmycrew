@@ -6,6 +6,7 @@ Create Date: 2026-05-22
 
 Allow KB chunks to store embeddings from multiple providers.
 """
+
 from collections.abc import Sequence
 
 from alembic import op
@@ -26,6 +27,5 @@ def downgrade() -> None:
     op.execute("UPDATE kbchunk SET embedding = NULL WHERE vector_dims(embedding) != 1536")
     op.execute("ALTER TABLE kbchunk ALTER COLUMN embedding TYPE vector(1536)")
     op.execute(
-        "CREATE INDEX kbchunk_embedding_idx ON kbchunk "
-        "USING hnsw (embedding vector_cosine_ops)"
+        "CREATE INDEX kbchunk_embedding_idx ON kbchunk USING hnsw (embedding vector_cosine_ops)"
     )

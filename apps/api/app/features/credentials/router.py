@@ -7,8 +7,8 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
-from apps.api.app.features.credentials.manager.api_keys import PROVIDERS as API_KEY_PROVIDERS
-from apps.api.app.features.credentials.manager.oauth.flow import PROVIDERS as OAUTH_PROVIDERS
+from apps.api.app.credential_manager.api_keys import PROVIDERS as API_KEY_PROVIDERS
+from apps.api.app.credential_manager.oauth.flow import PROVIDERS as OAUTH_PROVIDERS
 from apps.api.app.features.credentials.schemas import (
     AuditLogOut,
     CredentialCreate,
@@ -210,7 +210,7 @@ async def get_oauth_url(
 ):
     await _require_manage_credentials(current_user, workspace, db)
     try:
-        from apps.api.app.features.credentials.manager.oauth.flow import get_oauth_provider
+        from apps.api.app.credential_manager.oauth.flow import get_oauth_provider
 
         provider = get_oauth_provider(service_name)
         if not provider:
@@ -301,7 +301,7 @@ async def oauth_callback(
 
         workspace = await WorkspaceService(db).resolve_workspace(user, uuid.UUID(workspace_id))
 
-        from apps.api.app.features.credentials.manager.oauth.callback import handle_oauth_callback
+        from apps.api.app.credential_manager.oauth.callback import handle_oauth_callback
 
         await handle_oauth_callback(
             service_name=service_name,

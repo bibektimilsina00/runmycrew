@@ -25,8 +25,8 @@ class A2AProperties(BaseModel):
     message: str = ""
     inputData: Any = None
     authToken: str = ""
-    taskId: str = ""        # for get_status / cancel
-    waitForCompletion: bool = True   # poll until execution finishes
+    taskId: str = ""  # for get_status / cancel
+    waitForCompletion: bool = True  # poll until execution finishes
     timeoutSeconds: int = 120
 
 
@@ -149,9 +149,13 @@ class A2ANode(BaseNode[A2AProperties]):
                 else:
                     return NodeResult(success=False, error=f"Unknown operation: {op}")
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"A2A HTTP {e.response.status_code}: {e.response.text[:200]}")
+            return NodeResult(
+                success=False, error=f"A2A HTTP {e.response.status_code}: {e.response.text[:200]}"
+            )
         except httpx.TimeoutException:
-            return NodeResult(success=False, error=f"A2A timed out after {self.props.timeoutSeconds}s")
+            return NodeResult(
+                success=False, error=f"A2A timed out after {self.props.timeoutSeconds}s"
+            )
         except Exception as e:
             return NodeResult(success=False, error=f"A2A error: {e}")
 
@@ -172,11 +176,14 @@ class A2ANode(BaseNode[A2AProperties]):
         execution_id = data.get("execution_id", "")
 
         if not self.props.waitForCompletion or not execution_id:
-            return NodeResult(success=True, output_data={
-                "output": data.get("output"),
-                "status": data.get("status", "running"),
-                "executionId": execution_id,
-            })
+            return NodeResult(
+                success=True,
+                output_data={
+                    "output": data.get("output"),
+                    "status": data.get("status", "running"),
+                    "executionId": execution_id,
+                },
+            )
 
         # Poll for completion
         status_url = url.rstrip("/") + f"/status/{execution_id}"
@@ -201,7 +208,9 @@ class A2ANode(BaseNode[A2AProperties]):
             except Exception:
                 pass  # transient poll failure — keep trying
 
-        return NodeResult(success=False, error=f"A2A timed out waiting for execution {execution_id}")
+        return NodeResult(
+            success=False, error=f"A2A timed out waiting for execution {execution_id}"
+        )
 
     async def _get_status(self, client: httpx.AsyncClient, url: str) -> NodeResult:
         task_id = self.props.taskId.strip()
@@ -211,11 +220,14 @@ class A2ANode(BaseNode[A2AProperties]):
         resp = await client.get(status_url, headers=self._headers())
         resp.raise_for_status()
         data = resp.json()
-        return NodeResult(success=True, output_data={
-            "output": data.get("output", {}),
-            "status": data.get("status", "unknown"),
-            "executionId": task_id,
-        })
+        return NodeResult(
+            success=True,
+            output_data={
+                "output": data.get("output", {}),
+                "status": data.get("status", "unknown"),
+                "executionId": task_id,
+            },
+        )
 
     async def _cancel(self, client: httpx.AsyncClient, url: str) -> NodeResult:
         task_id = self.props.taskId.strip()
@@ -224,6 +236,11 @@ class A2ANode(BaseNode[A2AProperties]):
         cancel_url = url.rstrip("/") + f"/{task_id}"
         resp = await client.delete(cancel_url, headers=self._headers())
         resp.raise_for_status()
-        return NodeResult(success=True, output_data={
-            "output": {}, "status": "cancelled", "executionId": task_id,
-        })
+        return NodeResult(
+            success=True,
+            output_data={
+                "output": {},
+                "status": "cancelled",
+                "executionId": task_id,
+            },
+        )

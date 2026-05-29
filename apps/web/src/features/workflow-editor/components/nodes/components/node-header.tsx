@@ -13,7 +13,7 @@ export const NodeHeader = ({ label, icon, color }: NodeHeaderProps) => (
       className="flex size-[22px] shrink-0 items-center justify-center rounded-[5px]"
       style={{ background: color ?? 'var(--surface-3)' }}
     >
-      {React.cloneElement(getIcon(icon) as React.ReactElement, {
+      {React.cloneElement(getIcon(icon) as React.ReactElement<{ className?: string }>, {
         className: 'size-[13px] text-white',
       })}
     </div>

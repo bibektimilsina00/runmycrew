@@ -6,6 +6,7 @@ Create Date: 2026-05-21
 
 Create a starter workflow for any existing workspace that has no workflows.
 """
+
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from uuid import uuid4

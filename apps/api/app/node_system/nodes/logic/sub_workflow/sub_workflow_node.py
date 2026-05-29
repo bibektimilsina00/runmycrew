@@ -71,6 +71,7 @@ class SubWorkflowNode(BaseNode[SubWorkflowProperties]):
         extra_input = self.props.input_data or {}
         if isinstance(extra_input, str):
             import json
+
             try:
                 extra_input = json.loads(extra_input)
             except Exception:

@@ -17,8 +17,8 @@ class DynamoDBProperties(BaseModel):
     secretAccessKey: str = ""
     tableName: str = ""
     operation: str = "get_item"  # get_item | put_item | query | scan | delete_item
-    key: Any = None       # primary key for get/delete
-    item: Any = None      # item for put_item
+    key: Any = None  # primary key for get/delete
+    item: Any = None  # item for put_item
     keyCondition: str = ""  # KeyConditionExpression for query
     expressionValues: Any = None  # ExpressionAttributeValues
 
@@ -39,11 +39,24 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
             color="#ff9900",
             properties=[
                 {"name": "region", "label": "AWS Region", "type": "string", "default": "us-east-1"},
-                {"name": "accessKeyId", "label": "Access Key ID", "type": "string", "required": True},
-                {"name": "secretAccessKey", "label": "Secret Access Key", "type": "string", "required": True},
+                {
+                    "name": "accessKeyId",
+                    "label": "Access Key ID",
+                    "type": "string",
+                    "required": True,
+                },
+                {
+                    "name": "secretAccessKey",
+                    "label": "Secret Access Key",
+                    "type": "string",
+                    "required": True,
+                },
                 {"name": "tableName", "label": "Table Name", "type": "string", "required": True},
                 {
-                    "name": "operation", "label": "Operation", "type": "options", "default": "get_item",
+                    "name": "operation",
+                    "label": "Operation",
+                    "type": "options",
+                    "default": "get_item",
                     "options": [
                         {"label": "Get Item", "value": "get_item"},
                         {"label": "Put Item", "value": "put_item"},
@@ -52,10 +65,33 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
                         {"label": "Delete Item", "value": "delete_item"},
                     ],
                 },
-                {"name": "key", "label": "Key", "type": "json", "default": {}, "description": "Primary key for get/delete.", "condition": {"field": "operation", "value": "get_item"}},
-                {"name": "item", "label": "Item", "type": "json", "default": {}, "condition": {"field": "operation", "value": "put_item"}},
-                {"name": "keyCondition", "label": "Key Condition Expression", "type": "string", "condition": {"field": "operation", "value": "query"}},
-                {"name": "expressionValues", "label": "Expression Attribute Values", "type": "json", "condition": {"field": "operation", "value": "query"}},
+                {
+                    "name": "key",
+                    "label": "Key",
+                    "type": "json",
+                    "default": {},
+                    "description": "Primary key for get/delete.",
+                    "condition": {"field": "operation", "value": "get_item"},
+                },
+                {
+                    "name": "item",
+                    "label": "Item",
+                    "type": "json",
+                    "default": {},
+                    "condition": {"field": "operation", "value": "put_item"},
+                },
+                {
+                    "name": "keyCondition",
+                    "label": "Key Condition Expression",
+                    "type": "string",
+                    "condition": {"field": "operation", "value": "query"},
+                },
+                {
+                    "name": "expressionValues",
+                    "label": "Expression Attribute Values",
+                    "type": "json",
+                    "condition": {"field": "operation", "value": "query"},
+                },
             ],
             inputs=1,
             outputs=1,
@@ -82,7 +118,9 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
         try:
             import aioboto3  # type: ignore[import]
         except ImportError:
-            return NodeResult(success=False, error="aioboto3 not installed. Run: pip install aioboto3")
+            return NodeResult(
+                success=False, error="aioboto3 not installed. Run: pip install aioboto3"
+            )
 
         session = aioboto3.Session(
             aws_access_key_id=self.props.accessKeyId,
@@ -99,11 +137,20 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
                 if op == "get_item":
                     resp = await table.get_item(Key=self._parse(self.props.key))
                     item = resp.get("Item", {})
-                    return NodeResult(success=True, output_data={"item": item, "items": [item] if item else [], "count": 1 if item else 0})
+                    return NodeResult(
+                        success=True,
+                        output_data={
+                            "item": item,
+                            "items": [item] if item else [],
+                            "count": 1 if item else 0,
+                        },
+                    )
 
                 elif op == "put_item":
                     await table.put_item(Item=self._parse(self.props.item))
-                    return NodeResult(success=True, output_data={"item": {}, "items": [], "count": 1})
+                    return NodeResult(
+                        success=True, output_data={"item": {}, "items": [], "count": 1}
+                    )
 
                 elif op == "query":
                     kwargs: dict[str, Any] = {"KeyConditionExpression": self.props.keyCondition}
@@ -112,16 +159,32 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
                         kwargs["ExpressionAttributeValues"] = expr_vals
                     resp = await table.query(**kwargs)
                     items = resp.get("Items", [])
-                    return NodeResult(success=True, output_data={"item": items[0] if items else {}, "items": items, "count": len(items)})
+                    return NodeResult(
+                        success=True,
+                        output_data={
+                            "item": items[0] if items else {},
+                            "items": items,
+                            "count": len(items),
+                        },
+                    )
 
                 elif op == "scan":
                     resp = await table.scan()
                     items = resp.get("Items", [])
-                    return NodeResult(success=True, output_data={"item": items[0] if items else {}, "items": items, "count": len(items)})
+                    return NodeResult(
+                        success=True,
+                        output_data={
+                            "item": items[0] if items else {},
+                            "items": items,
+                            "count": len(items),
+                        },
+                    )
 
                 elif op == "delete_item":
                     await table.delete_item(Key=self._parse(self.props.key))
-                    return NodeResult(success=True, output_data={"item": {}, "items": [], "count": 1})
+                    return NodeResult(
+                        success=True, output_data={"item": {}, "items": [], "count": 1}
+                    )
 
                 else:
                     return NodeResult(success=False, error=f"Unknown operation: {op}")

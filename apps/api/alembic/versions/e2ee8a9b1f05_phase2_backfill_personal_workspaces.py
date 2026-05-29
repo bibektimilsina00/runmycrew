@@ -9,6 +9,7 @@ Phase 2 of 3: Data migration
 - Add them as owner member
 - Backfill workspace_id on all resource tables
 """
+
 import uuid
 from collections.abc import Sequence
 from datetime import UTC, datetime
@@ -16,15 +17,15 @@ from datetime import UTC, datetime
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = 'e2ee8a9b1f05'
-down_revision: str | None = 'd1dd799c25e7'
+revision: str = "e2ee8a9b1f05"
+down_revision: str | None = "d1dd799c25e7"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
 def slugify(email: str, user_id: str) -> str:
-    prefix = email.split('@')[0].lower()
-    prefix = ''.join(c if c.isalnum() or c == '-' else '-' for c in prefix)[:20].strip('-')
+    prefix = email.split("@")[0].lower()
+    prefix = "".join(c if c.isalnum() or c == "-" else "-" for c in prefix)[:20].strip("-")
     suffix = user_id[:8]
     return f"{prefix}-{suffix}"
 
@@ -43,7 +44,7 @@ def upgrade() -> None:
     conn = op.get_bind()
     now = datetime.now(UTC)
 
-    users = conn.execute(sa.text("SELECT id, email, full_name FROM \"user\"")).fetchall()
+    users = conn.execute(sa.text('SELECT id, email, full_name FROM "user"')).fetchall()
 
     for user in users:
         user_id = str(user.id)
@@ -52,46 +53,63 @@ def upgrade() -> None:
         name = personal_workspace_name(user.email, user.full_name)
 
         # Create personal workspace
-        conn.execute(sa.text("""
+        conn.execute(
+            sa.text("""
             INSERT INTO workspace (id, name, slug, owner_id, is_personal, plan, created_at, updated_at)
             VALUES (:id, :name, :slug, :owner_id, true, 'free', :now, :now)
-        """), {
-            "id": workspace_id, "name": name,
-            "slug": slug, "owner_id": user_id, "now": now,
-        })
+        """),
+            {
+                "id": workspace_id,
+                "name": name,
+                "slug": slug,
+                "owner_id": user_id,
+                "now": now,
+            },
+        )
 
         # Add user as owner member
-        conn.execute(sa.text("""
+        conn.execute(
+            sa.text("""
             INSERT INTO workspacemember (id, workspace_id, user_id, role, joined_at)
             VALUES (:id, :workspace_id, :user_id, 'owner', :now)
-        """), {
-            "id": str(uuid.uuid4()), "workspace_id": workspace_id,
-            "user_id": user_id, "now": now,
-        })
+        """),
+            {
+                "id": str(uuid.uuid4()),
+                "workspace_id": workspace_id,
+                "user_id": user_id,
+                "now": now,
+            },
+        )
 
         # Backfill workspace_id on all resource tables
         for table, owner_col in [
-            ('workflow', 'user_id'),
-            ('folder', 'user_id'),
-            ('credential', 'user_id'),
-            ('secret', 'user_id'),
-            ('skill', 'user_id'),
+            ("workflow", "user_id"),
+            ("folder", "user_id"),
+            ("credential", "user_id"),
+            ("secret", "user_id"),
+            ("skill", "user_id"),
         ]:
-            conn.execute(sa.text(f"""
+            conn.execute(
+                sa.text(f"""
                 UPDATE {table} SET workspace_id = :workspace_id
                 WHERE {owner_col} = :user_id AND workspace_id IS NULL
-            """), {"workspace_id": workspace_id, "user_id": user_id})
+            """),
+                {"workspace_id": workspace_id, "user_id": user_id},
+            )
 
         # knowledgebase uses user_id too
-        conn.execute(sa.text("""
+        conn.execute(
+            sa.text("""
             UPDATE knowledgebase SET workspace_id = :workspace_id
             WHERE user_id = :user_id AND workspace_id IS NULL
-        """), {"workspace_id": workspace_id, "user_id": user_id})
+        """),
+            {"workspace_id": workspace_id, "user_id": user_id},
+        )
 
 
 def downgrade() -> None:
     conn = op.get_bind()
-    for table in ('workflow', 'folder', 'credential', 'secret', 'knowledgebase', 'skill'):
+    for table in ("workflow", "folder", "credential", "secret", "knowledgebase", "skill"):
         conn.execute(sa.text(f"UPDATE {table} SET workspace_id = NULL"))
     conn.execute(sa.text("DELETE FROM workspacemember"))
     conn.execute(sa.text("DELETE FROM workspace WHERE is_personal = true"))

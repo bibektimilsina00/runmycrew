@@ -161,15 +161,17 @@ export function useAppLayoutController() {
     setIsCreateWorkflowOpen(true)
   }, [])
 
-  // Listen for external requests (e.g. from Automations page "New automation" button)
-  const pendingOpen = useWorkflowModalStore(s => s.pendingOpen)
-  const consumePending = useWorkflowModalStore(s => s.consume)
+  // Listen for external requests (e.g. from Automations page "New automation" button).
+  // Subscribe imperatively so the action fires on the store transition rather than
+  // setting state synchronously inside the effect body.
   useEffect(() => {
-    if (pendingOpen) {
-      openCreateWorkflow(null)
-      consumePending()
-    }
-  }, [pendingOpen, openCreateWorkflow, consumePending])
+    return useWorkflowModalStore.subscribe((state, prevState) => {
+      if (state.pendingOpen && !prevState.pendingOpen) {
+        openCreateWorkflow(null)
+        useWorkflowModalStore.getState().consume()
+      }
+    })
+  }, [openCreateWorkflow])
 
   const openCreateFolder = (parentId?: string | null) => {
     setFolderParentId(parentId ?? null)

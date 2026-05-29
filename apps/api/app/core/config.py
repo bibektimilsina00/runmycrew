@@ -45,8 +45,8 @@ class Settings(BaseSettings):
     LINEAR_CLIENT_SECRET: str = ""
 
     # Environment & CORS
-    ENVIRONMENT: str = "development"   # "production" in prod
-    CORS_ORIGINS: str = ""             # Comma-separated origins; overrides defaults when set
+    ENVIRONMENT: str = "development"  # "production" in prod
+    CORS_ORIGINS: str = ""  # Comma-separated origins; overrides defaults when set
 
     # Rate limits (slowapi format: "N/period")
     RATE_LIMIT_AUTH: str = "5/minute"

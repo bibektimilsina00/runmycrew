@@ -53,7 +53,13 @@ class HttpRequestNode(BaseNode[HttpRequestProperties]):
                         {"label": "PATCH", "value": "PATCH"},
                     ],
                 },
-                {"name": "headers", "label": "Headers", "type": "key-value", "required": False, "mode": "advanced"},
+                {
+                    "name": "headers",
+                    "label": "Headers",
+                    "type": "key-value",
+                    "required": False,
+                    "mode": "advanced",
+                },
                 {
                     "name": "params",
                     "label": "Query Parameters",
@@ -69,7 +75,13 @@ class HttpRequestNode(BaseNode[HttpRequestProperties]):
                     "mode": "advanced",
                 },
                 {"name": "body", "label": "Body", "type": "json", "required": False},
-                {"name": "formData", "label": "Form Data", "type": "key-value", "required": False, "mode": "advanced"},
+                {
+                    "name": "formData",
+                    "label": "Form Data",
+                    "type": "key-value",
+                    "required": False,
+                    "mode": "advanced",
+                },
                 {
                     "name": "timeout",
                     "label": "Timeout (ms)",

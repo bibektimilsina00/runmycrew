@@ -3,7 +3,7 @@ import { Icons } from '@/shared/components/icons'
 import { useAutomations } from '../hooks/useAutomations'
 import { AutomationList } from '../components/AutomationList'
 import { useWorkflowModalStore } from '@/stores/workflowModalStore'
-import type { WorkflowKind, WorkflowStatus } from '../types/automationsTypes'
+import type { WorkflowKind } from '../types/automationsTypes'
 
 type FilterId = 'all' | WorkflowKind | 'paused'
 
@@ -24,7 +24,7 @@ const SORT_OPTIONS: { id: SortKey; label: string }[] = [
 ]
 
 export function Automations() {
-  const { data: items = [], isLoading, refetch } = useAutomations()
+  const { data: items = [], isLoading } = useAutomations()
   const requestCreateWorkflow = useWorkflowModalStore(s => s.requestOpen)
 
   const [filter, setFilter]     = useState<FilterId>('all')
@@ -150,7 +150,7 @@ export function Automations() {
           Loading automations…
         </div>
       ) : (
-        <AutomationList items={filtered} onRefresh={refetch} />
+        <AutomationList items={filtered} />
       )}
     </div>
   )

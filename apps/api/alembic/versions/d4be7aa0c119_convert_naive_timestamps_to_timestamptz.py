@@ -5,6 +5,7 @@ Revises: ee615c3211b2
 Create Date: 2026-05-28 14:56:16.200753
 
 """
+
 from collections.abc import Sequence
 
 import sqlalchemy as sa
@@ -72,7 +73,7 @@ def upgrade() -> None:
             table,
             column,
             type_=sa.DateTime(timezone=True),
-            postgresql_using=f'"{column}" AT TIME ZONE \'UTC\'',
+            postgresql_using=f"\"{column}\" AT TIME ZONE 'UTC'",
         )
 
     for table, column in TIGHTEN_NOT_NULL:
@@ -89,5 +90,5 @@ def downgrade() -> None:
             table,
             column,
             type_=sa.DateTime(timezone=False),
-            postgresql_using=f'"{column}" AT TIME ZONE \'UTC\'',
+            postgresql_using=f"\"{column}\" AT TIME ZONE 'UTC'",
         )

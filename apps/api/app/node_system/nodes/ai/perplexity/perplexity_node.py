@@ -57,7 +57,10 @@ class PerplexityNode(BaseNode[PerplexityProperties]):
                     "options": [
                         {"label": "Sonar (fast, web search)", "value": "sonar"},
                         {"label": "Sonar Pro (more thorough)", "value": "sonar-pro"},
-                        {"label": "Sonar Reasoning (thinking + search)", "value": "sonar-reasoning"},
+                        {
+                            "label": "Sonar Reasoning (thinking + search)",
+                            "value": "sonar-reasoning",
+                        },
                         {"label": "Sonar Deep Research", "value": "sonar-deep-research"},
                     ],
                 },
@@ -147,7 +150,10 @@ class PerplexityNode(BaseNode[PerplexityProperties]):
             async with httpx.AsyncClient(timeout=120.0) as client:
                 resp = await client.post(
                     PERPLEXITY_URL,
-                    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
                     json=payload,
                 )
                 resp.raise_for_status()
@@ -158,19 +164,25 @@ class PerplexityNode(BaseNode[PerplexityProperties]):
             citations = data.get("citations") or []
             usage = data.get("usage") or {}
 
-            return NodeResult(success=True, output_data={
-                "text": text,
-                "citations": citations,
-                "model": data.get("model", self.props.model),
-                "tokens": {
-                    "prompt_tokens": usage.get("prompt_tokens"),
-                    "completion_tokens": usage.get("completion_tokens"),
-                    "total_tokens": usage.get("total_tokens"),
+            return NodeResult(
+                success=True,
+                output_data={
+                    "text": text,
+                    "citations": citations,
+                    "model": data.get("model", self.props.model),
+                    "tokens": {
+                        "prompt_tokens": usage.get("prompt_tokens"),
+                        "completion_tokens": usage.get("completion_tokens"),
+                        "total_tokens": usage.get("total_tokens"),
+                    },
                 },
-            })
+            )
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"Perplexity API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False,
+                error=f"Perplexity API error {e.response.status_code}: {e.response.text[:300]}",
+            )
         except Exception as e:
             logger.error(f"PerplexityNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -179,7 +191,15 @@ class PerplexityNode(BaseNode[PerplexityProperties]):
         credentials = context.credentials or []
         cred = None
         if self.props.credential:
-            cred = next((c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == "perplexity_api_key"), None)
+            cred = next(
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential)
+                    and c.get("type") == "perplexity_api_key"
+                ),
+                None,
+            )
         if cred is None:
             cred = next((c for c in credentials if c.get("type") == "perplexity_api_key"), None)
         data = cred.get("data") if cred else None

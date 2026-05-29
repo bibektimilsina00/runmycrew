@@ -77,7 +77,9 @@ class GitHubService:
             payload["state"] = state
         if labels is not None:
             payload["labels"] = labels
-        return await self._client.patch(f"/repos/{owner}/{repo}/issues/{issue_number}", json=payload)
+        return await self._client.patch(
+            f"/repos/{owner}/{repo}/issues/{issue_number}", json=payload
+        )
 
     async def add_comment(self, owner: str, repo: str, issue_number: int, body: str) -> dict:
         return await self._client.post(
@@ -86,6 +88,4 @@ class GitHubService:
         )
 
     async def list_comments(self, owner: str, repo: str, issue_number: int) -> list:
-        return await self._client.get(
-            f"/repos/{owner}/{repo}/issues/{issue_number}/comments"
-        )
+        return await self._client.get(f"/repos/{owner}/{repo}/issues/{issue_number}/comments")

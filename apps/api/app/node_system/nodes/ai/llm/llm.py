@@ -54,18 +54,21 @@ class LLMNode(BaseNode[LLMProperties]):
                     "type": "credential",
                     "required": True,
                     "dependsOn": ["provider"],
-                    "credentialTypeByField": {"field": "provider", "values": {
-                        "openai": "openai_api_key",
-                        "anthropic": "anthropic_api_key",
-                        "google": "google_api_key",
-                        "groq": "groq_api_key",
-                        "openrouter": "openrouter_api_key",
-                        "deepseek": "deepseek_api_key",
-                        "mistral": "mistral_api_key",
-                        "xai": "xai_api_key",
-                        "together": "together_api_key",
-                        "fireworks": "fireworks_api_key",
-                    }},
+                    "credentialTypeByField": {
+                        "field": "provider",
+                        "values": {
+                            "openai": "openai_api_key",
+                            "anthropic": "anthropic_api_key",
+                            "google": "google_api_key",
+                            "groq": "groq_api_key",
+                            "openrouter": "openrouter_api_key",
+                            "deepseek": "deepseek_api_key",
+                            "mistral": "mistral_api_key",
+                            "xai": "xai_api_key",
+                            "together": "together_api_key",
+                            "fireworks": "fireworks_api_key",
+                        },
+                    },
                 },
                 {
                     "name": "model",
@@ -139,18 +142,28 @@ class LLMNode(BaseNode[LLMProperties]):
         try:
             async with httpx.AsyncClient(timeout=120.0) as client:
                 if ai_provider.ai_api_type == "openai_compatible":
-                    text, tokens = await self._call_openai(client, ai_provider.chat_completions_url or "", api_key, model)
+                    text, tokens = await self._call_openai(
+                        client, ai_provider.chat_completions_url or "", api_key, model
+                    )
                 elif ai_provider.ai_api_type == "anthropic":
-                    text, tokens = await self._call_anthropic(client, ai_provider.chat_completions_url or "", api_key, model)
+                    text, tokens = await self._call_anthropic(
+                        client, ai_provider.chat_completions_url or "", api_key, model
+                    )
                 elif ai_provider.ai_api_type == "google":
-                    text, tokens = await self._call_google(client, ai_provider.chat_completions_url or "", api_key, model)
+                    text, tokens = await self._call_google(
+                        client, ai_provider.chat_completions_url or "", api_key, model
+                    )
                 else:
-                    return NodeResult(success=False, error=f"Unsupported provider type: {ai_provider.ai_api_type}")
+                    return NodeResult(
+                        success=False, error=f"Unsupported provider type: {ai_provider.ai_api_type}"
+                    )
 
             return NodeResult(success=True, output_data={"text": text, "tokens": tokens})
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+            )
         except Exception as e:
             logger.error(f"LLMNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -237,7 +250,8 @@ class LLMNode(BaseNode[LLMProperties]):
         system = next((m["content"] for m in msgs if m["role"] == "system"), None)
         contents = [
             {"role": "user" if m["role"] == "user" else "model", "parts": [{"text": m["content"]}]}
-            for m in msgs if m["role"] != "system"
+            for m in msgs
+            if m["role"] != "system"
         ]
 
         generation_config: dict[str, Any] = {}
@@ -258,7 +272,9 @@ class LLMNode(BaseNode[LLMProperties]):
         model_path = model if model.startswith("models/") else f"models/{model}"
         url = url_template.format(model=model_path)
 
-        resp = await client.post(url, params={"key": api_key}, headers={"Content-Type": "application/json"}, json=payload)
+        resp = await client.post(
+            url, params={"key": api_key}, headers={"Content-Type": "application/json"}, json=payload
+        )
         resp.raise_for_status()
         data = resp.json()
         candidates = data.get("candidates") or []
@@ -281,7 +297,12 @@ class LLMNode(BaseNode[LLMProperties]):
         cred = None
         if self.props.credential:
             cred = next(
-                (c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == ai_provider.id),
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential)
+                    and c.get("type") == ai_provider.id
+                ),
                 None,
             )
         if cred is None:

@@ -34,6 +34,7 @@ app.add_middleware(
 
 # ── Health check (exempt from rate limiting, no auth required) ────────────────
 
+
 @app.get("/health", tags=["health"])
 async def health_check():
     """Check API, DB, Redis and Celery worker connectivity."""
@@ -49,6 +50,7 @@ async def health_check():
         import sqlalchemy as sa
 
         from apps.api.app.core.database import AsyncSessionLocal
+
         async with AsyncSessionLocal() as db:
             await db.execute(sa.text("SELECT 1"))
         status["db"] = "ok"
@@ -59,6 +61,7 @@ async def health_check():
     # Redis check
     try:
         from apps.api.app.core.redis import get_redis
+
         redis = await get_redis()
         await redis.ping()
         status["redis"] = "ok"
@@ -69,9 +72,11 @@ async def health_check():
     # Celery worker check (non-blocking, 2s timeout)
     try:
         loop = asyncio.get_event_loop()
+
         def _ping():
             inspector = celery_app.control.inspect(timeout=2)
             return inspector.ping() or {}
+
         result = await loop.run_in_executor(None, _ping)
         status["worker"] = "ok" if result else "unreachable"
         if not result:
@@ -82,6 +87,7 @@ async def health_check():
 
     overall = "ok" if http_status == 200 else "degraded"
     from fastapi.responses import JSONResponse
+
     return JSONResponse({"status": overall, **status}, status_code=http_status)
 
 

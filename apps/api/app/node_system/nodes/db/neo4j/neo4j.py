@@ -16,8 +16,8 @@ class Neo4jProperties(BaseModel):
     username: str = "neo4j"
     password: str = ""
     database: str = "neo4j"
-    query: str = ""         # Cypher query
-    params: Any = None      # Query parameters dict
+    query: str = ""  # Cypher query
+    params: Any = None  # Query parameters dict
 
 
 class Neo4jNode(BaseNode[Neo4jProperties]):
@@ -35,7 +35,12 @@ class Neo4jNode(BaseNode[Neo4jProperties]):
             icon="si:SiNeo4j",
             color="#008cc1",
             properties=[
-                {"name": "uri", "label": "URI", "type": "string", "default": "bolt://localhost:7687"},
+                {
+                    "name": "uri",
+                    "label": "URI",
+                    "type": "string",
+                    "default": "bolt://localhost:7687",
+                },
                 {"name": "username", "label": "Username", "type": "string", "default": "neo4j"},
                 {"name": "password", "label": "Password", "type": "string", "required": True},
                 {"name": "database", "label": "Database", "type": "string", "default": "neo4j"},

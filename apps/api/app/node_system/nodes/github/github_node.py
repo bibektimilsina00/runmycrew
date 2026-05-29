@@ -262,7 +262,9 @@ class GitHubNode(BaseNode[GitHubProperties]):
                     labels=self.props.labels or None,
                     per_page=self.props.per_page,
                 )
-                return NodeResult(success=True, output_data={"issues": issues, "count": len(issues)})
+                return NodeResult(
+                    success=True, output_data={"issues": issues, "count": len(issues)}
+                )
 
             elif op == "get_issue":
                 owner = (self.props.owner or "").strip()
@@ -272,7 +274,9 @@ class GitHubNode(BaseNode[GitHubProperties]):
                 if not self.props.issue_number:
                     return NodeResult(success=False, error="issue_number is required")
 
-                issue = await service.get_issue(owner=owner, repo=repo, issue_number=self.props.issue_number)
+                issue = await service.get_issue(
+                    owner=owner, repo=repo, issue_number=self.props.issue_number
+                )
                 return NodeResult(success=True, output_data=issue)
 
             elif op == "update_issue":
@@ -321,8 +325,12 @@ class GitHubNode(BaseNode[GitHubProperties]):
                 if not self.props.issue_number:
                     return NodeResult(success=False, error="issue_number is required")
 
-                comments = await service.list_comments(owner=owner, repo=repo, issue_number=self.props.issue_number)
-                return NodeResult(success=True, output_data={"comments": comments, "count": len(comments)})
+                comments = await service.list_comments(
+                    owner=owner, repo=repo, issue_number=self.props.issue_number
+                )
+                return NodeResult(
+                    success=True, output_data={"comments": comments, "count": len(comments)}
+                )
 
             elif op == "get_repo":
                 owner = (self.props.owner or "").strip()

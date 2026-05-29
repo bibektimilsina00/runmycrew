@@ -79,30 +79,30 @@ async def _execute_http_request(params: dict[str, Any], context: NodeContext) ->
 
 tool_registry.register(
     ToolDefinition(
-        id='http_request',
-        name='HTTP Request',
-        description='Make an HTTP request to any URL',
+        id="http_request",
+        name="HTTP Request",
+        description="Make an HTTP request to any URL",
         params={
-            'url': ToolParam(
-                type='string',
+            "url": ToolParam(
+                type="string",
                 required=True,
-                visibility='user-or-llm',
-                description='URL to request',
+                visibility="user-or-llm",
+                description="URL to request",
             ),
-            'method': ToolParam(
-                type='string',
-                visibility='user-only',
-                description='HTTP method (GET, POST, PUT, DELETE, PATCH). Defaults to GET if not set.',
+            "method": ToolParam(
+                type="string",
+                visibility="user-only",
+                description="HTTP method (GET, POST, PUT, DELETE, PATCH). Defaults to GET if not set.",
             ),
-            'headers': ToolParam(
-                type='json',
-                visibility='user-only',
-                description='HTTP headers as JSON object',
+            "headers": ToolParam(
+                type="json",
+                visibility="user-only",
+                description="HTTP headers as JSON object",
             ),
-            'body': ToolParam(
-                type='json',
-                visibility='user-or-llm',
-                description='Request body as JSON',
+            "body": ToolParam(
+                type="json",
+                visibility="user-or-llm",
+                description="Request body as JSON",
             ),
         },
     ),

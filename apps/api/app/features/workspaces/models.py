@@ -28,12 +28,10 @@ class Workspace(SQLModelBase, table=True):
     updated_at: datetime = updated_at_field()
 
     members: list["WorkspaceMember"] = Relationship(
-        back_populates="workspace",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="workspace", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     invites: list["WorkspaceInvite"] = Relationship(
-        back_populates="workspace",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="workspace", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 
@@ -50,7 +48,7 @@ class WorkspaceMember(SQLModelBase, table=True):
     workspace: "Workspace" = Relationship(back_populates="members")
     user: "User" = Relationship(
         back_populates="workspace_memberships",
-        sa_relationship_kwargs={"foreign_keys": "[WorkspaceMember.user_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[WorkspaceMember.user_id]"},
     )
 
 
@@ -66,4 +64,3 @@ class WorkspaceInvite(SQLModelBase, table=True):
     created_at: datetime = created_at_field()
 
     workspace: "Workspace" = Relationship(back_populates="invites")
-

@@ -42,11 +42,11 @@ export interface NodeProperty {
   type: NodePropertyType
   description?: string
   default?: unknown
-  required?: boolean | { field: string; value: unknown }
-  options?: { label: string; value: unknown }[]
+  required?: boolean | { field: string; value?: unknown }
+  options?: { label: string; value?: unknown }[]
   placeholder?: string
   condition?: unknown
-  credentialType?: string | string[]
+  credentialType?: string | string[] | null
   credentialTypeByField?: { field: string; values: Record<string, string> }
   dependsOn?: string[] | { all?: string[]; any?: string[] }
   loadOptions?: string

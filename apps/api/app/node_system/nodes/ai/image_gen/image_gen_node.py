@@ -155,7 +155,10 @@ class ImageGenNode(BaseNode[ImageGenProperties]):
             async with httpx.AsyncClient(timeout=120.0) as client:
                 resp = await client.post(
                     "https://api.openai.com/v1/images/generations",
-                    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
                     json=payload,
                 )
                 resp.raise_for_status()
@@ -166,24 +169,32 @@ class ImageGenNode(BaseNode[ImageGenProperties]):
                 urls = [img.get("url", "") for img in images]
                 first_url = urls[0] if urls else ""
                 revised_prompt = images[0].get("revised_prompt") if images else None
-                return NodeResult(success=True, output_data={
-                    "url": first_url,
-                    "urls": urls,
-                    "revised_prompt": revised_prompt,
-                    "model": self.props.model,
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "url": first_url,
+                        "urls": urls,
+                        "revised_prompt": revised_prompt,
+                        "model": self.props.model,
+                    },
+                )
             else:
                 b64_images = [img.get("b64_json", "") for img in images]
                 first = b64_images[0] if b64_images else ""
-                return NodeResult(success=True, output_data={
-                    "url": f"data:image/png;base64,{first}" if first else "",
-                    "urls": [f"data:image/png;base64,{b}" for b in b64_images],
-                    "revised_prompt": images[0].get("revised_prompt") if images else None,
-                    "model": self.props.model,
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "url": f"data:image/png;base64,{first}" if first else "",
+                        "urls": [f"data:image/png;base64,{b}" for b in b64_images],
+                        "revised_prompt": images[0].get("revised_prompt") if images else None,
+                        "model": self.props.model,
+                    },
+                )
 
         except httpx.HTTPStatusError as e:
-            return NodeResult(success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}")
+            return NodeResult(
+                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+            )
         except Exception as e:
             logger.error(f"ImageGenNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -192,7 +203,15 @@ class ImageGenNode(BaseNode[ImageGenProperties]):
         credentials = context.credentials or []
         cred = None
         if self.props.credential:
-            cred = next((c for c in credentials if str(c.get("id")) == str(self.props.credential) and c.get("type") == "openai_api_key"), None)
+            cred = next(
+                (
+                    c
+                    for c in credentials
+                    if str(c.get("id")) == str(self.props.credential)
+                    and c.get("type") == "openai_api_key"
+                ),
+                None,
+            )
         if cred is None:
             cred = next((c for c in credentials if c.get("type") == "openai_api_key"), None)
         data = cred.get("data") if cred else None

@@ -53,9 +53,9 @@ async def _run_workflow(
         PauseSignal,
         WorkflowRunner,
     )
-    from apps.api.app.repositories.execution_repository import ExecutionRepository
-    from apps.api.app.repositories.workflow_repository import WorkflowRepository
-    from apps.api.app.services.credential_service import CredentialService
+    from apps.api.app.features.credentials.service import CredentialService
+    from apps.api.app.features.executions.repository import ExecutionRepository
+    from apps.api.app.features.workflows.repository import WorkflowRepository
 
     credentials_list: list[dict[str, Any]] = []
     secrets_dict: dict[str, str] = {}
@@ -75,7 +75,7 @@ async def _run_workflow(
                 import sqlalchemy as sa
 
                 from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
-                from apps.api.app.models.secret import Secret
+                from apps.api.app.features.secrets.models import Secret
 
                 _enc = AESEncryptionService()
                 result = await db.execute(

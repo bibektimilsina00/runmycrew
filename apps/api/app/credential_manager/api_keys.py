@@ -48,7 +48,9 @@ PROVIDERS = {
         description="Browser Use — AI-powered browser automation via browser-use.com",
         icon_url="https://cdn.brandfetch.io/browser-use.com/icon",
         hint="bu-...",
-        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="bu-...")],
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="bu-...")
+        ],
     ),
     "airtable": APIKeyProvider(
         id="airtable_api_key",
@@ -56,7 +58,11 @@ PROVIDERS = {
         description="Airtable — database and spreadsheet automation",
         icon_url="https://cdn.brandfetch.io/airtable.com/icon",
         hint="pat...",
-        fields=[CredentialField(id="api_key", label="Personal Access Token", type="password", placeholder="pat...")],
+        fields=[
+            CredentialField(
+                id="api_key", label="Personal Access Token", type="password", placeholder="pat..."
+            )
+        ],
     ),
     "stripe": APIKeyProvider(
         id="stripe_api_key",
@@ -64,7 +70,11 @@ PROVIDERS = {
         description="Stripe — payments and billing automation",
         icon_url="https://cdn.brandfetch.io/stripe.com/icon",
         hint="sk_live_... or sk_test_...",
-        fields=[CredentialField(id="api_key", label="Secret Key", type="password", placeholder="sk_live_...")],
+        fields=[
+            CredentialField(
+                id="api_key", label="Secret Key", type="password", placeholder="sk_live_..."
+            )
+        ],
     ),
     "hubspot": APIKeyProvider(
         id="hubspot_api_key",
@@ -72,7 +82,11 @@ PROVIDERS = {
         description="HubSpot — CRM contacts, deals, and companies",
         icon_url="https://cdn.brandfetch.io/hubspot.com/icon",
         hint="Private App Token",
-        fields=[CredentialField(id="api_key", label="Private App Token", type="password", placeholder="pat-na1-...")],
+        fields=[
+            CredentialField(
+                id="api_key", label="Private App Token", type="password", placeholder="pat-na1-..."
+            )
+        ],
     ),
     "linear": APIKeyProvider(
         id="linear_api_key",
@@ -80,7 +94,11 @@ PROVIDERS = {
         description="Linear project management — create and manage issues",
         icon_url="https://cdn.brandfetch.io/linear.app/icon",
         hint="lin_api_...",
-        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="lin_api_...")],
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="lin_api_..."
+            )
+        ],
     ),
     "perplexity": APIKeyProvider(
         id="perplexity_api_key",
@@ -88,7 +106,9 @@ PROVIDERS = {
         description="Perplexity Sonar — web search + LLM with live internet access",
         icon_url="https://cdn.brandfetch.io/perplexity.ai/icon",
         hint="pplx-...",
-        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="pplx-...")],
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="pplx-...")
+        ],
     ),
     "elevenlabs": APIKeyProvider(
         id="elevenlabs_api_key",
@@ -96,7 +116,9 @@ PROVIDERS = {
         description="High-quality text-to-speech with voice cloning",
         icon_url="https://cdn.brandfetch.io/elevenlabs.io/icon",
         hint="API Key",
-        fields=[CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")],
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
     ),
     "notion": APIKeyProvider(
         id="notion_api_key",
@@ -275,9 +297,18 @@ PROVIDERS = {
         icon_url="https://cdn.brandfetch.io/atlassian.com/icon",
         hint="https://yoursite.atlassian.net",
         fields=[
-            CredentialField(id="email", label="Atlassian Email", type="text", placeholder="you@company.com"),
-            CredentialField(id="api_key", label="API Token", type="password", placeholder="ATATT3x..."),
-            CredentialField(id="base_url", label="Jira Base URL", type="text", placeholder="https://yoursite.atlassian.net"),
+            CredentialField(
+                id="email", label="Atlassian Email", type="text", placeholder="you@company.com"
+            ),
+            CredentialField(
+                id="api_key", label="API Token", type="password", placeholder="ATATT3x..."
+            ),
+            CredentialField(
+                id="base_url",
+                label="Jira Base URL",
+                type="text",
+                placeholder="https://yoursite.atlassian.net",
+            ),
         ],
     ),
     "salesforce": APIKeyProvider(
@@ -287,8 +318,15 @@ PROVIDERS = {
         icon_url="https://cdn.brandfetch.io/salesforce.com/icon",
         hint="Access token from Salesforce Connected App",
         fields=[
-            CredentialField(id="api_key", label="Access Token", type="password", placeholder="00D..."),
-            CredentialField(id="instance_url", label="Instance URL", type="text", placeholder="https://yourorg.my.salesforce.com"),
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="00D..."
+            ),
+            CredentialField(
+                id="instance_url",
+                label="Instance URL",
+                type="text",
+                placeholder="https://yourorg.my.salesforce.com",
+            ),
         ],
     ),
     "fireworks": APIKeyProvider(

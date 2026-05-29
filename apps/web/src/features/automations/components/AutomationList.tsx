@@ -7,7 +7,6 @@ import type { Automation } from '../types/automationsTypes'
 
 interface Props {
   items: Automation[]
-  onRefresh: () => void
 }
 
 function statusDot(s: string) {
@@ -24,7 +23,7 @@ function statusPill(s: string) {
   return 'ok'
 }
 
-export function AutomationList({ items, onRefresh }: Props) {
+export function AutomationList({ items }: Props) {
   const navigate  = useNavigate()
   const { toast } = useToast()
   const confirm   = useConfirm()

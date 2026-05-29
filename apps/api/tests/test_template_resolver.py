@@ -12,9 +12,9 @@ def test_resolves_node_output_path_when_node_id_contains_dots() -> None:
         variables={},
     )
 
-    assert resolver.resolve_properties({
-        "content": "{{action.http_request-1778949244013.output.body}}"
-    }) == {"content": {"message": "hello"}}
+    assert resolver.resolve_properties(
+        {"content": "{{action.http_request-1778949244013.output.body}}"}
+    ) == {"content": {"message": "hello"}}
 
 
 def test_resolves_nested_node_output_path_when_node_id_contains_dots() -> None:
@@ -28,6 +28,6 @@ def test_resolves_nested_node_output_path_when_node_id_contains_dots() -> None:
         variables={},
     )
 
-    assert resolver.resolve_properties({
-        "content": "{{action.http_request-1778949244013.output.body.message}}"
-    }) == {"content": "hello"}
+    assert resolver.resolve_properties(
+        {"content": "{{action.http_request-1778949244013.output.body.message}}"}
+    ) == {"content": "hello"}

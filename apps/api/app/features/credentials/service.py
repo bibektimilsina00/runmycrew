@@ -7,8 +7,8 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
-from apps.api.app.features.credentials.manager.encryption.aes import encryption_service
-from apps.api.app.features.credentials.manager.oauth.flow import get_oauth_provider
+from apps.api.app.credential_manager.encryption.aes import encryption_service
+from apps.api.app.credential_manager.oauth.flow import get_oauth_provider
 from apps.api.app.features.credentials.models import Credential
 from apps.api.app.features.credentials.repository import CredentialRepository
 from apps.api.app.features.users.models import User

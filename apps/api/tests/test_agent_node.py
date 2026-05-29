@@ -18,7 +18,9 @@ def test_agent_model_field_uses_generic_dynamic_options_contract():
     assert provider_property["loadOptions"] == "/ai/providers"
     assert "options" not in provider_property
     assert credential_property["credentialTypeByField"]["field"] == "provider"
-    assert credential_property["credentialTypeByField"]["values"]["openrouter"] == "openrouter_api_key"
+    assert (
+        credential_property["credentialTypeByField"]["values"]["openrouter"] == "openrouter_api_key"
+    )
     assert model_property["type"] == "string"
     assert model_property["loadOptions"] == "/ai/models"
     assert model_property["loadOptionsDependsOn"] == [
@@ -77,7 +79,7 @@ async def test_agent_node_sends_openai_request_and_returns_output():
                     {
                         "message": {
                             "role": "assistant",
-                            "content": "{\"answer\":\"done\"}",
+                            "content": '{"answer":"done"}',
                         }
                     }
                 ],
@@ -113,14 +115,16 @@ async def test_agent_node_sends_openai_request_and_returns_output():
     assert request_body["temperature"] == 0.2
     assert request_body["max_tokens"] == 512
     assert result.output_data["provider"] == "openai"
-    assert result.output_data["content"] == "{\"answer\":\"done\"}"
+    assert result.output_data["content"] == '{"answer":"done"}'
     assert result.output_data["answer"] == "done"
     assert result.output_data["tokens"]["total_tokens"] == 15
 
 
 @pytest.mark.anyio
 async def test_agent_node_requires_selected_provider_credential():
-    async with httpx.AsyncClient(transport=httpx.MockTransport(lambda request: httpx.Response(200))) as client:
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(lambda request: httpx.Response(200))
+    ) as client:
         node = AgentNode(
             node_id="agent-1",
             properties={"provider": "anthropic", "messages": "Hello"},
@@ -141,7 +145,7 @@ async def test_agent_node_sends_anthropic_request_with_tools():
         captured_headers.append(dict(request.headers))
         payload = json.loads(request.read())
         captured_payloads.append(payload)
-        
+
         # On first request (which requires lookup), return tool use
         # On subsequent request (summarization), return text response so it stops looping
         if len(captured_payloads) == 1:
@@ -237,7 +241,7 @@ async def test_agent_node_sends_google_request_with_response_schema_and_memory()
         captured_params.append(dict(request.url.params))
         payload = json.loads(request.read())
         captured_payloads.append(payload)
-        
+
         # On first request, return function call and text
         # On subsequent request, return only text so it stops looping
         if len(captured_payloads) == 1:
@@ -248,8 +252,13 @@ async def test_agent_node_sends_google_request_with_response_schema_and_memory()
                         {
                             "content": {
                                 "parts": [
-                                    {"text": "{\"status\":\"ok\"}"},
-                                    {"functionCall": {"name": "search_docs", "args": {"q": "billing"}}},
+                                    {"text": '{"status":"ok"}'},
+                                    {
+                                        "functionCall": {
+                                            "name": "search_docs",
+                                            "args": {"q": "billing"},
+                                        }
+                                    },
                                 ]
                             }
                         }
@@ -269,7 +278,7 @@ async def test_agent_node_sends_google_request_with_response_schema_and_memory()
                         {
                             "content": {
                                 "parts": [
-                                    {"text": "{\"status\":\"ok\"}"},
+                                    {"text": '{"status":"ok"}'},
                                 ]
                             }
                         }
@@ -333,4 +342,7 @@ async def test_agent_node_sends_google_request_with_response_schema_and_memory()
             "result": {"error": "Unknown tool: search_docs"},
         }
     ]
-    assert variables["agent_memory:support"][-1] == {"role": "assistant", "content": "{\"status\":\"ok\"}"}
+    assert variables["agent_memory:support"][-1] == {
+        "role": "assistant",
+        "content": '{"status":"ok"}',
+    }

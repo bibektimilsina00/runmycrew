@@ -298,9 +298,7 @@ class AgentNode(BaseNode[AgentProperties]):
                 "condition": {"field": "provider", "value": "groq"},
             },
         ]
-        catalog_by_provider = {
-            provider.ai_provider_id: provider for provider in get_ai_providers()
-        }
+        catalog_by_provider = {provider.ai_provider_id: provider for provider in get_ai_providers()}
         for prop in credential_properties:
             provider_id = prop["condition"]["value"]
             catalog_provider = catalog_by_provider.get(provider_id)
@@ -331,7 +329,9 @@ class AgentNode(BaseNode[AgentProperties]):
             api_key = self._get_api_key(context)
             if not api_key:
                 provider_name = self._provider_name()
-                return NodeResult(success=False, error=f"{provider_name} API key credential is required.")
+                return NodeResult(
+                    success=False, error=f"{provider_name} API key credential is required."
+                )
 
             messages = self._normalize_messages(input_data)
             messages = await self._apply_memory_async(messages, context)
@@ -350,7 +350,12 @@ class AgentNode(BaseNode[AgentProperties]):
                 messages = self._inject_skills_system_prompt(messages, skill_meta)
 
             # Resolve tools — includes MCP tools fetched asynchronously
-            tool_specs, tool_user_params, forced_tool_ids, mcp_clients = await self._resolve_tools_async()
+            (
+                tool_specs,
+                tool_user_params,
+                forced_tool_ids,
+                mcp_clients,
+            ) = await self._resolve_tools_async()
 
             # Inject load_skill tool if skills are available
             if skill_meta:
@@ -362,7 +367,9 @@ class AgentNode(BaseNode[AgentProperties]):
 
             ai_provider = get_ai_provider(self.props.provider)
             if not ai_provider:
-                return NodeResult(success=False, error=f"Unsupported AI provider: {self.props.provider}")
+                return NodeResult(
+                    success=False, error=f"Unsupported AI provider: {self.props.provider}"
+                )
 
             all_tool_calls: list[dict[str, Any]] = []
             final_content: str = ""
@@ -439,7 +446,10 @@ class AgentNode(BaseNode[AgentProperties]):
                             )
                             raw_data = {}
                         else:
-                            return NodeResult(success=False, error=f"Unsupported AI provider: {self.props.provider}")
+                            return NodeResult(
+                                success=False,
+                                error=f"Unsupported AI provider: {self.props.provider}",
+                            )
                     elif ai_provider.ai_api_type == "openai_compatible":
                         raw_data = await self._call_llm_openai_compatible(
                             client=client,
@@ -467,7 +477,8 @@ class AgentNode(BaseNode[AgentProperties]):
                         tokens = {
                             "prompt_tokens": usage.get("input_tokens"),
                             "completion_tokens": usage.get("output_tokens"),
-                            "total_tokens": (usage.get("input_tokens") or 0) + (usage.get("output_tokens") or 0),
+                            "total_tokens": (usage.get("input_tokens") or 0)
+                            + (usage.get("output_tokens") or 0),
                         }
                     elif ai_provider.ai_api_type == "google":
                         raw_data = await self._call_llm_google(
@@ -487,7 +498,9 @@ class AgentNode(BaseNode[AgentProperties]):
                             "total_tokens": usage.get("totalTokenCount"),
                         }
                     else:
-                        return NodeResult(success=False, error=f"Unsupported AI provider: {self.props.provider}")
+                        return NodeResult(
+                            success=False, error=f"Unsupported AI provider: {self.props.provider}"
+                        )
 
                     final_content = content
                     final_raw = raw_data
@@ -511,6 +524,7 @@ class AgentNode(BaseNode[AgentProperties]):
 
                     # Execute each tool call and append results
                     from apps.api.app.node_system.tools.base import ToolResult as _TR
+
                     blocked_this_iteration = 0
                     for tc in tool_calls:
                         tool_id = tc["name"]
@@ -551,7 +565,9 @@ class AgentNode(BaseNode[AgentProperties]):
                             if mcp_client:
                                 result = await mcp_client.call_tool(mcp_tool_name, llm_args)
                             else:
-                                result = _TR(success=False, error=f"MCP server '{server_name}' not found")
+                                result = _TR(
+                                    success=False, error=f"MCP server '{server_name}' not found"
+                                )
                         else:
                             seen_tool_calls.add(call_sig)
                             result = await tool_registry.execute(tool_id, merged_params, context)
@@ -577,14 +593,16 @@ class AgentNode(BaseNode[AgentProperties]):
                         consecutive_blocked += 1
                         if consecutive_blocked >= 2:
                             break
-                        messages.append({
-                            "role": "user",
-                            "content": (
-                                "All your tool calls were duplicates — those results are already above. "
-                                "Do not repeat them. Use the data you already have and complete "
-                                "your remaining tasks now."
-                            ),
-                        })
+                        messages.append(
+                            {
+                                "role": "user",
+                                "content": (
+                                    "All your tool calls were duplicates — those results are already above. "
+                                    "Do not repeat them. Use the data you already have and complete "
+                                    "your remaining tasks now."
+                                ),
+                            }
+                        )
                     else:
                         consecutive_blocked = 0
                 else:
@@ -596,7 +614,8 @@ class AgentNode(BaseNode[AgentProperties]):
                 if not final_content and all_tool_calls:
                     # Explicitly recap successful tool results so weak models don't ask for input
                     successful_results = [
-                        tc for tc in all_tool_calls
+                        tc
+                        for tc in all_tool_calls
                         if tc["success"] and not str(tc.get("result", "")).startswith("Duplicate")
                     ]
                     recap_lines = ["Here are the tool results from this run:"]
@@ -629,7 +648,9 @@ class AgentNode(BaseNode[AgentProperties]):
                                 messages=messages,
                                 tool_specs=tool_specs,
                             )
-                            final_content, summary_tool_calls = self._extract_openai_content_and_tools(summary_raw)
+                            final_content, summary_tool_calls = (
+                                self._extract_openai_content_and_tools(summary_raw)
+                            )
                         elif ai_provider.ai_api_type == "anthropic":
                             summary_raw = await self._call_llm_anthropic(
                                 client=client,
@@ -639,7 +660,9 @@ class AgentNode(BaseNode[AgentProperties]):
                                 messages=messages,
                                 tool_specs=tool_specs,
                             )
-                            final_content, summary_tool_calls = self._extract_anthropic_content_and_tools(summary_raw)
+                            final_content, summary_tool_calls = (
+                                self._extract_anthropic_content_and_tools(summary_raw)
+                            )
                         elif ai_provider.ai_api_type == "google":
                             summary_raw = await self._call_llm_google(
                                 client=client,
@@ -649,13 +672,17 @@ class AgentNode(BaseNode[AgentProperties]):
                                 messages=messages,
                                 tool_specs=tool_specs,
                             )
-                            final_content, summary_tool_calls = self._extract_google_content_and_tools(summary_raw)
+                            final_content, summary_tool_calls = (
+                                self._extract_google_content_and_tools(summary_raw)
+                            )
 
                         # If the summarization response itself has tool calls, execute them.
                         # This is the common case: model wants to call Slack after seeing HTTP data.
                         if summary_tool_calls:
                             messages.append(
-                                self._build_assistant_message(final_content, summary_tool_calls, ai_provider.ai_api_type)
+                                self._build_assistant_message(
+                                    final_content, summary_tool_calls, ai_provider.ai_api_type
+                                )
                             )
                             for tc in summary_tool_calls:
                                 tool_id = tc["name"]
@@ -663,12 +690,16 @@ class AgentNode(BaseNode[AgentProperties]):
                                 user_params = tool_user_params.get(tool_id, {})
                                 merged = {**llm_args, **user_params}
                                 result = await tool_registry.execute(tool_id, merged, context)
-                                all_tool_calls.append({
-                                    "name": tool_id,
-                                    "arguments": llm_args,
-                                    "result": result.output if result.success else {"error": result.error},
-                                    "success": result.success,
-                                })
+                                all_tool_calls.append(
+                                    {
+                                        "name": tool_id,
+                                        "arguments": llm_args,
+                                        "result": result.output
+                                        if result.success
+                                        else {"error": result.error},
+                                        "success": result.success,
+                                    }
+                                )
                             # If only tool calls and no text, set a brief summary
                             if not final_content:
                                 final_content = f"Completed: {', '.join(tc['name'] for tc in summary_tool_calls)}"
@@ -678,19 +709,28 @@ class AgentNode(BaseNode[AgentProperties]):
                     # Hard fallback — API returned success but empty text
                     if not final_content:
                         successful = [tc for tc in all_tool_calls if tc["success"]]
-                        failed = [tc for tc in all_tool_calls if not tc["success"] and "Duplicate call blocked" not in str(tc.get("result", ""))]
+                        failed = [
+                            tc
+                            for tc in all_tool_calls
+                            if not tc["success"]
+                            and "Duplicate call blocked" not in str(tc.get("result", ""))
+                        ]
                         parts = [f"Agent completed {len(all_tool_calls)} tool call(s)."]
                         if successful:
                             parts.append(f"{len(successful)} succeeded.")
                         if failed:
-                            parts.append(f"{len(failed)} failed: " + "; ".join(tc["name"] for tc in failed))
+                            parts.append(
+                                f"{len(failed)} failed: " + "; ".join(tc["name"] for tc in failed)
+                            )
                         final_content = " ".join(parts)
 
             finally:
                 if not context.http_client:
                     await client.aclose()
 
-            output = self._build_output(final_content, model, final_tokens, all_tool_calls, final_raw)
+            output = self._build_output(
+                final_content, model, final_tokens, all_tool_calls, final_raw
+            )
             output["provider"] = self.props.provider
             output["memory"] = await self._persist_memory_async(messages, final_content, context)
             return NodeResult(success=True, output_data=output)
@@ -698,7 +738,9 @@ class AgentNode(BaseNode[AgentProperties]):
         except httpx.HTTPStatusError as e:
             return NodeResult(success=False, error=self._extract_provider_error(e.response))
         except httpx.TimeoutException:
-            return NodeResult(success=False, error=f"Agent request timed out after {self.props.timeout}ms")
+            return NodeResult(
+                success=False, error=f"Agent request timed out after {self.props.timeout}ms"
+            )
         except Exception as e:
             logger.error(f"AgentNode failed: {e}", exc_info=True)
             return NodeResult(success=False, error=str(e))
@@ -711,9 +753,7 @@ class AgentNode(BaseNode[AgentProperties]):
     # Skill helpers
     # ------------------------------------------------------------------
 
-    async def _resolve_skills(
-        self, context: Any
-    ) -> tuple[list[dict[str, str]], dict[str, str]]:
+    async def _resolve_skills(self, context: Any) -> tuple[list[dict[str, str]], dict[str, str]]:
         """Fetch skill metadata + content for selected skill IDs.
 
         Returns:
@@ -771,10 +811,14 @@ class AgentNode(BaseNode[AgentProperties]):
     def _inject_skills_system_prompt(
         self, messages: list[dict[str, Any]], skill_meta: list[dict[str, str]]
     ) -> list[dict[str, Any]]:
-        skills_xml_parts = ["You have access to the following skills. Use the load_skill tool to activate a skill when relevant.\n\n<available_skills>"]
+        skills_xml_parts = [
+            "You have access to the following skills. Use the load_skill tool to activate a skill when relevant.\n\n<available_skills>"
+        ]
         for s in skill_meta:
             desc = s["description"].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            skills_xml_parts.append(f'  <skill name="{s["name"]}">\n    <description>{desc}</description>\n  </skill>')
+            skills_xml_parts.append(
+                f'  <skill name="{s["name"]}">\n    <description>{desc}</description>\n  </skill>'
+            )
         skills_xml_parts.append("</available_skills>")
         skills_section = "\n".join(skills_xml_parts)
 
@@ -787,9 +831,7 @@ class AgentNode(BaseNode[AgentProperties]):
         # No system message — prepend one
         return [{"role": "system", "content": skills_section}, *messages]
 
-    def _ensure_agent_system_prompt(
-        self, messages: list[dict[str, Any]]
-    ) -> list[dict[str, Any]]:
+    def _ensure_agent_system_prompt(self, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Prepend a default system prompt if the user provided none.
 
         Guides the LLM on failure handling and dedup — critical for weaker models.
@@ -808,9 +850,7 @@ class AgentNode(BaseNode[AgentProperties]):
         )
         return [{"role": "system", "content": system_content}, *messages]
 
-    def _build_load_skill_tool(
-        self, skill_meta: list[dict[str, str]]
-    ) -> dict[str, Any]:
+    def _build_load_skill_tool(self, skill_meta: list[dict[str, str]]) -> dict[str, Any]:
         skill_names = [s["name"] for s in skill_meta]
         return {
             "type": "function",
@@ -854,7 +894,9 @@ class AgentNode(BaseNode[AgentProperties]):
                     name = item.get("mcpName") or item.get("title", "")
                     url = item.get("mcpUrl", "")
                     if name and url and name not in seen_names:
-                        servers.append({"name": str(name), "url": str(url), "apiKey": item.get("mcpApiKey")})
+                        servers.append(
+                            {"name": str(name), "url": str(url), "apiKey": item.get("mcpApiKey")}
+                        )
                         seen_names.add(name)
 
         # 2. Fallback: legacy mcpServers prop
@@ -872,7 +914,9 @@ class AgentNode(BaseNode[AgentProperties]):
                     name = item.get("name")
                     url = item.get("url")
                     if name and url and name not in seen_names:
-                        servers.append({"name": str(name), "url": str(url), "apiKey": item.get("apiKey")})
+                        servers.append(
+                            {"name": str(name), "url": str(url), "apiKey": item.get("apiKey")}
+                        )
                         seen_names.add(name)
 
         return servers
@@ -1007,14 +1051,16 @@ class AgentNode(BaseNode[AgentProperties]):
                         }
                         if p.required:
                             params_schema["required"].append(p_name)
-                    tool_specs.append({
-                        "type": "function",
-                        "function": {
-                            "name": tool_def.id,
-                            "description": tool_def.description,
-                            "parameters": params_schema,
-                        },
-                    })
+                    tool_specs.append(
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": tool_def.id,
+                                "description": tool_def.description,
+                                "parameters": params_schema,
+                            },
+                        }
+                    )
                 mcp_clients[name] = mcp_client
             except Exception as e:
                 logger.warning(f"Failed to fetch tools from MCP server '{name}' ({url}): {e}")
@@ -1099,7 +1145,10 @@ class AgentNode(BaseNode[AgentProperties]):
         if tool_specs:
             payload["tools"] = [self._to_anthropic_tool(spec) for spec in tool_specs]
             if tool_choice_override is not None:
-                if isinstance(tool_choice_override, dict) and tool_choice_override.get("type") == "function":
+                if (
+                    isinstance(tool_choice_override, dict)
+                    and tool_choice_override.get("type") == "function"
+                ):
                     fn_name = (tool_choice_override.get("function") or {}).get("name", "")
                     payload["tool_choice"] = {"type": "tool", "name": fn_name}
                 else:
@@ -1248,7 +1297,9 @@ class AgentNode(BaseNode[AgentProperties]):
                 text = delta.get("content") or ""
                 if text:
                     accumulated_content += text
-                    await emitter.emit("agent_chunk", {"node_id": node_id, "delta": text, "iteration": iteration})
+                    await emitter.emit(
+                        "agent_chunk", {"node_id": node_id, "delta": text, "iteration": iteration}
+                    )
                 for tc in delta.get("tool_calls") or []:
                     idx = tc.get("index", 0)
                     if idx not in tool_calls_buffer:
@@ -1294,7 +1345,10 @@ class AgentNode(BaseNode[AgentProperties]):
         if tool_specs:
             payload["tools"] = [self._to_anthropic_tool(spec) for spec in tool_specs]
             if tool_choice_override is not None:
-                if isinstance(tool_choice_override, dict) and tool_choice_override.get("type") == "function":
+                if (
+                    isinstance(tool_choice_override, dict)
+                    and tool_choice_override.get("type") == "function"
+                ):
                     fn_name = (tool_choice_override.get("function") or {}).get("name", "")
                     payload["tool_choice"] = {"type": "tool", "name": fn_name}
                 else:
@@ -1339,7 +1393,9 @@ class AgentNode(BaseNode[AgentProperties]):
                     usage = (data.get("message") or {}).get("usage") or {}
                     tokens["prompt_tokens"] = usage.get("input_tokens")
                     if tokens.get("total_tokens") and tokens.get("prompt_tokens"):
-                        tokens["total_tokens"] = (tokens.get("prompt_tokens") or 0) + (tokens.get("completion_tokens") or 0)
+                        tokens["total_tokens"] = (tokens.get("prompt_tokens") or 0) + (
+                            tokens.get("completion_tokens") or 0
+                        )
                 elif event_type == "content_block_start":
                     block = data.get("content_block") or {}
                     if block.get("type") == "tool_use":
@@ -1355,7 +1411,10 @@ class AgentNode(BaseNode[AgentProperties]):
                     if delta.get("type") == "text_delta":
                         text = delta.get("text") or ""
                         accumulated_text += text
-                        await emitter.emit("agent_chunk", {"node_id": node_id, "delta": text, "iteration": iteration})
+                        await emitter.emit(
+                            "agent_chunk",
+                            {"node_id": node_id, "delta": text, "iteration": iteration},
+                        )
                     elif delta.get("type") == "input_json_delta" and idx in tool_use_blocks:
                         tool_use_blocks[idx]["partial_json"] += delta.get("partial_json") or ""
 
@@ -1408,8 +1467,9 @@ class AgentNode(BaseNode[AgentProperties]):
                         "functionCallingConfig": {"mode": "ANY", "allowedFunctionNames": [fn_name]}
                     }
 
-        stream_url = (url_template.format(model=self._google_model_path(model))
-                      .replace(":generateContent", ":streamGenerateContent"))
+        stream_url = url_template.format(model=self._google_model_path(model)).replace(
+            ":generateContent", ":streamGenerateContent"
+        )
 
         accumulated_text = ""
         tool_calls: list[dict[str, Any]] = []
@@ -1445,14 +1505,19 @@ class AgentNode(BaseNode[AgentProperties]):
                         if "text" in part:
                             text = part["text"]
                             accumulated_text += text
-                            await emitter.emit("agent_chunk", {"node_id": node_id, "delta": text, "iteration": iteration})
+                            await emitter.emit(
+                                "agent_chunk",
+                                {"node_id": node_id, "delta": text, "iteration": iteration},
+                            )
                         if "functionCall" in part:
                             call = part["functionCall"]
-                            tool_calls.append({
-                                "id": call.get("name", ""),
-                                "name": call.get("name", ""),
-                                "arguments": call.get("args") or {},
-                            })
+                            tool_calls.append(
+                                {
+                                    "id": call.get("name", ""),
+                                    "name": call.get("name", ""),
+                                    "arguments": call.get("args") or {},
+                                }
+                            )
 
         return accumulated_text, tool_calls, tokens
 
@@ -1479,11 +1544,13 @@ class AgentNode(BaseNode[AgentProperties]):
                 parsed_args = json.loads(args) if isinstance(args, str) else args
             except json.JSONDecodeError:
                 parsed_args = {}
-            tool_calls.append({
-                "id": tc.get("id", ""),
-                "name": fn.get("name", ""),
-                "arguments": parsed_args,
-            })
+            tool_calls.append(
+                {
+                    "id": tc.get("id", ""),
+                    "name": fn.get("name", ""),
+                    "arguments": parsed_args,
+                }
+            )
         return str(content), tool_calls
 
     def _extract_anthropic_content_and_tools(
@@ -1498,11 +1565,13 @@ class AgentNode(BaseNode[AgentProperties]):
             if block.get("type") == "text":
                 text_parts.append(block.get("text", ""))
             elif block.get("type") == "tool_use":
-                tool_calls.append({
-                    "id": block.get("id", ""),
-                    "name": block.get("name", ""),
-                    "arguments": block.get("input") or {},
-                })
+                tool_calls.append(
+                    {
+                        "id": block.get("id", ""),
+                        "name": block.get("name", ""),
+                        "arguments": block.get("input") or {},
+                    }
+                )
         return "".join(text_parts), tool_calls
 
     def _extract_google_content_and_tools(
@@ -1520,11 +1589,13 @@ class AgentNode(BaseNode[AgentProperties]):
                 text_parts.append(part["text"])
             if "functionCall" in part:
                 call = part["functionCall"]
-                tool_calls.append({
-                    "id": call.get("name", ""),  # Google uses name as ID
-                    "name": call.get("name", ""),
-                    "arguments": call.get("args") or {},
-                })
+                tool_calls.append(
+                    {
+                        "id": call.get("name", ""),  # Google uses name as ID
+                        "name": call.get("name", ""),
+                        "arguments": call.get("args") or {},
+                    }
+                )
         return "".join(text_parts), tool_calls
 
     # ------------------------------------------------------------------
@@ -1542,12 +1613,14 @@ class AgentNode(BaseNode[AgentProperties]):
             if content:
                 content_blocks.append({"type": "text", "text": content})
             for tc in tool_calls:
-                content_blocks.append({
-                    "type": "tool_use",
-                    "id": tc["id"],
-                    "name": tc["name"],
-                    "input": tc.get("arguments") or {},
-                })
+                content_blocks.append(
+                    {
+                        "type": "tool_use",
+                        "id": tc["id"],
+                        "name": tc["name"],
+                        "input": tc.get("arguments") or {},
+                    }
+                )
             return {"role": "assistant", "content": content_blocks}
 
         if api_type == "google":
@@ -1555,12 +1628,14 @@ class AgentNode(BaseNode[AgentProperties]):
             if content:
                 parts.append({"text": content})
             for tc in tool_calls:
-                parts.append({
-                    "functionCall": {
-                        "name": tc["name"],
-                        "args": tc.get("arguments") or {},
+                parts.append(
+                    {
+                        "functionCall": {
+                            "name": tc["name"],
+                            "args": tc.get("arguments") or {},
+                        }
                     }
-                })
+                )
             return {"role": "model", "parts": parts}
 
         # OpenAI-compatible
@@ -1587,7 +1662,9 @@ class AgentNode(BaseNode[AgentProperties]):
         result: Any,  # ToolResult
         api_type: str,
     ) -> dict[str, Any]:
-        result_text = json.dumps(result.output) if result.success else json.dumps({"error": result.error})
+        result_text = (
+            json.dumps(result.output) if result.success else json.dumps({"error": result.error})
+        )
 
         if api_type == "anthropic":
             return {
@@ -1608,7 +1685,9 @@ class AgentNode(BaseNode[AgentProperties]):
                     {
                         "functionResponse": {
                             "name": tc["name"],
-                            "response": result.output if result.success else {"error": result.error},
+                            "response": result.output
+                            if result.success
+                            else {"error": result.error},
                         }
                     }
                 ],
@@ -1647,7 +1726,9 @@ class AgentNode(BaseNode[AgentProperties]):
             )
 
         if credential is None:
-            credential = next((item for item in credentials if item.get("type") == credential_type), None)
+            credential = next(
+                (item for item in credentials if item.get("type") == credential_type), None
+            )
 
         data = credential.get("data") if credential else None
         if not isinstance(data, dict):
@@ -1714,7 +1795,9 @@ class AgentNode(BaseNode[AgentProperties]):
                 role = "user"
                 content = message
 
-            messages.append({"role": self._normalize_role(role), "content": self._stringify_content(content)})
+            messages.append(
+                {"role": self._normalize_role(role), "content": self._stringify_content(content)}
+            )
 
         return messages
 
@@ -1733,13 +1816,19 @@ class AgentNode(BaseNode[AgentProperties]):
             return None
 
         if provider == "google":
-            schema = raw_format.get("schema") if isinstance(raw_format.get("schema"), dict) else raw_format
+            schema = (
+                raw_format.get("schema")
+                if isinstance(raw_format.get("schema"), dict)
+                else raw_format
+            )
             return schema
 
         if isinstance(raw_format.get("type"), str):
             return raw_format
 
-        schema = raw_format.get("schema") if isinstance(raw_format.get("schema"), dict) else raw_format
+        schema = (
+            raw_format.get("schema") if isinstance(raw_format.get("schema"), dict) else raw_format
+        )
         name = raw_format.get("name", "agent_response")
         strict = raw_format.get("strict", True)
 
@@ -1757,6 +1846,7 @@ class AgentNode(BaseNode[AgentProperties]):
 
     def _get_provider(self, context: NodeContext) -> Any:
         from apps.api.app.node_system.nodes.ai.agent.memory.providers import get_memory_provider
+
         # memoryType drives backend selection (workflow → workflow, redis → redis)
         backend = self.props.memoryBackend
         if self.props.memoryType == "redis":
@@ -1765,7 +1855,7 @@ class AgentNode(BaseNode[AgentProperties]):
             backend = "workflow"
         # Extract OpenAI API key for embedding (used by Pinecone/Qdrant)
         openai_key = ""
-        for cred in (context.credentials or []):
+        for cred in context.credentials or []:
             if cred.get("type") == "openai_api_key":
                 openai_key = (cred.get("data") or {}).get("api_key", "")
                 break
@@ -1788,10 +1878,13 @@ class AgentNode(BaseNode[AgentProperties]):
             return messages
         # Sync wrapper — memory providers are async; run in event loop
         import asyncio
+
         provider = self._get_provider(context)
         try:
             loop = asyncio.get_event_loop()
-            memory = loop.run_until_complete(provider.get(self._memory_key(), self.props.memoryLimit))
+            memory = loop.run_until_complete(
+                provider.get(self._memory_key(), self.props.memoryLimit)
+            )
         except RuntimeError:
             # Already inside event loop (normal case)
             memory = []
@@ -1805,7 +1898,8 @@ class AgentNode(BaseNode[AgentProperties]):
         # Caller is async — schedule provider.append as a task (called from async context)
         # Return the new messages list for the output
         new_items = [
-            message for message in messages
+            message
+            for message in messages
             if isinstance(message, dict) and message.get("role") in {"user", "assistant"}
         ]
         if assistant_content:
@@ -1832,8 +1926,7 @@ class AgentNode(BaseNode[AgentProperties]):
         if self.props.memoryType == "none":
             return []
         new_items = [
-            m for m in messages
-            if isinstance(m, dict) and m.get("role") in {"user", "assistant"}
+            m for m in messages if isinstance(m, dict) and m.get("role") in {"user", "assistant"}
         ]
         if assistant_content:
             new_items.append({"role": "assistant", "content": assistant_content})
@@ -1845,11 +1938,13 @@ class AgentNode(BaseNode[AgentProperties]):
         result = []
         for message in memory:
             if isinstance(message, dict) and {"role", "content"} <= set(message):
-                result.append({
-                    "role": self._normalize_role(message["role"]),
-                    "content": self._stringify_content(message["content"]),
-                })
-        return result[-max(self.props.memoryLimit, 1):]
+                result.append(
+                    {
+                        "role": self._normalize_role(message["role"]),
+                        "content": self._stringify_content(message["content"]),
+                    }
+                )
+        return result[-max(self.props.memoryLimit, 1) :]
 
     # ------------------------------------------------------------------
     # Tool format converters (for legacy format + provider-specific)
@@ -1869,7 +1964,11 @@ class AgentNode(BaseNode[AgentProperties]):
 
     def _to_anthropic_tool(self, openai_spec: dict[str, Any]) -> dict[str, Any]:
         """Convert an OpenAI-format tool spec to Anthropic format."""
-        fn = openai_spec.get("function") if isinstance(openai_spec.get("function"), dict) else openai_spec
+        fn = (
+            openai_spec.get("function")
+            if isinstance(openai_spec.get("function"), dict)
+            else openai_spec
+        )
         return {
             "name": fn.get("name", ""),
             "description": fn.get("description", ""),
@@ -1878,7 +1977,11 @@ class AgentNode(BaseNode[AgentProperties]):
 
     def _to_google_tool(self, openai_spec: dict[str, Any]) -> dict[str, Any]:
         """Convert an OpenAI-format tool spec to Google format."""
-        fn = openai_spec.get("function") if isinstance(openai_spec.get("function"), dict) else openai_spec
+        fn = (
+            openai_spec.get("function")
+            if isinstance(openai_spec.get("function"), dict)
+            else openai_spec
+        )
         return {
             "name": fn.get("name", ""),
             "description": fn.get("description", ""),

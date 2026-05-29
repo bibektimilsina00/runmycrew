@@ -8,7 +8,7 @@ from apps.api.app.node_system.tools.registry import tool_registry
 
 
 async def _execute_workflow(params: dict[str, Any], context: NodeContext) -> ToolResult:
-    workflow_id = params.get('workflowId')
+    workflow_id = params.get("workflowId")
     if not workflow_id:
         return ToolResult(success=False, error="workflowId is required")
     if not context.db:
@@ -32,7 +32,7 @@ async def _execute_workflow(params: dict[str, Any], context: NodeContext) -> Too
             credentials=context.credentials,
         )
 
-        trigger_data = {k: v for k, v in params.items() if k != 'workflowId'}
+        trigger_data = {k: v for k, v in params.items() if k != "workflowId"}
         result = await runner.run(trigger_data)
         return ToolResult(success=True, output=result)
     except Exception as e:
@@ -41,20 +41,20 @@ async def _execute_workflow(params: dict[str, Any], context: NodeContext) -> Too
 
 tool_registry.register(
     ToolDefinition(
-        id='workflow_executor',
-        name='Run Workflow',
-        description='Execute another workflow as a tool',
+        id="workflow_executor",
+        name="Run Workflow",
+        description="Execute another workflow as a tool",
         params={
-            'workflowId': ToolParam(
-                type='string',
+            "workflowId": ToolParam(
+                type="string",
                 required=True,
-                visibility='user-only',
-                description='ID of the workflow to run',
+                visibility="user-only",
+                description="ID of the workflow to run",
             ),
-            'input': ToolParam(
-                type='json',
-                visibility='user-or-llm',
-                description='Input data for the workflow',
+            "input": ToolParam(
+                type="json",
+                visibility="user-or-llm",
+                description="Input data for the workflow",
             ),
         },
     ),

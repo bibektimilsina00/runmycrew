@@ -202,12 +202,15 @@ class NotionNode(BaseNode[NotionProperties]):
                     properties=self.props.properties,
                     content=self.props.content if isinstance(self.props.content, list) else None,
                 )
-                return NodeResult(success=True, output_data={
-                    "id": page.get("id"),
-                    "url": page.get("url"),
-                    "title": self.props.title,
-                    "properties": page.get("properties", {}),
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "id": page.get("id"),
+                        "url": page.get("url"),
+                        "title": self.props.title,
+                        "properties": page.get("properties", {}),
+                    },
+                )
 
             elif op == "get_page":
                 page_id = _clean_id(self.props.page_id)
@@ -236,7 +239,9 @@ class NotionNode(BaseNode[NotionProperties]):
 
                 result = await service.get_page_content(page_id=page_id)
                 blocks = result.get("results", [])
-                return NodeResult(success=True, output_data={"blocks": blocks, "count": len(blocks)})
+                return NodeResult(
+                    success=True, output_data={"blocks": blocks, "count": len(blocks)}
+                )
 
             elif op == "append_content":
                 page_id = _clean_id(self.props.page_id)
@@ -245,7 +250,9 @@ class NotionNode(BaseNode[NotionProperties]):
 
                 children = self.props.content
                 if not isinstance(children, list):
-                    return NodeResult(success=False, error="content must be a JSON array of block objects")
+                    return NodeResult(
+                        success=False, error="content must be a JSON array of block objects"
+                    )
 
                 result = await service.append_block_children(page_id=page_id, children=children)
                 return NodeResult(success=True, output_data=result)
@@ -262,16 +269,21 @@ class NotionNode(BaseNode[NotionProperties]):
                     page_size=self.props.page_size,
                 )
                 results = result.get("results", [])
-                return NodeResult(success=True, output_data={
-                    "results": results,
-                    "count": len(results),
-                    "has_more": result.get("has_more", False),
-                    "next_cursor": result.get("next_cursor"),
-                })
+                return NodeResult(
+                    success=True,
+                    output_data={
+                        "results": results,
+                        "count": len(results),
+                        "has_more": result.get("has_more", False),
+                        "next_cursor": result.get("next_cursor"),
+                    },
+                )
 
             elif op == "list_databases":
                 databases = await service.list_databases()
-                return NodeResult(success=True, output_data={"databases": databases, "count": len(databases)})
+                return NodeResult(
+                    success=True, output_data={"databases": databases, "count": len(databases)}
+                )
 
             else:
                 return NodeResult(success=False, error=f"Unsupported operation: {op}")

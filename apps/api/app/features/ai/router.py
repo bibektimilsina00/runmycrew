@@ -1,5 +1,9 @@
 from fastapi import APIRouter, Depends, Query
 
+from apps.api.app.credential_manager.api_keys import (
+    get_ai_provider_ids,
+    get_ai_providers,
+)
 from apps.api.app.features.ai.schemas import (
     AIModelResponse,
     AIProviderData,
@@ -7,10 +11,6 @@ from apps.api.app.features.ai.schemas import (
     AIStatusResponse,
 )
 from apps.api.app.features.ai.service import AIService, get_ai_service
-from apps.api.app.features.credentials.manager.api_keys import (
-    get_ai_provider_ids,
-    get_ai_providers,
-)
 from apps.api.app.features.users.models import User
 from apps.api.app.shared.dependencies import get_current_user
 

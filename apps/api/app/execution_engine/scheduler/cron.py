@@ -11,6 +11,7 @@ REDIS_KEY_PREFIX = "fuse:cron:last_run"
 @celery_app.task(name="check_cron_triggers")
 def check_cron_triggers():
     import asyncio
+
     asyncio.run(_check_and_fire())
 
 
@@ -48,7 +49,9 @@ async def _check_and_fire():
 
             try:
                 if not croniter.is_valid(cron_expr):
-                    logger.warning(f"Invalid cron expression '{cron_expr}' on workflow {workflow.id}")
+                    logger.warning(
+                        f"Invalid cron expression '{cron_expr}' on workflow {workflow.id}"
+                    )
                     continue
 
                 citer = croniter(cron_expr, now)
