@@ -2,7 +2,7 @@ import { Plus, X, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/cn'
 import type { NodeDefinition, NodeProperty } from '../../../../types/editorTypes'
-import { evaluateDisplayOptions } from '../../utils/inspector-visibility'
+import { shouldShowProperty } from '../../../../utils/nodeUtils'
 // Lazy import to avoid circular dep — PropertyField imports from this registry
 import { PropertyField } from '../PropertyField'
 
@@ -96,7 +96,7 @@ interface SingleItemProps {
 }
 
 function SingleItem({ subProps, definition, item, onChange, allValues }: SingleItemProps) {
-  const visible = subProps.filter(p => p.visibility !== 'hidden' && evaluateDisplayOptions(p, { ...allValues, ...item }))
+  const visible = subProps.filter(p => p.visibility !== 'hidden' && shouldShowProperty(p, { ...allValues, ...item }))
   return (
     <div className="flex flex-col gap-3 rounded-[8px] border border-border-faint bg-bg p-3">
       {visible.map(p => (
@@ -127,7 +127,7 @@ interface CollapsibleItemProps {
 
 function CollapsibleItem({ index, subProps, definition, item, onUpdate, onRemove, allValues }: CollapsibleItemProps) {
   const [open, setOpen] = useState(true)
-  const visible = subProps.filter(p => p.visibility !== 'hidden' && evaluateDisplayOptions(p, { ...allValues, ...item }))
+  const visible = subProps.filter(p => p.visibility !== 'hidden' && shouldShowProperty(p, { ...allValues, ...item }))
 
   return (
     <div className="rounded-[8px] border border-border-faint bg-bg overflow-hidden">

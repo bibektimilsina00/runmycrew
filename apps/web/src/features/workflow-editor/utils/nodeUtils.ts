@@ -1,4 +1,4 @@
-import type { NodeProperty } from '../types/editorTypes'
+import type { NodeProperty, PropertyCondition } from '../types/editorTypes'
 
 export const getPropValuePreview = (val: unknown, propType: string): string => {
   if (val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)) return '-'
@@ -16,15 +16,24 @@ export const getDynamicLabel = (prop: NodeProperty, mode: 'manual' | 'dynamic' =
   return prop.label
 }
 
+function matchesCondition(condition: PropertyCondition, values: Record<string, unknown>): boolean {
+  if ('all' in condition) return condition.all.every(c => matchesCondition(c, values))
+  if ('any' in condition) return condition.any.some(c => matchesCondition(c, values))
+  const current = values[condition.field]
+  if (Array.isArray(condition.value)) return condition.value.includes(current)
+  return current === condition.value
+}
+
+// Single source of truth for property visibility, shared by the canvas node and
+// the inspector. A property is shown unless its `condition` is set and doesn't
+// match — supporting leaf { field, value } and composite { all | any: [...] }.
 export const shouldShowProperty = (
   prop: NodeProperty,
-  properties: Record<string, unknown>,
+  values: Record<string, unknown>,
 ): boolean => {
-  if (!prop.condition) return true
-  const { field, value } = prop.condition as { field: string; value: unknown }
-  const current = properties[field]
-  if (Array.isArray(value)) return value.includes(current)
-  return current === value
+  const { condition } = prop
+  if (!condition) return true
+  return matchesCondition(condition, values)
 }
 
 // Properties shown on the canvas node: never hidden, advanced ones only when

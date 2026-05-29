@@ -74,7 +74,16 @@ class HttpRequestNode(BaseNode[HttpRequestProperties]):
                     "required": False,
                     "mode": "advanced",
                 },
-                {"name": "body", "label": "Body", "type": "json", "required": False},
+                {
+                    "name": "body",
+                    "label": "Body",
+                    "type": "json",
+                    "required": False,
+                    "condition": {
+                        "field": "method",
+                        "value": ["POST", "PUT", "PATCH", "DELETE"],
+                    },
+                },
                 {
                     "name": "formData",
                     "label": "Form Data",

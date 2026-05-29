@@ -8,7 +8,7 @@ interface NodeHeaderProps {
 }
 
 export const NodeHeader = ({ label, icon, color }: NodeHeaderProps) => (
-  <div className="flex items-center gap-2 px-2.5 py-2 border-b border-border-faint">
+  <div className="flex items-center gap-2 px-2.5 py-1.5 border-b border-border-faint">
     <div
       className="flex size-[20px] shrink-0 items-center justify-center rounded-[5px]"
       style={{ background: color ?? 'var(--surface-3)' }}

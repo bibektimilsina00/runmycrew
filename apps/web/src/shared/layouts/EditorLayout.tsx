@@ -21,7 +21,7 @@ export function EditorLayout() {
       <AppSidebar controller={controller} />
 
       <div className="relative flex h-screen min-h-0 flex-col overflow-hidden">
-        <Outlet />
+        <Outlet context={controller} />
       </div>
 
       <AppOverlays controller={controller} />

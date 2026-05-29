@@ -60,17 +60,18 @@ export interface TypeOptions {
   [key: string]: unknown
 }
 
-// Display conditions (replaces legacy `condition`)
-export interface DisplayOptions {
-  show?: Record<string, unknown[]>  // show when ALL field conditions match
-  hide?: Record<string, unknown[]>  // hide when ANY field condition matches
-}
-
 export interface NodePropertyOption {
   label: string
   value: unknown
   description?: string
 }
+
+// Property visibility condition: a leaf (field equals value, or is one of value[])
+// or a composite of nested conditions joined by `all` (every) / `any` (some).
+export type PropertyCondition =
+  | { field: string; value: unknown }
+  | { all: PropertyCondition[] }
+  | { any: PropertyCondition[] }
 
 export interface NodeProperty {
   name: string
@@ -81,10 +82,8 @@ export interface NodeProperty {
   required?: boolean | { field: string; value: unknown }
   options?: NodePropertyOption[]
   placeholder?: string
-  // New: replaces legacy `condition`
-  displayOptions?: DisplayOptions
-  // Legacy: kept for backward compat
-  condition?: unknown
+  // Conditional visibility — leaf { field, value } or composite { all | any: [...] }
+  condition?: PropertyCondition
   // Per-type renderer config
   typeOptions?: TypeOptions
   // Sub-properties (for collection / fixed-collection)
@@ -120,6 +119,14 @@ export interface NodeDefinition {
 
 // ── Node definitions (from backend /nodes/) ───────────────────────────────────
 
+const ConditionSchema: z.ZodType<PropertyCondition> = z.lazy(() =>
+  z.union([
+    z.object({ field: z.string(), value: z.any() }),
+    z.object({ all: z.array(ConditionSchema) }),
+    z.object({ any: z.array(ConditionSchema) }),
+  ])
+)
+
 const NodePropertySchema: z.ZodType<NodeProperty> = z.lazy(() =>
   z.object({
     name:        z.string(),
@@ -130,11 +137,7 @@ const NodePropertySchema: z.ZodType<NodeProperty> = z.lazy(() =>
     required:    z.union([z.boolean(), z.object({ field: z.string(), value: z.any() })]).optional(),
     options:     z.array(z.object({ label: z.string(), value: z.any(), description: z.string().optional() })).optional(),
     placeholder: z.string().optional(),
-    displayOptions: z.object({
-      show: z.record(z.string(), z.array(z.any())).optional(),
-      hide: z.record(z.string(), z.array(z.any())).optional(),
-    }).optional(),
-    condition:   z.any().optional(),
+    condition:   ConditionSchema.optional(),
     typeOptions: z.record(z.string(), z.any()).optional(),
     properties:  z.array(NodePropertySchema).optional(),
     credentialType: z.union([z.string(), z.array(z.string())]).nullable().optional(),

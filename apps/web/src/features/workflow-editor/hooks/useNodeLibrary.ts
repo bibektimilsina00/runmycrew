@@ -17,6 +17,7 @@ export const CATEGORY_LABEL: Record<string, string> = {
 export function useNodeLibrary() {
   const nodeDefinitions = useWorkflowEditorStore(s => s.nodeDefinitions)
   const setNodes = useWorkflowEditorStore(s => s.setNodes)
+  const pushHistory = useWorkflowEditorStore(s => s.pushHistory)
   const [query, setQuery] = useState('')
   const { screenToFlowPosition } = useReactFlow()
 
@@ -46,6 +47,7 @@ export function useNodeLibrary() {
     const position = screenToFlowPosition({ x: canvasCenterX, y: canvasCenterY })
     position.x += (Math.random() - 0.5) * 80
     position.y += (Math.random() - 0.5) * 80
+    pushHistory()
     setNodes(ns => [...ns, {
       id: crypto.randomUUID(),
       type: def.type,

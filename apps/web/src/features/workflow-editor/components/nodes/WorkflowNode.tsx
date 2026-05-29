@@ -43,7 +43,7 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
           executionStatus === 'completed' && 'node-status-completed',
           executionStatus === 'failed'    && 'node-status-failed',
           executionStatus === 'running'   && 'border-border',
-          !executionStatus && selected && !isLocked && 'border-accent-line',
+          !executionStatus && selected && !isLocked && 'border-[var(--text-dim)] shadow-[0_0_0_1px_var(--text-dim)]',
           !executionStatus && (!selected || isLocked) && 'border-border',
         )}
       >
@@ -56,7 +56,7 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
           color={definition.color}
         />
 
-        <div className="flex flex-col gap-0.5 py-2">
+        <div className="flex flex-col gap-0.5 py-1.5">
           {visibleProps.map(prop => {
             const modes = (data.properties as Record<string, unknown>)?._modes as Record<string, string> | undefined
             const mode = modes?.[prop.name] ?? (prop.loadOptions ? 'dynamic' : 'manual')
