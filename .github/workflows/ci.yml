@@ -11,8 +11,31 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend — ruff + pytest
+    name: Backend — ruff + migrations + pytest
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: fuse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -26,6 +49,18 @@ jobs:
 
       - name: Ruff format check
         run: uv run --project apps/api ruff format --check apps/api apps/worker
+
+      - name: Apply migrations
+        working-directory: apps/api
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: uv run alembic upgrade head
+
+      - name: Migration drift check
+        working-directory: apps/api
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: uv run alembic check
 
       - name: Pytest
         env:

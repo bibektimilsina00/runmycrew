@@ -4,6 +4,7 @@ setup:
 	pnpm install
 	cd apps/api && uv sync
 	cd apps/worker && uv sync
+	uvx pre-commit install
 
 dev:
 	pnpm dev
