@@ -135,7 +135,7 @@ async def run_copilot(
     from apps.api.app.features.copilot.repository import CopilotSessionRepository
     from apps.api.app.features.workflows.repository import WorkflowRepository
 
-    known_types = {m["type"] for m in node_metadata}
+    meta_by_type = {m["type"]: m for m in node_metadata}
     system_prompt = build_system_prompt(graph, node_metadata)
     current_graph = json.loads(json.dumps(graph))
 
@@ -195,38 +195,64 @@ async def run_copilot(
                 # ── edit_workflow ─────────────────────────────────────────
                 if tool_name == "edit_workflow":
                     operations: list[dict[str, Any]] = args.get("operations", [])
-                    updated_graph, errors = apply_operations(current_graph, operations, known_types)
+                    res = apply_operations(current_graph, operations, meta_by_type)
+                    current_graph = res["graph"]
 
-                    if errors:
-                        result: dict[str, Any] = {"success": False, "errors": errors}
-                        all_tool_calls.append(
-                            {"name": tool_name, "success": False, "result": {"error": str(errors)}}
+                    # Persist updated graph to DB (interim — switches to propose/accept in M3/M4)
+                    try:
+                        repo = WorkflowRepository(db)
+                        wf = await repo.get_by_id(uuid.UUID(workflow_id))
+                        if wf:
+                            await repo.update(wf, {"graph": current_graph})
+                    except Exception as e:
+                        logger.error(f"Failed to persist graph: {e}", exc_info=True)
+
+                    # Structured feedback so the model self-corrects (save valid parts)
+                    result: dict[str, Any] = {
+                        "success": True,
+                        "applied": len(res["applied"]),
+                        "nodes": len(current_graph.get("nodes", [])),
+                        "edges": len(current_graph.get("edges", [])),
+                    }
+                    if res["input_errors"]:
+                        msgs = [
+                            f"{e.get('node_id', '?')}.{e['field']}: {e['error']}"
+                            for e in res["input_errors"]
+                        ]
+                        result["input_validation_errors"] = msgs
+                        result["input_validation_message"] = (
+                            f"{len(msgs)} input(s) rejected (valid inputs were kept): "
+                            + "; ".join(msgs)
                         )
-                        yield _sse(
-                            "tool_result", {"tool": tool_name, "success": False, "errors": errors}
+                    if res["skipped"]:
+                        msgs = [f"{s.get('op')}: {s['reason']}" for s in res["skipped"]]
+                        result["skipped_items"] = msgs
+                        result["skipped_message"] = (
+                            f"{len(msgs)} operation(s) skipped: " + "; ".join(msgs)
                         )
-                    else:
-                        current_graph = updated_graph
+                    if res["lint"]:
+                        result["lint"] = res["lint"]
 
-                        # Persist updated graph to DB
-                        try:
-                            repo = WorkflowRepository(db)
-                            wf = await repo.get_by_id(uuid.UUID(workflow_id))
-                            if wf:
-                                await repo.update(wf, {"graph": current_graph})
-                        except Exception as e:
-                            logger.error(f"Failed to persist graph: {e}", exc_info=True)
-
-                        result = {
+                    all_tool_calls.append({"name": tool_name, "success": True, "result": result})
+                    yield _sse(
+                        "tool_result",
+                        {
+                            "tool": tool_name,
                             "success": True,
-                            "nodes": len(current_graph.get("nodes", [])),
-                            "edges": len(current_graph.get("edges", [])),
-                        }
-                        all_tool_calls.append(
-                            {"name": tool_name, "success": True, "result": result}
-                        )
-                        yield _sse("tool_result", {"tool": tool_name, "success": True})
-                        yield _sse("workflow_updated", {"graph": current_graph})
+                            "applied": len(res["applied"]),
+                            **(
+                                {"input_validation_message": result["input_validation_message"]}
+                                if res["input_errors"]
+                                else {}
+                            ),
+                            **(
+                                {"skipped_message": result["skipped_message"]}
+                                if res["skipped"]
+                                else {}
+                            ),
+                        },
+                    )
+                    yield _sse("workflow_updated", {"graph": current_graph})
 
                 # ── get_node_metadata ─────────────────────────────────────
                 elif tool_name == "get_node_metadata":

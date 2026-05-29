@@ -69,3 +69,26 @@ def auto_layout(nodes: list[dict[str, Any]], edges: list[dict[str, Any]]) -> lis
             node["position"] = positions[node["id"]]
 
     return nodes
+
+
+def layout_new_nodes(
+    nodes: list[dict[str, Any]],
+    edges: list[dict[str, Any]],
+    fixed_ids: set[str],
+) -> list[dict[str, Any]]:
+    """Assign positions only to nodes NOT in `fixed_ids` (newly added). Existing
+    user-positioned nodes keep their coordinates — copilot never reflows the canvas.
+
+    Computes the DAG column layout over the whole graph (so new nodes land in
+    sensible columns relative to existing ones), but only writes the new nodes.
+    """
+    if all(n["id"] in fixed_ids for n in nodes):
+        return nodes
+
+    laid_out = auto_layout([dict(n) for n in nodes], edges)
+    computed = {n["id"]: n.get("position") for n in laid_out}
+
+    for node in nodes:
+        if node["id"] not in fixed_ids and node["id"] in computed:
+            node["position"] = computed[node["id"]]
+    return nodes
