@@ -22,7 +22,7 @@ import json, math, re, datetime, collections
 from typing import Any
 
 input = __input__
-output = {}
+output = {{}}
 logs = []
 
 {code}
