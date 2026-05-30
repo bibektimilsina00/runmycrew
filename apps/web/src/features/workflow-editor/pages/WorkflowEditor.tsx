@@ -1,11 +1,12 @@
-import { useMemo } from 'react'
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { useParams, useNavigate, useOutletContext, useLocation } from 'react-router-dom'
 import { ReactFlowProvider } from 'reactflow'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import type { AppLayoutController } from '@/shared/layouts/app-layout/use-app-layout-controller'
 import { useWorkflowEditor } from '../hooks/useWorkflowEditor'
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts'
 import { useCopilotDiffStore } from '../stores/copilotDiffStore'
+import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { EditorTopbar } from '../components/topbar/EditorTopbar'
 import { EditorCanvas } from '../components/canvas/EditorCanvas'
 import { EditorRightPanel } from '../components/right-panel/EditorRightPanel'
@@ -57,6 +58,21 @@ export function WorkflowEditor() {
   }, [diffActive, proposed, baseline, summary, nodes])
 
   const canvasEdges = diffActive && proposed ? proposed.edges : edges
+
+  // Auto-seed Copilot when the dashboard prompt navigates here with a seed.
+  const location = useLocation()
+  const initialSeed = (location.state as { copilotSeed?: string } | null)?.copilotSeed
+  useEffect(() => {
+    if (!initialSeed || !workflow?.id) return
+    // Clear nav state so refresh / back doesn't re-fire
+    navigate(location.pathname, { replace: true, state: {} })
+    useWorkflowEditorStore.getState().setInspectorTab('copilot')
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('copilot-send-message', { detail: { message: initialSeed } }))
+    }, 250)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSeed, workflow?.id])
 
   if (isLoading) return <EditorLoading />
   if (error || !workflow) return <EditorError onBack={() => navigate(APP_ROUTES.AUTOMATIONS)} />
