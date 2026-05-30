@@ -62,6 +62,14 @@ class Settings(BaseSettings):
     CODE_SANDBOX_NODE_IMAGE: str = "node:22-alpine"
     CODE_SANDBOX_MEMORY_MB: int = 512
 
+    # Copilot fallback API keys — used by /copilot/{id}/chat ONLY, when the user
+    # has no stored credential for that provider. Lets the Copilot run against a
+    # shared/dev key without provisioning per-user credentials. All optional.
+    GEMINI_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
+    ANTHROPIC_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+
     # Observability — error tracking is off unless SENTRY_DSN is set.
     SENTRY_DSN: str = ""
     SENTRY_TRACES_SAMPLE_RATE: float = 0.0

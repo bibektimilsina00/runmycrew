@@ -1,10 +1,10 @@
 import json
-import os
 import uuid
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.app.core.config import settings
 from apps.api.app.core.database import get_db
 from apps.api.app.credential_manager.api_keys import get_ai_providers
 from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
@@ -29,9 +29,10 @@ _PROVIDER_DEFAULT_MODELS: dict[str, str] = {
     "groq": "llama-3.3-70b-versatile",
 }
 
-# Per-provider env var checked when the user has no stored credential — lets the
-# Copilot run against a shared/dev key without provisioning credentials per user.
-_PROVIDER_ENV_KEYS: dict[str, str] = {
+# Per-provider Settings field checked when the user has no stored credential —
+# Settings loads these from the root .env (see core/config.py). Lets the Copilot
+# run against a shared/dev key without provisioning credentials per user.
+_PROVIDER_SETTINGS_KEYS: dict[str, str] = {
     "openai": "OPENAI_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
     "google": "GEMINI_API_KEY",
@@ -91,12 +92,12 @@ class CopilotService:
             except Exception:
                 pass
 
-        # Final fallback: a shared key from the environment (dev/single-user setups).
-        env_var = _PROVIDER_ENV_KEYS.get(provider)
-        if env_var:
-            env_key = os.environ.get(env_var)
-            if env_key:
-                return env_key
+        # Final fallback: a shared key from Settings (loaded from the root .env).
+        settings_key = _PROVIDER_SETTINGS_KEYS.get(provider)
+        if settings_key:
+            fallback = getattr(settings, settings_key, "") or ""
+            if fallback:
+                return fallback
 
         return None
 
