@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
 import { ReactFlowProvider } from 'reactflow'
 import { APP_ROUTES } from '@/shared/constants/routes'
@@ -6,6 +6,8 @@ import type { AppLayoutController } from '@/shared/layouts/app-layout/use-app-la
 import { useWorkflowEditor } from '../hooks/useWorkflowEditor'
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts'
 import { useCopilotDiffStore } from '../stores/copilotDiffStore'
+import { useCopilotPendingStore } from '../stores/copilotPendingStore'
+import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { EditorTopbar } from '../components/topbar/EditorTopbar'
 import { EditorCanvas } from '../components/canvas/EditorCanvas'
 import { EditorRightPanel } from '../components/right-panel/EditorRightPanel'
@@ -57,6 +59,15 @@ export function WorkflowEditor() {
   }, [diffActive, proposed, baseline, summary, nodes])
 
   const canvasEdges = diffActive && proposed ? proposed.edges : edges
+
+  // If we arrived with a parked prompt (e.g. from the dashboard), open the
+  // Copilot tab so the panel mounts and consumes it on its own.
+  const hasPending = useCopilotPendingStore(s => !!s.prompt)
+  useEffect(() => {
+    if (hasPending && workflow?.id) {
+      useWorkflowEditorStore.getState().setInspectorTab('copilot')
+    }
+  }, [hasPending, workflow?.id])
 
   if (isLoading) return <EditorLoading />
   if (error || !workflow) return <EditorError onBack={() => navigate(APP_ROUTES.AUTOMATIONS)} />

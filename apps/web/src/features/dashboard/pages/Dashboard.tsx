@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GreetingRow }      from '../components/GreetingRow'
 import { StatsGrid }        from '../components/StatsGrid'
 import { PromptCard }       from '../components/PromptCard'
+import { SuggestionChips }  from '../components/SuggestionChips'
 import { RecentRuns }       from '../components/RecentRuns'
 import { SchedulePanel }    from '../components/SchedulePanel'
 import { ConnectionsPanel } from '../components/ConnectionsPanel'
@@ -17,10 +19,17 @@ const SKELETON_STATS: DashboardStat[] = [
   { label: 'Active workflows', value: '—', unit: '',   delta: '—', delta_dir: 'flat', spark: [] },
 ]
 
+const SUGGESTIONS = [
+  'Every weekday at 9am, summarize new GitHub issues and post to Slack',
+  'When a new row is added to Notion, send a welcome email',
+  'Fetch JSON from an API and save it to a database',
+]
+
 export function Dashboard() {
   const navigate = useNavigate()
   const { data } = useDashboard()
   const ai = useAIGenerator()
+  const [prompt, setPrompt] = useState('')
 
   const stats       = data?.stats       ?? SKELETON_STATS
   const recentRuns  = data?.recent_runs ?? []
@@ -28,17 +37,31 @@ export function Dashboard() {
   const connections = data?.connections ?? []
   const totalToday  = data?.total_today ?? 0
 
+  const submit = () => {
+    const text = prompt.trim()
+    if (!text || ai.creating) return
+    void ai.generate(text)
+  }
+
   return (
     <div className="p-[24px_28px_28px] flex flex-col gap-[24px] max-w-[1240px] w-full mx-auto flex-1">
       <GreetingRow />
       <StatsGrid items={stats} />
 
-      <PromptCard
-        onSubmit={ai.generate}
-        busy={ai.creating}
-        statusMessage={ai.message}
-        onCancel={ai.cancel}
-      />
+      <div className="flex flex-col gap-3">
+        <PromptCard
+          prompt={prompt}
+          onPromptChange={setPrompt}
+          onSubmit={submit}
+          busy={ai.creating}
+          statusMessage={ai.statusMessage}
+        />
+        <SuggestionChips
+          suggestions={SUGGESTIONS}
+          onPick={setPrompt}
+          disabled={ai.creating}
+        />
+      </div>
 
       <div className="grid grid-cols-[minmax(0,1fr)_320px] gap-[24px]">
         <RecentRuns

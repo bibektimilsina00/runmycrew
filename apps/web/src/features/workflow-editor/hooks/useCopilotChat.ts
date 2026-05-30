@@ -4,6 +4,7 @@ import { HelpCircle, Code2, Search, Wrench, Sparkles } from 'lucide-react'
 import { streamCopilotChat, copilotAPI, type SessionItem } from '../services/copilotAPI'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { useCopilotDiffStore } from '../stores/copilotDiffStore'
+import { useCopilotPendingStore } from '../stores/copilotPendingStore'
 
 export interface ChatMessage {
   role: 'user' | 'assistant'
@@ -207,6 +208,17 @@ export function useCopilotChat() {
     window.addEventListener('copilot-send-message', handler)
     return () => window.removeEventListener('copilot-send-message', handler)
   }, [])
+
+  // Pending-prompt handoff (e.g. dashboard → editor): consume once on mount.
+  const seedConsumedRef = useRef(false)
+  useEffect(() => {
+    if (!workflowId || seedConsumedRef.current) return
+    const seed = useCopilotPendingStore.getState().consume()
+    if (seed) {
+      seedConsumedRef.current = true
+      void sendRef.current(seed)
+    }
+  }, [workflowId])
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (slashOpen) {
