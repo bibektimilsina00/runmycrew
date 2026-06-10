@@ -67,8 +67,8 @@ export function useAppLayoutController() {
     Workspace: true,
     Operate: true,
     Workflows: true,
-    Data: false,
-    Integrations: false,
+    Data: true,
+    Integrations: true,
   })
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)

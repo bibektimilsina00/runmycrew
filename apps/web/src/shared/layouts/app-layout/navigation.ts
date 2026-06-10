@@ -58,3 +58,5 @@ export const NAV_LINK_CLASS =
 
 export const ACTIVE_NAV_LINK_CLASS =
   "bg-[var(--surface)] text-[var(--text)] group-data-[collapsed=true]/shell:shadow-[inset_0_0_0_1px_var(--border-soft)] before:content-[''] before:w-[3px] before:h-[14px] before:bg-[var(--text)] before:rounded-[0_2px_2px_0] before:absolute before:left-0 group-data-[collapsed=true]/shell:before:hidden"
+
+

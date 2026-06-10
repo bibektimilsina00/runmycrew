@@ -8,12 +8,28 @@ import { cn } from '@/lib/cn'
 import { Spinner } from '@/shared/components'
 import { Icons } from '@/shared/components/icons'
 import type { AppLayoutController } from './use-app-layout-controller'
-import { ACTIVE_NAV_LINK_CLASS, MENU_ITEM_CLASS, NAV_GROUPS, NAV_LINK_CLASS } from './navigation'
+import { NAV_GROUPS } from './navigation'
 import { DropdownMenu } from './dropdown-menu'
 
 interface AppSidebarProps {
   controller: AppLayoutController
 }
+
+/** Base class for all nav items — used by NavLink, workflow and folder rows */
+const NAV_ITEM =
+  'flex items-center gap-[10px] py-[6px] px-[10px] rounded-[8px] text-[13px] font-medium text-[var(--text-mute)] w-full cursor-pointer transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[15px] [&_svg]:h-[15px] [&_svg]:shrink-0 [&_svg]:text-current [&_svg]:opacity-80 relative no-underline'
+
+const NAV_ITEM_ACTIVE =
+  "bg-[var(--surface)] text-[var(--text)] [&_svg]:opacity-100"
+
+const SECTION_HEADER =
+  'flex items-center gap-[6px] px-[10px] pt-[6px] pb-[4px] select-none group-data-[collapsed=true]/shell:hidden'
+
+const ACTION_BTN =
+  'w-[20px] h-[20px] rounded-[5px] inline-flex items-center justify-center text-[var(--text-faint)] transition-colors duration-100 shrink-0 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[12px] [&_svg]:h-[12px]'
+
+const MENU_ITEM =
+  'flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0'
 
 export function AppSidebar({ controller }: AppSidebarProps) {
   const {
@@ -47,87 +63,150 @@ export function AppSidebar({ controller }: AppSidebarProps) {
     <aside className="relative h-[calc(100vh-28px)] my-[14px] ml-[14px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] flex flex-col overflow-hidden shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)] z-20">
       <SidebarHeader collapsed={collapsed} onToggleCollapsed={() => setCollapsed(value => !value)} />
 
-      <div className="flex-1 min-h-0 overflow-y-auto pt-[8px] px-[10px] pb-[10px] flex flex-col gap-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] group-data-[collapsed=true]/shell:px-[8px]">
+      {/* ── Nav scroll area ─────────────────────────────────── */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-[8px] pb-[8px] flex flex-col [&::-webkit-scrollbar]:hidden [scrollbar-width:none] group-data-[collapsed=true]/shell:px-[6px]">
         {NAV_GROUPS.map((section, index) => (
           <div
             key={section.group}
             className={cn(
-              'flex flex-col gap-[1px] pb-[4px] group-data-[collapsed=true]/shell:pb-[6px] group-data-[collapsed=true]/shell:border-t group-data-[collapsed=true]/shell:border-[var(--border-faint)] group-data-[collapsed=true]/shell:pt-[6px] first:border-none first:pt-0',
-              !openGroups[section.group] && 'pb-0',
-              section.isWorkflows && 'relative'
+              'flex flex-col',
+              section.isWorkflows && 'relative flex-1',
+              index > 0 && 'mt-[4px] pt-[8px] border-t border-[var(--border-faint)] group-data-[collapsed=true]/shell:border-none group-data-[collapsed=true]/shell:mt-0 group-data-[collapsed=true]/shell:pt-0'
             )}
           >
-            <SidebarGroupHeader
-              sectionName={section.group}
-              isWorkflows={section.isWorkflows}
-              workflowCount={workflows.length}
-              isOpen={!!openGroups[section.group]}
-              onToggle={() => toggleGroup(section.group)}
-              onOpenMenu={event => openAnchoredMenu(event, 'group')}
-              onCreateWorkflow={() => openCreateWorkflow()}
-              menuOpen={menuOpen}
-            />
-
-            {openGroups[section.group] && !section.isWorkflows && section.items?.map(item => (
-              <NavLink
-                key={item.id}
-                to={item.to}
-                className={({ isActive }) => cn(NAV_LINK_CLASS, isActive && item.to !== '#' && ACTIVE_NAV_LINK_CLASS)}
-                title={item.label}
-              >
-                <item.icon />
-                <span className="flex-1 group-data-[collapsed=true]/shell:hidden">{item.label}</span>
-                {navItemCounts[item.id] && (
-                  <span className="ml-auto font-mono text-[10.5px] text-[var(--text-faint)] font-medium group-data-[collapsed=true]/shell:hidden">
-                    {navItemCounts[item.id]}
-                  </span>
+            {/* Section header */}
+            <button
+              type="button"
+              className={cn(
+                SECTION_HEADER,
+                'text-left w-full cursor-pointer group-data-[collapsed=true]/shell:hidden'
+              )}
+              onClick={() => toggleGroup(section.group)}
+            >
+              <span
+                className={cn(
+                  'inline-flex w-[13px] h-[13px] text-[var(--text-mute)] transition-transform duration-150 [&_svg]:w-[12px] [&_svg]:h-[12px]',
+                  !openGroups[section.group] && '-rotate-90'
                 )}
-              </NavLink>
-            ))}
-
-            {openGroups[section.group] && section.isWorkflows && (
-              <DndContext
-                sensors={workflowDnd.sensors}
-                onDragStart={workflowDnd.handleDragStart}
-                onDragOver={workflowDnd.handleDragOver}
-                onDragEnd={workflowDnd.handleDragEnd}
               >
-                <WorkflowTree
-                  folders={folders}
-                  workflows={workflows}
-                  rootWorkflows={workflowDnd.rootWorkflows}
-                  expandedFolders={workflowDnd.expandedFolders}
-                  isLoading={isLoadingTree}
-                  menuOpen={menuOpen}
-                  setMenuOpen={setMenuOpen}
-                  setRootNodeRef={setRootNodeRef}
-                  toggleFolder={workflowDnd.toggleFolder}
-                  onCreateWorkflow={openCreateWorkflow}
-                  onCreateFolder={openCreateFolder}
-                  onRenameFolder={openRenameFolder}
-                  onDeleteFolder={deleteFolderWithConfirm}
-                  onRenameWorkflow={openRenameWorkflow}
-                  onDeleteWorkflow={deleteWorkflowWithConfirm}
-                  onDuplicateWorkflow={duplicateWorkflowWithToast}
-                  onToggleWorkflowActive={toggleWorkflowActive}
-                />
-                <WorkflowDragOverlay activeWorkflow={workflowDnd.activeWorkflowForOverlay} />
-              </DndContext>
-            )}
+                <Icons.Caret />
+              </span>
+              <span className="flex-1 text-[12.5px] text-[var(--text)] font-bold tracking-tight">
+                {section.group}
+              </span>
+              {section.isWorkflows && (
+                <>
+                  <span className="font-mono text-[9.5px] text-[var(--text-faint)] font-medium">
+                    {workflows.length}
+                  </span>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className={cn(
+                      ACTION_BTN,
+                      menuOpen === 'group' && 'bg-[var(--surface-2)] text-[var(--text)]'
+                    )}
+                    onClick={e => openAnchoredMenu(e, 'group')}
+                    onKeyDown={e => e.key === 'Enter' && openAnchoredMenu(e as unknown as React.MouseEvent, 'group')}
+                    title="More options"
+                    aria-label="More workflow options"
+                  >
+                    <Icons.More />
+                  </span>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className={ACTION_BTN}
+                    title="New workflow"
+                    aria-label="Create new workflow"
+                    onClick={event => {
+                      event.stopPropagation()
+                      openCreateWorkflow()
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') { e.stopPropagation(); openCreateWorkflow() }
+                    }}
+                  >
+                    <Icons.Plus />
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* Nav items */}
+            <div
+              className={cn(
+                'grid transition-[grid-template-rows] duration-200 ease-in-out',
+                openGroups[section.group] ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              )}
+            >
+              <div className="overflow-hidden min-h-0 pl-[14px] flex flex-col gap-[2px]">
+                {!section.isWorkflows && section.items?.map(item => (
+                  <NavLink
+                    key={item.id}
+                    to={item.to}
+                    className={({ isActive }) => cn(NAV_ITEM, isActive && item.to !== '#' && NAV_ITEM_ACTIVE)}
+                    title={item.label}
+                  >
+                    <item.icon />
+                    <span className="flex-1 group-data-[collapsed=true]/shell:hidden">{item.label}</span>
+                    {navItemCounts[item.id] && (
+                      <span className="ml-auto font-mono text-[10.5px] text-[var(--text-faint)] font-medium tabular-nums group-data-[collapsed=true]/shell:hidden">
+                        {navItemCounts[item.id]}
+                      </span>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+
+            {/* Workflow tree */}
+            <div
+              className={cn(
+                'grid transition-[grid-template-rows] duration-200 ease-in-out',
+                openGroups[section.group] ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              )}
+            >
+              <div className="overflow-hidden min-h-0 pl-[14px]">
+                {section.isWorkflows && (
+                  <DndContext
+                    sensors={workflowDnd.sensors}
+                    onDragStart={workflowDnd.handleDragStart}
+                    onDragOver={workflowDnd.handleDragOver}
+                    onDragEnd={workflowDnd.handleDragEnd}
+                  >
+                    <WorkflowTree
+                      folders={folders}
+                      workflows={workflows}
+                      rootWorkflows={workflowDnd.rootWorkflows}
+                      expandedFolders={workflowDnd.expandedFolders}
+                      isLoading={isLoadingTree}
+                      menuOpen={menuOpen}
+                      setMenuOpen={setMenuOpen}
+                      setRootNodeRef={setRootNodeRef}
+                      toggleFolder={workflowDnd.toggleFolder}
+                      onCreateWorkflow={openCreateWorkflow}
+                      onCreateFolder={openCreateFolder}
+                      onRenameFolder={openRenameFolder}
+                      onDeleteFolder={deleteFolderWithConfirm}
+                      onRenameWorkflow={openRenameWorkflow}
+                      onDeleteWorkflow={deleteWorkflowWithConfirm}
+                      onDuplicateWorkflow={duplicateWorkflowWithToast}
+                      onToggleWorkflowActive={toggleWorkflowActive}
+                    />
+                    <WorkflowDragOverlay activeWorkflow={workflowDnd.activeWorkflowForOverlay} />
+                  </DndContext>
+                )}
+              </div>
+            </div>
 
             {index === NAV_GROUPS.length - 1 && (
               <GroupActionsMenu
                 activeId={menuOpen}
                 position={menuPos}
                 onClose={closeMenus}
-                onCreateWorkflow={() => {
-                  closeMenus()
-                  openCreateWorkflow()
-                }}
-                onCreateFolder={() => {
-                  closeMenus()
-                  openCreateFolder()
-                }}
+                onCreateWorkflow={() => { closeMenus(); openCreateWorkflow() }}
+                onCreateFolder={() => { closeMenus(); openCreateFolder() }}
                 onImport={() => showPendingFeature('Import feature not implemented yet')}
                 onExport={() => showPendingFeature('Export all feature not implemented yet')}
                 onSort={() => showPendingFeature('Sorting not implemented yet')}
@@ -137,25 +216,44 @@ export function AppSidebar({ controller }: AppSidebarProps) {
         ))}
       </div>
 
-      <div className="shrink-0 h-[36px] px-[6px] border-t border-[var(--border-faint)] flex items-center gap-[4px] group-data-[collapsed=true]/shell:hidden">
-        <button className="flex-1 inline-flex items-center justify-center gap-[6px] py-[4px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-mute)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]" type="button"><Icons.Help /> Help &amp; docs</button>
-        <button className="flex-1 inline-flex items-center justify-center gap-[6px] py-[4px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-mute)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]" type="button"><Icons.Feedback /> Feedback</button>
+      {/* ── Footer ──────────────────────────────────────────── */}
+      <div className="shrink-0 px-[8px] py-[6px] border-t border-[var(--border-faint)] flex items-center gap-[2px] group-data-[collapsed=true]/shell:hidden">
+        <button
+          className="flex-1 inline-flex items-center justify-center gap-[6px] py-[5px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
+          type="button"
+        >
+          <Icons.Help />
+          <span>Help & docs</span>
+        </button>
+        <button
+          className="flex-1 inline-flex items-center justify-center gap-[6px] py-[5px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
+          type="button"
+        >
+          <Icons.Feedback />
+          <span>Feedback</span>
+        </button>
       </div>
     </aside>
   )
 }
 
+/* ── Sidebar header ─────────────────────────────────────────────────────────── */
 function SidebarHeader({ collapsed, onToggleCollapsed }: { collapsed: boolean; onToggleCollapsed: () => void }) {
   return (
-    <div className="shrink-0 pt-[14px] px-[10px] pb-[12px] flex flex-col gap-[12px] border-b border-[var(--border-faint)] group-data-[collapsed=true]/shell:pt-[14px] group-data-[collapsed=true]/shell:px-[8px] group-data-[collapsed=true]/shell:pb-[12px] group-data-[collapsed=true]/shell:gap-[10px]">
-      <div className="flex items-center justify-between py-[2px] px-[6px] pb-[4px] group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:flex-col group-data-[collapsed=true]/shell:gap-[10px] group-data-[collapsed=true]/shell:px-[4px]">
-        <span className="inline-flex items-center gap-[9px] text-[15px] font-semibold tracking-tight text-[var(--text)] group-data-[collapsed=true]/shell:gap-0">
-          <span className="w-[22px] h-[22px] inline-flex items-center justify-center rounded-[6px] bg-[var(--text)] text-[var(--bg)]"><Icons.FuseMark style={{ width: 14, height: 14 }} /></span>
-          <span className="inline group-data-[collapsed=true]/shell:hidden">fuse</span>
-          <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-[var(--text-faint)] border border-[var(--border-soft)] py-[2px] px-[6px] pb-[1px] rounded-[4px] ml-[6px] group-data-[collapsed=true]/shell:hidden">Beta</span>
+    <div className="shrink-0 px-[12px] pt-[14px] pb-[10px] flex flex-col gap-[10px] border-b border-[var(--border-faint)] group-data-[collapsed=true]/shell:px-[8px] group-data-[collapsed=true]/shell:py-[14px] group-data-[collapsed=true]/shell:gap-[10px]">
+      {/* Logo row */}
+      <div className="flex items-center justify-between group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:flex-col group-data-[collapsed=true]/shell:gap-[10px]">
+        <span className="inline-flex items-center gap-[8px] text-[14px] font-semibold tracking-tight text-[var(--text)] group-data-[collapsed=true]/shell:gap-0">
+          <span className="w-[22px] h-[22px] inline-flex items-center justify-center rounded-[6px] bg-[var(--text)] text-[var(--bg)] shrink-0">
+            <Icons.FuseMark style={{ width: 13, height: 13 }} />
+          </span>
+          <span className="group-data-[collapsed=true]/shell:hidden">fuse</span>
+          <span className="font-mono text-[9px] tracking-[0.16em] uppercase text-[var(--text-faint)] border border-[var(--border-soft)] py-[2px] px-[5px] rounded-[4px] group-data-[collapsed=true]/shell:hidden">
+            BETA
+          </span>
         </span>
         <button
-          className="w-[24px] h-[24px] rounded-[6px] text-[var(--text-faint)] inline-flex items-center justify-center hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
+          className="w-[24px] h-[24px] rounded-[6px] text-[var(--text-faint)] inline-flex items-center justify-center hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px] transition-colors duration-100"
           onClick={onToggleCollapsed}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -163,78 +261,23 @@ function SidebarHeader({ collapsed, onToggleCollapsed }: { collapsed: boolean; o
         </button>
       </div>
 
+      {/* Workspace selector */}
       <WorkspaceSelector />
 
-      <div className="flex items-center gap-[8px] px-[10px] h-[34px] rounded-[9px] bg-[var(--bg)] border border-[var(--border-faint)] transition-colors duration-120 w-full min-w-0 hover:border-[var(--border-soft)] focus-within:border-[var(--border)] focus-within:bg-[var(--surface)] [&>svg]:w-[14px] [&>svg]:h-[14px] [&>svg]:text-[var(--text-faint)] [&>svg]:shrink-0 group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0 group-data-[collapsed=true]/shell:gap-0">
+      {/* Search bar */}
+      <div className="flex items-center gap-[8px] px-[10px] h-[32px] rounded-[8px] bg-[var(--bg)] border border-[var(--border-faint)] transition-colors duration-120 w-full min-w-0 hover:border-[var(--border-soft)] focus-within:border-[var(--border)] focus-within:bg-[var(--surface)] [&>svg]:w-[13px] [&>svg]:h-[13px] [&>svg]:text-[var(--text-faint)] [&>svg]:shrink-0 group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0 group-data-[collapsed=true]/shell:gap-0">
         <Icons.Search />
-        <input placeholder="Search" className="bg-transparent border-none outline-none flex-1 min-w-0 text-[13px] text-[var(--text)] tracking-tight p-0 placeholder:text-[var(--text-faint)] group-data-[collapsed=true]/shell:hidden" />
+        <input
+          placeholder="Search"
+          className="bg-transparent border-none outline-none flex-1 min-w-0 text-[12.5px] text-[var(--text)] tracking-tight p-0 placeholder:text-[var(--text-dim)] group-data-[collapsed=true]/shell:hidden"
+        />
         <span className="kbd group-data-[collapsed=true]/shell:hidden">⌘K</span>
       </div>
     </div>
   )
 }
 
-interface SidebarGroupHeaderProps {
-  sectionName: string
-  isWorkflows?: boolean
-  workflowCount: number
-  menuOpen: string | null
-  isOpen: boolean
-  onToggle: () => void
-  onOpenMenu: (event: React.MouseEvent) => void
-  onCreateWorkflow: () => void
-}
-
-function SidebarGroupHeader({
-  sectionName,
-  isWorkflows,
-  workflowCount,
-  menuOpen,
-  isOpen,
-  onToggle,
-  onOpenMenu,
-  onCreateWorkflow,
-}: SidebarGroupHeaderProps) {
-  return (
-    <div className="flex items-center gap-[6px] pt-[8px] px-[10px] pb-[4px] font-mono text-[10px] tracking-widest uppercase text-[var(--text-dim)] font-medium cursor-pointer w-full text-left transition-colors duration-100 hover:text-[var(--text-mute)] group-data-[collapsed=true]/shell:hidden relative" onClick={onToggle}>
-      <span
-        className={cn(
-          'inline-flex w-[12px] h-[12px] transition-transform duration-160 [&_svg]:w-[11px] [&_svg]:h-[11px]',
-          !isOpen && '-rotate-90',
-        )}
-      >
-        <Icons.Caret />
-      </span>
-      <span className="flex-1">{sectionName}</span>
-      {isWorkflows && (
-        <>
-          <span className="font-mono text-[9.5px] text-[var(--text-faint)] ml-[4px] font-medium">{workflowCount}</span>
-          <button
-            className={cn(
-              'w-[20px] h-[20px] rounded-[5px] text-[var(--text-faint)] inline-flex items-center justify-center transition-colors duration-100 shrink-0 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[12px] [&_svg]:h-[12px]',
-              menuOpen === 'group' && 'bg-[var(--surface-2)] text-[var(--text)]'
-            )}
-            onClick={onOpenMenu}
-            title="More"
-          >
-            <Icons.More />
-          </button>
-          <button
-            className="w-[20px] h-[20px] rounded-[5px] text-[var(--text-faint)] inline-flex items-center justify-center transition-colors duration-100 shrink-0 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[12px] [&_svg]:h-[12px]"
-            title="New workflow"
-            onClick={event => {
-              event.stopPropagation()
-              onCreateWorkflow()
-            }}
-          >
-            <Icons.Plus />
-          </button>
-        </>
-      )}
-    </div>
-  )
-}
-
+/* ── Workflow tree ──────────────────────────────────────────────────────────── */
 interface WorkflowTreeProps {
   folders: AppLayoutController['folders']
   workflows: AppLayoutController['workflows']
@@ -275,13 +318,17 @@ function WorkflowTree({
   onToggleWorkflowActive,
 }: WorkflowTreeProps) {
   return (
-    <div ref={setRootNodeRef} className="flex flex-col gap-[1px] pl-[14px] group-data-[collapsed=true]/shell:hidden group-data-[collapsed=true]/shell:pl-0">
+    <div ref={setRootNodeRef} className="flex flex-col gap-[1px] group-data-[collapsed=true]/shell:hidden">
       {isLoading ? (
-        <div className="flex items-center justify-center py-4">
+        <div className="flex items-center justify-center py-6">
           <Spinner />
         </div>
       ) : folders.length === 0 && workflows.length === 0 ? (
-        <div className="text-center py-3 text-[11px] text-[var(--text-mute)]">No folders or workflows</div>
+        <div className="mx-[2px] mt-[2px] flex flex-col items-center justify-center gap-[6px] py-[20px] px-[12px] rounded-[8px] border border-dashed border-[var(--border-faint)]">
+          <span className="text-[11px] text-[var(--text-faint)] text-center leading-relaxed">
+            No workflows yet
+          </span>
+        </div>
       ) : (
         <>
           {folders
@@ -329,6 +376,7 @@ function WorkflowTree({
   )
 }
 
+/* ── Group actions menu ─────────────────────────────────────────────────────── */
 function GroupActionsMenu({
   activeId,
   position,
@@ -350,12 +398,12 @@ function GroupActionsMenu({
 }) {
   return (
     <DropdownMenu id="group" activeId={activeId} position={position} onClose={onClose}>
-      <button className={MENU_ITEM_CLASS} onClick={onCreateWorkflow}><Icons.Plus /> New workflow</button>
-      <button className={MENU_ITEM_CLASS} onClick={onCreateFolder}><Icons.Folder /> Create folder</button>
-      <button className={MENU_ITEM_CLASS} onClick={onImport}><Icons.Doc /> Import workflow</button>
-      <button className={MENU_ITEM_CLASS} onClick={onExport}><Icons.Download /> Export all</button>
+      <button className={MENU_ITEM} onClick={onCreateWorkflow}><Icons.Plus /> New workflow</button>
+      <button className={MENU_ITEM} onClick={onCreateFolder}><Icons.Folder /> Create folder</button>
+      <button className={MENU_ITEM} onClick={onImport}><Icons.Doc /> Import workflow</button>
+      <button className={MENU_ITEM} onClick={onExport}><Icons.Download /> Export all</button>
       <div className="h-[1px] bg-[var(--border-faint)] my-[4px]" />
-      <button className={MENU_ITEM_CLASS} onClick={onSort}><Icons.Sort /> Sort A → Z</button>
+      <button className={MENU_ITEM} onClick={onSort}><Icons.Sort /> Sort A → Z</button>
     </DropdownMenu>
   )
 }

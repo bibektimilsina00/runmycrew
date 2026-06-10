@@ -8,6 +8,13 @@ import { cn } from '@/lib/cn'
 import type { Folder } from '@/features/folders/types/folderTypes'
 import type { WorkflowWithStats } from '@/features/workflows/types/workflowTypes'
 
+/** Must match NAV_ITEM in app-sidebar.tsx */
+const ROW_BASE =
+  'flex items-center gap-[10px] py-[6px] px-[10px] rounded-[8px] text-[13px] font-medium w-full cursor-pointer transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] relative text-[var(--text-mute)]'
+
+const MENU_ITEM =
+  'flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0'
+
 interface SidebarFolderItemProps {
   folder: Folder
   allFolders: Folder[]
@@ -79,34 +86,42 @@ export function SidebarFolderItem({
       <div
         ref={setNodeRef}
         className={cn(
-          "flex items-center gap-[8px] p-[6px] rounded-[8px] text-[12.5px] text-[var(--text-mute)] cursor-pointer transition-colors duration-100 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)]",
-          isOver && "bg-[oklch(from_var(--accent)_l_c_h_/_0.15)] text-[var(--accent)] scale-[1.02]"
+          ROW_BASE,
+          isOver && 'bg-[oklch(from_var(--accent)_l_c_h_/_0.15)] text-[var(--accent)] scale-[1.01]'
         )}
         onClick={(e) => toggleFolder(folder.id, e)}
       >
-        <span
-          className={cn(
-            "w-[12px] h-[12px] inline-flex items-center justify-center transition-transform duration-140 text-[var(--text-faint)] shrink-0 [&_svg]:w-[10px] [&_svg]:h-[10px]",
-            open ? "" : "-rotate-90"
-          )}
-        >
-          <Icons.Caret />
+        {/* Expand caret — fixed 15×15 container to align with icons */}
+        <span className="w-[15px] h-[15px] flex items-center justify-center shrink-0">
+          <span
+            className={cn(
+              'inline-flex w-[11px] h-[11px] text-[var(--text-faint)] transition-transform duration-140 [&_svg]:w-[10px] [&_svg]:h-[10px]',
+              open ? '' : '-rotate-90'
+            )}
+          >
+            <Icons.Caret />
+          </span>
         </span>
-        <span className="inline-flex text-[var(--text-mute)] shrink-0 [&_svg]:w-[14px] [&_svg]:h-[14px]">
+
+        {/* Folder icon */}
+        <span className="w-[15px] h-[15px] flex items-center justify-center text-[var(--text-mute)] shrink-0 [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:opacity-80">
           {open ? <Icons.FolderOpen /> : <Icons.Folder />}
         </span>
-        <span className="flex-1 min-w-0 whitespace-nowrap overflow-hidden text-ellipsis tracking-tight">
+
+        <span className="flex-1 min-w-0 whitespace-nowrap overflow-hidden text-ellipsis tracking-[-0.005em]">
           {folder.name}
         </span>
+
         {(folderWorkflows.length > 0 || childFolders.length > 0) && (
-          <span className="font-mono text-[10px] text-[var(--text-faint)] font-medium px-[2px]">
+          <span className="font-mono text-[10px] text-[var(--text-faint)] font-medium tabular-nums">
             {folderWorkflows.length}
           </span>
         )}
+
         <button
           className={cn(
-            "w-[22px] h-[22px] rounded-[5px] text-[var(--text-faint)] inline-flex items-center justify-center opacity-0 transition-all duration-100 shrink-0 hover:bg-[var(--surface-2)] hover:text-[var(--text)] group-hover/folder:opacity-100 [&_svg]:w-[13px] [&_svg]:h-[13px]",
-            isMenuOpen && "opacity-100 bg-[var(--surface-2)] text-[var(--text)]"
+            'w-[22px] h-[22px] rounded-[5px] text-[var(--text-faint)] inline-flex items-center justify-center opacity-0 transition-all duration-100 shrink-0 hover:bg-[var(--surface-2)] hover:text-[var(--text)] group-hover/folder:opacity-100 [&_svg]:w-[13px] [&_svg]:h-[13px]',
+            isMenuOpen && 'opacity-100 bg-[var(--surface-2)] text-[var(--text)]'
           )}
           onClick={handleMoreClick}
           onPointerDown={(e) => e.stopPropagation()}
@@ -116,8 +131,9 @@ export function SidebarFolderItem({
         </button>
       </div>
 
+      {/* Children — indented with a subtle vertical guide line */}
       {open && (
-        <div className="pl-[14px] flex flex-col relative before:content-[''] before:absolute before:left-[11px] before:top-[4px] before:bottom-[4px] before:w-[1px] before:bg-[var(--border-faint)]">
+        <div className="pl-[14px] flex flex-col relative before:content-[''] before:absolute before:left-[18px] before:top-[2px] before:bottom-[4px] before:w-[1px] before:bg-[var(--border-faint)]">
           {childFolders.map((child) => (
             <SidebarFolderItem
               key={child.id}
@@ -165,10 +181,7 @@ export function SidebarFolderItem({
         <>
           <div
             style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
-            onClick={(e) => {
-              e.stopPropagation()
-              closeMenu()
-            }}
+            onClick={(e) => { e.stopPropagation(); closeMenu() }}
             onPointerDown={(e) => e.stopPropagation()}
           />
           <div
@@ -178,43 +191,27 @@ export function SidebarFolderItem({
             onPointerDown={(e) => e.stopPropagation()}
           >
             <button
-              className="flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0"
-              onClick={(e) => {
-                e.stopPropagation()
-                closeMenu()
-                onCreateWorkflow(folder.id)
-              }}
+              className={MENU_ITEM}
+              onClick={(e) => { e.stopPropagation(); closeMenu(); onCreateWorkflow(folder.id) }}
             >
               <Icons.Plus /> New workflow in folder
             </button>
             <button
-              className="flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0"
-              onClick={(e) => {
-                e.stopPropagation()
-                closeMenu()
-                onCreateSubfolder(folder.id)
-              }}
+              className={MENU_ITEM}
+              onClick={(e) => { e.stopPropagation(); closeMenu(); onCreateSubfolder(folder.id) }}
             >
               <Icons.Folder /> New subfolder
             </button>
             <button
-              className="flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0"
-              onClick={(e) => {
-                e.stopPropagation()
-                closeMenu()
-                onRenameFolder(folder.id, folder.name)
-              }}
+              className={MENU_ITEM}
+              onClick={(e) => { e.stopPropagation(); closeMenu(); onRenameFolder(folder.id, folder.name) }}
             >
               <Icons.Edit /> Rename folder
             </button>
             <div className="h-[1px] bg-[var(--border-faint)] my-[4px]" />
             <button
-              className="flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0 text-[var(--err)] hover:bg-[oklch(0.70_0.18_22/0.10)]"
-              onClick={(e) => {
-                e.stopPropagation()
-                closeMenu()
-                onDeleteFolder(folder.id, folder.name)
-              }}
+              className={cn(MENU_ITEM, 'text-[var(--err)] hover:bg-[oklch(0.70_0.18_22/0.10)]')}
+              onClick={(e) => { e.stopPropagation(); closeMenu(); onDeleteFolder(folder.id, folder.name) }}
             >
               <Icons.Trash /> Delete folder
             </button>
