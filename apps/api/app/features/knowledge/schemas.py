@@ -6,7 +6,7 @@ from sqlmodel import SQLModel
 class KBCreate(SQLModel):
     name: str
     description: str | None = None
-    embedding_model: str = "text-embedding-3-small"
+    embedding_model: str = "default:gemini-embedding-001"
     embedding_credential_id: uuid.UUID | None = None
     min_chunk_size: int = 100  # characters
     max_chunk_tokens: int = 1024  # tokens  → stored as chars

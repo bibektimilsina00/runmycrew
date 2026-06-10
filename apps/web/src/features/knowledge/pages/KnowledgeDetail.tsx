@@ -118,11 +118,6 @@ export function KnowledgeDetail() {
           <button className="btn btn-secondary" onClick={() => setSettingsOpen(true)}>
             <Icons.Settings style={{ width: 14, height: 14 }} />
             Configure
-            {!kb?.embedding_credential_id && (
-              <span className="ml-1 text-[9.5px] font-mono font-semibold tracking-widest uppercase px-[6px] py-[2px] rounded-[4px] bg-[oklch(0.82_0.14_80/0.16)] text-[var(--warn)]">
-                not set
-              </span>
-            )}
           </button>
           <button className="btn btn-secondary" onClick={() => setConnectorOpen(true)}>
             <Icons.Plug style={{ width: 14, height: 14 }} /> New connector
@@ -149,21 +144,6 @@ export function KnowledgeDetail() {
       </div>
 
 
-
-      {/* Setup banner */}
-      {!kb.embedding_credential_id && (
-        <div className="flex items-center justify-between gap-4 px-5 py-3.5 bg-[oklch(0.82_0.14_80/0.10)] border border-[oklch(0.82_0.14_80/0.3)] rounded-[10px]">
-          <div className="flex items-center gap-3">
-            <Icons.Activity style={{ width: 14, height: 14, color: 'var(--warn)', flexShrink: 0 }} />
-            <span className="text-[12.5px] text-[var(--text-faint)]">
-              No embedding model configured — documents will not be indexed until you set one.
-            </span>
-          </div>
-          <button className="btn btn-secondary shrink-0 text-[12.5px]" onClick={() => setSettingsOpen(true)}>
-            Configure
-          </button>
-        </div>
-      )}
 
       {/* Add mode inline panel */}
       {addMode && (

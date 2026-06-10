@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { Icons } from '@/shared/components/icons'
 import { APP_ROUTES } from '@/shared/constants/routes'
-import type { KnowledgeBase } from '../types/knowledgeTypes'
+import { isKBConfigured, type KnowledgeBase } from '../types/knowledgeTypes'
 
 interface Props {
   items: KnowledgeBase[]
@@ -25,14 +25,7 @@ function timeAgo(iso: string) {
 
 export function KnowledgeList({ items, onDelete }: Props) {
   const navigate = useNavigate()
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-3 py-16 text-[var(--text-faint)]">
-        <Icons.Book style={{ width: 24, height: 24, color: 'var(--text-dim)' }} />
-        <span className="text-[13px]">No knowledge bases yet. Create one to get started.</span>
-      </div>
-    )
-  }
+  if (items.length === 0) return null
 
   return (
     <div className="kn-grid">
@@ -44,7 +37,7 @@ export function KnowledgeList({ items, onDelete }: Props) {
             </span>
             <div className="flex items-center gap-2">
               {(() => {
-                if (!kb.embedding_credential_id)
+                if (!isKBConfigured(kb))
                   return <span className="kn-state stale">not configured</span>
                 if (kb.document_count === 0)
                   return <span className="kn-state stale">empty</span>
@@ -53,7 +46,7 @@ export function KnowledgeList({ items, onDelete }: Props) {
                 return <span className="kn-state indexed">indexed</span>
               })()}
               <button
-                className="w-[22px] h-[22px] rounded-[5px] flex items-center justify-center text-[var(--text-dim)] opacity-0 group-hover:opacity-100 hover:bg-[oklch(0.70_0.18_22/0.14)] hover:text-[var(--err)] transition-all"
+                className="w-[22px] h-[22px] rounded-[5px] flex items-center justify-center text-[var(--text-dim)] hover:bg-[oklch(0.70_0.18_22/0.14)] hover:text-[var(--err)] transition-colors"
                 onClick={e => { e.stopPropagation(); onDelete(kb) }}
                 title="Delete knowledge base"
               >
@@ -67,18 +60,16 @@ export function KnowledgeList({ items, onDelete }: Props) {
             <div className="kn-meta-row">
               {kb.description
                 ? <span className="text-[var(--text-faint)] text-[12px]">{kb.description}</span>
-                : <><span>{fmtChunks(kb.total_chunks)} chunks</span><span>·</span><span className="font-mono truncate">{kb.embedding_model}</span></>
+                : <span className="font-mono truncate text-[12px] text-[var(--text-faint)]">{kb.embedding_model}</span>
               }
             </div>
           </div>
 
           <div className="kn-foot">
-            <div className="kn-usage">
-              <div className="kn-usage-bar">
-                <span style={{ width: `${Math.min((kb.total_chunks / 10000) * 100, 100)}%` }} />
-              </div>
-              <span className="kn-usage-num">{fmtChunks(kb.total_chunks)} chunks indexed</span>
-            </div>
+            <span className="kn-usage-num">
+              {fmtChunks(kb.document_count)} {kb.document_count === 1 ? 'doc' : 'docs'} ·{' '}
+              {fmtChunks(kb.total_chunks)} {kb.total_chunks === 1 ? 'chunk' : 'chunks'}
+            </span>
             <span className="kn-updated">{timeAgo(kb.created_at)}</span>
           </div>
         </div>

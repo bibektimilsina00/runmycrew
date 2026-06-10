@@ -11,7 +11,7 @@ import {
 } from '../hooks/useKnowledge'
 import { knowledgeAPI } from '../services/knowledgeAPI'
 import { useCredentials } from '@/features/connections/hooks/useConnections'
-import { EMBEDDING_MODELS, CHUNKING_STRATEGIES } from '../types/knowledgeTypes'
+import { EMBEDDING_MODELS, CHUNKING_STRATEGIES, isKBConfigured } from '../types/knowledgeTypes'
 import type { KnowledgeBase, SearchResult } from '../types/knowledgeTypes'
 
 type AddTab = 'text' | 'file' | 'url'
@@ -37,9 +37,9 @@ export function KBDetailPanel({ kb, onClose }: Props) {
 
   const [panel, setPanel] = useState<'docs' | 'add' | 'search'>('docs')
 
-  // ── Setup state (shown when KB has no embedding credential) ──
-  const isConfigured = !!(detail?.embedding_credential_id ?? kb.embedding_credential_id)
-  const [setupModel, setSetupModel]   = useState(kb.embedding_model || 'text-embedding-3-small')
+  // ── Setup state (shown when KB has no usable embedding setup) ──
+  const isConfigured = isKBConfigured(detail ?? kb)
+  const [setupModel, setSetupModel]   = useState(kb.embedding_model || 'default:gemini-embedding-001')
   const [setupCredId, setSetupCredId] = useState(kb.embedding_credential_id ?? '')
   const [setupMinChunk, setSetupMinChunk]       = useState(kb.min_chunk_size ?? 100)
   const [setupMaxTokens, setSetupMaxTokens]     = useState(kb.max_chunk_tokens ?? 1024)

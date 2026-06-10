@@ -3,8 +3,9 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, Query, Response, UploadFile, status
 
+from apps.api.app.features.knowledge.embedding_catalog import EmbeddingModelInfo
 from apps.api.app.features.knowledge.schemas import (
     AddTextRequest,
     AddUrlRequest,
@@ -39,6 +40,18 @@ async def list_kb_options(
     """loadOptions endpoint for the Knowledge node dropdown."""
     options = await service.list_kb_options(workspace.id)
     return KBListOptionsResponse(ok=True, data=options)
+
+
+@router.get("/embedding-models", response_model=list[EmbeddingModelInfo])
+async def list_embedding_models_endpoint(
+    provider: str = Query(..., description="Default | OpenAI | Google | Mistral"),
+    credential_id: uuid.UUID | None = Query(None, description="Required for non-Default providers"),
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    service: KnowledgeService = Depends(get_knowledge_service),
+) -> Any:
+    """Live-list embedding models from the provider's API. Cached 1 hour per key."""
+    return await service.list_embedding_models(workspace.id, provider, credential_id)
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=KBOut)

@@ -28,4 +28,4 @@ export { PublicRoute } from './PublicRoute'
 export { Icons } from './icons'
 export { ConfirmProvider, useConfirm } from './ConfirmModal'
 export { ColorPicker } from './ColorPicker'
-
+export { CredentialSelector } from './CredentialSelector'

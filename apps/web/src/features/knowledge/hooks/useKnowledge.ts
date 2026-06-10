@@ -5,6 +5,28 @@ import type { KBCreateRequest } from '../types/knowledgeTypes'
 const KEYS = {
   list: ['kb', 'list'] as const,
   detail: (id: string) => ['kb', id] as const,
+  embeddingModels: (provider: string, credentialId: string | null) =>
+    ['kb', 'embedding-models', provider, credentialId ?? ''] as const,
+}
+
+/**
+ * Live-list embedding models for a provider.
+ *
+ * - `Default` provider: server uses its managed Gemini key — no credentialId needed.
+ * - Other providers: pass a `credentialId` of the matching type. Query stays
+ *   disabled until one is provided.
+ *
+ * Results cached client-side for 5 minutes (backend additionally caches 1h
+ * per-key in process memory).
+ */
+export function useEmbeddingModels(provider: string, credentialId: string | null) {
+  const isDefault = provider === 'Default'
+  return useQuery({
+    queryKey: KEYS.embeddingModels(provider, credentialId),
+    queryFn: ({ signal }) => knowledgeAPI.listEmbeddingModels(provider, credentialId, signal),
+    enabled: isDefault || !!credentialId,
+    staleTime: 1000 * 60 * 5,
+  })
 }
 
 export function useKBList() {

@@ -74,14 +74,57 @@ export const CHUNKING_STRATEGIES = [
 ]
 
 export const EMBEDDING_MODELS = [
+  // Default — Fuse-managed Gemini (no credential required).
+  // Backend interprets `default` and `default:<google-model>` sentinels.
+  { id: 'default:gemini-embedding-001', label: 'gemini-embedding-001', provider: 'Default', credType: null as string | null, dims: 3072 },
+  { id: 'default:gemini-embedding-2',   label: 'gemini-embedding-2',   provider: 'Default', credType: null as string | null, dims: 3072 },
   // OpenAI
   { id: 'text-embedding-3-small', label: 'text-embedding-3-small', provider: 'OpenAI', credType: 'openai_api_key', dims: 1536 },
   { id: 'text-embedding-3-large', label: 'text-embedding-3-large', provider: 'OpenAI', credType: 'openai_api_key', dims: 3072 },
-  { id: 'text-embedding-ada-002',  label: 'text-embedding-ada-002',  provider: 'OpenAI', credType: 'openai_api_key', dims: 1536 },
-  // Google
-  { id: 'text-embedding-004', label: 'text-embedding-004', provider: 'Google', credType: 'google_api_key', dims: 768 },
+  { id: 'text-embedding-ada-002', label: 'text-embedding-ada-002', provider: 'OpenAI', credType: 'openai_api_key', dims: 1536 },
+  // Google (BYO credential)
+  { id: 'gemini-embedding-001', label: 'gemini-embedding-001', provider: 'Google', credType: 'google_api_key', dims: 3072 },
+  { id: 'gemini-embedding-2',   label: 'gemini-embedding-2',   provider: 'Google', credType: 'google_api_key', dims: 3072 },
   // Mistral
   { id: 'mistral-embed', label: 'mistral-embed', provider: 'Mistral', credType: 'mistral_api_key', dims: 1024 },
 ]
 
-export const EMBEDDING_PROVIDERS = ['OpenAI', 'Google', 'Mistral']
+export const EMBEDDING_PROVIDERS = ['Default', 'OpenAI', 'Google', 'Mistral']
+
+/** Provider → credential type. Static map; providers and their auth types don't change. */
+export const PROVIDER_CRED_TYPE: Record<string, string | null> = {
+  Default: null,
+  OpenAI:  'openai_api_key',
+  Google:  'google_api_key',
+  Mistral: 'mistral_api_key',
+}
+
+export const EmbeddingModelInfoSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  provider: z.string(),
+  cred_type: z.string().nullable().optional(),
+  dims: z.number().nullable().optional(),
+})
+export type EmbeddingModelInfo = z.infer<typeof EmbeddingModelInfoSchema>
+
+/** True when `modelId` is the Fuse-managed default (uses server's Gemini key). */
+export function isDefaultModel(modelId: string | null | undefined): boolean {
+  return !!modelId && (modelId === 'default' || modelId.startsWith('default:'))
+}
+
+/** Provider for a saved model id. Handles `default` and `default:<model>` sentinels. */
+export function providerForModelId(modelId: string): string {
+  if (isDefaultModel(modelId)) return 'Default'
+  return EMBEDDING_MODELS.find(m => m.id === modelId)?.provider ?? 'Default'
+}
+
+/** True if the KB has a usable embedding setup (default sentinel, or model+credential). */
+export function isKBConfigured(kb: {
+  embedding_model?: string | null
+  embedding_credential_id?: string | null
+}): boolean {
+  if (!kb.embedding_model) return false
+  if (isDefaultModel(kb.embedding_model)) return true
+  return !!kb.embedding_credential_id
+}

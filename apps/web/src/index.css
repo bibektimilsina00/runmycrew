@@ -424,9 +424,6 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .kn-name { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; }
 .kn-meta-row { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.04em; }
 .kn-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border-faint); }
-.kn-usage { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-.kn-usage-bar { height: 3px; background: var(--surface); border-radius: 99px; overflow: hidden; }
-.kn-usage-bar span { display: block; height: 100%; background: var(--text-mute); border-radius: 99px; }
 .kn-usage-num, .kn-updated { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); letter-spacing: 0.04em; }
 
 /* ============ LOGS ============ */
@@ -481,30 +478,107 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .run-trigger svg { width: 12px; height: 12px; color: var(--text-dim); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   WORKFLOW NODE — execution status
+   WORKFLOW NODE — execution status (matches v1)
 ══════════════════════════════════════════════════════════════════════════════ */
-.node-status-completed { border-color: var(--ok) !important; }
-.node-status-failed    { border-color: var(--err) !important; }
+@property --node-border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes node-border-rotate {
+  to { --node-border-angle: 360deg; }
+}
+
+/* Running — green light travels around the border perimeter */
+.node-running-wrapper { isolation: isolate; }
 
 .node-running-wrapper::before {
   content: '';
   position: absolute;
-  inset: -3px;
-  border-radius: 13px;
-  background: conic-gradient(var(--accent) 0deg, transparent 120deg);
-  animation: node-spin 1.2s linear infinite;
-  z-index: 10;
+  inset: -2px;
+  border-radius: 10px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--node-border-angle),
+    transparent           0deg,
+    transparent          30deg,
+    rgba(51,196,130,0.1)  50deg,
+    rgba(51,196,130,0.95) 90deg,
+    rgba(51,196,130,0.1) 130deg,
+    transparent         150deg,
+    transparent         360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: node-border-rotate 1.6s linear infinite;
+  z-index: 0;
   pointer-events: none;
 }
-.node-running-wrapper::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 11px;
-  background: var(--bg);
-  z-index: 11;
-  pointer-events: none;
-}
-.node-running-wrapper > div { z-index: 12 !important; }
 
-@keyframes node-spin { to { transform: rotate(360deg); } }
+/* Success — thin green border + soft glow */
+.node-status-completed {
+  border-color: #33c482 !important;
+  box-shadow: 0 0 5px rgba(51, 196, 130, 0.18);
+}
+
+/* Failed — thin red border + soft glow */
+.node-status-failed {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 5px rgba(239, 68, 68, 0.18);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COPILOT CHAT — typography stack matching GitHub Copilot / VS Code
+══════════════════════════════════════════════════════════════════════════════ */
+.copilot-chat {
+  /* VS Code's default font stack — what GitHub Copilot Chat actually renders in. */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI",
+    "HelveticaNeue-Light", system-ui, "Ubuntu", "Droid Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+.copilot-chat strong,
+.copilot-chat b,
+.copilot-chat h1,
+.copilot-chat h2,
+.copilot-chat h3,
+.copilot-chat h4 {
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PRISM token palette (Tokyo Night-ish) — shared by JSON viewer + Copilot code blocks
+══════════════════════════════════════════════════════════════════════════════ */
+.json-code-pre .token.property,
+.copilot-md-code .token.property      { color: #7aa2f7; }  /* keys */
+.json-code-pre .token.string,
+.copilot-md-code .token.string        { color: #9ece6a; }  /* strings */
+.json-code-pre .token.number,
+.copilot-md-code .token.number        { color: #e0af68; }  /* numbers */
+.json-code-pre .token.boolean,
+.copilot-md-code .token.boolean       { color: #bb9af7; }
+.json-code-pre .token.null,
+.copilot-md-code .token.null          { color: #f7768e; }
+.json-code-pre .token.punctuation,
+.copilot-md-code .token.punctuation,
+.json-code-pre .token.operator,
+.copilot-md-code .token.operator      { color: var(--text-faint); }
+
+/* Extra languages — JS / TS / Python / Bash */
+.copilot-md-code .token.keyword       { color: #bb9af7; }
+.copilot-md-code .token.function      { color: #7dcfff; }
+.copilot-md-code .token.builtin       { color: #7dcfff; }
+.copilot-md-code .token.class-name    { color: #ffc777; }
+.copilot-md-code .token.tag           { color: #f7768e; }
+.copilot-md-code .token.attr-name     { color: #7aa2f7; }
+.copilot-md-code .token.attr-value    { color: #9ece6a; }
+.copilot-md-code .token.comment       { color: var(--text-faint); font-style: italic; }
+.copilot-md-code .token.regex         { color: #f7768e; }
+.copilot-md-code .token.constant      { color: #e0af68; }
+.copilot-md-code .token.variable      { color: var(--text); }

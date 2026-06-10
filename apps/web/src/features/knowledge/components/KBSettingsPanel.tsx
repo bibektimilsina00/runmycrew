@@ -1,14 +1,15 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Icons } from '@/shared/components/icons'
-import { useToast } from '@/shared/components'
+import { useToast, CredentialSelector } from '@/shared/components'
 import {
   Dropdown, DropdownTrigger, DropdownContent, DropdownItem,
 } from '@/shared/components/Dropdown'
 import { knowledgeAPI } from '../services/knowledgeAPI'
-import { useReindex } from '../hooks/useKnowledge'
-import { useCredentials } from '@/features/connections/hooks/useConnections'
-import { EMBEDDING_MODELS, CHUNKING_STRATEGIES } from '../types/knowledgeTypes'
+import { useReindex, useEmbeddingModels } from '../hooks/useKnowledge'
+import {
+  EMBEDDING_PROVIDERS, PROVIDER_CRED_TYPE, CHUNKING_STRATEGIES, providerForModelId,
+} from '../types/knowledgeTypes'
 import type { KBDetail } from '../types/knowledgeTypes'
 
 interface Props {
@@ -17,11 +18,14 @@ interface Props {
   onSaved: () => void
 }
 
+const DEFAULT_FALLBACK_MODEL = 'default:gemini-embedding-001'
+
 export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
   const { toast } = useToast()
-  const { data: credentials = [] } = useCredentials()
 
-  const [model, setModel]         = useState(kb.embedding_model || 'text-embedding-3-small')
+  const initialModel = kb.embedding_model || DEFAULT_FALLBACK_MODEL
+  const [provider, setProvider]   = useState<string>(providerForModelId(initialModel))
+  const [model, setModel]         = useState(initialModel)
   const [credId, setCredId]       = useState(kb.embedding_credential_id ?? '')
   const [minChunk, setMinChunk]   = useState(kb.min_chunk_size ?? 100)
   const [maxTokens, setMaxTokens] = useState(kb.max_chunk_tokens ?? 1024)
@@ -31,37 +35,52 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
   const [error, setError]         = useState<string | null>(null)
   const reindex = useReindex(kb.id)
 
-  const selectedModel    = EMBEDDING_MODELS.find(m => m.id === model)
+  const isDefault = provider === 'Default'
+  const credType  = PROVIDER_CRED_TYPE[provider] ?? null
   const selectedStrategy = CHUNKING_STRATEGIES.find(s => s.id === strategy)
 
-  const relevantCreds = useMemo(
-    () => credentials.filter(c => c.type === selectedModel?.credType),
-    [credentials, selectedModel?.credType]
-  )
-  const selectedCred = relevantCreds.find(c => c.id === credId)
+  // Live-fetch models from the provider's API. Disabled until we have what's
+  // needed (Default → always enabled, others → wait for credId).
+  const modelsQuery = useEmbeddingModels(provider, isDefault ? null : (credId || null))
+  const providerModels = modelsQuery.data ?? []
 
-  const handleModelChange = (modelId: string) => {
-    setModel(modelId)
-    const m = EMBEDDING_MODELS.find(x => x.id === modelId)
-    if (m && !credentials.some(c => c.type === m.credType && c.id === credId)) setCredId('')
+  // When the model list resolves and the saved model isn't in it, fall back
+  // to the first listed model so the radio shows a valid selection.
+  useEffect(() => {
+    if (modelsQuery.isSuccess && providerModels.length > 0) {
+      if (!providerModels.some(m => m.id === model)) {
+        setModel(providerModels[0].id)
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelsQuery.isSuccess, providerModels.length])
+
+  const handleProviderChange = (next: string) => {
+    setProvider(next)
+    setCredId('')
+    // Defer model selection — useEffect above will pick the first one once the
+    // fetched list resolves for the new provider.
+    setModel('')
   }
 
   const handleSave = async () => {
-    if (!credId) { setError(`Select a ${selectedModel?.provider} credential.`); return }
+    if (!isDefault && !credId) {
+      setError(`Select a ${provider} credential.`)
+      return
+    }
     setError(null); setSaving(true)
     try {
       await knowledgeAPI.update(kb.id, {
         name: kb.name,
         description: kb.description ?? undefined,
         embedding_model: model,
-        embedding_credential_id: credId,
+        embedding_credential_id: isDefault ? null : credId,
         min_chunk_size: minChunk,
         max_chunk_tokens: maxTokens,
         overlap_tokens: overlap,
         chunking_strategy: strategy,
       })
       toast('Settings saved', { variant: 'ok', description: 'Embedding model configured.' })
-      // Auto re-index documents that failed to index (have no chunks but have raw content)
       if (kb.document_count > 0 && kb.total_chunks === 0) {
         try {
           const result = await reindex.mutateAsync()
@@ -81,13 +100,6 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
     }
   }
 
-  const modelsByProvider = useMemo(() =>
-    ['OpenAI', 'Google', 'Mistral'].map(p => ({
-      provider: p,
-      models: EMBEDDING_MODELS.filter(m => m.provider === p),
-    })), []
-  )
-
   return createPortal(
     <>
       <div className="fixed inset-0 z-[9997] bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
@@ -104,77 +116,94 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
 
-          {/* Embedding model — providers with no credential shown disabled */}
-          <div className="flex flex-col gap-3">
+          {/* Provider */}
+          <div className="flex flex-col gap-2">
             <div>
-              <div className="text-[13px] font-semibold text-[var(--text)]">Embedding model</div>
-              <p className="text-[12px] text-[var(--text-faint)] mt-0.5">Used to convert documents and queries into vectors for retrieval.</p>
+              <div className="text-[13px] font-semibold text-[var(--text)]">Provider</div>
+              <p className="text-[12px] text-[var(--text-faint)] mt-0.5">Choose where embeddings are generated.</p>
             </div>
-            <div className="flex flex-col gap-3">
-              {modelsByProvider.map(({ provider, models }) => {
-                const credType = EMBEDDING_MODELS.find(m => m.provider === provider)?.credType ?? ''
-                const hasCred  = credentials.some(c => c.type === credType)
-                return (
-                  <div key={provider}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10.5px] font-mono tracking-widest uppercase text-[var(--text-dim)]">{provider}</span>
-                      {hasCred
-                        ? <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[var(--ok)]"><Icons.Check style={{ width: 10, height: 10 }} /> credential connected</span>
-                        : <span className="text-[10px] font-mono text-[var(--warn)]">no credential — add in Connections</span>
-                      }
+            <Dropdown className="w-full">
+              <DropdownTrigger className="w-full">
+                <div className="flex items-center justify-between h-[38px] px-3 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[9px] text-[13px] cursor-pointer hover:border-[var(--border-soft)] transition-colors">
+                  <span className="text-[var(--text)]">{provider}</span>
+                  <Icons.Caret style={{ width: 11, height: 11, color: 'var(--text-faint)' }} />
+                </div>
+              </DropdownTrigger>
+              <DropdownContent className="w-full">
+                {EMBEDDING_PROVIDERS.map(p => (
+                  <DropdownItem key={p} onClick={() => handleProviderChange(p)} className={provider === p ? 'bg-[var(--surface)]' : ''}>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[13px] font-medium">{p}</span>
+                        {p === 'Default' && (
+                          <span className="text-[11px] text-[var(--text-faint)]">Fuse-managed Gemini — no credential needed</span>
+                        )}
+                      </div>
+                      {provider === p && <Icons.Check style={{ width: 13, height: 13, color: 'var(--ok)' }} />}
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      {models.map(m => (
-                        <label key={m.id}
-                          onClick={() => hasCred && handleModelChange(m.id)}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-[9px] border transition-colors
-                            ${!hasCred ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
-                            ${model === m.id ? 'bg-[var(--surface)] border-[var(--border-soft)]' : hasCred ? 'bg-[var(--bg)] border-[var(--border-faint)] hover:border-[var(--border-soft)]' : 'bg-[var(--bg)] border-[var(--border-faint)]'}`
-                          }>
-                          <input type="radio" name="setting-model" value={m.id} checked={model === m.id} disabled={!hasCred} readOnly className="accent-[var(--text)]" />
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-[13px] font-medium text-[var(--text)]">{m.label}</span>
-                            <span className="text-[11px] font-mono text-[var(--text-faint)]">{m.dims.toLocaleString()} dims</span>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
           </div>
 
-          {/* Credential — only shown for selected model's provider */}
+          {/* Credential — hidden for Default */}
+          {!isDefault && credType && (
+            <div className="flex flex-col gap-2">
+              <div className="text-[13px] font-semibold text-[var(--text)]">{provider} credential</div>
+              <CredentialSelector
+                credType={credType}
+                value={credId}
+                onChange={setCredId}
+                providerLabel={provider}
+              />
+            </div>
+          )}
+
+          {/* Embedding model — fetched live from provider API */}
           <div className="flex flex-col gap-2">
-            <div className="text-[13px] font-semibold text-[var(--text)]">{selectedModel?.provider} credential</div>
-            {relevantCreds.length === 0 ? (
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-[oklch(0.82_0.14_80/0.10)] border border-[oklch(0.82_0.14_80/0.3)] rounded-[9px]">
-                <Icons.Activity style={{ width: 13, height: 13, color: 'var(--warn)' }} />
-                <span className="text-[12px] text-[var(--warn)]">No {selectedModel?.provider} credentials. Add one in Connections.</span>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[13px] font-semibold text-[var(--text)]">Embedding model</div>
+                <p className="text-[12px] text-[var(--text-faint)] mt-0.5">Used to convert documents and queries into vectors for retrieval.</p>
               </div>
-            ) : (
-              <Dropdown className="w-full">
-                <DropdownTrigger className="w-full">
-                  <div className="flex items-center justify-between h-[38px] px-3 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[9px] text-[13px] cursor-pointer hover:border-[var(--border-soft)] transition-colors">
-                    <span className={selectedCred ? 'text-[var(--text)]' : 'text-[var(--text-faint)]'}>
-                      {selectedCred?.name ?? `Select ${selectedModel?.provider} credential…`}
-                    </span>
-                    <Icons.Caret style={{ width: 11, height: 11, color: 'var(--text-faint)' }} />
-                  </div>
-                </DropdownTrigger>
-                <DropdownContent className="w-full">
-                  {relevantCreds.map(c => (
-                    <DropdownItem key={c.id} onClick={() => setCredId(c.id)} className={credId === c.id ? 'bg-[var(--surface)]' : ''}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{c.name}</span>
-                        {credId === c.id && <Icons.Check style={{ width: 13, height: 13, color: 'var(--ok)' }} />}
-                      </div>
-                    </DropdownItem>
-                  ))}
-                </DropdownContent>
-              </Dropdown>
-            )}
+              {modelsQuery.isFetching && (
+                <span className="text-[10.5px] font-mono text-[var(--text-faint)]">Loading…</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {!isDefault && !credId ? (
+                <div className="px-3 py-3 text-[12px] text-[var(--text-faint)] bg-[var(--bg)] border border-[var(--border-faint)] rounded-[9px]">
+                  Select a credential above to list available models.
+                </div>
+              ) : modelsQuery.isError ? (
+                <div className="px-3 py-3 text-[12px] text-[var(--err)] bg-[var(--bg)] border border-[var(--border-faint)] rounded-[9px]">
+                  {modelsQuery.error instanceof Error ? modelsQuery.error.message : 'Failed to list models.'}
+                </div>
+              ) : modelsQuery.isLoading ? (
+                <div className="px-3 py-3 text-[12px] text-[var(--text-faint)] bg-[var(--bg)] border border-[var(--border-faint)] rounded-[9px]">
+                  Loading models from {provider}…
+                </div>
+              ) : providerModels.length === 0 ? (
+                <div className="px-3 py-3 text-[12px] text-[var(--text-faint)] bg-[var(--bg)] border border-[var(--border-faint)] rounded-[9px]">
+                  No embedding models available for {provider}.
+                </div>
+              ) : (
+                providerModels.map(m => (
+                  <label key={m.id}
+                    onClick={() => setModel(m.id)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-[9px] border cursor-pointer transition-colors
+                      ${model === m.id ? 'bg-[var(--surface)] border-[var(--border-soft)]' : 'bg-[var(--bg)] border-[var(--border-faint)] hover:border-[var(--border-soft)]'}`
+                    }>
+                    <input type="radio" name="setting-model" value={m.id} checked={model === m.id} readOnly className="accent-[var(--text)]" />
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <span className="text-[13px] font-medium text-[var(--text)] truncate">{m.label}</span>
+                      <span className="text-[11px] font-mono text-[var(--text-faint)]">{m.dims != null ? `${m.dims.toLocaleString()} dims` : '— dims'}</span>
+                    </div>
+                  </label>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="h-px bg-[var(--border-faint)]" />
@@ -234,7 +263,7 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
           </button>
           <button
             onClick={handleSave}
-            disabled={saving || !credId}
+            disabled={saving || !model || (!isDefault && !credId)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
           >
             {saving ? 'Saving…' : 'Save settings'}

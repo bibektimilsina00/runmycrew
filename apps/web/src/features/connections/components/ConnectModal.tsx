@@ -8,17 +8,25 @@ import type { Provider } from '../types/connectionsTypes'
 interface Props {
   providers: Provider[]
   onClose: () => void
+  /** Preselect a provider by id, skipping the browse step. */
+  initialProviderId?: string
+  /** Fires after credential is created (api_key flow). Receives the created credential id when available. */
+  onCreated?: (credentialId?: string) => void
 }
 
-export function ConnectModal({ providers, onClose }: Props) {
+export function ConnectModal({ providers, onClose, initialProviderId, onCreated }: Props) {
   const { toast } = useToast()
   const createCredential = useCreateCredential()
   const getOAuthUrl = useOAuthUrl()
 
+  const initial = initialProviderId
+    ? providers.find(p => p.id === initialProviderId) ?? null
+    : null
+
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<'all' | 'oauth' | 'api_key'>('all')
-  const [selected, setSelected] = useState<Provider | null>(null)
-  const [connName, setConnName] = useState('')
+  const [selected, setSelected] = useState<Provider | null>(initial)
+  const [connName, setConnName] = useState(initial?.name ?? '')
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
   const [connecting, setConnecting] = useState(false)
 
@@ -55,8 +63,9 @@ export function ConnectModal({ providers, onClose }: Props) {
       for (const field of (selected.fields ?? [])) {
         data[field.id] = fieldValues[field.id] ?? ''
       }
-      await createCredential.mutateAsync({ name: connName || selected.name, type: selected.id, data })
+      const created = await createCredential.mutateAsync({ name: connName || selected.name, type: selected.id, data })
       toast('Connected', { variant: 'ok', description: `${selected.name} has been connected.` })
+      onCreated?.(created?.id)
       onClose()
     } catch (err) {
       toast('Failed to connect', { variant: 'err', description: err instanceof Error ? err.message : 'Try again.' })

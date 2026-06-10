@@ -1,3 +1,5 @@
+import asyncio
+
 import httpx
 from fastapi import HTTPException
 
@@ -5,11 +7,23 @@ TOKENS_TO_CHARS = 4
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
+
+# Sentinel for "use the Fuse-managed Gemini key from settings.GEMINI_API_KEY".
+# Accepted forms:
+#   - "default"                          → resolves to DEFAULT_GOOGLE_MODEL
+#   - "default:<google-model-id>"        → resolves to that Google embedding model
+DEFAULT_MODEL_ID = "default"
+DEFAULT_MODEL_PREFIX = "default:"
+DEFAULT_GOOGLE_MODEL = "gemini-embedding-001"
+
 MODEL_PROVIDER: dict[str, str] = {
+    "default": "google",
     "text-embedding-3-small": "openai",
     "text-embedding-3-large": "openai",
     "text-embedding-ada-002": "openai",
     "text-embedding-004": "google",
+    "gemini-embedding-001": "google",
+    "gemini-embedding-2": "google",
     "mistral-embed": "mistral",
 }
 
@@ -18,8 +32,23 @@ MODEL_CRED_TYPE: dict[str, str] = {
     "text-embedding-3-large": "openai_api_key",
     "text-embedding-ada-002": "openai_api_key",
     "text-embedding-004": "google_api_key",
+    "gemini-embedding-001": "google_api_key",
+    "gemini-embedding-2": "google_api_key",
     "mistral-embed": "mistral_api_key",
 }
+
+
+def _is_default_model(model: str) -> bool:
+    return model == DEFAULT_MODEL_ID or model.startswith(DEFAULT_MODEL_PREFIX)
+
+
+def _resolve_model_id(model: str) -> str:
+    """Resolve sentinel `default` / `default:<google-model>` to concrete provider model id."""
+    if model == DEFAULT_MODEL_ID:
+        return DEFAULT_GOOGLE_MODEL
+    if model.startswith(DEFAULT_MODEL_PREFIX):
+        return model[len(DEFAULT_MODEL_PREFIX) :] or DEFAULT_GOOGLE_MODEL
+    return model
 
 
 def _cred_type_for_model(model: str) -> str:
@@ -33,6 +62,8 @@ def _cred_type_for_model(model: str) -> str:
 
 
 def _provider_from_model(model: str) -> str:
+    if _is_default_model(model):
+        return "google"
     if model in MODEL_PROVIDER:
         return MODEL_PROVIDER[model]
     if model.startswith("models/") or "gemini" in model:
@@ -191,24 +222,46 @@ async def _embed_mistral(texts: list[str], api_key: str, model: str) -> list[lis
 
 
 async def _embed_google(texts: list[str], api_key: str, model: str) -> list[list[float]]:
+    """Embed via Generative Language API.
+
+    Uses per-text `:embedContent` (singular) — `gemini-embedding-001` and the
+    legacy `text-embedding-004` both support it. The synchronous batch variant
+    `:batchEmbedContents` was retired for newer Gemini embedding models, so we
+    parallelise with `asyncio.gather` instead.
+    """
     model_id = model if model.startswith("models/") else f"models/{model}"
-    url = f"https://generativelanguage.googleapis.com/v1beta/{model_id}:batchEmbedContents?key={api_key}"
-    requests_payload = [{"model": model_id, "content": {"parts": [{"text": t}]}} for t in texts]
+    url = f"https://generativelanguage.googleapis.com/v1beta/{model_id}:embedContent?key={api_key}"
+
     async with httpx.AsyncClient(timeout=60.0) as client:
-        resp = await client.post(url, json={"requests": requests_payload})
-        resp.raise_for_status()
-        return [item["values"] for item in resp.json()["embeddings"]]
+
+        async def _one(text: str) -> list[float]:
+            resp = await client.post(
+                url,
+                json={"model": model_id, "content": {"parts": [{"text": text}]}},
+            )
+            resp.raise_for_status()
+            return resp.json()["embedding"]["values"]
+
+        # Bound concurrency so we don't blast the per-key rate limit.
+        sem = asyncio.Semaphore(8)
+
+        async def _bounded(text: str) -> list[float]:
+            async with sem:
+                return await _one(text)
+
+        return await asyncio.gather(*(_bounded(t) for t in texts))
 
 
 async def _embed_texts(
     texts: list[str], api_key: str, model: str = "text-embedding-3-small"
 ) -> list[list[float]]:
-    provider = _provider_from_model(model)
+    resolved = _resolve_model_id(model)
+    provider = _provider_from_model(resolved)
     if provider == "google":
-        return await _embed_google(texts, api_key, model)
+        return await _embed_google(texts, api_key, resolved)
     if provider == "mistral":
-        return await _embed_mistral(texts, api_key, model)
-    return await _embed_openai(texts, api_key, model)
+        return await _embed_mistral(texts, api_key, resolved)
+    return await _embed_openai(texts, api_key, resolved)
 
 
 async def _embed_one(text: str, api_key: str, model: str = "text-embedding-3-small") -> list[float]:

@@ -67,8 +67,6 @@ export function KnowledgeDocumentView() {
     if (chunk) openEditor(chunk)
   }
 
-  const editingChunk = chunks.find(c => c.id === editingId)
-
   if (isLoading) return (
     <div className="view-body">
       <div className="flex items-center gap-3 py-12 text-[13px] text-[var(--text-faint)]">
@@ -121,21 +119,23 @@ export function KnowledgeDocumentView() {
         </div>
       )}
 
-      {/* Main layout: chunk list + editor side by side */}
-      <div className={`flex gap-5 ${editingId ? 'items-start' : ''}`}>
-
-        {/* Chunk list */}
-        <div className={`flex flex-col gap-2 ${editingId ? 'w-[320px] shrink-0' : 'w-full'}`}>
-          {chunks.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-12">
-              <Icons.Doc style={{ width: 20, height: 20, color: 'var(--text-dim)' }} />
-              <p className="text-[13px] text-[var(--text-faint)]">No chunks yet.</p>
-            </div>
-          ) : chunks.map(chunk => (
+      {/* Chunk list — editing happens inline inside the same card */}
+      <div className="flex flex-col gap-2 w-full">
+        {chunks.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-12">
+            <Icons.Doc style={{ width: 20, height: 20, color: 'var(--text-dim)' }} />
+            <p className="text-[13px] text-[var(--text-faint)]">No chunks yet.</p>
+          </div>
+        ) : chunks.map(chunk => {
+          const isEditing = editingId === chunk.id
+          return (
             <div
               key={chunk.id}
-              onClick={() => openEditor(chunk)}
-              className={`flex flex-col gap-2 p-4 rounded-[10px] border cursor-pointer transition-colors group ${editingId === chunk.id ? 'bg-[var(--surface)] border-[var(--border-soft)]' : 'bg-[var(--bg)] border-[var(--border-faint)] hover:border-[var(--border-soft)]'}`}
+              onClick={() => { if (!isEditing) openEditor(chunk) }}
+              className={`flex flex-col gap-2 p-4 rounded-[10px] border transition-colors group
+                ${isEditing
+                  ? 'bg-[var(--surface)] border-[var(--border-soft)] cursor-default min-h-[calc(100vh-220px)]'
+                  : 'bg-[var(--bg)] border-[var(--border-faint)] hover:border-[var(--border-soft)] cursor-pointer'}`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono text-[var(--text-dim)]">chunk #{chunk.chunk_index}</span>
@@ -143,76 +143,84 @@ export function KnowledgeDocumentView() {
                   {chunk.has_embedding && (
                     <span className="text-[9.5px] font-mono tracking-widest uppercase px-[6px] py-[2px] rounded-[3px] bg-[oklch(0.78_0.14_145/0.14)] text-[var(--ok)]">indexed</span>
                   )}
+                  {isEditing && (
+                    <>
+                      <button
+                        onClick={e => { e.stopPropagation(); navigateChunk('prev') }}
+                        disabled={chunk.chunk_index === 0}
+                        className="w-[24px] h-[24px] rounded-[5px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--bg)] hover:text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title="Previous chunk"
+                      >
+                        <Icons.CaretRight style={{ width: 11, height: 11, transform: 'rotate(180deg)' }} />
+                      </button>
+                      <button
+                        onClick={e => { e.stopPropagation(); navigateChunk('next') }}
+                        disabled={chunk.chunk_index >= chunks.length - 1}
+                        className="w-[24px] h-[24px] rounded-[5px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--bg)] hover:text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title="Next chunk"
+                      >
+                        <Icons.CaretRight style={{ width: 11, height: 11 }} />
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={e => { e.stopPropagation(); handleDelete(chunk) }}
-                    className="w-[20px] h-[20px] rounded-[5px] inline-flex items-center justify-center text-[var(--text-dim)] opacity-0 group-hover:opacity-100 hover:bg-[oklch(0.70_0.18_22/0.14)] hover:text-[var(--err)] transition-all"
+                    className={`w-[20px] h-[20px] rounded-[5px] inline-flex items-center justify-center text-[var(--text-dim)] hover:bg-[oklch(0.70_0.18_22/0.14)] hover:text-[var(--err)] transition-all ${isEditing ? '' : 'opacity-0 group-hover:opacity-100'}`}
+                    title="Delete chunk"
                   >
                     <Icons.Trash style={{ width: 11, height: 11 }} />
                   </button>
+                  {isEditing && (
+                    <button
+                      onClick={e => { e.stopPropagation(); closeEditor() }}
+                      className="w-[24px] h-[24px] rounded-[5px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--bg)] hover:text-[var(--text)] transition-colors text-[12px] ml-1"
+                      title="Close"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               </div>
-              <p className={`text-[12.5px] text-[var(--text-mute)] leading-relaxed ${editingId ? 'line-clamp-3' : 'line-clamp-4'}`}>
-                {chunk.content}
-              </p>
-              <span className="text-[10.5px] font-mono text-[var(--text-dim)]">{chunk.content.length} chars</span>
-            </div>
-          ))}
-        </div>
 
-        {/* Chunk editor */}
-        {editingId && editingChunk && (
-          <div className="flex-1 flex flex-col gap-4 p-5 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[12px] sticky top-4">
-            {/* Editor header */}
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-semibold text-[var(--text-mute)]">chunk #{editingChunk.chunk_index}</span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => navigateChunk('prev')}
-                  disabled={editingChunk.chunk_index === 0}
-                  className="w-[26px] h-[26px] rounded-[6px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--surface)] hover:text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  title="Previous chunk"
-                >
-                  <Icons.CaretRight style={{ width: 12, height: 12, transform: 'rotate(180deg)' }} />
-                </button>
-                <button
-                  onClick={() => navigateChunk('next')}
-                  disabled={editingChunk.chunk_index >= chunks.length - 1}
-                  className="w-[26px] h-[26px] rounded-[6px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--surface)] hover:text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  title="Next chunk"
-                >
-                  <Icons.CaretRight style={{ width: 12, height: 12 }} />
-                </button>
-                <button onClick={closeEditor} className="w-[26px] h-[26px] rounded-[6px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--surface)] hover:text-[var(--text)] transition-colors text-[12px] ml-1">
-                  ✕
-                </button>
-              </div>
+              {isEditing ? (
+                <>
+                  <textarea
+                    autoFocus
+                    value={editContent}
+                    onChange={e => setEditContent(e.target.value)}
+                    onClick={e => e.stopPropagation()}
+                    className="flex-1 min-h-[300px] px-3 py-2.5 bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[9px] text-[13px] font-mono text-[var(--text)] outline-none resize-none focus:border-[var(--border)] transition-colors leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10.5px] font-mono text-[var(--text-dim)]">{editContent.length} chars</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={e => { e.stopPropagation(); closeEditor() }}
+                        className="px-3 py-1.5 rounded-[7px] text-[12.5px] font-medium text-[var(--text-mute)] bg-[var(--bg)] border border-[var(--border-faint)] hover:bg-[var(--surface-2)] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={e => { e.stopPropagation(); void handleSave() }}
+                        disabled={updateChunk.isPending || editContent === chunk.content}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] bg-[var(--text)] text-[var(--bg)] text-[12.5px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+                      >
+                        {updateChunk.isPending ? 'Saving…' : 'Save & re-index'}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-[12.5px] text-[var(--text-mute)] leading-relaxed line-clamp-4">
+                    {chunk.content}
+                  </p>
+                  <span className="text-[10.5px] font-mono text-[var(--text-dim)]">{chunk.content.length} chars</span>
+                </>
+              )}
             </div>
-
-            {/* Text editor */}
-            <textarea
-              value={editContent}
-              onChange={e => setEditContent(e.target.value)}
-              rows={14}
-              className="px-3 py-2.5 bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[9px] text-[13px] font-mono text-[var(--text)] outline-none resize-none focus:border-[var(--border)] transition-colors leading-relaxed"
-            />
-
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono text-[var(--text-dim)]">{editContent.length} chars · {chunks.length} total chunks</span>
-              <div className="flex items-center gap-2">
-                <button onClick={closeEditor} className="px-3 py-1.5 rounded-[7px] text-[12.5px] font-medium text-[var(--text-mute)] bg-[var(--surface)] border border-[var(--border-faint)] hover:bg-[var(--surface-2)] transition-colors">
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={updateChunk.isPending || editContent === editingChunk.content}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] bg-[var(--text)] text-[var(--bg)] text-[12.5px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
-                >
-                  {updateChunk.isPending ? 'Saving…' : 'Save & re-index'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+          )
+        })}
       </div>
     </div>
   )

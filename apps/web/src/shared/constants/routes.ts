@@ -78,6 +78,7 @@ export const API_ROUTES = {
   KB_CHUNK: (kbId: string, chunkId: string) => `/kb/${kbId}/chunks/${chunkId}`,
   KB_SEARCH: (id: string) => `/kb/${id}/search`,
   KB_REINDEX: (id: string) => `/kb/${id}/reindex`,
+  KB_EMBEDDING_MODELS: '/kb/embedding-models',
 
   // Variables (backed by /secrets endpoint)
   VARIABLES_LIST: '/secrets/',

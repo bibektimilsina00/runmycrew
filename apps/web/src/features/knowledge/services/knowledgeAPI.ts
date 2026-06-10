@@ -3,7 +3,7 @@ import apiClient, { requestJson } from '@/shared/utils/apiClient'
 import { API_ROUTES } from '@/shared/constants/routes'
 import {
   KnowledgeBaseSchema, KBDetailSchema, SearchResponseSchema,
-  KBChunkSchema,
+  KBChunkSchema, EmbeddingModelInfoSchema,
   type KBCreateRequest,
 } from '../types/knowledgeTypes'
 
@@ -87,4 +87,12 @@ export const knowledgeAPI = {
       z.object({ reindexed: z.number(), needs_reupload: z.number(), message: z.string() }),
       { url: API_ROUTES.KB_REINDEX(kbId), method: 'POST' }
     ),
+
+  listEmbeddingModels: (provider: string, credentialId: string | null, signal?: AbortSignal) =>
+    requestJson(z.array(EmbeddingModelInfoSchema), {
+      url: API_ROUTES.KB_EMBEDDING_MODELS,
+      method: 'GET',
+      params: { provider, ...(credentialId ? { credential_id: credentialId } : {}) },
+      signal,
+    }),
 }

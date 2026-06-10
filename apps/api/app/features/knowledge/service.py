@@ -4,10 +4,15 @@ import httpx
 from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.app.core.config import settings
 from apps.api.app.core.database import get_db
 from apps.api.app.core.logger import get_logger
 from apps.api.app.features.credentials.repository import CredentialRepository
 from apps.api.app.features.credentials.service import CredentialService
+from apps.api.app.features.knowledge.embedding_catalog import (
+    EmbeddingModelInfo,
+    list_embedding_models,
+)
 from apps.api.app.features.knowledge.models import KBChunk, KBDocument, KnowledgeBase
 from apps.api.app.features.knowledge.repository import KnowledgeRepository
 from apps.api.app.features.knowledge.schemas import (
@@ -25,6 +30,7 @@ from apps.api.app.features.knowledge.service_helpers import (
     _embed_one,
     _embed_texts,
     _handle_ingestion_error,
+    _is_default_model,
     _provider_from_model,
     _split_text,
 )
@@ -38,9 +44,23 @@ class KnowledgeService:
         self.repo = KnowledgeRepository(db)
 
     async def _get_api_key(self, kb: KnowledgeBase, workspace_id: uuid.UUID) -> str:
+        model = kb.embedding_model or "text-embedding-3-small"
+
+        # Fuse-managed default: use Gemini key from settings, skip credential lookup.
+        if _is_default_model(model):
+            if not settings.GEMINI_API_KEY:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "Fuse default embedding model is unavailable: GEMINI_API_KEY is not set "
+                        "on the server. Pick a different provider in KB settings."
+                    ),
+                )
+            return settings.GEMINI_API_KEY
+
         cred_repo = CredentialRepository(self.db)
         cred_service = CredentialService(self.db)
-        required_cred_type = _cred_type_for_model(kb.embedding_model or "text-embedding-3-small")
+        required_cred_type = _cred_type_for_model(model)
 
         if kb.embedding_credential_id:
             cred = await cred_repo.get_by_id_and_workspace(kb.embedding_credential_id, workspace_id)
@@ -73,6 +93,56 @@ class KnowledgeService:
         if not kb:
             raise HTTPException(status_code=404, detail="Knowledge base not found.")
         return kb
+
+    async def list_embedding_models(
+        self,
+        workspace_id: uuid.UUID,
+        provider: str,
+        credential_id: uuid.UUID | None,
+    ) -> list[EmbeddingModelInfo]:
+        """List embedding models live from the provider's API.
+
+        - Default provider: uses server-managed `GEMINI_API_KEY`.
+        - Other providers: requires `credential_id` of the matching cred type.
+        """
+        if provider == "Default":
+            if not settings.GEMINI_API_KEY:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Default provider unavailable: GEMINI_API_KEY is not set on the server.",
+                )
+            return await list_embedding_models("Default", settings.GEMINI_API_KEY)
+
+        cred_type_map = {
+            "OpenAI": "openai_api_key",
+            "Google": "google_api_key",
+            "Mistral": "mistral_api_key",
+        }
+        cred_type = cred_type_map.get(provider)
+        if cred_type is None:
+            raise HTTPException(status_code=400, detail=f"Unknown provider: {provider}")
+
+        if not credential_id:
+            raise HTTPException(
+                status_code=400,
+                detail=f"credential_id is required for {provider}.",
+            )
+
+        cred_repo = CredentialRepository(self.db)
+        cred = await cred_repo.get_by_id_and_workspace(credential_id, workspace_id)
+        if not cred or cred.type != cred_type:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No {provider} credential found for id {credential_id}.",
+            )
+        decrypted = await CredentialService(self.db).get_decrypted_credential(cred)
+        api_key = decrypted.get("api_key")
+        if not api_key:
+            raise HTTPException(
+                status_code=400,
+                detail=f"{provider} credential has no api_key field.",
+            )
+        return await list_embedding_models(provider, api_key)
 
     async def list_kb_options(self, workspace_id: uuid.UUID) -> list[dict]:
         kbs = await self.repo.list_kbs(workspace_id)

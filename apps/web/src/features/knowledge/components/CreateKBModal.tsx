@@ -15,6 +15,12 @@ interface Props {
 const ACCEPTED = '.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.md,.ppt,.pptx,.html,.jsonl'
 const ACCEPT_LABEL = 'PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, HTML, JSONL (max 100MB each)'
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
 export function CreateKBModal({ onClose, onCreated }: Props) {
   const createKB = useCreateKB()
 
@@ -51,7 +57,7 @@ export function CreateKBModal({ onClose, onCreated }: Props) {
       const kb = await createKB.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
-        embedding_model: 'text-embedding-3-small',
+        embedding_model: 'default:gemini-embedding-001',
         min_chunk_size: minChunk,
         max_chunk_tokens: maxTokens,
         overlap_tokens: overlap,
@@ -174,7 +180,7 @@ export function CreateKBModal({ onClose, onCreated }: Props) {
                   <div key={i} className="flex items-center gap-3 px-3 py-2 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[8px]">
                     <Icons.Doc style={{ width: 13, height: 13, color: 'var(--text-faint)', flexShrink: 0 }} />
                     <span className="flex-1 text-[12.5px] text-[var(--text-mute)] truncate">{f.name}</span>
-                    <span className="text-[11px] font-mono text-[var(--text-dim)]">{(f.size / 1024 / 1024).toFixed(1)} MB</span>
+                    <span className="text-[11px] font-mono text-[var(--text-dim)]">{formatFileSize(f.size)}</span>
                     <button onClick={e => { e.stopPropagation(); setFiles(prev => prev.filter((_, j) => j !== i)) }}
                       className="text-[var(--text-dim)] hover:text-[var(--err)] transition-colors text-[12px]">✕</button>
                   </div>
