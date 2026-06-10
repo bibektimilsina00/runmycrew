@@ -101,7 +101,7 @@ async def _list_google(api_key: str, *, default_provider: bool) -> list[Embeddin
             )
         )
     # Stable display order: known/popular first, then alpha.
-    out.sort(key=lambda x: (x.label.lower()))
+    out.sort(key=lambda x: x.label.lower())
     return out
 
 

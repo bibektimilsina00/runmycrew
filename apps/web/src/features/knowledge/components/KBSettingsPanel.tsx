@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Icons } from '@/shared/components/icons'
 import { useToast, CredentialSelector } from '@/shared/components'
@@ -44,22 +44,18 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
   const modelsQuery = useEmbeddingModels(provider, isDefault ? null : (credId || null))
   const providerModels = modelsQuery.data ?? []
 
-  // When the model list resolves and the saved model isn't in it, fall back
-  // to the first listed model so the radio shows a valid selection.
-  useEffect(() => {
-    if (modelsQuery.isSuccess && providerModels.length > 0) {
-      if (!providerModels.some(m => m.id === model)) {
-        setModel(providerModels[0].id)
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelsQuery.isSuccess, providerModels.length])
+  // The model the radio displays as selected: prefer the user's pick if it's
+  // present in the fetched list; otherwise fall back to the first listed model
+  // so a saved-but-now-retired id doesn't leave the radio in a stuck state.
+  const effectiveModel = providerModels.some(m => m.id === model)
+    ? model
+    : providerModels[0]?.id ?? ''
 
   const handleProviderChange = (next: string) => {
     setProvider(next)
     setCredId('')
-    // Defer model selection — useEffect above will pick the first one once the
-    // fetched list resolves for the new provider.
+    // Clear model — `effectiveModel` will display the first one once the new
+    // provider's list resolves, and the user can still click to pick another.
     setModel('')
   }
 
@@ -73,7 +69,7 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
       await knowledgeAPI.update(kb.id, {
         name: kb.name,
         description: kb.description ?? undefined,
-        embedding_model: model,
+        embedding_model: effectiveModel,
         embedding_credential_id: isDefault ? null : credId,
         min_chunk_size: minChunk,
         max_chunk_tokens: maxTokens,
@@ -193,9 +189,9 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
                   <label key={m.id}
                     onClick={() => setModel(m.id)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-[9px] border cursor-pointer transition-colors
-                      ${model === m.id ? 'bg-[var(--surface)] border-[var(--border-soft)]' : 'bg-[var(--bg)] border-[var(--border-faint)] hover:border-[var(--border-soft)]'}`
+                      ${effectiveModel === m.id ? 'bg-[var(--surface)] border-[var(--border-soft)]' : 'bg-[var(--bg)] border-[var(--border-faint)] hover:border-[var(--border-soft)]'}`
                     }>
-                    <input type="radio" name="setting-model" value={m.id} checked={model === m.id} readOnly className="accent-[var(--text)]" />
+                    <input type="radio" name="setting-model" value={m.id} checked={effectiveModel === m.id} readOnly className="accent-[var(--text)]" />
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-[13px] font-medium text-[var(--text)] truncate">{m.label}</span>
                       <span className="text-[11px] font-mono text-[var(--text-faint)]">{m.dims != null ? `${m.dims.toLocaleString()} dims` : '— dims'}</span>
@@ -263,7 +259,7 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
           </button>
           <button
             onClick={handleSave}
-            disabled={saving || !model || (!isDefault && !credId)}
+            disabled={saving || !effectiveModel || (!isDefault && !credId)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
           >
             {saving ? 'Saving…' : 'Save settings'}
