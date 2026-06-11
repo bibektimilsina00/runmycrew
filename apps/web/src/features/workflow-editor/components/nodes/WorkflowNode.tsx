@@ -2,6 +2,7 @@ import { useMemo, useEffect } from 'react'
 import { type NodeProps, useUpdateNodeInternals } from 'reactflow'
 import { cn } from '@/lib/cn'
 import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
+import { useEditorLayoutStore } from '../../stores/editorLayoutStore'
 import { NodeToolbar } from './components/node-toolbar'
 import { NodeHeader } from './components/node-header'
 import { NodeProperty } from './components/node-property'
@@ -12,6 +13,7 @@ import { useNodeExecutionStatus } from '../../hooks/useNodeExecutionStatus'
 export function WorkflowNode({ id, type, data, selected }: NodeProps) {
   const nodeDefinitions = useWorkflowEditorStore(s => s.nodeDefinitions)
   const definition = useMemo(() => nodeDefinitions.find(d => d.type === type), [type, nodeDefinitions])
+  const nodeUI = useEditorLayoutStore(s => s.nodeUI[id])
   const updateNodeInternals = useUpdateNodeInternals()
   const isLocked = data?.locked ?? false
   const handleDirection: 'horizontal' | 'vertical' = data?.handleDirection ?? 'horizontal'
@@ -26,7 +28,8 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
   if (!definition) return null
 
   const properties: Record<string, unknown> = data.properties ?? {}
-  const showAdvanced = (data?.showAdvanced as boolean | undefined) ?? false
+  const showAdvanced = nodeUI?.showAdvanced ?? false
+  const fieldModes = nodeUI?.fieldModes
   const diffMark = data?.__diff as 'new' | 'edited' | 'deleted' | undefined
 
   const visibleProps = getVisibleNodeProperties(definition.properties, properties, showAdvanced)
@@ -52,7 +55,7 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
           !diffMark && !executionStatus && (!selected || isLocked) && 'border-border',
         )}
       >
-        <NodeToolbar id={id} />
+        <NodeToolbar id={id} selected={!!selected} />
         <NodeHandles definition={definition} direction={handleDirection} />
 
         <NodeHeader
@@ -63,8 +66,7 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
 
         <div className="flex flex-col gap-0.5 py-1.5">
           {visibleProps.map(prop => {
-            const modes = (data.properties as Record<string, unknown>)?._modes as Record<string, string> | undefined
-            const mode = modes?.[prop.name] ?? (prop.loadOptions ? 'dynamic' : 'manual')
+            const mode = fieldModes?.[prop.name] ?? 'manual'
             return (
               <NodeProperty
                 key={prop.name}

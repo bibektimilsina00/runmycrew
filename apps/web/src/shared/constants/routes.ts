@@ -44,6 +44,7 @@ export const API_ROUTES = {
 
   // Nodes
   NODES_LIST: '/nodes/',
+  NODE_TEST:  '/nodes/test',
 
   // Workflows / Automations
   WORKFLOWS_WITH_STATS: '/workflows/with-stats',

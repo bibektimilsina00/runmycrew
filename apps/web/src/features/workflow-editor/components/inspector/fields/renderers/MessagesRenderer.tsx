@@ -1,13 +1,7 @@
 import { Plus, X } from 'lucide-react'
 import { Textarea } from '@/shared/components'
 import { cn } from '@/lib/cn'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 interface Message {
   role: 'system' | 'user' | 'assistant'
@@ -37,7 +31,7 @@ function toMessages(value: unknown): Message[] {
   return []
 }
 
-export function MessagesRenderer({ value, onChange }: Props) {
+export function MessagesRenderer({ value, onChange, disabled }: RendererProps) {
   const messages = toMessages(value)
 
   const updateRole = (i: number, role: Message['role']) => {
@@ -96,7 +90,8 @@ export function MessagesRenderer({ value, onChange }: Props) {
       <button
         type="button"
         onClick={add}
-        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border border-dashed border-border-faint text-[11px] text-text-faint hover:border-border-soft hover:text-text-mute transition-colors"
+        disabled={disabled}
+        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border border-dashed border-border-faint text-[11px] text-text-faint hover:border-border-soft hover:text-text-mute transition-colors disabled:opacity-40"
       >
         <Plus size={11} />
         Add message

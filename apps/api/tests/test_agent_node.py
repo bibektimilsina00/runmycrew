@@ -14,14 +14,19 @@ def test_agent_model_field_uses_generic_dynamic_options_contract():
     credential_property = next(prop for prop in metadata.properties if prop["name"] == "credential")
     model_property = next(prop for prop in metadata.properties if prop["name"] == "model")
 
-    assert provider_property["type"] == "string"
+    # Provider + model use the searchable+allowCustom combobox now so the
+    # inspector renders a real picker instead of a plain text input. The
+    # static `options` array stays absent — choices come from `loadOptions`.
+    assert provider_property["type"] == "options"
     assert provider_property["loadOptions"] == "/ai/providers"
+    assert provider_property["typeOptions"] == {"searchable": True, "allowCustom": True}
     assert "options" not in provider_property
     assert credential_property["credentialTypeByField"]["field"] == "provider"
     assert (
         credential_property["credentialTypeByField"]["values"]["openrouter"] == "openrouter_api_key"
     )
-    assert model_property["type"] == "string"
+    assert model_property["type"] == "options"
+    assert model_property["typeOptions"] == {"searchable": True, "allowCustom": True}
     assert model_property["loadOptions"] == "/ai/models"
     assert model_property["loadOptionsDependsOn"] == [
         "provider",

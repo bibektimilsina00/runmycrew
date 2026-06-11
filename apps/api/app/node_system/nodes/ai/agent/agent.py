@@ -78,11 +78,12 @@ class AgentNode(BaseNode[AgentProperties]):
                 {
                     "name": "provider",
                     "label": "Provider",
-                    "type": "string",
+                    "type": "options",
                     "default": "openai",
                     "required": True,
                     "placeholder": "Type or select an AI provider",
                     "loadOptions": "/ai/providers",
+                    "typeOptions": {"searchable": True, "allowCustom": True},
                 },
                 *cls._provider_credential_properties(),
                 {
@@ -99,7 +100,7 @@ class AgentNode(BaseNode[AgentProperties]):
                 {
                     "name": "model",
                     "label": "Model",
-                    "type": "string",
+                    "type": "options",
                     "required": True,
                     "placeholder": "Type or select a model ID",
                     "loadOptions": "/ai/models",
@@ -111,6 +112,7 @@ class AgentNode(BaseNode[AgentProperties]):
                         "googleCredential",
                         "groqCredential",
                     ],
+                    "typeOptions": {"searchable": True, "allowCustom": True},
                 },
                 {
                     "name": "messages",

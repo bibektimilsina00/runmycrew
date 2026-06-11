@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { Textarea } from '@/shared/components'
 import { cn } from '@/lib/cn'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 function toJsonString(value: unknown): string {
   if (value === undefined || value === null || value === '') return ''
@@ -15,7 +9,7 @@ function toJsonString(value: unknown): string {
   return JSON.stringify(value, null, 2)
 }
 
-export function JsonRenderer({ prop, value, onChange }: Props) {
+export function JsonRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const [raw, setRaw] = useState(() => toJsonString(value))
   const [invalid, setInvalid] = useState(false)
   const opts = prop.typeOptions ?? {}
@@ -41,6 +35,7 @@ export function JsonRenderer({ prop, value, onChange }: Props) {
         rows={rows}
         spellCheck={false}
         placeholder={prop.placeholder ?? '{}'}
+        disabled={disabled}
         className={cn(
           'font-mono text-[11px] leading-relaxed',
           invalid && 'border-err focus-visible:ring-err/30',

@@ -22,9 +22,10 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
     advancedGroups,
     showAdvanced,
     toggleAdvanced,
+    fieldModes,
+    setFieldMode,
     updateProperty,
     updateLabel,
-    closeInspector,
   } = useInspectorNode({ nodes, updateNodeData })
 
   return (
@@ -44,15 +45,13 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
       ) : (
         <>
           <InspectorHeader
-            nodeId={selectedNode.id}
             label={(selectedNode.data?.label as string | undefined) || definition.name}
             definition={definition}
             onLabelChange={updateLabel}
-            onClose={closeInspector}
           />
 
           {/* Scrollable body */}
-          <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {basicGroups.length === 0 && advancedGroups.length === 0 ? (
               <Empty
                 title="No configurable fields"
@@ -61,15 +60,15 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
               />
             ) : (
               <div className="flex flex-col gap-4 p-4 pb-6">
-                {/* Basic fields — no header, no collapsible */}
                 <PropertyGroupList
                   groups={basicGroups}
                   definition={definition}
                   properties={properties}
                   onPropertyChange={updateProperty}
+                  fieldModes={fieldModes}
+                  onFieldModeChange={(name, mode) => setFieldMode(name, mode)}
                 />
 
-                {/* Advanced toggle — v1 dashed divider style */}
                 {advancedGroups.length > 0 && (
                   <div className="flex flex-col gap-4">
                     <button
@@ -88,14 +87,14 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
                     </button>
 
                     {showAdvanced && (
-                      <div className="flex flex-col gap-4">
-                        <PropertyGroupList
-                          groups={advancedGroups}
-                          definition={definition}
-                          properties={properties}
-                          onPropertyChange={updateProperty}
-                        />
-                      </div>
+                      <PropertyGroupList
+                        groups={advancedGroups}
+                        definition={definition}
+                        properties={properties}
+                        onPropertyChange={updateProperty}
+                        fieldModes={fieldModes}
+                        onFieldModeChange={(name, mode) => setFieldMode(name, mode)}
+                      />
                     )}
                   </div>
                 )}
@@ -103,7 +102,6 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
             )}
           </div>
 
-          {/* Output schema — pinned footer, collapsible */}
           <OutputSchemaSection nodeId={selectedNode.id} outputs={definition.outputsSchema} />
         </>
       )}

@@ -1,12 +1,6 @@
 import { Plus, X } from 'lucide-react'
 import { Input } from '@/shared/components'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 type KVItem = { key: string; value: string }
 
@@ -22,7 +16,7 @@ function fromKVArray(items: KVItem[]): Record<string, string> {
   return Object.fromEntries(items.map(i => [i.key, i.value]))
 }
 
-export function KeyValueRenderer({ value, onChange }: Props) {
+export function KeyValueRenderer({ value, onChange, disabled }: RendererProps) {
   const items = toKVArray(value)
 
   const update = (index: number, field: 'key' | 'value', text: string) => {
@@ -47,18 +41,21 @@ export function KeyValueRenderer({ value, onChange }: Props) {
             value={item.key}
             onChange={e => update(i, 'key', e.target.value)}
             placeholder="Key"
+            disabled={disabled}
             className="h-7 flex-1 text-[11px]"
           />
           <Input
             value={item.value}
             onChange={e => update(i, 'value', e.target.value)}
             placeholder="Value"
+            disabled={disabled}
             className="h-7 flex-1 text-[11px]"
           />
           <button
             type="button"
             onClick={() => remove(i)}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-text-faint hover:bg-surface hover:text-err transition-colors"
+            disabled={disabled}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-text-faint hover:bg-surface hover:text-err transition-colors disabled:opacity-40"
           >
             <X size={12} />
           </button>
@@ -67,7 +64,8 @@ export function KeyValueRenderer({ value, onChange }: Props) {
       <button
         type="button"
         onClick={add}
-        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border border-dashed border-border-faint text-[11px] text-text-faint hover:border-border-soft hover:text-text-mute transition-colors"
+        disabled={disabled}
+        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border border-dashed border-border-faint text-[11px] text-text-faint hover:border-border-soft hover:text-text-mute transition-colors disabled:opacity-40"
       >
         <Plus size={11} />
         Add entry

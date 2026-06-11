@@ -5,13 +5,18 @@ interface ToggleProps {
   checked?: boolean
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   className?: string
+  disabled?: boolean
   'aria-label'?: string
 }
 
-export function Toggle({ checked = false, onChange, className, 'aria-label': ariaLabel }: ToggleProps) {
+export function Toggle({ checked = false, onChange, className, disabled = false, 'aria-label': ariaLabel }: ToggleProps) {
   return (
     <label
-      className={cn('relative inline-flex items-center cursor-pointer shrink-0 select-none', className)}
+      className={cn(
+        'relative inline-flex items-center shrink-0 select-none',
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+        className,
+      )}
       aria-label={ariaLabel}
     >
       <input
@@ -20,6 +25,7 @@ export function Toggle({ checked = false, onChange, className, 'aria-label': ari
         aria-checked={checked}
         checked={checked}
         onChange={onChange}
+        disabled={disabled}
         className="sr-only"
       />
       {/* Track 34×20 */}

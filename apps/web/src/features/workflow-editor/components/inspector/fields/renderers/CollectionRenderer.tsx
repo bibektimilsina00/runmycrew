@@ -5,14 +5,7 @@ import type { NodeDefinition, NodeProperty } from '../../../../types/editorTypes
 import { shouldShowProperty } from '../../../../utils/nodeUtils'
 // Lazy import to avoid circular dep — PropertyField imports from this registry
 import { PropertyField } from '../PropertyField'
-
-interface Props {
-  prop: NodeProperty
-  definition: NodeDefinition
-  value: unknown
-  onChange: (value: unknown) => void
-  properties: Record<string, unknown>
-}
+import type { RendererProps } from '../types'
 
 type CollectionItem = Record<string, unknown>
 
@@ -22,7 +15,7 @@ function toItemArray(value: unknown): CollectionItem[] {
   return []
 }
 
-export function CollectionRenderer({ prop, definition, value, onChange, properties }: Props) {
+export function CollectionRenderer({ prop, definition, value, onChange, properties }: RendererProps) {
   const opts = prop.typeOptions ?? {}
   const multipleValues = opts.multipleValues ?? false
   const addLabel = typeof opts.addButtonText === 'string' ? opts.addButtonText : 'Add item'

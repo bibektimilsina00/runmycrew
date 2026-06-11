@@ -1,13 +1,7 @@
 import { Input } from '@/shared/components'
-import type { NodeProperty } from '../../../../types/editorTypes'
+import type { RendererProps } from '../types'
 
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
-
-export function NumberRenderer({ prop, value, onChange }: Props) {
+export function NumberRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const opts = prop.typeOptions ?? {}
   const str = value === undefined || value === null ? '' : String(value)
 
@@ -20,6 +14,7 @@ export function NumberRenderer({ prop, value, onChange }: Props) {
       min={opts.min !== undefined ? String(opts.min) : undefined}
       max={opts.max !== undefined ? String(opts.max) : undefined}
       step={opts.step !== undefined ? String(opts.step) : undefined}
+      disabled={disabled}
       className="h-8 text-[12px]"
     />
   )

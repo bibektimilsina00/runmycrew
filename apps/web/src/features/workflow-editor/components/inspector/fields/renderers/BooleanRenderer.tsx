@@ -1,14 +1,8 @@
 import { Toggle } from '@/shared/components'
 import { cn } from '@/lib/cn'
-import type { NodeProperty } from '../../../../types/editorTypes'
+import type { RendererProps } from '../types'
 
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
-
-export function BooleanRenderer({ prop, value, onChange }: Props) {
+export function BooleanRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const checked = Boolean(value)
   return (
     <div className="flex h-8 items-center justify-between rounded-[8px] border border-border-faint bg-bg px-3">
@@ -18,6 +12,7 @@ export function BooleanRenderer({ prop, value, onChange }: Props) {
       <Toggle
         checked={checked}
         onChange={e => onChange(e.target.checked)}
+        disabled={disabled}
         aria-label={prop.label}
       />
     </div>

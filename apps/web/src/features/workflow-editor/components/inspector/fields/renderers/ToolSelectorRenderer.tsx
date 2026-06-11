@@ -2,13 +2,7 @@ import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Input } from '@/shared/components'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 type UsageControl = 'auto' | 'force' | 'none'
 
@@ -32,7 +26,7 @@ const USAGE_STYLES: Record<UsageControl, string> = {
   none: 'bg-err/10 text-err border-err/30',
 }
 
-export function ToolSelectorRenderer({ value, onChange }: Props) {
+export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
   const [adding, setAdding] = useState(false)
   const [newId, setNewId] = useState('')
   const tools = toToolArray(value)

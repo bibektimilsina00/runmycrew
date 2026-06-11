@@ -1,12 +1,6 @@
 import { Plus, X } from 'lucide-react'
 import { Input } from '@/shared/components'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 function toStringArray(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String)
@@ -16,7 +10,7 @@ function toStringArray(value: unknown): string[] {
   return []
 }
 
-export function ListRenderer({ prop, value, onChange }: Props) {
+export function ListRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const items = toStringArray(value)
   const opts = prop.typeOptions ?? {}
   const addLabel = typeof opts.addButtonText === 'string' ? opts.addButtonText : 'Add item'
@@ -41,12 +35,14 @@ export function ListRenderer({ prop, value, onChange }: Props) {
             value={item}
             onChange={e => update(i, e.target.value)}
             placeholder={`Item ${i + 1}`}
+            disabled={disabled}
             className="h-7 flex-1 text-[11px]"
           />
           <button
             type="button"
             onClick={() => remove(i)}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-text-faint hover:bg-surface hover:text-err transition-colors"
+            disabled={disabled}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-text-faint hover:bg-surface hover:text-err transition-colors disabled:opacity-40"
           >
             <X size={12} />
           </button>
@@ -55,7 +51,8 @@ export function ListRenderer({ prop, value, onChange }: Props) {
       <button
         type="button"
         onClick={add}
-        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border border-dashed border-border-faint text-[11px] text-text-faint hover:border-border-soft hover:text-text-mute transition-colors"
+        disabled={disabled}
+        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border border-dashed border-border-faint text-[11px] text-text-faint hover:border-border-soft hover:text-text-mute transition-colors disabled:opacity-40"
       >
         <Plus size={11} />
         {addLabel}

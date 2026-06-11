@@ -2,13 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Check, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import apiClient from '@/shared/utils/apiClient'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 interface Skill {
   id: string
@@ -23,7 +17,7 @@ function toIdArray(value: unknown): string[] {
   return []
 }
 
-export function SkillSelectorRenderer({ value, onChange }: Props) {
+export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
   const selected = toIdArray(value)
 
   const { data: skills = [], isLoading } = useQuery({

@@ -1,11 +1,5 @@
 import { Textarea } from '@/shared/components'
-import type { NodeProperty } from '../../../../types/editorTypes'
-
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
+import type { RendererProps } from '../types'
 
 const LANGUAGE_LABELS: Record<string, string> = {
   python: 'Python',
@@ -16,7 +10,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
   bash: 'Bash',
 }
 
-export function CodeRenderer({ prop, value, onChange }: Props) {
+export function CodeRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const str = value === undefined || value === null ? '' : String(value)
   const opts = prop.typeOptions ?? {}
   const language = typeof opts.language === 'string' ? opts.language : undefined
@@ -37,6 +31,7 @@ export function CodeRenderer({ prop, value, onChange }: Props) {
         rows={rows}
         spellCheck={false}
         placeholder={prop.placeholder ?? `# Write ${language ?? 'code'} here`}
+        disabled={disabled}
         className="font-mono text-[11px] leading-relaxed"
       />
     </div>

@@ -1,13 +1,7 @@
 import { Input, Textarea } from '@/shared/components'
-import type { NodeProperty } from '../../../../types/editorTypes'
+import type { RendererProps } from '../types'
 
-interface Props {
-  prop: NodeProperty
-  value: unknown
-  onChange: (value: unknown) => void
-}
-
-export function StringRenderer({ prop, value, onChange }: Props) {
+export function StringRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const str = value === undefined || value === null ? '' : String(value)
   const opts = prop.typeOptions ?? {}
 
@@ -18,6 +12,7 @@ export function StringRenderer({ prop, value, onChange }: Props) {
         onChange={e => onChange(e.target.value)}
         rows={typeof opts.rows === 'number' ? opts.rows : 3}
         placeholder={prop.placeholder}
+        disabled={disabled}
         className="text-[12px] leading-relaxed"
       />
     )
@@ -29,6 +24,7 @@ export function StringRenderer({ prop, value, onChange }: Props) {
       value={str}
       onChange={e => onChange(e.target.value)}
       placeholder={prop.placeholder}
+      disabled={disabled}
       className="h-8 text-[12px]"
     />
   )

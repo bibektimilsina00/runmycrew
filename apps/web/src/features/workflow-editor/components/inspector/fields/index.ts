@@ -1,17 +1,6 @@
-import type { FC } from 'react'
-import type { NodeDefinition, NodeProperty, NodePropertyType } from '../../../types/editorTypes'
+import type { NodePropertyType } from '../../../types/editorTypes'
+import type { FieldRenderer } from './types'
 
-export interface RendererProps {
-  prop: NodeProperty
-  definition: NodeDefinition
-  properties: Record<string, unknown>
-  value: unknown
-  onChange: (value: unknown) => void
-}
-
-export type FieldRenderer = FC<RendererProps>
-
-// Import all renderers
 import { StringRenderer } from './renderers/StringRenderer'
 import { NumberRenderer } from './renderers/NumberRenderer'
 import { BooleanRenderer } from './renderers/BooleanRenderer'
@@ -26,24 +15,26 @@ import { CollectionRenderer } from './renderers/CollectionRenderer'
 import { ToolSelectorRenderer } from './renderers/ToolSelectorRenderer'
 import { SkillSelectorRenderer } from './renderers/SkillSelectorRenderer'
 
+export type { RendererProps, FieldRenderer } from './types'
+
 export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> = {
-  string:             StringRenderer as FieldRenderer,
-  number:             NumberRenderer as FieldRenderer,
-  boolean:            BooleanRenderer as FieldRenderer,
-  options:            OptionsRenderer as FieldRenderer,
-  'multi-options':    OptionsRenderer as FieldRenderer,
-  credential:         CredentialRenderer as FieldRenderer,
-  code:               CodeRenderer as FieldRenderer,
-  json:               JsonRenderer as FieldRenderer,
-  schema:             JsonRenderer as FieldRenderer,
-  'key-value':        KeyValueRenderer as FieldRenderer,
-  list:               ListRenderer as FieldRenderer,
-  'file-list':        ListRenderer as FieldRenderer,
-  messages:           MessagesRenderer as FieldRenderer,
-  collection:         CollectionRenderer as FieldRenderer,
-  'fixed-collection': CollectionRenderer as FieldRenderer,
-  'tool-selector':    ToolSelectorRenderer as FieldRenderer,
-  'skill-selector':   SkillSelectorRenderer as FieldRenderer,
+  string:             StringRenderer,
+  number:             NumberRenderer,
+  boolean:            BooleanRenderer,
+  options:            OptionsRenderer,
+  'multi-options':    OptionsRenderer,
+  credential:         CredentialRenderer,
+  code:               CodeRenderer,
+  json:               JsonRenderer,
+  schema:             JsonRenderer,
+  'key-value':        KeyValueRenderer,
+  list:               ListRenderer,
+  'file-list':        ListRenderer,
+  messages:           MessagesRenderer,
+  collection:         CollectionRenderer,
+  'fixed-collection': CollectionRenderer,
+  'tool-selector':    ToolSelectorRenderer,
+  'skill-selector':   SkillSelectorRenderer,
 }
 
 export { JsonRenderer as FallbackRenderer }

@@ -2,6 +2,17 @@ import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, type Node, type Edge, type OnNodesChange, type OnEdgesChange } from 'reactflow'
 import type { NodeDefinition } from '../types/editorTypes'
 import type { SaveState, WorkflowDetail } from '../types/editorTypes'
+import { editorAPI } from '../services/editorAPI'
+
+export type NodeRunStatus = 'idle' | 'running' | 'success' | 'failed'
+
+export interface NodeRunState {
+  status: NodeRunStatus
+  output?: unknown
+  error?: string
+  durationMs?: number
+  startedAt?: number
+}
 
 interface GraphSnapshot {
   nodes: Node[]
@@ -59,9 +70,21 @@ interface WorkflowEditorState {
   selectedNodeId: string | null
   setSelectedNodeId: (id: string | null) => void
 
+  // Per-node manual runs (Play/Stop toolbar buttons).
+  // Map is keyed by node id; entries persist after completion so the inspector
+  // can show the last result. Cleared on workflow reset.
+  nodeRuns: Record<string, NodeRunState>
+  runNode: (id: string, inputData?: Record<string, unknown>) => Promise<void>
+  stopNode: (id: string) => void
+  clearNodeRun: (id: string) => void
+
   // Reset when leaving editor
   reset: () => void
 }
+
+// AbortControllers live outside the store so we don't put non-serialisable
+// values in zustand state (would break devtools + persist if we ever add it).
+const NODE_RUN_ABORTS = new Map<string, AbortController>()
 
 export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => ({
   workflow: null,
@@ -209,16 +232,93 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => 
   selectedNodeId: null,
   setSelectedNodeId: (selectedNodeId) => set({ selectedNodeId }),
 
-  reset: () => set({
-    workflow: null,
-    nodes: [],
-    edges: [],
-    nodeDefinitions: [],
-    past: [],
-    future: [],
-    clipboard: null,
-    saveState: 'saved',
-    versionVector: 0,
-    selectedNodeId: null,
+  nodeRuns: {},
+
+  runNode: async (id, inputData) => {
+    const node = get().nodes.find(n => n.id === id)
+    if (!node?.type) return
+
+    // Don't double-run a node that's already in flight.
+    if (get().nodeRuns[id]?.status === 'running') return
+
+    const abort = new AbortController()
+    NODE_RUN_ABORTS.set(id, abort)
+
+    const startedAt = Date.now()
+    set(s => ({
+      nodeRuns: { ...s.nodeRuns, [id]: { status: 'running', startedAt } },
+    }))
+
+    try {
+      const data = (node.data as { properties?: Record<string, unknown> } | undefined) ?? {}
+      const properties = data.properties ?? {}
+      const result = await editorAPI.testNode(
+        {
+          node_type: node.type,
+          properties,
+          input_data: inputData ?? {},
+          workflow_id: get().workflow?.id,
+        },
+        abort.signal,
+      )
+      set(s => ({
+        nodeRuns: {
+          ...s.nodeRuns,
+          [id]: {
+            status: result.success ? 'success' : 'failed',
+            output: result.output ?? undefined,
+            error: result.error ?? undefined,
+            durationMs: result.duration_ms,
+            startedAt,
+          },
+        },
+      }))
+    } catch (err) {
+      // Abort surfaces here as a rejected promise — treat as a manual stop.
+      const aborted =
+        (err as { name?: string; message?: string })?.name === 'CanceledError' ||
+        (err as { name?: string; message?: string })?.name === 'AbortError'
+      set(s => ({
+        nodeRuns: {
+          ...s.nodeRuns,
+          [id]: {
+            status: 'failed',
+            error: aborted ? 'Stopped' : (err instanceof Error ? err.message : 'Run failed'),
+            durationMs: Date.now() - startedAt,
+            startedAt,
+          },
+        },
+      }))
+    } finally {
+      NODE_RUN_ABORTS.delete(id)
+    }
+  },
+
+  stopNode: (id) => {
+    const abort = NODE_RUN_ABORTS.get(id)
+    if (abort) abort.abort()
+  },
+
+  clearNodeRun: (id) => set(s => {
+    const { [id]: _omit, ...rest } = s.nodeRuns
+    return { nodeRuns: rest }
   }),
+
+  reset: () => {
+    for (const abort of NODE_RUN_ABORTS.values()) abort.abort()
+    NODE_RUN_ABORTS.clear()
+    set({
+      workflow: null,
+      nodes: [],
+      edges: [],
+      nodeDefinitions: [],
+      past: [],
+      future: [],
+      clipboard: null,
+      saveState: 'saved',
+      versionVector: 0,
+      selectedNodeId: null,
+      nodeRuns: {},
+    })
+  },
 }))

@@ -1,29 +1,92 @@
-import type { NodeDefinition } from '../../../types/editorTypes'
+import type { NodeDefinition, NodeProperty } from '../../../types/editorTypes'
 import type { InspectorPropertyGroup } from '../utils/inspector-visibility'
-import { PropertyField } from './property-field'
+import { PropertyField } from '../fields/PropertyField'
 
 interface PropertyGroupListProps {
   groups: InspectorPropertyGroup[]
   definition: NodeDefinition
   properties: Record<string, unknown>
   onPropertyChange: (name: string, value: unknown) => void
+
+  /** Per-field manual/expression toggle state (managed by use-inspector-node). */
+  fieldModes?: Record<string, 'manual' | 'dynamic'>
+  onFieldModeChange?: (name: string, mode: 'manual' | 'dynamic') => void
 }
 
-export function PropertyGroupList({ groups, definition, properties, onPropertyChange }: PropertyGroupListProps) {
+export function PropertyGroupList({
+  groups,
+  definition,
+  properties,
+  onPropertyChange,
+  fieldModes,
+  onFieldModeChange,
+}: PropertyGroupListProps) {
+  // Single group ('Settings' default bucket) → no header. Multiple groups →
+  // render each with a small label so the user can see structure (e.g.
+  // "Connection" / "Body" / "Headers" on the HTTP node).
+  const showHeaders = groups.length > 1
+
   return (
     <>
-      {groups.flatMap(group =>
-        group.properties.map(prop => (
-          <PropertyField
-            key={prop.name}
-            prop={prop}
-            definition={definition}
-            properties={properties}
-            value={properties[prop.name] ?? prop.default}
-            onChange={value => onPropertyChange(prop.name, value)}
-          />
-        )),
-      )}
+      {groups.map(group => (
+        <section key={group.name} className="flex flex-col gap-3">
+          {showHeaders && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-faint">
+                {group.name}
+              </span>
+              <div className="h-px flex-1 bg-border-faint" />
+            </div>
+          )}
+          {group.properties.map(prop => (
+            <PropertyFieldSlot
+              key={prop.name}
+              prop={prop}
+              definition={definition}
+              properties={properties}
+              onPropertyChange={onPropertyChange}
+              fieldModes={fieldModes}
+              onFieldModeChange={onFieldModeChange}
+            />
+          ))}
+        </section>
+      ))}
     </>
+  )
+}
+
+interface SlotProps {
+  prop: NodeProperty
+  definition: NodeDefinition
+  properties: Record<string, unknown>
+  onPropertyChange: (name: string, value: unknown) => void
+  fieldModes?: Record<string, 'manual' | 'dynamic'>
+  onFieldModeChange?: (name: string, mode: 'manual' | 'dynamic') => void
+}
+
+function PropertyFieldSlot({
+  prop,
+  definition,
+  properties,
+  onPropertyChange,
+  fieldModes,
+  onFieldModeChange,
+}: SlotProps) {
+  // Default to "list" (manual) so the user sees the picker first, even on
+  // fields that also support expressions. Switching to fx is one click.
+  const mode = fieldModes?.[prop.name] ?? 'manual'
+  const value = properties[prop.name] ?? prop.default
+  return (
+    <PropertyField
+      prop={prop}
+      definition={definition}
+      properties={properties}
+      value={value}
+      onChange={v => onPropertyChange(prop.name, v)}
+      mode={mode}
+      onModeChange={onFieldModeChange ? (m) => onFieldModeChange(prop.name, m) : undefined}
+      defaultValue={prop.default}
+      onReset={prop.default !== undefined ? () => onPropertyChange(prop.name, prop.default) : undefined}
+    />
   )
 }

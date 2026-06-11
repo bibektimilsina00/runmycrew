@@ -43,4 +43,34 @@ export const editorAPI = {
       method: 'GET',
       signal,
     }),
+
+  /**
+   * Execute a single node in isolation with the supplied properties + input
+   * payload. Synchronous: returns the node's output (or error) when finished.
+   * Pass `signal` from an `AbortController` to cancel the run.
+   */
+  testNode: (
+    body: {
+      node_type: string
+      properties: Record<string, unknown>
+      input_data?: Record<string, unknown>
+      workflow_id?: string
+    },
+    signal?: AbortSignal,
+  ) =>
+    requestJson(NodeTestResponseSchema, {
+      url: API_ROUTES.NODE_TEST,
+      method: 'POST',
+      data: body,
+      signal,
+    }),
 }
+
+export const NodeTestResponseSchema = z.object({
+  success: z.boolean(),
+  output: z.union([z.record(z.string(), z.unknown()), z.array(z.unknown())]).nullable().optional(),
+  error: z.string().nullable().optional(),
+  logs: z.array(z.record(z.string(), z.unknown())).default([]),
+  duration_ms: z.number(),
+})
+export type NodeTestResponse = z.infer<typeof NodeTestResponseSchema>

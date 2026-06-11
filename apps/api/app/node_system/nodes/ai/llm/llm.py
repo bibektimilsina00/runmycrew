@@ -19,8 +19,7 @@ class LLMProperties(BaseModel):
     provider: str = "openai"
     credential: str | None = None
     model: str | None = None
-    system_prompt: str | None = None
-    user_prompt: str = ""
+    messages: list[dict[str, Any]] = []
     temperature: float | None = None
     max_tokens: int | None = None
     response_format: str = "text"  # "text" | "json"
@@ -44,9 +43,12 @@ class LLMNode(BaseNode[LLMProperties]):
                 {
                     "name": "provider",
                     "label": "Provider",
-                    "type": "string",
+                    "type": "options",
                     "default": "openai",
+                    "required": True,
+                    "placeholder": "Type or select an AI provider",
                     "loadOptions": "/ai/providers",
+                    "typeOptions": {"searchable": True, "allowCustom": True},
                 },
                 {
                     "name": "credential",
@@ -73,24 +75,22 @@ class LLMNode(BaseNode[LLMProperties]):
                 {
                     "name": "model",
                     "label": "Model",
-                    "type": "string",
+                    "type": "options",
                     "required": True,
+                    "placeholder": "Type or select a model ID",
                     "loadOptions": "/ai/models",
                     "loadOptionsDependsOn": ["provider", "credential"],
+                    "typeOptions": {"searchable": True, "allowCustom": True},
                 },
                 {
-                    "name": "system_prompt",
-                    "label": "System Prompt",
-                    "type": "string",
-                    "required": False,
-                    "placeholder": "You are a helpful assistant.",
-                },
-                {
-                    "name": "user_prompt",
-                    "label": "User Prompt",
-                    "type": "string",
+                    "name": "messages",
+                    "label": "Messages",
+                    "type": "messages",
                     "required": True,
-                    "placeholder": "Summarize the following: {{trigger.output}}",
+                    "default": [
+                        {"role": "user", "content": "{{trigger.output}}"},
+                    ],
+                    "description": "Prompt messages with role and content.",
                 },
                 {
                     "name": "response_format",
@@ -126,8 +126,10 @@ class LLMNode(BaseNode[LLMProperties]):
         )
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
-        if not self.props.user_prompt.strip():
-            return NodeResult(success=False, error="User prompt is required.")
+        if not self.props.messages or not any(
+            isinstance(m, dict) and str(m.get("content", "")).strip() for m in self.props.messages
+        ):
+            return NodeResult(success=False, error="At least one non-empty message is required.")
 
         ai_provider = get_ai_provider(self.props.provider)
         if not ai_provider:
@@ -169,10 +171,16 @@ class LLMNode(BaseNode[LLMProperties]):
             return NodeResult(success=False, error=str(e))
 
     def _messages(self) -> list[dict[str, Any]]:
+        """Normalise the configured messages list into provider-neutral shape."""
         msgs: list[dict[str, Any]] = []
-        if self.props.system_prompt and self.props.system_prompt.strip():
-            msgs.append({"role": "system", "content": self.props.system_prompt.strip()})
-        msgs.append({"role": "user", "content": self.props.user_prompt})
+        for m in self.props.messages or []:
+            if not isinstance(m, dict):
+                continue
+            role = m.get("role") or "user"
+            if role not in {"system", "user", "assistant"}:
+                role = "user"
+            content = str(m.get("content", ""))
+            msgs.append({"role": role, "content": content})
         return msgs
 
     async def _call_openai(

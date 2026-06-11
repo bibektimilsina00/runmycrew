@@ -1,14 +1,12 @@
-import { useRef, useState } from 'react'
-import { Pencil, BookOpen } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Pencil } from 'lucide-react'
 import type { NodeDefinition } from '../../../types/editorTypes'
 import { getIcon } from '../../../utils/icon-map'
 
 interface InspectorHeaderProps {
-  nodeId: string
   label: string
   definition: NodeDefinition
   onLabelChange: (label: string) => void
-  onClose: () => void
 }
 
 export function InspectorHeader({ label, definition, onLabelChange }: InspectorHeaderProps) {
@@ -17,10 +15,14 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
   const [draft, setDraft] = useState(label)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Effect-based focus: deterministic across React batching, no setTimeout race.
+  useEffect(() => {
+    if (editing) inputRef.current?.select()
+  }, [editing])
+
   const startEdit = () => {
     setDraft(label)
     setEditing(true)
-    setTimeout(() => inputRef.current?.select(), 0)
   }
 
   const commit = () => {
@@ -48,7 +50,7 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
               onBlur={commit}
               onKeyDown={e => {
                 if (e.key === 'Enter') commit()
-                if (e.key === 'Escape') { setEditing(false) }
+                if (e.key === 'Escape') setEditing(false)
               }}
               className="w-full bg-transparent text-[13px] font-medium text-[var(--text)] outline-none"
               aria-label="Node name"
@@ -66,13 +68,6 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
           title="Rename node"
         >
           <Pencil className="h-3 w-3" />
-        </button>
-
-        <button
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text-mute)]"
-          title="View docs"
-        >
-          <BookOpen className="h-3 w-3" />
         </button>
       </div>
     </header>

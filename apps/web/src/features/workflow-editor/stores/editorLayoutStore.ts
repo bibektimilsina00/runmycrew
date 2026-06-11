@@ -20,6 +20,19 @@ const MIN_BOTTOM_HEIGHT = 140
 const MAX_BOTTOM_HEIGHT = 640
 const DEFAULT_BOTTOM_HEIGHT = 260
 
+/**
+ * UI-only state attached to a node. Lives here instead of `node.data` so it
+ * never leaks into the saved workflow graph (which is sent to the backend
+ * and shared between users).
+ *
+ * - `showAdvanced` — whether the node body + inspector reveal "advanced" props.
+ * - `fieldModes`   — per-field manual/expression toggle for the inspector.
+ */
+export interface NodeUIState {
+  showAdvanced?: boolean
+  fieldModes?: Record<string, 'manual' | 'dynamic'>
+}
+
 interface EditorLayoutState {
   panelZones: Record<EditorTab, PanelZone>
   rightActiveTab: EditorTab
@@ -27,6 +40,9 @@ interface EditorLayoutState {
   rightOpen: boolean
   bottomOpen: boolean
   bottomHeight: number
+
+  // Per-node UI prefs (volatile across workflows; not persisted to graph).
+  nodeUI: Record<string, NodeUIState>
 
   setRightActiveTab: (tab: EditorTab) => void
   setBottomActiveTab: (tab: EditorTab) => void
@@ -37,6 +53,10 @@ interface EditorLayoutState {
   focusTab: (tab: EditorTab) => void
   closeTabPanel: (tab: EditorTab) => void
   tabsInZone: (zone: PanelZone) => EditorTab[]
+
+  setNodeShowAdvanced: (nodeId: string, value: boolean) => void
+  setNodeFieldMode: (nodeId: string, field: string, mode: 'manual' | 'dynamic') => void
+  clearNodeUI: (nodeId: string) => void
 }
 
 export const useEditorLayoutStore = create<EditorLayoutState>()(
@@ -48,6 +68,7 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
       rightOpen: true,
       bottomOpen: false,
       bottomHeight: DEFAULT_BOTTOM_HEIGHT,
+      nodeUI: {},
 
       setRightActiveTab: (rightActiveTab) => set({ rightActiveTab, rightOpen: true }),
       setBottomActiveTab: (bottomActiveTab) => set({ bottomActiveTab, bottomOpen: true }),
@@ -96,6 +117,31 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
         const z = get().panelZones
         return (Object.keys(z) as EditorTab[]).filter((t) => z[t] === zone)
       },
+
+      setNodeShowAdvanced: (nodeId, value) =>
+        set((s) => ({
+          nodeUI: {
+            ...s.nodeUI,
+            [nodeId]: { ...s.nodeUI[nodeId], showAdvanced: value },
+          },
+        })),
+
+      setNodeFieldMode: (nodeId, field, mode) =>
+        set((s) => ({
+          nodeUI: {
+            ...s.nodeUI,
+            [nodeId]: {
+              ...s.nodeUI[nodeId],
+              fieldModes: { ...s.nodeUI[nodeId]?.fieldModes, [field]: mode },
+            },
+          },
+        })),
+
+      clearNodeUI: (nodeId) =>
+        set((s) => {
+          const { [nodeId]: _omit, ...rest } = s.nodeUI
+          return { nodeUI: rest }
+        }),
     }),
     {
       name: 'fuse-editor-layout',
