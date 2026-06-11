@@ -6,8 +6,11 @@ import type { NodeProperty } from '../../../types/editorTypes'
 interface FieldWrapperProps {
   prop: NodeProperty
   isExpression: boolean
-  /** When omitted, the List/fx tabs are hidden (e.g. non-expression types). */
+  /** When omitted, the expression toggle is hidden (e.g. non-expression types). */
   onToggleExpression?: () => void
+  /** True when the field actually picks from a list (options / credentials).
+   *  Controls whether we show a `List | fx` pill or just a single `fx` toggle. */
+  hasList?: boolean
   /** When `canReset` + onReset are both set, renders a small reset chevron. */
   canReset?: boolean
   onReset?: () => void
@@ -20,6 +23,7 @@ export function FieldWrapper({
   prop,
   isExpression,
   onToggleExpression,
+  hasList = false,
   canReset,
   onReset,
   children,
@@ -46,7 +50,9 @@ export function FieldWrapper({
             </button>
           )}
           {supportsExpression && (
-            <ModeTabs isExpression={isExpression} onChange={onToggleExpression!} />
+            hasList
+              ? <ModeTabs isExpression={isExpression} onChange={onToggleExpression!} />
+              : <FxToggle isExpression={isExpression} onChange={onToggleExpression!} />
           )}
         </div>
       </div>
@@ -60,9 +66,33 @@ export function FieldWrapper({
   )
 }
 
-interface ModeTabsProps {
+interface ToggleSharedProps {
   isExpression: boolean
   onChange: () => void
+}
+
+/**
+ * Single `fx` button used for plain text / number / code fields — they don't
+ * have a meaningful "List" mode so a two-cell pill would be confusing.
+ * Off = renderer (text input); on = expression textarea.
+ */
+function FxToggle({ isExpression, onChange }: ToggleSharedProps) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      title={isExpression ? 'Switch to manual input' : 'Use an expression like {{node.field}}'}
+      aria-pressed={isExpression}
+      className={cn(
+        'h-[18px] shrink-0 rounded-[4px] border px-1.5 font-mono text-[10px] italic transition-colors',
+        isExpression
+          ? 'border-[var(--accent-line)] bg-[var(--accent-line)]/15 text-[var(--accent)]'
+          : 'border-transparent text-text-faint hover:border-border-faint hover:text-text-mute',
+      )}
+    >
+      fx
+    </button>
+  )
 }
 
 /**
@@ -72,7 +102,7 @@ interface ModeTabsProps {
  * `onChange` is a flip — the parent already knows it's only ever two states,
  * so it doesn't need to receive the target mode.
  */
-function ModeTabs({ isExpression, onChange }: ModeTabsProps) {
+function ModeTabs({ isExpression, onChange }: ToggleSharedProps) {
   const flipIfNeeded = (targetExpression: boolean) => {
     if (targetExpression !== isExpression) onChange()
   }

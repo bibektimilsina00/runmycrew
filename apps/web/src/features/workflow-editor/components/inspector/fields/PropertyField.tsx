@@ -37,11 +37,23 @@ export function PropertyField({
   const isExpression = mode === 'dynamic'
   const Renderer = FIELD_RENDERERS[prop.type as keyof typeof FIELD_RENDERERS] ?? FallbackRenderer
 
+  // A "list" only exists when the field actually picks from one — either an
+  // options renderer (with static options or a loadOptions endpoint) or a
+  // credential picker. Plain text / number / code fields get a single `fx`
+  // toggle instead of the List | fx pill.
+  const hasList =
+    prop.type === 'options' ||
+    prop.type === 'multi-options' ||
+    prop.type === 'credential' ||
+    !!prop.loadOptions ||
+    (prop.options?.length ?? 0) > 0
+
   return (
     <FieldWrapper
       prop={prop}
       isExpression={isExpression}
       onToggleExpression={onModeChange ? () => onModeChange(isExpression ? 'manual' : 'dynamic') : undefined}
+      hasList={hasList}
       canReset={defaultValue !== undefined && !sameValue(value, defaultValue)}
       onReset={onReset}
     >
