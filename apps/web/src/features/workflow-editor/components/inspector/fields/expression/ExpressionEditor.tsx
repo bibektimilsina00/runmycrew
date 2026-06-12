@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { CompletionPopup } from './CompletionPopup'
+import { useExpressionCompletions, type Completion } from './useExpressionCompletions'
 
 /**
  * In-line editor for JSONata expressions saved with a leading `=` prefix.
@@ -10,9 +12,9 @@ import { cn } from '@/lib/cn'
  * Clicking the close button drops the `=` and writes back a plain string,
  * which transitions the field renderer out of expression mode.
  *
- * Syntax highlighting is intentionally minimal in PR6 — `$identifier`,
- * `$func()`, `"string"`, numbers, operators. Full Monaco / autocomplete
- * arrives in PR7.
+ * PR7 adds completions: as the user types, a popup suggests `$step.<field>`,
+ * `$node('Label').<field>`, and JSONata built-ins, populated from the
+ * currently-selected node's reachable ancestors and their outputsSchema.
  */
 interface ExpressionEditorProps {
   value: string                       // includes the leading `=`
@@ -33,6 +35,14 @@ export function ExpressionEditor({
 }: ExpressionEditorProps) {
   const inner = value.startsWith('=') ? value.slice(1) : value
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+
+  const [caret, setCaret] = useState(inner.length)
+  const [popupOpen, setPopupOpen] = useState(false)
+  const [popupAnchor, setPopupAnchor] = useState<{ left: number; top: number } | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const completionState = useExpressionCompletions(inner, caret)
 
   // Auto-grow textarea height in multiline mode so users can see what they're
   // writing without scroll. Capped to keep the inspector usable on long
@@ -45,12 +55,77 @@ export function ExpressionEditor({
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
   }, [inner, multiline])
 
-  const commit = (next: string) => onChange(`=${next}`)
+  const commitText = useCallback(
+    (next: string) => {
+      onChange(`=${next}`)
+      // Typing always changes the prefix, so the previously-highlighted
+      // completion no longer makes sense. Reset to the first match instead
+      // of running a render-time effect against `completionState.completions`.
+      setSelectedIndex(0)
+    },
+    [onChange],
+  )
 
   const exit = () => {
-    // Drop the `=` and write back the bare value so the renderer swaps back
-    // to a plain string input. The user keeps whatever they typed.
     onChange(inner)
+  }
+
+  const syncCaret = useCallback(() => {
+    const el = inputRef.current
+    if (!el) return
+    const pos = el.selectionStart ?? inner.length
+    setCaret(pos)
+    if (wrapperRef.current) {
+      const r = wrapperRef.current.getBoundingClientRect()
+      setPopupAnchor({ left: r.left, top: r.bottom + 4 })
+    }
+    setPopupOpen(true)
+  }, [inner.length])
+
+  const handleAccept = useCallback(
+    (item: Completion) => {
+      const range = completionState.replaceRange
+      const next = inner.slice(0, range.start) + item.insertText + inner.slice(range.end)
+      commitText(next)
+      setPopupOpen(false)
+      // After React commits the new value, place the caret just after the inserted
+      // text. We can't `requestAnimationFrame` the focus before React renders, so
+      // use a microtask hop.
+      Promise.resolve().then(() => {
+        const el = inputRef.current
+        if (!el) return
+        const pos = range.start + item.insertText.length
+        el.focus()
+        el.setSelectionRange(pos, pos)
+        setCaret(pos)
+      })
+    },
+    [completionState.replaceRange, inner, commitText],
+  )
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!popupOpen || !completionState.active || completionState.completions.length === 0) {
+      if (e.key === 'Escape') (e.target as HTMLElement).blur()
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setSelectedIndex(i => (i + 1) % completionState.completions.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setSelectedIndex(i => (i - 1 + completionState.completions.length) % completionState.completions.length)
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      // Don't intercept Enter when the popup is empty or in plain multiline
+      // editing without an active completion trigger.
+      const item = completionState.completions[selectedIndex]
+      if (item) {
+        e.preventDefault()
+        handleAccept(item)
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setPopupOpen(false)
+    }
   }
 
   const highlights = useMemo(() => buildHighlights(inner), [inner])
@@ -63,6 +138,7 @@ export function ExpressionEditor({
 
   return (
     <div
+      ref={wrapperRef}
       className={cn(
         'group relative flex items-stretch rounded-[7px] border border-accent/40 bg-accent/[0.06] transition-colors',
         'focus-within:border-accent/70 focus-within:bg-accent/[0.10]',
@@ -76,27 +152,31 @@ export function ExpressionEditor({
         </span>
       </div>
 
-      {/* The textarea sits on top of the highlight layer so the user types
-          normal text while the colored tokens render behind. Both share the
-          exact same padding + font so they overlap pixel-perfectly. */}
       <div className="relative min-w-0 flex-1 px-2 py-1">
         <pre
           aria-hidden
           className={cn(
             'pointer-events-none absolute inset-0 m-0 overflow-hidden whitespace-pre-wrap break-words px-2 py-1 font-mono text-[12px] leading-[18px]',
-            multiline ? '' : 'whitespace-pre overflow-hidden',
+            multiline ? '' : 'overflow-hidden whitespace-pre',
           )}
         >
           {highlights}
-          {/* trailing newline so the highlight layer keeps the textarea's
-              final empty line in sync */}
           {'\n'}
         </pre>
         {multiline ? (
           <textarea
             ref={inputRef as React.RefObject<HTMLTextAreaElement>}
             value={inner}
-            onChange={e => commit(e.target.value)}
+            onChange={e => {
+              commitText(e.target.value)
+              syncCaret()
+            }}
+            onSelect={syncCaret}
+            onClick={syncCaret}
+            onKeyUp={syncCaret}
+            onKeyDown={handleKeyDown}
+            onFocus={syncCaret}
+            onBlur={() => setPopupOpen(false)}
             placeholder={placeholder ?? 'JSONata expression'}
             disabled={disabled}
             rows={rows}
@@ -108,7 +188,16 @@ export function ExpressionEditor({
             ref={inputRef as React.RefObject<HTMLInputElement>}
             type="text"
             value={inner}
-            onChange={e => commit(e.target.value)}
+            onChange={e => {
+              commitText(e.target.value)
+              syncCaret()
+            }}
+            onSelect={syncCaret}
+            onClick={syncCaret}
+            onKeyUp={syncCaret}
+            onKeyDown={handleKeyDown}
+            onFocus={syncCaret}
+            onBlur={() => setPopupOpen(false)}
             placeholder={placeholder ?? 'JSONata expression'}
             disabled={disabled}
             spellCheck={false}
@@ -126,6 +215,16 @@ export function ExpressionEditor({
       >
         <X className="h-3 w-3" />
       </button>
+
+      {popupOpen && popupAnchor && completionState.active && (
+        <CompletionPopup
+          completions={completionState.completions}
+          selectedIndex={selectedIndex}
+          onSelectIndex={setSelectedIndex}
+          onAccept={handleAccept}
+          anchor={popupAnchor}
+        />
+      )}
     </div>
   )
 }
@@ -151,7 +250,6 @@ function buildHighlights(source: string): React.ReactNode[] {
     while ((m = regex.exec(source)) !== null) {
       const start = m.index
       const end = start + m[0].length
-      // Skip ranges that overlap an earlier (higher-priority) match.
       if (ranges.some(r => start < r.end && end > r.start)) continue
       ranges.push({ start, end, className })
     }
