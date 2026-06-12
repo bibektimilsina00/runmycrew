@@ -170,11 +170,6 @@ function AncestorRow({ ancestor }: { ancestor: Ancestor }) {
               No output schema declared and no run data yet.
             </p>
           )}
-          {!hasOutput && hasAnyValue && (
-            <p className="mt-1.5 text-[10px] italic text-[var(--text-dim)]">
-              Schema preview — run the upstream node to see actual values.
-            </p>
-          )}
         </div>
       )}
     </div>
