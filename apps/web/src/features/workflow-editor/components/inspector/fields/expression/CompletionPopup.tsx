@@ -60,13 +60,23 @@ export function CompletionPopup({
             // whatever item the cursor happened to be over. Keyboard owns
             // selectedIndex; hover is CSS-only visual feedback.
             onClick={() => onAccept(c)}
+            // `bg-accent/12` Tailwind opacity modifier wasn't compiling in
+            // this project's Tailwind config, so the active row had no
+            // visible fill — keyboard selection looked broken even though
+            // the state was correct. Use `color-mix(...)` inline style for
+            // a fill that always renders.
+            style={
+              active
+                ? {
+                    backgroundColor:
+                      'color-mix(in oklch, var(--accent) 22%, transparent)',
+                  }
+                : undefined
+            }
             className={cn(
               'flex w-full items-start gap-2 border-l-2 px-2.5 py-1.5 text-left transition-colors',
               active
-                // `bg-surface-2` matched the popup background and made the
-                // selection invisible. Use a stronger accent fill + left
-                // border so the active row reads clearly against the panel.
-                ? 'border-accent bg-accent/12 text-text'
+                ? 'border-accent text-text'
                 : 'border-transparent text-text hover:bg-surface',
             )}
           >
