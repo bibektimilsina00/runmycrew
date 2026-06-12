@@ -42,14 +42,14 @@ export function KeyValueRenderer({ value, onChange, disabled }: RendererProps) {
             onChange={e => update(i, 'key', e.target.value)}
             placeholder="Key"
             disabled={disabled}
-            className="h-7 flex-1 text-[11px]"
+            className="h-7 flex-1 rounded-[5px] text-[11px]"
           />
           <Input
             value={item.value}
             onChange={e => update(i, 'value', e.target.value)}
             placeholder="Value"
             disabled={disabled}
-            className="h-7 flex-1 text-[11px]"
+            className="h-7 flex-1 rounded-[5px] text-[11px]"
           />
           <button
             type="button"

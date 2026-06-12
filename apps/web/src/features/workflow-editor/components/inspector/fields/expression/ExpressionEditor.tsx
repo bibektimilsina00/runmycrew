@@ -222,14 +222,14 @@ export function ExpressionEditor({
   // the only signal that we're in expression mode.
   const wrapperClass = multiline
     ? cn(
-        'relative w-full bg-bg border border-border-faint rounded-[8px] px-3 py-2.5',
+        'relative w-full bg-bg border border-border-faint rounded-[5px] px-3 py-2.5',
         'transition-[background-color,border-color] duration-[120ms]',
         'hover:border-border-soft focus-within:border-border focus-within:bg-surface',
         disabled && 'pointer-events-none opacity-60',
       )
     : cn(
         'relative flex h-9 items-center gap-2 px-3',
-        'bg-bg border border-border-faint rounded-[8px]',
+        'bg-bg border border-border-faint rounded-[5px]',
         'transition-[background-color,border-color] duration-[120ms]',
         'hover:border-border-soft focus-within:border-border focus-within:bg-surface',
         disabled && 'pointer-events-none opacity-60',

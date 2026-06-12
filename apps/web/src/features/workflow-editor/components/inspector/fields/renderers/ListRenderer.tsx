@@ -36,7 +36,7 @@ export function ListRenderer({ prop, value, onChange, disabled }: RendererProps)
             onChange={e => update(i, e.target.value)}
             placeholder={`Item ${i + 1}`}
             disabled={disabled}
-            className="h-7 flex-1 text-[11px]"
+            className="h-7 flex-1 rounded-[5px] text-[11px]"
           />
           <button
             type="button"

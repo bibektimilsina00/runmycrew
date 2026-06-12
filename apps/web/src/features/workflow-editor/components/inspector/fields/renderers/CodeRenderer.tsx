@@ -32,7 +32,7 @@ export function CodeRenderer({ prop, value, onChange, disabled }: RendererProps)
         spellCheck={false}
         placeholder={prop.placeholder ?? `# Write ${language ?? 'code'} here`}
         disabled={disabled}
-        className="font-mono text-[11px] leading-relaxed"
+        className="rounded-[5px] font-mono text-[11px] leading-relaxed"
       />
     </div>
   )

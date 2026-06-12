@@ -53,7 +53,7 @@ export function MessagesRenderer({ value, onChange, disabled }: RendererProps) {
   return (
     <div className="flex flex-col gap-2">
       {messages.map((msg, i) => (
-        <div key={i} className="flex flex-col gap-1 rounded-[8px] border border-border-faint bg-bg p-2">
+        <div key={i} className="flex flex-col gap-1 rounded-[5px] border border-border-faint bg-bg p-2">
           <div className="flex items-center justify-between gap-2">
             <div className="flex gap-1">
               {ROLES.map(role => (
@@ -83,7 +83,7 @@ export function MessagesRenderer({ value, onChange, disabled }: RendererProps) {
             onChange={e => updateContent(i, e.target.value)}
             rows={2}
             placeholder={msg.role === 'system' ? 'System instructions…' : msg.role === 'user' ? '{{trigger.output}}' : 'Assistant response…'}
-            className="min-h-[52px] text-[11px] leading-relaxed"
+            className="min-h-[52px] rounded-[5px] text-[11px] leading-relaxed"
           />
         </div>
       ))}
