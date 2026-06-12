@@ -50,14 +50,16 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
     onChange(`=${str}`)
   }
 
-  // Auto-promote to expression mode when the user types `$` as the first
-  // character. The saved value still carries the `=` prefix (backend
-  // dispatcher routes on `=`), so the next render swaps in ExpressionEditor
-  // and the `$` they typed shows up at the caret. Lets users skip the `=`
-  // entirely — `$step.x` is what they reach for, the `=` is just a marker.
+  // Auto-promote to expression mode when the user types `=` or `$` as the
+  // first character. Typing `=` is the canonical entry; typing `$` is the
+  // shortcut (the renderer prefixes the saved value with `=` so the
+  // dispatcher contract holds). Either transition stamps `autoFocusOnEnter`
+  // so the ExpressionEditor that mounts next grabs focus.
   const handleTyped = (next: string) => {
+    const enteringExpression =
+      !str.startsWith('=') && (next.startsWith('=') || next.startsWith('$'))
+    if (enteringExpression) setAutoFocusOnEnter(true)
     if (next.startsWith('$') && !str.startsWith('=')) {
-      setAutoFocusOnEnter(true)
       onChange(`=${next}`)
       return
     }
