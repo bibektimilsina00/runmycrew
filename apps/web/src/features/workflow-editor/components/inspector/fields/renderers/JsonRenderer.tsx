@@ -37,7 +37,7 @@ export function JsonRenderer({ prop, value, onChange, disabled }: RendererProps)
         placeholder={prop.placeholder ?? '{}'}
         disabled={disabled}
         className={cn(
-          'font-mono text-[11px] leading-relaxed',
+          'rounded-[5px] font-mono text-[11px] leading-relaxed',
           invalid && 'border-err focus-visible:ring-err/30',
         )}
       />

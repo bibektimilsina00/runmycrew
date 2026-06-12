@@ -91,7 +91,7 @@ interface SingleItemProps {
 function SingleItem({ subProps, definition, item, onChange, allValues }: SingleItemProps) {
   const visible = subProps.filter(p => p.visibility !== 'hidden' && shouldShowProperty(p, { ...allValues, ...item }))
   return (
-    <div className="flex flex-col gap-3 rounded-[8px] border border-border-faint bg-bg p-3">
+    <div className="flex flex-col gap-3 rounded-[5px] border border-border-faint bg-bg p-3">
       {visible.map(p => (
         <PropertyField
           key={p.name}
@@ -123,7 +123,7 @@ function CollapsibleItem({ index, subProps, definition, item, onUpdate, onRemove
   const visible = subProps.filter(p => p.visibility !== 'hidden' && shouldShowProperty(p, { ...allValues, ...item }))
 
   return (
-    <div className="rounded-[8px] border border-border-faint bg-bg overflow-hidden">
+    <div className="rounded-[5px] border border-border-faint bg-bg overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2">
         <button
           type="button"

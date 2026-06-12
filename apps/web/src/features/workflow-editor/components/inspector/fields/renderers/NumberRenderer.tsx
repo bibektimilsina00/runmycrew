@@ -15,7 +15,7 @@ export function NumberRenderer({ prop, value, onChange, disabled }: RendererProp
       max={opts.max !== undefined ? String(opts.max) : undefined}
       step={opts.step !== undefined ? String(opts.step) : undefined}
       disabled={disabled}
-      className="h-8 text-[12px]"
+      className="h-8 rounded-[5px] text-[12px]"
     />
   )
 }

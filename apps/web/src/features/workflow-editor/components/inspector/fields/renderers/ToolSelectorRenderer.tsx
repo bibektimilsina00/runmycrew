@@ -84,7 +84,7 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
             onChange={e => setNewId(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') addTool(); if (e.key === 'Escape') { setAdding(false); setNewId('') } }}
             placeholder="tool_id (e.g. slack_send_message)"
-            className="h-7 flex-1 font-mono text-[11px]"
+            className="h-7 flex-1 rounded-[5px] font-mono text-[11px]"
             autoFocus
           />
           <button type="button" onClick={addTool} className="h-7 shrink-0 rounded-[6px] bg-accent/10 px-2 text-[11px] text-accent hover:bg-accent/20 transition-colors">Add</button>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Input, Textarea } from '@/shared/components'
 import { cn } from '@/lib/cn'
 import type { RendererProps } from '../types'
@@ -11,11 +11,11 @@ import { ExpressionEditor } from '../expression/ExpressionEditor'
  * field into expression mode and routes evaluation through the JSONata
  * resolver at runtime (PR5). Bare strings stay literal.
  *
- * The mode-switch button is a small `fx` text badge at the top-right corner
- * of the input — readable as "switch to expression", not as "AI generate"
- * the way the Sparkles icon read. No separate UI state for the mode itself;
- * the rule "string starts with `=` → expression" lives in one place and
- * survives reload, copy-paste, and undo/redo.
+ * The mode-switch button is a small `fx` text badge in the label row to the
+ * right — readable as "switch to expression", not as "AI generate" the way
+ * the Sparkles icon read. No separate UI state for the mode itself; the rule
+ * "string starts with `=` → expression" lives in one place and survives
+ * reload, copy-paste, and undo/redo.
  */
 export function StringRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const str = value === undefined || value === null ? '' : String(value)
@@ -24,16 +24,30 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
   const rows = typeof opts.rows === 'number' ? opts.rows : 3
   const isExpression = str.startsWith('=')
 
-  // Tracks whether the most recent mode change came from user action
-  // (typing `=` / `$`, clicking the fx badge) so the ExpressionEditor that
-  // mounts next knows to grab focus + restore the caret.
+  // Flags drive focus preservation across the plain ↔ expression renderer
+  // swap. Without these, the unmounted `<input>` drops focus to `<body>` and
+  // the next keypress (a held backspace, say) hits the global editor
+  // shortcut and deletes the *selected node* instead of editing the field.
   const [autoFocusOnEnter, setAutoFocusOnEnter] = useState(false)
+  const [autoFocusOnExit, setAutoFocusOnExit] = useState(false)
+  const plainFieldRef = usePlainFieldFocusOnExit(autoFocusOnExit, () =>
+    setAutoFocusOnExit(false),
+  )
 
   if (isExpression) {
+    // While in expression mode, intercept onChange so we can detect the
+    // moment the user deletes back past the `=` and arm the plain-input
+    // refocus on the next render.
+    const handleExpressionChange = (next: string) => {
+      if (!next.startsWith('=') && str.startsWith('=')) {
+        setAutoFocusOnExit(true)
+      }
+      onChange(next)
+    }
     return (
       <ExpressionEditor
         value={str}
-        onChange={onChange}
+        onChange={handleExpressionChange}
         placeholder={prop.placeholder}
         multiline={multiline}
         rows={rows}
@@ -69,12 +83,13 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
     return (
       <div className="relative">
         <Textarea
+          ref={plainFieldRef as React.Ref<HTMLTextAreaElement>}
           value={str}
           onChange={e => handleTyped(e.target.value)}
           rows={rows}
           placeholder={prop.placeholder}
           disabled={disabled}
-          className="text-[12px] leading-relaxed"
+          className="rounded-[5px] text-[12px] leading-relaxed"
         />
         <FxBadge onClick={enterExpressionMode} disabled={disabled} />
       </div>
@@ -84,16 +99,47 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
   return (
     <div className="relative">
       <Input
+        ref={plainFieldRef as React.Ref<HTMLInputElement>}
         type={opts.password ? 'password' : 'text'}
         value={str}
         onChange={e => handleTyped(e.target.value)}
         placeholder={prop.placeholder}
         disabled={disabled}
-        className="h-8 text-[12px]"
+        className="h-8 rounded-[5px] text-[12px]"
       />
       <FxBadge onClick={enterExpressionMode} disabled={disabled} />
     </div>
   )
+}
+
+type PlainField = HTMLInputElement | HTMLTextAreaElement
+
+/**
+ * Callback ref that focuses the plain input/textarea once when the parent
+ * flag flips true (i.e. the renderer just swapped back from expression
+ * mode). Clears the flag after focusing so subsequent renders don't yank
+ * focus away from later edits.
+ *
+ * Called unconditionally at the top of `StringRenderer` (which is why it
+ * works for either the input or the textarea branch) — switching variants
+ * mid-render would otherwise violate the rules-of-hooks ordering rule.
+ */
+function usePlainFieldFocusOnExit(shouldFocus: boolean, onDone: () => void) {
+  const ref = useRef<PlainField | null>(null)
+  useEffect(() => {
+    if (!shouldFocus) return
+    const el = ref.current
+    if (!el) return
+    el.focus()
+    // Place caret at end so continued typing appends to whatever was left
+    // behind when the user shrank the expression past its `=`.
+    const pos = el.value.length
+    el.setSelectionRange(pos, pos)
+    onDone()
+  }, [shouldFocus, onDone])
+  return (node: PlainField | null) => {
+    ref.current = node
+  }
 }
 
 interface FxBadgeProps {
@@ -102,9 +148,8 @@ interface FxBadgeProps {
 }
 
 /**
- * Small monospace `fx` badge anchored at the top-right corner of the
- * input. Click switches to expression mode. Visually distinct from the
- * Sparkles "AI generate" pattern users associate that icon with.
+ * Small monospace `fx` badge sitting on the label row, right-aligned above
+ * the input. Click switches to expression mode.
  */
 function FxBadge({ onClick, disabled }: FxBadgeProps) {
   return (
@@ -113,7 +158,6 @@ function FxBadge({ onClick, disabled }: FxBadgeProps) {
       onClick={onClick}
       disabled={disabled}
       title="Switch to expression (JSONata)"
-      // Sits above the field, aligned to the label row on the right.
       // FieldWrapper draws the label with `gap-1.5` (6px) below; the input
       // top is at y=0 in this `relative` wrapper, so -22px lands the badge
       // roughly on the label's baseline.

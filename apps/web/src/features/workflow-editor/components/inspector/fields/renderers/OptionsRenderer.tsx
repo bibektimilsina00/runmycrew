@@ -104,7 +104,7 @@ function SimpleSelect({ options, value, onChange, placeholder, isLoading, disabl
         onClick={() => setOpen(v => !v)}
         disabled={disabled}
         className={cn(
-          'flex h-8 w-full items-center gap-2 rounded-[8px] border border-border-faint bg-bg px-3 text-[12px] text-left',
+          'flex h-8 w-full items-center gap-2 rounded-[5px] border border-border-faint bg-bg px-3 text-[12px] text-left',
           'transition-colors hover:border-border-soft',
           open && 'border-border bg-surface',
           disabled && 'opacity-50 cursor-not-allowed',
@@ -205,7 +205,7 @@ function ComboBox({ options, value, displayValue, onChange, placeholder, isLoadi
         onClick={() => setOpen(v => !v)}
         disabled={disabled}
         className={cn(
-          'flex h-8 w-full items-center gap-2 rounded-[8px] border border-border-faint bg-bg px-3 text-[12px] text-left',
+          'flex h-8 w-full items-center gap-2 rounded-[5px] border border-border-faint bg-bg px-3 text-[12px] text-left',
           'transition-colors hover:border-border-soft',
           open && 'border-border bg-surface',
           disabled && 'opacity-50 cursor-not-allowed',
@@ -330,7 +330,7 @@ function MultiSelect({ options, value, onChange, placeholder, isLoading, disable
         onClick={() => setOpen(v => !v)}
         disabled={disabled}
         className={cn(
-          'flex min-h-8 w-full items-center gap-1.5 rounded-[8px] border border-border-faint bg-bg p-1 pl-2 text-[12px] text-left',
+          'flex min-h-8 w-full items-center gap-1.5 rounded-[5px] border border-border-faint bg-bg p-1 pl-2 text-[12px] text-left',
           'transition-colors hover:border-border-soft',
           open && 'border-border bg-surface',
           disabled && 'opacity-50 cursor-not-allowed',
