@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Plus, X, Search, Lock, AlertCircle } from 'lucide-react'
+import { Plus, X, Search, Lock, AlertCircle, ChevronDown, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { Input, Textarea } from '@/shared/components'
 import type { RendererProps } from '../types'
 import { useToolCatalog, type Tool } from '../../../../hooks/useToolCatalog'
+import { ExpressionEditor } from '../expression/ExpressionEditor'
 
 type UsageControl = 'auto' | 'force' | 'none'
 
@@ -10,6 +12,12 @@ interface ToolEntry {
   toolId: string
   usageControl: UsageControl
   kind: 'tool' | 'mcp'
+  /**
+   * User-preset parameter values for this tool. Each value is merged on top
+   * of the LLM-provided args at run time (see agent.py `_resolve_tools`),
+   * so the LLM can still override if the param's visibility allows.
+   */
+  params?: Record<string, unknown>
 }
 
 function toToolArray(value: unknown): ToolEntry[] {
@@ -37,6 +45,7 @@ const USAGE_STYLES: Record<UsageControl, string> = {
 export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
   const tools = toToolArray(value)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const catalogQuery = useToolCatalog()
   const catalogData = catalogQuery.data?.tools
   const catalog = useMemo<Tool[]>(() => catalogData ?? [], [catalogData])
@@ -45,7 +54,10 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
     [catalog],
   )
 
-  const remove = (i: number) => onChange(tools.filter((_, j) => j !== i))
+  const remove = (i: number) => {
+    onChange(tools.filter((_, j) => j !== i))
+    if (expandedIndex === i) setExpandedIndex(null)
+  }
 
   const cycleUsage = (i: number) => {
     const cycle: UsageControl[] = ['auto', 'force', 'none']
@@ -54,12 +66,17 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
     onChange(tools.map((t, j) => (j === i ? { ...t, usageControl: nextUsage } : t)))
   }
 
+  const updateParams = (i: number, params: Record<string, unknown>) => {
+    onChange(tools.map((t, j) => (j === i ? { ...t, params } : t)))
+  }
+
   const addTool = (toolId: string) => {
     if (tools.some(t => t.toolId === toolId)) {
       setPickerOpen(false)
       return
     }
     onChange([...tools, { toolId, usageControl: 'auto', kind: 'tool' }])
+    setExpandedIndex(tools.length)
     setPickerOpen(false)
   }
 
@@ -70,8 +87,11 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
           key={i}
           entry={tool}
           definition={catalogById.get(tool.toolId)}
+          expanded={expandedIndex === i}
+          onToggleExpand={() => setExpandedIndex(expandedIndex === i ? null : i)}
           onCycleUsage={() => cycleUsage(i)}
           onRemove={() => remove(i)}
+          onChangeParams={params => updateParams(i, params)}
         />
       ))}
 
@@ -105,53 +125,441 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
 interface SelectedToolRowProps {
   entry: ToolEntry
   definition: Tool | undefined
+  expanded: boolean
+  onToggleExpand: () => void
   onCycleUsage: () => void
   onRemove: () => void
+  onChangeParams: (params: Record<string, unknown>) => void
 }
 
-function SelectedToolRow({ entry, definition, onCycleUsage, onRemove }: SelectedToolRowProps) {
-  // Tools may be in the saved value but no longer in the catalog (deprecated
-  // / removed module). Show them with a warning marker so users know to
-  // re-pick before next run.
+function SelectedToolRow({
+  entry,
+  definition,
+  expanded,
+  onToggleExpand,
+  onCycleUsage,
+  onRemove,
+  onChangeParams,
+}: SelectedToolRowProps) {
   const isOrphan = definition === undefined
+
+  // Only render the chevron + expand affordance when there's something to
+  // configure (params the user can edit). Tools with zero user-visible
+  // params (e.g. `slack_list_channels`) collapse to the single row.
+  const userVisibleParams = useMemo(
+    () =>
+      definition
+        ? Object.entries(definition.params).filter(
+            ([, p]) => p.visibility === 'user-only' || p.visibility === 'user-or-llm',
+          )
+        : [],
+    [definition],
+  )
+  const hasConfigurable = userVisibleParams.length > 0
+
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 rounded-[5px] border bg-bg px-2.5 py-1.5',
+        'flex flex-col rounded-[5px] border bg-bg',
         isOrphan ? 'border-warn/40' : 'border-border-faint',
       )}
     >
-      {isOrphan ? (
-        <AlertCircle size={11} className="shrink-0 text-warn" />
-      ) : definition?.requires_auth ? (
-        <Lock size={10} className="shrink-0 text-text-faint" />
-      ) : null}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className={cn('truncate text-[11.5px]', isOrphan ? 'text-warn' : 'text-text')}>
-          {definition?.name ?? entry.toolId}
-        </span>
-        <span className="truncate font-mono text-[10px] text-text-faint">
-          {definition?.category_label ? `${definition.category_label} · ${entry.toolId}` : entry.toolId}
-        </span>
-      </div>
-      <button
-        type="button"
-        onClick={onCycleUsage}
-        className={cn(
-          'shrink-0 rounded-[4px] border px-1.5 py-0.5 text-[10px] font-medium transition-colors',
-          USAGE_STYLES[entry.usageControl],
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5">
+        {hasConfigurable ? (
+          <button
+            type="button"
+            onClick={onToggleExpand}
+            className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-text-faint hover:text-text-mute"
+            title={expanded ? 'Collapse' : 'Configure'}
+          >
+            <ChevronDown
+              size={11}
+              className={cn('transition-transform', expanded && 'rotate-180')}
+            />
+          </button>
+        ) : (
+          <div className="h-4 w-4 shrink-0" />
         )}
-        title="Click to cycle usage control"
+
+        {isOrphan ? (
+          <AlertCircle size={11} className="shrink-0 text-warn" />
+        ) : definition?.requires_auth ? (
+          <Lock size={10} className="shrink-0 text-text-faint" />
+        ) : null}
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <span className={cn('truncate text-[11.5px]', isOrphan ? 'text-warn' : 'text-text')}>
+            {definition?.name ?? entry.toolId}
+          </span>
+          <span className="truncate font-mono text-[10px] text-text-faint">
+            {definition?.category_label
+              ? `${definition.category_label} · ${entry.toolId}`
+              : entry.toolId}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={onCycleUsage}
+          className={cn(
+            'shrink-0 rounded-[4px] border px-1.5 py-0.5 text-[10px] font-medium transition-colors',
+            USAGE_STYLES[entry.usageControl],
+          )}
+          title="Click to cycle usage control"
+        >
+          {USAGE_LABELS[entry.usageControl]}
+        </button>
+
+        <button
+          type="button"
+          onClick={onRemove}
+          className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-text-faint hover:text-err transition-colors"
+        >
+          <X size={11} />
+        </button>
+      </div>
+
+      {expanded && hasConfigurable && definition && (
+        <ToolConfigPanel
+          definition={definition}
+          params={entry.params ?? {}}
+          onChange={onChangeParams}
+        />
+      )}
+    </div>
+  )
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+//  Tool config panel (expanded body)
+// ──────────────────────────────────────────────────────────────────────────
+
+interface ToolConfigPanelProps {
+  definition: Tool
+  params: Record<string, unknown>
+  onChange: (params: Record<string, unknown>) => void
+}
+
+function ToolConfigPanel({ definition, params, onChange }: ToolConfigPanelProps) {
+  const entries = useMemo(
+    () =>
+      Object.entries(definition.params).filter(
+        ([, p]) => p.visibility === 'user-only' || p.visibility === 'user-or-llm',
+      ),
+    [definition.params],
+  )
+
+  const setParam = (name: string, value: unknown) => {
+    if (value === '' || value === undefined) {
+      // Unset rather than store empty so the merge with LLM args still
+      // gives the model a chance to fill in.
+      const next = { ...params }
+      delete next[name]
+      onChange(next)
+    } else {
+      onChange({ ...params, [name]: value })
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2 border-t border-border-faint px-2.5 py-2">
+      {entries.map(([name, def]) => (
+        <ParamField
+          key={name}
+          name={name}
+          paramType={def.type}
+          required={def.required}
+          visibility={def.visibility}
+          description={def.description}
+          value={params[name]}
+          onChange={v => setParam(name, v)}
+        />
+      ))}
+    </div>
+  )
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+//  ParamField — per-type editor
+// ──────────────────────────────────────────────────────────────────────────
+
+interface ParamFieldProps {
+  name: string
+  paramType: string
+  required: boolean
+  visibility: string
+  description: string
+  value: unknown
+  onChange: (value: unknown) => void
+}
+
+function ParamField({
+  name,
+  paramType,
+  required,
+  visibility,
+  description,
+  value,
+  onChange,
+}: ParamFieldProps) {
+  // Visibility badge — clarifies the LLM/user contract per param.
+  const visibilityBadge =
+    visibility === 'user-only' ? (
+      <span
+        className="inline-flex items-center gap-1 rounded-[3px] bg-surface px-1 py-0.5 font-mono text-[9px] text-text-faint"
+        title="User-only: hidden from the LLM"
       >
-        {USAGE_LABELS[entry.usageControl]}
-      </button>
+        <EyeOff size={8} />
+        user only
+      </span>
+    ) : (
+      <span
+        className="inline-flex items-center gap-1 rounded-[3px] bg-surface px-1 py-0.5 font-mono text-[9px] text-text-faint"
+        title="User or LLM: your preset overrides what the LLM picks"
+      >
+        <Eye size={8} />
+        user or LLM
+      </span>
+    )
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between gap-2">
+        <label className="font-mono text-[10.5px] uppercase tracking-wide text-text-mute">
+          {name}
+          {required && <span className="ml-0.5 text-err">*</span>}
+        </label>
+        {visibilityBadge}
+      </div>
+      <ParamInput paramType={paramType} value={value} onChange={onChange} placeholder={description} />
+      {description && (
+        <p className="text-[10.5px] leading-relaxed text-text-faint">{description}</p>
+      )}
+    </div>
+  )
+}
+
+interface ParamInputProps {
+  paramType: string
+  value: unknown
+  onChange: (value: unknown) => void
+  placeholder?: string
+}
+
+function ParamInput({ paramType, value, onChange, placeholder }: ParamInputProps) {
+  if (paramType === 'boolean') {
+    return <BooleanParam value={value} onChange={onChange} />
+  }
+  if (paramType === 'number') {
+    return <NumberParam value={value} onChange={onChange} placeholder={placeholder} />
+  }
+  if (paramType === 'json') {
+    return <JsonParam value={value} onChange={onChange} placeholder={placeholder} />
+  }
+  // string + fallback
+  return <StringParam value={value} onChange={onChange} placeholder={placeholder} />
+}
+
+// ── String param with inline expression-mode swap ──────────────────────────
+
+function StringParam({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: unknown
+  onChange: (v: unknown) => void
+  placeholder?: string
+}) {
+  const str = value === undefined || value === null ? '' : String(value)
+  const isExpression = str.startsWith('=')
+
+  const [autoFocusOnEnter, setAutoFocusOnEnter] = useState(false)
+  const [autoFocusOnExit, setAutoFocusOnExit] = useState(false)
+  const plainRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (!autoFocusOnExit) return
+    const el = plainRef.current
+    if (!el) return
+    el.focus()
+    el.setSelectionRange(el.value.length, el.value.length)
+    setAutoFocusOnExit(false)
+  }, [autoFocusOnExit])
+
+  const toggleMode = () => {
+    if (isExpression) {
+      setAutoFocusOnExit(true)
+      onChange(str.slice(1))
+    } else {
+      setAutoFocusOnEnter(true)
+      onChange(`=${str}`)
+    }
+  }
+
+  const handlePlain = (next: string) => {
+    if (!str.startsWith('=') && (next.startsWith('=') || next.startsWith('$'))) {
+      setAutoFocusOnEnter(true)
+    }
+    if (next.startsWith('$') && !str.startsWith('=')) {
+      onChange(`=${next}`)
+      return
+    }
+    onChange(next)
+  }
+
+  const handleExpression = (next: string) => {
+    if (!next.startsWith('=') && str.startsWith('=')) {
+      setAutoFocusOnExit(true)
+    }
+    onChange(next)
+  }
+
+  return (
+    <div className="relative">
       <button
         type="button"
-        onClick={onRemove}
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-text-faint hover:text-err transition-colors"
+        onClick={toggleMode}
+        title={isExpression ? 'Switch to plain text' : 'Switch to expression (JSONata)'}
+        aria-pressed={isExpression}
+        className={cn(
+          'absolute -top-[18px] right-0 flex h-[14px] items-center rounded-[3px] px-1',
+          'font-mono text-[9px] font-semibold uppercase tracking-wide leading-none',
+          'transition-colors',
+          isExpression
+            ? 'bg-accent/15 text-accent hover:bg-accent/25'
+            : 'text-text-faint hover:bg-accent/15 hover:text-accent',
+        )}
       >
-        <X size={11} />
+        fx
       </button>
+      {isExpression ? (
+        <ExpressionEditor
+          value={str}
+          onChange={handleExpression}
+          placeholder={placeholder}
+          autoFocus={autoFocusOnEnter}
+          onAutoFocusDone={() => setAutoFocusOnEnter(false)}
+        />
+      ) : (
+        <Input
+          ref={plainRef}
+          value={str}
+          onChange={e => handlePlain(e.target.value)}
+          placeholder={placeholder}
+          className="h-7 rounded-[4px] text-[11px]"
+        />
+      )}
+    </div>
+  )
+}
+
+// ── Number param ─────────────────────────────────────────────────────────
+
+function NumberParam({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: unknown
+  onChange: (v: unknown) => void
+  placeholder?: string
+}) {
+  const str = value === undefined || value === null ? '' : String(value)
+  return (
+    <Input
+      type="number"
+      value={str}
+      onChange={e => onChange(e.target.value === '' ? '' : Number(e.target.value))}
+      placeholder={placeholder}
+      className="h-7 rounded-[4px] text-[11px]"
+    />
+  )
+}
+
+// ── Boolean param ────────────────────────────────────────────────────────
+
+function BooleanParam({
+  value,
+  onChange,
+}: {
+  value: unknown
+  onChange: (v: unknown) => void
+}) {
+  const checked = Boolean(value)
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      role="switch"
+      aria-checked={checked}
+      className={cn(
+        'flex h-7 w-fit items-center gap-2 rounded-[4px] border px-2 text-[11px] transition-colors',
+        checked
+          ? 'border-accent/40 bg-accent/10 text-accent'
+          : 'border-border-faint bg-bg text-text-mute hover:border-border-soft',
+      )}
+    >
+      <span
+        className={cn(
+          'inline-block h-2.5 w-2.5 rounded-full',
+          checked ? 'bg-accent' : 'bg-border-soft',
+        )}
+      />
+      {checked ? 'true' : 'false'}
+    </button>
+  )
+}
+
+// ── JSON param ───────────────────────────────────────────────────────────
+
+function JsonParam({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: unknown
+  onChange: (v: unknown) => void
+  placeholder?: string
+}) {
+  const initialRaw =
+    value === undefined || value === null
+      ? ''
+      : typeof value === 'string'
+        ? value
+        : JSON.stringify(value, null, 2)
+  const [raw, setRaw] = useState(initialRaw)
+  const [invalid, setInvalid] = useState(false)
+
+  const commit = (next: string) => {
+    setRaw(next)
+    if (next.trim() === '') {
+      setInvalid(false)
+      onChange(undefined)
+      return
+    }
+    try {
+      onChange(JSON.parse(next))
+      setInvalid(false)
+    } catch {
+      setInvalid(true)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Textarea
+        value={raw}
+        onChange={e => commit(e.target.value)}
+        rows={3}
+        spellCheck={false}
+        placeholder={placeholder ?? '{}'}
+        className={cn(
+          'rounded-[4px] font-mono text-[10.5px] leading-relaxed',
+          invalid && 'border-err focus-visible:ring-err/30',
+        )}
+      />
+      {invalid && <p className="text-[10px] text-err">Invalid JSON</p>}
     </div>
   )
 }
@@ -196,7 +604,6 @@ function ToolPicker({ catalog, alreadyAdded, loading, error, onPick, onClose }: 
     )
   }, [catalog, query])
 
-  // Build flat list with section headers so keyboard navigation stays linear.
   const flatItems = useMemo<FlatItem[]>(() => {
     const items: FlatItem[] = []
     let currentCategory: string | null = null
@@ -210,16 +617,11 @@ function ToolPicker({ catalog, alreadyAdded, loading, error, onPick, onClose }: 
     return items
   }, [filtered])
 
-  // Flattened tool-only list (used by keyboard handlers — group rows are
-  // never selectable).
   const toolItems = useMemo(
     () => flatItems.filter((i): i is FlatItem & { kind: 'tool'; tool: Tool } => i.kind === 'tool'),
     [flatItems],
   )
 
-  // Clamp the highlight to whatever's currently in range — derived, not
-  // effect-based, so it stays in lockstep with `toolItems.length` without
-  // a render-time setState.
   const clampedIndex = toolItems.length === 0 ? 0 : Math.min(activeIndex, toolItems.length - 1)
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -243,9 +645,6 @@ function ToolPicker({ catalog, alreadyAdded, loading, error, onPick, onClose }: 
     }
   }
 
-  // Close when focus leaves the picker (mousedown elsewhere). Tested via
-  // relatedTarget so clicks INSIDE the picker (selecting an item) don't
-  // close prematurely.
   const handleBlur = (e: React.FocusEvent) => {
     if (wrapperRef.current?.contains(e.relatedTarget as Node | null)) return
     onClose()
