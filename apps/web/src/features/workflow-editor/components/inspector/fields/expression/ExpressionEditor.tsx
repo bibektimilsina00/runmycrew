@@ -117,7 +117,6 @@ export function ExpressionEditor({
       const end = completionState.replaceRange.end + offset
       const next = value.slice(0, start) + item.insertText + value.slice(end)
       commit(next)
-      setPopupOpen(false)
       Promise.resolve().then(() => {
         const el = inputRef.current
         if (!el) return
@@ -125,6 +124,15 @@ export function ExpressionEditor({
         el.focus()
         el.setSelectionRange(pos, pos)
         setCaret(pos)
+        // Re-open the popup at the new caret. The follow-up trigger surface
+        // (e.g. `$step.` → field names) renders immediately rather than
+        // requiring the user to click or type again.
+        if (wrapperRef.current) {
+          const r = wrapperRef.current.getBoundingClientRect()
+          setPopupAnchor({ left: r.left, top: r.bottom + 4 })
+        }
+        setPopupOpen(true)
+        setSelectedIndex(0)
       })
     },
     [completionState.replaceRange, value, commit],
@@ -177,7 +185,25 @@ export function ExpressionEditor({
     }
   }
 
-  const highlights = useMemo(() => buildHighlights(value), [value])
+  // Ghost preview: shows the tail of the highlighted completion as dim text
+  // at the end of the input, so users can see what Tab/Enter will insert
+  // without leaving the keyboard. Only fires when:
+  //   - the popup is open and has a highlighted item
+  //   - the candidate's insertText is a true prefix-extension of what the
+  //     user has typed
+  //   - the caret is at the end of the value (no clean way to render a
+  //     ghost in the middle without restructuring the two-layer overlay).
+  const ghost = useMemo(() => {
+    if (!popupOpen || !completionState.active) return ''
+    if (caret !== value.length) return ''
+    const item = completionState.completions[selectedIndex]
+    if (!item) return ''
+    const prefix = completionState.prefix
+    if (!item.insertText.toLowerCase().startsWith(prefix.toLowerCase())) return ''
+    return item.insertText.slice(prefix.length)
+  }, [popupOpen, completionState, selectedIndex, caret, value.length])
+
+  const highlights = useMemo(() => buildHighlights(value, ghost), [value, ghost])
 
   // Chrome that mirrors `Input` (single-line) or `Textarea` (multiline).
   // No accent tint, no `fx` pill, no exit button — the syntax colouring is
@@ -282,9 +308,10 @@ export function ExpressionEditor({
  * are matched first. The leading `=` (when present) is given its own dim
  * class so users see the mode marker without it dominating the value.
  */
-function buildHighlights(source: string): React.ReactNode[] {
+function buildHighlights(source: string, ghost: string = ''): React.ReactNode[] {
   // Tokenise the body (without the leading `=`) and prepend a dim `=` span
-  // if the source is in expression mode.
+  // if the source is in expression mode. Appends a dimmer ghost span at the
+  // very end (after all tokens) when a completion preview is requested.
   const equalsPrefix = source.startsWith('=')
   const body = equalsPrefix ? source.slice(1) : source
 
@@ -328,5 +355,12 @@ function buildHighlights(source: string): React.ReactNode[] {
     cursor = r.end
   })
   if (cursor < body.length) out.push(body.slice(cursor))
+  if (ghost) {
+    out.push(
+      <span key="ghost" className="text-text-faint/60 italic">
+        {ghost}
+      </span>,
+    )
+  }
   return out
 }
