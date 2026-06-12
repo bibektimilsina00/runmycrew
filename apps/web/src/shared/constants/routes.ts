@@ -46,6 +46,9 @@ export const API_ROUTES = {
   NODES_LIST: '/nodes/',
   NODE_TEST:  '/nodes/test',
 
+  // Tools (agent catalog)
+  TOOLS_LIST: '/tools/',
+
   // Workflows / Automations
   WORKFLOWS_WITH_STATS: '/workflows/with-stats',
   WORKFLOW_CREATE: '/workflows/',
