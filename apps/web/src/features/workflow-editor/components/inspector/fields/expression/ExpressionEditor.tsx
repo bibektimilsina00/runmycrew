@@ -205,6 +205,18 @@ export function ExpressionEditor({
 
   const highlights = useMemo(() => buildHighlights(value, ghost), [value, ghost])
 
+  // Hide the popup when the only remaining match is what the user already
+  // typed in full — keeps `=$step.input_data` from leaving a stale popup
+  // covering the field after the user finished. Multiple matches stay open
+  // (the user still has choices); zero matches close naturally.
+  const shouldShowPopup =
+    completionState.completions.length > 0 &&
+    !(
+      completionState.completions.length === 1 &&
+      completionState.completions[0].insertText.toLowerCase() ===
+        completionState.prefix.toLowerCase()
+    )
+
   // Chrome that mirrors `Input` (single-line) or `Textarea` (multiline).
   // No accent tint, no `fx` pill, no exit button — the syntax colouring is
   // the only signal that we're in expression mode.
@@ -289,7 +301,7 @@ export function ExpressionEditor({
         </div>
       )}
 
-      {popupOpen && popupAnchor && completionState.active && (
+      {popupOpen && popupAnchor && completionState.active && shouldShowPopup && (
         <CompletionPopup
           completions={completionState.completions}
           selectedIndex={selectedIndex}
@@ -357,7 +369,14 @@ function buildHighlights(source: string, ghost: string = ''): React.ReactNode[] 
   if (cursor < body.length) out.push(body.slice(cursor))
   if (ghost) {
     out.push(
-      <span key="ghost" className="text-text-faint/60 italic">
+      <span
+        key="ghost"
+        className="italic opacity-50"
+        // Explicit color — the `/60` modifier on `text-text-faint` wasn't
+        // compiling cleanly in the Tailwind setup; ghost was rendering in
+        // the default text color and looked like real input.
+        style={{ color: 'var(--text-faint)' }}
+      >
         {ghost}
       </span>,
     )
