@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { CompletionPopup } from './CompletionPopup'
 import { useExpressionCompletions, type Completion } from './useExpressionCompletions'
@@ -7,18 +6,20 @@ import { useExpressionCompletions, type Completion } from './useExpressionComple
 /**
  * In-line editor for JSONata expressions saved with a leading `=` prefix.
  *
- * The saved value always starts with `=`. The editor strips it for display
- * and re-applies it on every keystroke, so the stored shape never drifts.
- * Clicking the close button drops the `=` and writes back a plain string,
- * which transitions the field renderer out of expression mode.
+ * Visual chrome mirrors the regular Input / Textarea components exactly —
+ * same border, padding, height, hover / focus states. The only difference
+ * is a transparent input layered over a `<pre>` that syntax-colours the
+ * value, so users see structure without any extra UI noise (no fx pill,
+ * no boxed accent border, no close button).
  *
- * PR7 adds completions: as the user types, a popup suggests `$step.<field>`,
- * `$node('Label').<field>`, and JSONata built-ins, populated from the
- * currently-selected node's reachable ancestors and their outputsSchema.
+ * The saved value always starts with `=`; the editor displays it verbatim.
+ * When the user deletes the `=`, StringRenderer swaps the field back to a
+ * plain Input on the next render, so no explicit "exit expression mode"
+ * affordance is needed.
  */
 interface ExpressionEditorProps {
   value: string                       // includes the leading `=`
-  onChange: (next: string) => void   // receives the new value including `=` or '' on exit
+  onChange: (next: string) => void
   placeholder?: string
   multiline?: boolean
   rows?: number
@@ -30,93 +31,88 @@ export function ExpressionEditor({
   onChange,
   placeholder,
   multiline,
-  rows = 1,
+  rows = 3,
   disabled,
 }: ExpressionEditorProps) {
-  const inner = value.startsWith('=') ? value.slice(1) : value
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
 
-  const [caret, setCaret] = useState(inner.length)
+  const [caret, setCaret] = useState(value.length)
   const [popupOpen, setPopupOpen] = useState(false)
   const [popupAnchor, setPopupAnchor] = useState<{ left: number; top: number } | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const completionState = useExpressionCompletions(inner, caret)
+  // Completion engine works on the expression body (without the leading `=`)
+  // since the caret index inside `value` is offset by 1 from the body.
+  const inner = value.startsWith('=') ? value.slice(1) : value
+  const innerCaret = Math.max(0, caret - (value.startsWith('=') ? 1 : 0))
+  const completionState = useExpressionCompletions(inner, innerCaret)
 
-  // Auto-grow textarea height in multiline mode so users can see what they're
-  // writing without scroll. Capped to keep the inspector usable on long
-  // expressions.
+  // Auto-grow multiline textarea up to a cap so long expressions stay
+  // visible without the rest of the inspector exploding.
   useEffect(() => {
     if (!multiline) return
     const el = inputRef.current as HTMLTextAreaElement | null
     if (!el) return
     el.style.height = 'auto'
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
-  }, [inner, multiline])
+  }, [value, multiline])
 
-  const commitText = useCallback(
+  const commit = useCallback(
     (next: string) => {
-      onChange(`=${next}`)
-      // Typing always changes the prefix, so the previously-highlighted
-      // completion no longer makes sense. Reset to the first match instead
-      // of running a render-time effect against `completionState.completions`.
+      onChange(next)
       setSelectedIndex(0)
     },
     [onChange],
   )
 
-  const exit = () => {
-    onChange(inner)
-  }
-
   const syncCaret = useCallback(() => {
     const el = inputRef.current
     if (!el) return
-    const pos = el.selectionStart ?? inner.length
+    const pos = el.selectionStart ?? value.length
     setCaret(pos)
     if (wrapperRef.current) {
       const r = wrapperRef.current.getBoundingClientRect()
       setPopupAnchor({ left: r.left, top: r.bottom + 4 })
     }
     setPopupOpen(true)
-  }, [inner.length])
+  }, [value.length])
 
-  const handleAccept = useCallback(
+  const acceptCompletion = useCallback(
     (item: Completion) => {
-      const range = completionState.replaceRange
-      const next = inner.slice(0, range.start) + item.insertText + inner.slice(range.end)
-      commitText(next)
+      // ReplaceRange is in inner-string coords; lift to full-value coords.
+      const offset = value.startsWith('=') ? 1 : 0
+      const start = completionState.replaceRange.start + offset
+      const end = completionState.replaceRange.end + offset
+      const next = value.slice(0, start) + item.insertText + value.slice(end)
+      commit(next)
       setPopupOpen(false)
-      // After React commits the new value, place the caret just after the inserted
-      // text. We can't `requestAnimationFrame` the focus before React renders, so
-      // use a microtask hop.
       Promise.resolve().then(() => {
         const el = inputRef.current
         if (!el) return
-        const pos = range.start + item.insertText.length
+        const pos = start + item.insertText.length
         el.focus()
         el.setSelectionRange(pos, pos)
         setCaret(pos)
       })
     },
-    [completionState.replaceRange, inner, commitText],
+    [completionState.replaceRange, value, commit],
   )
 
   const handleDrop = (e: React.DragEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    // Drops from the Inputs / Logs JSON tree carry an `=<expression>` payload
-    // because the user often drops them on a plain text field that needs the
-    // leading `=` to enter expression mode. We're already in expression mode,
-    // so strip the `=` before inserting so the inner JSONata stays valid.
+    // Drops from the Inputs / Logs JSON tree carry `=<expression>` because
+    // they're designed to drop on a plain text field that needs the `=` to
+    // enter expression mode. We're already in expression mode — strip the
+    // leading `=` so the result is `... $step.x ...`, not `... =$step.x ...`.
     const raw = e.dataTransfer.getData('text/plain')
     if (!raw) return
     e.preventDefault()
     const cleaned = raw.startsWith('=') ? raw.slice(1) : raw
     const el = e.currentTarget
-    const start = el.selectionStart ?? inner.length
+    const start = el.selectionStart ?? value.length
     const end = el.selectionEnd ?? start
-    const next = inner.slice(0, start) + cleaned + inner.slice(end)
-    commitText(next)
+    const next = value.slice(0, start) + cleaned + value.slice(end)
+    commit(next)
     Promise.resolve().then(() => {
       el.focus()
       const pos = start + cleaned.length
@@ -135,14 +131,14 @@ export function ExpressionEditor({
       setSelectedIndex(i => (i + 1) % completionState.completions.length)
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelectedIndex(i => (i - 1 + completionState.completions.length) % completionState.completions.length)
+      setSelectedIndex(
+        i => (i - 1 + completionState.completions.length) % completionState.completions.length,
+      )
     } else if (e.key === 'Enter' || e.key === 'Tab') {
-      // Don't intercept Enter when the popup is empty or in plain multiline
-      // editing without an active completion trigger.
       const item = completionState.completions[selectedIndex]
       if (item) {
         e.preventDefault()
-        handleAccept(item)
+        acceptCompletion(item)
       }
     } else if (e.key === 'Escape') {
       e.preventDefault()
@@ -150,47 +146,48 @@ export function ExpressionEditor({
     }
   }
 
-  const highlights = useMemo(() => buildHighlights(inner), [inner])
+  const highlights = useMemo(() => buildHighlights(value), [value])
 
-  const editorClass = cn(
-    'w-full resize-none bg-transparent font-mono text-[12px] leading-[18px] text-text outline-none',
+  // Chrome that mirrors `Input` (single-line) or `Textarea` (multiline).
+  // No accent tint, no `fx` pill, no exit button — the syntax colouring is
+  // the only signal that we're in expression mode.
+  const wrapperClass = multiline
+    ? cn(
+        'relative w-full bg-bg border border-border-faint rounded-[8px] px-3 py-2.5',
+        'transition-[background-color,border-color] duration-[120ms]',
+        'hover:border-border-soft focus-within:border-border focus-within:bg-surface',
+        disabled && 'pointer-events-none opacity-60',
+      )
+    : cn(
+        'relative flex h-9 items-center gap-2 px-3',
+        'bg-bg border border-border-faint rounded-[8px]',
+        'transition-[background-color,border-color] duration-[120ms]',
+        'hover:border-border-soft focus-within:border-border focus-within:bg-surface',
+        disabled && 'pointer-events-none opacity-60',
+      )
+
+  const sharedInputClass = cn(
+    'w-full bg-transparent outline-none text-sm text-transparent caret-text',
     'placeholder:text-text-faint',
-    multiline ? 'min-h-[26px]' : 'h-[26px] truncate',
+  )
+
+  const sharedPreClass = cn(
+    'pointer-events-none m-0 font-mono text-sm leading-normal whitespace-pre-wrap break-words',
   )
 
   return (
-    <div
-      ref={wrapperRef}
-      className={cn(
-        'group relative flex items-stretch rounded-[7px] border border-accent/40 bg-accent/[0.06] transition-colors',
-        'focus-within:border-accent/70 focus-within:bg-accent/[0.10]',
-        disabled && 'opacity-60',
-      )}
-    >
-      <div className="flex shrink-0 items-center gap-1 border-r border-accent/20 px-2 py-1">
-        <Sparkles className="h-3 w-3 text-accent" />
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-accent">
-          fx
-        </span>
-      </div>
-
-      <div className="relative min-w-0 flex-1 px-2 py-1">
-        <pre
-          aria-hidden
-          className={cn(
-            'pointer-events-none absolute inset-0 m-0 overflow-hidden whitespace-pre-wrap break-words px-2 py-1 font-mono text-[12px] leading-[18px]',
-            multiline ? '' : 'overflow-hidden whitespace-pre',
-          )}
-        >
-          {highlights}
-          {'\n'}
-        </pre>
-        {multiline ? (
+    <div ref={wrapperRef} className={wrapperClass}>
+      {multiline ? (
+        <div className="relative w-full">
+          <pre aria-hidden className={cn(sharedPreClass, 'absolute inset-0')}>
+            {highlights}
+            {'\n'}
+          </pre>
           <textarea
             ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-            value={inner}
+            value={value}
             onChange={e => {
-              commitText(e.target.value)
+              commit(e.target.value)
               syncCaret()
             }}
             onSelect={syncCaret}
@@ -204,15 +201,20 @@ export function ExpressionEditor({
             disabled={disabled}
             rows={rows}
             spellCheck={false}
-            className={cn(editorClass, 'relative z-10 text-transparent caret-text')}
+            className={cn(sharedInputClass, 'relative z-10 resize-none font-mono')}
           />
-        ) : (
+        </div>
+      ) : (
+        <div className="relative h-full min-w-0 flex-1">
+          <pre aria-hidden className={cn(sharedPreClass, 'absolute inset-0 flex items-center')}>
+            {highlights}
+          </pre>
           <input
             ref={inputRef as React.RefObject<HTMLInputElement>}
             type="text"
-            value={inner}
+            value={value}
             onChange={e => {
-              commitText(e.target.value)
+              commit(e.target.value)
               syncCaret()
             }}
             onSelect={syncCaret}
@@ -225,27 +227,17 @@ export function ExpressionEditor({
             placeholder={placeholder ?? 'JSONata expression'}
             disabled={disabled}
             spellCheck={false}
-            className={cn(editorClass, 'relative z-10 text-transparent caret-text')}
+            className={cn(sharedInputClass, 'relative z-10 h-full font-mono border-none')}
           />
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={exit}
-        title="Exit expression mode"
-        disabled={disabled}
-        className="shrink-0 px-1.5 text-text-faint transition-colors hover:text-text"
-      >
-        <X className="h-3 w-3" />
-      </button>
+        </div>
+      )}
 
       {popupOpen && popupAnchor && completionState.active && (
         <CompletionPopup
           completions={completionState.completions}
           selectedIndex={selectedIndex}
           onSelectIndex={setSelectedIndex}
-          onAccept={handleAccept}
+          onAccept={acceptCompletion}
           anchor={popupAnchor}
         />
       )}
@@ -256,9 +248,15 @@ export function ExpressionEditor({
 /**
  * Cheap tokeniser for JSONata source. Splits the string into spans with
  * semantic colour classes. Order matters — longer / more-specific patterns
- * are matched first.
+ * are matched first. The leading `=` (when present) is given its own dim
+ * class so users see the mode marker without it dominating the value.
  */
 function buildHighlights(source: string): React.ReactNode[] {
+  // Tokenise the body (without the leading `=`) and prepend a dim `=` span
+  // if the source is in expression mode.
+  const equalsPrefix = source.startsWith('=')
+  const body = equalsPrefix ? source.slice(1) : source
+
   const tokens: { regex: RegExp; className: string }[] = [
     { regex: /\$[A-Za-z_][A-Za-z0-9_]*/g, className: 'text-accent' },        // $step / $sum
     { regex: /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, className: 'text-ok' }, // strings
@@ -271,7 +269,7 @@ function buildHighlights(source: string): React.ReactNode[] {
   for (const { regex, className } of tokens) {
     let m: RegExpExecArray | null
     regex.lastIndex = 0
-    while ((m = regex.exec(source)) !== null) {
+    while ((m = regex.exec(body)) !== null) {
       const start = m.index
       const end = start + m[0].length
       if (ranges.some(r => start < r.end && end > r.start)) continue
@@ -281,16 +279,23 @@ function buildHighlights(source: string): React.ReactNode[] {
   ranges.sort((a, b) => a.start - b.start)
 
   const out: React.ReactNode[] = []
+  if (equalsPrefix) {
+    out.push(
+      <span key="eq" className="text-text-faint">
+        =
+      </span>,
+    )
+  }
   let cursor = 0
   ranges.forEach((r, i) => {
-    if (cursor < r.start) out.push(source.slice(cursor, r.start))
+    if (cursor < r.start) out.push(body.slice(cursor, r.start))
     out.push(
-      <span key={i} className={r.className}>
-        {source.slice(r.start, r.end)}
+      <span key={`t-${i}`} className={r.className}>
+        {body.slice(r.start, r.end)}
       </span>,
     )
     cursor = r.end
   })
-  if (cursor < source.length) out.push(source.slice(cursor))
+  if (cursor < body.length) out.push(body.slice(cursor))
   return out
 }
