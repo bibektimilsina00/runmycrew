@@ -7,6 +7,7 @@ import { editorAPI } from '../services/editorAPI'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../stores/editorLayoutStore'
 import { useRunsStore } from '@/features/runs/store/runsStore'
+import { renameNodeInGraph } from '../utils/rename-refactor'
 
 const AUTOSAVE_DELAY = 1500 // ms
 
@@ -158,6 +159,16 @@ export function useWorkflowEditor(workflowId: string) {
     )
   }, [setNodes])
 
+  /**
+   * Rename a node's display label and atomically rewrite every
+   * `$node('Old')` reference in every other node's properties to
+   * `$node('New')`. The rewrite + label-set happen in a single setNodes
+   * batch so callers never see a half-renamed graph.
+   */
+  const renameNode = useCallback((nodeId: string, newLabel: string) => {
+    setNodes(currentNodes => renameNodeInGraph(currentNodes, nodeId, newLabel))
+  }, [setNodes])
+
   const onConnect = useCallback((connection: Connection) => {
     pushHistory()
     setEdges(eds => addEdge({
@@ -217,6 +228,7 @@ export function useWorkflowEditor(workflowId: string) {
     setNodes,
     setEdges,
     updateNodeData,
+    renameNode,
     selectNode,
     // Actions
     run: runMutation.mutate,

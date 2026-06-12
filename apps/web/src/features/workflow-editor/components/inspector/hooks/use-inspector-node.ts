@@ -4,6 +4,7 @@ import { useWorkflowEditorStore } from '../../../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../../../stores/editorLayoutStore'
 import type { NodeDefinition } from '../../../types/editorTypes'
 import { splitPropertyGroups } from '../utils/inspector-visibility'
+import { renameNodeInGraph, validateNodeLabel } from '../../../utils/rename-refactor'
 
 interface UseInspectorNodeParams {
   nodes: Node[]
@@ -55,10 +56,23 @@ export function useInspectorNode({ nodes, updateNodeData }: UseInspectorNodePara
     })
   }, [selectedNode, updateNodeData])
 
-  const updateLabel = useCallback((label: string) => {
-    if (!selectedNode) return
-    updateNodeData(selectedNode.id, { label })
-  }, [selectedNode, updateNodeData])
+  /**
+   * Rename the selected node atomically with `$node('Old')` → `$node('New')`
+   * rewriting across every other node's properties. Returns the user-facing
+   * reason for rejection, or `null` when the rename was applied.
+   *
+   * The validate+apply step uses `getState().setNodes` rather than the
+   * `updateNodeData` prop because the rename touches multiple nodes — not
+   * just the selected one — and `updateNodeData` is single-node by design.
+   */
+  const updateLabel = useCallback((label: string): string | null => {
+    if (!selectedNode) return null
+    const store = useWorkflowEditorStore.getState()
+    const error = validateNodeLabel(selectedNode.id, label, store.nodes)
+    if (error) return error
+    store.setNodes(renameNodeInGraph(store.nodes, selectedNode.id, label.trim()))
+    return null
+  }, [selectedNode])
 
   const showAdvanced = nodeUI?.showAdvanced ?? false
   const toggleAdvanced = useCallback(() => {
