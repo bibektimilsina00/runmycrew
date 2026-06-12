@@ -28,16 +28,45 @@ type ValueKind = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null' |
  * or `<textarea>` in the inspector.
  */
 export function JsonTreeView({ value, initialDepth = 2, nodeId = null }: Props) {
+  const kind = classify(value)
+
+  // Skip the synthetic "root" row — render the value's contents directly.
+  // For containers, that means iterating top-level entries inline; for
+  // primitives, that means rendering the formatted value alone.
+  if (kind === 'object' || kind === 'array') {
+    const entries: [string | number, unknown][] =
+      kind === 'object'
+        ? Object.entries(value as Record<string, unknown>)
+        : (value as unknown[]).map((v, i) => [i, v])
+
+    if (entries.length === 0) {
+      return (
+        <div className="text-[12.5px] leading-[20px] italic text-[var(--text-faint)]">
+          {kind === 'object' ? '{}' : '[]'}
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-col text-[12.5px] leading-[20px]">
+        {entries.map(([k, v]) => (
+          <TreeNode
+            key={k}
+            keyName={k}
+            value={v}
+            depth={0}
+            initialDepth={initialDepth}
+            nodeId={nodeId}
+            parentPath=""
+          />
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col text-[12.5px] leading-[20px]">
-      <TreeNode
-        keyName={null}
-        value={value}
-        depth={0}
-        initialDepth={initialDepth}
-        nodeId={nodeId}
-        parentPath=""
-      />
+    <div className="text-[12.5px] leading-[20px]">
+      <PrimitiveValue value={value} kind={kind} />
     </div>
   )
 }

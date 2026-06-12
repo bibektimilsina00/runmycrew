@@ -164,7 +164,7 @@ function AncestorRow({ ancestor }: { ancestor: Ancestor }) {
       {open && (
         <div className="ml-[26px] mt-1 mb-1.5">
           {hasAnyValue ? (
-            <JsonTreeView value={treeValue} nodeId={node.id} initialDepth={1} />
+            <JsonTreeView value={treeValue} nodeId={node.id} initialDepth={0} />
           ) : (
             <p className="text-[11px] italic text-[var(--text-faint)]">
               No output schema declared and no run data yet.
