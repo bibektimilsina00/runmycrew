@@ -442,6 +442,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "jinja2" },
+    { name = "jsonata-python" },
     { name = "pgvector" },
     { name = "pydantic-settings" },
     { name = "pypdf" },
@@ -472,6 +473,7 @@ requires-dist = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "jsonata-python", specifier = ">=0.6.2" },
     { name = "pgvector", specifier = ">=0.4.2" },
     { name = "pydantic-settings" },
     { name = "pypdf", specifier = ">=6.11.0" },
@@ -643,6 +645,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d", size = 245115, upload-time = "2025-03-05T20:05:02.478Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67", size = 134899, upload-time = "2025-03-05T20:05:00.369Z" },
+]
+
+[[package]]
+name = "jsonata-python"
+version = "0.6.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/cc/16f20b1e9466a9904601df339a6b2b31d82eeba6ae97610076ffc9fec9a2/jsonata_python-0.6.2.tar.gz", hash = "sha256:6d553563f0d2cbfd64842d6b35fcec18615acbcf0859061be04bacce3a83b418", size = 363452, upload-time = "2026-03-21T07:02:20.565Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/fb/8ba2f1354718839087cb83b138d710026a05a05e3780c9afa8e43d0a9b86/jsonata_python-0.6.2-py3-none-any.whl", hash = "sha256:86c61632f23587d945cf1693fe966f023593c7ebfe2615814db8756c67e7c776", size = 83798, upload-time = "2026-03-21T07:02:19.018Z" },
 ]
 
 [[package]]
