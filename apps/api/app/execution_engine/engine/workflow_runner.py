@@ -165,9 +165,11 @@ class WorkflowRunner:
         label = node_data.get("data", {}).get("label") or node_data["type"]
         await self._log(label, node_id=node_id)
 
+        from apps.api.app.execution_engine.engine.expression_engine import JsonataResolver
+        from apps.api.app.execution_engine.engine.property_resolver import resolve_properties
         from apps.api.app.execution_engine.engine.template_resolver import TemplateResolver
 
-        resolver = TemplateResolver(
+        template_resolver = TemplateResolver(
             node_outputs=self._outputs,
             trigger_data=self._trigger_data,
             variables=self.variables,
@@ -175,8 +177,29 @@ class WorkflowRunner:
             secrets=self.secrets,
             loop_data=self.loop_data,
         )
-        resolved_properties = resolver.resolve_properties(
-            node_data.get("data", {}).get("properties", {})
+        # Label→id snapshot for `$node('Label')` lookups. On duplicate labels
+        # the later-defined node wins (editor-side uniqueness lands in PR9).
+        # Falls back to the raw node id so `$node('http_request-1')` works too.
+        label_to_id: dict[str, str] = {}
+        for nid, ndata in self.nodes.items():
+            label_to_id[ndata.get("data", {}).get("label") or nid] = nid
+            label_to_id.setdefault(nid, nid)
+        incoming = (
+            PairedItem(source_node_id=_source_node_id, source_item_index=_source_item_index)
+            if _source_node_id is not None
+            else None
+        )
+        jsonata_resolver = JsonataResolver(
+            context=input_data,
+            current_node_id=node_id,
+            incoming=incoming,
+            node_items=self._output_items,
+            label_to_id=label_to_id,
+        )
+        resolved_properties = resolve_properties(
+            node_data.get("data", {}).get("properties", {}),
+            jsonata_resolver,
+            template_resolver,
         )
 
         from apps.api.app.core.http import get_http_client

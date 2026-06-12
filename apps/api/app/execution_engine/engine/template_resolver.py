@@ -41,6 +41,15 @@ class TemplateResolver:
         """Resolve all template strings in a node's properties dict recursively."""
         return self._resolve_recursive(properties)
 
+    def resolve(self, value: Any) -> Any:
+        """Resolve any single property value (string, dict, list, primitive).
+
+        Public counterpart of the internal recursive walker; the PR5 dispatcher
+        in :mod:`expression_engine` delegates here for every value the user
+        didn't mark as a JSONata expression (no leading ``=``).
+        """
+        return self._resolve_recursive(value)
+
     def evaluate_condition(self, condition: str) -> bool:
         """Evaluate a condition expression. Supports:
         - {{path}} < / > / == / != / <= / >= value
@@ -83,7 +92,7 @@ class TemplateResolver:
         resolved = self._resolve_string(condition)
         if isinstance(resolved, bool):
             return resolved
-        if isinstance(resolved, (int, float)):
+        if isinstance(resolved, int | float):
             return resolved != 0
         if isinstance(resolved, str):
             return resolved.lower() not in ("", "false", "0", "null", "none")
@@ -114,7 +123,7 @@ class TemplateResolver:
             resolved = self._resolve_path(path)
             if resolved is None:
                 return ""
-            if isinstance(resolved, (dict, list)):
+            if isinstance(resolved, dict | list):
                 return json.dumps(resolved)
             return str(resolved)
 
