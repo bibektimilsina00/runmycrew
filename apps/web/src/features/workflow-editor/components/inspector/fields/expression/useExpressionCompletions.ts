@@ -212,7 +212,12 @@ function stepFieldCompletions(target: Ancestor | null, prefix: string): Completi
 
 function fuzzy(candidate: string, prefix: string): boolean {
   if (!prefix) return true
-  return candidate.toLowerCase().startsWith(prefix.toLowerCase().replace(/^\$/, ''))
+  // Both sides can carry a leading `$` (root completions are `$step`,
+  // `$node`, `$sum`…); strip it on both before comparing so `$st` matches
+  // `$step` and a plain field name like `status_code` still matches `stat`.
+  const c = candidate.toLowerCase().replace(/^\$/, '')
+  const p = prefix.toLowerCase().replace(/^\$/, '')
+  return c.startsWith(p)
 }
 
 /**
