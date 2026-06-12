@@ -37,12 +37,25 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
 
   const enterExpressionMode = () => onChange(`=${str}`)
 
+  // Auto-promote to expression mode when the user types `$` as the first
+  // character. The saved value still carries the `=` prefix (backend
+  // dispatcher routes on `=`), so the next render swaps in ExpressionEditor
+  // and the `$` they typed shows up at the caret. Lets users skip the `=`
+  // entirely — `$step.x` is what they reach for, the `=` is just a marker.
+  const handleTyped = (next: string) => {
+    if (next.startsWith('$') && !str.startsWith('=')) {
+      onChange(`=${next}`)
+      return
+    }
+    onChange(next)
+  }
+
   if (multiline) {
     return (
       <div className="relative">
         <Textarea
           value={str}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => handleTyped(e.target.value)}
           rows={rows}
           placeholder={prop.placeholder}
           disabled={disabled}
@@ -58,7 +71,7 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
       <Input
         type={opts.password ? 'password' : 'text'}
         value={str}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => handleTyped(e.target.value)}
         placeholder={prop.placeholder}
         disabled={disabled}
         className="h-8 pr-7 text-[12px]"
