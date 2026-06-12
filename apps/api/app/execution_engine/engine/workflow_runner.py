@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.api.app.core.logger import get_logger
 from apps.api.app.execution_engine.engine.node_executor import node_executor
 from apps.api.app.node_system.base.node_context import NodeContext
+from apps.api.app.node_system.base.node_item import NodeItem, PairedItem
 
 logger = get_logger(__name__)
 
@@ -64,6 +65,11 @@ class WorkflowRunner:
         self._lock = asyncio.Lock()
         self._executed: dict[str, Any] = {}  # node_id → NodeResult
         self._outputs: dict[str, dict[str, Any]] = {}  # node_id → output_data
+        # Rich per-item view kept in parallel with `_outputs`. Foundation for
+        # the JSONata resolver's paired-item walking (PR4 wires it). Today
+        # nothing reads from this map; it's populated as nodes complete so
+        # the data is ready when PR4 lights up the resolver.
+        self._output_items: dict[str, list[NodeItem]] = {}
         self._failed = asyncio.Event()
         self._error_message: str | None = None
         self._depth = _depth
@@ -115,7 +121,21 @@ class WorkflowRunner:
         except Exception:
             return False
 
-    async def _execute_node(self, node_id: str, input_data: dict[str, Any]) -> None:
+    async def _execute_node(
+        self,
+        node_id: str,
+        input_data: dict[str, Any],
+        *,
+        _source_node_id: str | None = None,
+        _source_item_index: int = 0,
+    ) -> None:
+        """Run ``node_id`` and dispatch its successors.
+
+        ``_source_node_id`` / ``_source_item_index`` describe which upstream
+        node-output item fed this invocation. They are recorded as the
+        ``paired_item`` provenance on every item the current node produces
+        whenever the node itself didn't set one explicitly.
+        """
         if self._failed.is_set():
             return
 
@@ -197,10 +217,12 @@ class WorkflowRunner:
                 sub_runner.secrets = self.secrets
                 sub_runner.loop_data = loop_data or item_input  # expose as {{loop.*}}
                 sub_runner._outputs = dict(self._outputs)
+                sub_runner._output_items = dict(self._output_items)
                 result = await sub_runner._execute_subgraph(start_id, item_input)
                 results.append(result)
                 async with self._lock:
                     self._outputs.update(sub_runner._outputs)
+                    self._output_items.update(sub_runner._output_items)
             return results
 
         # Build pause callback
@@ -265,8 +287,10 @@ class WorkflowRunner:
         next_edges = [e for e in self.edges if e["source"] == node_id]
 
         if result.success:
+            items = self._build_items_with_provenance(result, _source_node_id, _source_item_index)
             async with self._lock:
                 self._outputs[node_id] = result.output_data
+                self._output_items[node_id] = items
 
             await self._emit("node_completed", {"node_id": node_id, "output": result.output_data})
             await self._log(
@@ -294,7 +318,15 @@ class WorkflowRunner:
 
             if active_edges:
                 await asyncio.gather(
-                    *[self._execute_node(e["target"], result.output_data) for e in active_edges]
+                    *[
+                        self._execute_node(
+                            e["target"],
+                            result.output_data,
+                            _source_node_id=node_id,
+                            _source_item_index=0,
+                        )
+                        for e in active_edges
+                    ]
                 )
 
         else:
@@ -319,7 +351,15 @@ class WorkflowRunner:
                     "error": result.error,
                 }
                 await asyncio.gather(
-                    *[self._execute_node(e["target"], error_payload) for e in error_edges]
+                    *[
+                        self._execute_node(
+                            e["target"],
+                            error_payload,
+                            _source_node_id=node_id,
+                            _source_item_index=0,
+                        )
+                        for e in error_edges
+                    ]
                 )
             else:
                 self._failed.set()
@@ -335,12 +375,25 @@ class WorkflowRunner:
         async with self._lock:
             self._executed[paused_node_id] = True
             self._outputs[paused_node_id] = resume_input
+            # The paused node didn't go through `_execute_node` post-completion,
+            # so build its items list inline from the injected resume payload.
+            # No upstream provenance is available here; downstream items will
+            # carry `paired_item -> paused_node_id` from the dispatch below.
+            self._output_items[paused_node_id] = [NodeItem(data=resume_input)]
 
         # Follow outgoing edges from the paused node
         next_edges = [e for e in self.edges if e["source"] == paused_node_id]
         if next_edges:
             await asyncio.gather(
-                *[self._execute_node(e["target"], resume_input) for e in next_edges]
+                *[
+                    self._execute_node(
+                        e["target"],
+                        resume_input,
+                        _source_node_id=paused_node_id,
+                        _source_item_index=0,
+                    )
+                    for e in next_edges
+                ]
             )
 
         if self._failed.is_set():
@@ -366,6 +419,35 @@ class WorkflowRunner:
     def _get_start_nodes(self) -> list[str]:
         target_nodes = {e["target"] for e in self.edges}
         return [n for n in self.nodes if n not in target_nodes]
+
+    @staticmethod
+    def _build_items_with_provenance(
+        result: Any,
+        source_node_id: str | None,
+        source_item_index: int,
+    ) -> list[NodeItem]:
+        """Materialise the items list a node emits, stamping default provenance.
+
+        - If the node returned its own ``items`` list, items missing a
+          ``paired_item`` get one synthesised from the dispatch provenance.
+          Items the node set explicitly are left alone.
+        - If the node returned only ``output_data``, a single-item list is
+          synthesised with the default provenance attached.
+        - When ``source_node_id`` is ``None`` (entry nodes / trigger), items
+          keep ``paired_item=None`` — there is no upstream to point to.
+        """
+        items = result.get_items()
+        default_provenance: PairedItem | None = (
+            PairedItem(source_node_id=source_node_id, source_item_index=source_item_index)
+            if source_node_id is not None
+            else None
+        )
+        if default_provenance is None:
+            return items
+        for item in items:
+            if item.paired_item is None:
+                item.paired_item = default_provenance
+        return items
 
     async def _emit(self, event_type: str, data: dict[str, Any]) -> None:
         if self.emitter:
