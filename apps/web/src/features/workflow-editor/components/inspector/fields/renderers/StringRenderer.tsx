@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
 import { Input, Textarea } from '@/shared/components'
 import { cn } from '@/lib/cn'
 import type { RendererProps } from '../types'
@@ -12,9 +11,11 @@ import { ExpressionEditor } from '../expression/ExpressionEditor'
  * field into expression mode and routes evaluation through the JSONata
  * resolver at runtime (PR5). Bare strings stay literal.
  *
- * No separate UI flag — the rule "string starts with `=` → expression" lives
- * in one place and survives reload, copy-paste, and undo/redo without any
- * extra plumbing.
+ * The mode-switch button is a small `fx` text badge at the top-right corner
+ * of the input — readable as "switch to expression", not as "AI generate"
+ * the way the Sparkles icon read. No separate UI state for the mode itself;
+ * the rule "string starts with `=` → expression" lives in one place and
+ * survives reload, copy-paste, and undo/redo.
  */
 export function StringRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const str = value === undefined || value === null ? '' : String(value)
@@ -24,10 +25,8 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
   const isExpression = str.startsWith('=')
 
   // Tracks whether the most recent mode change came from user action
-  // (typing `$`, clicking the fx button) so the ExpressionEditor that
-  // mounts next knows to grab focus + restore the caret. Without this the
-  // renderer swap would unmount the user's focused input and they'd have
-  // to click into the new editor to keep typing.
+  // (typing `=` / `$`, clicking the fx badge) so the ExpressionEditor that
+  // mounts next knows to grab focus + restore the caret.
   const [autoFocusOnEnter, setAutoFocusOnEnter] = useState(false)
 
   if (isExpression) {
@@ -75,9 +74,9 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
           rows={rows}
           placeholder={prop.placeholder}
           disabled={disabled}
-          className="pr-7 text-[12px] leading-relaxed"
+          className="text-[12px] leading-relaxed"
         />
-        <FxToggle onClick={enterExpressionMode} disabled={disabled} className="top-1.5 right-1.5" />
+        <FxBadge onClick={enterExpressionMode} disabled={disabled} />
       </div>
     )
   }
@@ -90,24 +89,24 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
         onChange={e => handleTyped(e.target.value)}
         placeholder={prop.placeholder}
         disabled={disabled}
-        className="h-8 pr-7 text-[12px]"
+        className="h-8 text-[12px]"
       />
-      <FxToggle
-        onClick={enterExpressionMode}
-        disabled={disabled}
-        className="top-1/2 right-1.5 -translate-y-1/2"
-      />
+      <FxBadge onClick={enterExpressionMode} disabled={disabled} />
     </div>
   )
 }
 
-interface FxToggleProps {
+interface FxBadgeProps {
   onClick: () => void
   disabled?: boolean
-  className?: string
 }
 
-function FxToggle({ onClick, disabled, className }: FxToggleProps) {
+/**
+ * Small monospace `fx` badge anchored at the top-right corner of the
+ * input. Click switches to expression mode. Visually distinct from the
+ * Sparkles "AI generate" pattern users associate that icon with.
+ */
+function FxBadge({ onClick, disabled }: FxBadgeProps) {
   return (
     <button
       type="button"
@@ -115,12 +114,14 @@ function FxToggle({ onClick, disabled, className }: FxToggleProps) {
       disabled={disabled}
       title="Switch to expression (JSONata)"
       className={cn(
-        'absolute flex h-5 w-5 items-center justify-center rounded-[4px] text-text-faint transition-colors hover:bg-accent/15 hover:text-accent',
+        'absolute -top-2 right-2 flex h-[16px] items-center rounded-[3px] px-1.5',
+        'font-mono text-[9.5px] font-semibold uppercase tracking-wide',
+        'bg-surface-2 text-text-faint',
+        'transition-colors hover:bg-accent/15 hover:text-accent',
         disabled && 'pointer-events-none opacity-50',
-        className,
       )}
     >
-      <Sparkles className="h-3 w-3" />
+      fx
     </button>
   )
 }
