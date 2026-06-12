@@ -119,19 +119,14 @@ class WorkflowService:
         await self.repository.delete(workflow)
 
     def _initial_graph(self, graph: dict | None) -> dict:
-        if graph and graph.get("nodes"):
+        # New workflows start empty. The editor's empty-state overlay handles
+        # the blank canvas and prompts the user to add their first node. Seeding
+        # a Start node here meant that deleting it and then re-mounting the
+        # editor (or hitting the cached workflow query) brought it back from
+        # the cache before the autosave landed — confusing.
+        if graph:
             return graph
-        return {
-            "nodes": [
-                {
-                    "id": str(uuid.uuid4()),
-                    "type": "trigger.manual",
-                    "data": {"name": "Start", "properties": {"startWorkflow": "manual"}},
-                    "position": {"x": 100, "y": 100},
-                }
-            ],
-            "edges": [],
-        }
+        return {"nodes": [], "edges": []}
 
     async def trigger_workflows(
         self,

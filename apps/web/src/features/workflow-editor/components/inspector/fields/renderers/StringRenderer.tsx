@@ -12,10 +12,10 @@ import { ExpressionEditor } from '../expression/ExpressionEditor'
  * resolver at runtime (PR5). Bare strings stay literal.
  *
  * The mode-switch button is a small `fx` text badge in the label row to the
- * right — readable as "switch to expression", not as "AI generate" the way
- * the Sparkles icon read. No separate UI state for the mode itself; the rule
- * "string starts with `=` → expression" lives in one place and survives
- * reload, copy-paste, and undo/redo.
+ * right. It's always rendered — toggling it adds or removes the `=` prefix.
+ * When the field is in expression mode the badge shows in its active
+ * (accent) state so users can read the current mode at a glance and click
+ * it back off to drop the `=`.
  */
 export function StringRenderer({ prop, value, onChange, disabled }: RendererProps) {
   const str = value === undefined || value === null ? '' : String(value)
@@ -34,41 +34,26 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
     setAutoFocusOnExit(false),
   )
 
-  if (isExpression) {
-    // While in expression mode, intercept onChange so we can detect the
-    // moment the user deletes back past the `=` and arm the plain-input
-    // refocus on the next render.
-    const handleExpressionChange = (next: string) => {
-      if (!next.startsWith('=') && str.startsWith('=')) {
-        setAutoFocusOnExit(true)
-      }
-      onChange(next)
+  const toggleExpressionMode = () => {
+    if (isExpression) {
+      // Exit: drop the leading `=`; the plain-input refocus armed below
+      // keeps the caret in the field across the renderer swap.
+      setAutoFocusOnExit(true)
+      onChange(str.slice(1))
+    } else {
+      // Enter: stamp `=` on the saved value; ExpressionEditor's autofocus
+      // takes over once it mounts.
+      setAutoFocusOnEnter(true)
+      onChange(`=${str}`)
     }
-    return (
-      <ExpressionEditor
-        value={str}
-        onChange={handleExpressionChange}
-        placeholder={prop.placeholder}
-        multiline={multiline}
-        rows={rows}
-        disabled={disabled}
-        autoFocus={autoFocusOnEnter}
-        onAutoFocusDone={() => setAutoFocusOnEnter(false)}
-      />
-    )
-  }
-
-  const enterExpressionMode = () => {
-    setAutoFocusOnEnter(true)
-    onChange(`=${str}`)
   }
 
   // Auto-promote to expression mode when the user types `=` or `$` as the
-  // first character. Typing `=` is the canonical entry; typing `$` is the
-  // shortcut (the renderer prefixes the saved value with `=` so the
-  // dispatcher contract holds). Either transition stamps `autoFocusOnEnter`
-  // so the ExpressionEditor that mounts next grabs focus.
-  const handleTyped = (next: string) => {
+  // first character of a plain field. Typing `=` is the canonical entry;
+  // typing `$` is the shortcut (the renderer prefixes the saved value with
+  // `=` so the dispatcher contract holds). Either transition stamps
+  // `autoFocusOnEnter` so the ExpressionEditor that mounts next grabs focus.
+  const handlePlainTyped = (next: string) => {
     const enteringExpression =
       !str.startsWith('=') && (next.startsWith('=') || next.startsWith('$'))
     if (enteringExpression) setAutoFocusOnEnter(true)
@@ -79,35 +64,55 @@ export function StringRenderer({ prop, value, onChange, disabled }: RendererProp
     onChange(next)
   }
 
-  if (multiline) {
-    return (
-      <div className="relative">
+  // While in expression mode, intercept onChange so we can detect the
+  // moment the user deletes back past the `=` and arm the plain-input
+  // refocus on the next render.
+  const handleExpressionTyped = (next: string) => {
+    if (!next.startsWith('=') && str.startsWith('=')) {
+      setAutoFocusOnExit(true)
+    }
+    onChange(next)
+  }
+
+  return (
+    <div className="relative">
+      <FxBadge
+        active={isExpression}
+        onClick={toggleExpressionMode}
+        disabled={disabled}
+      />
+      {isExpression ? (
+        <ExpressionEditor
+          value={str}
+          onChange={handleExpressionTyped}
+          placeholder={prop.placeholder}
+          multiline={multiline}
+          rows={rows}
+          disabled={disabled}
+          autoFocus={autoFocusOnEnter}
+          onAutoFocusDone={() => setAutoFocusOnEnter(false)}
+        />
+      ) : multiline ? (
         <Textarea
           ref={plainFieldRef as React.Ref<HTMLTextAreaElement>}
           value={str}
-          onChange={e => handleTyped(e.target.value)}
+          onChange={e => handlePlainTyped(e.target.value)}
           rows={rows}
           placeholder={prop.placeholder}
           disabled={disabled}
           className="rounded-[5px] text-[12px] leading-relaxed"
         />
-        <FxBadge onClick={enterExpressionMode} disabled={disabled} />
-      </div>
-    )
-  }
-
-  return (
-    <div className="relative">
-      <Input
-        ref={plainFieldRef as React.Ref<HTMLInputElement>}
-        type={opts.password ? 'password' : 'text'}
-        value={str}
-        onChange={e => handleTyped(e.target.value)}
-        placeholder={prop.placeholder}
-        disabled={disabled}
-        className="h-8 rounded-[5px] text-[12px]"
-      />
-      <FxBadge onClick={enterExpressionMode} disabled={disabled} />
+      ) : (
+        <Input
+          ref={plainFieldRef as React.Ref<HTMLInputElement>}
+          type={opts.password ? 'password' : 'text'}
+          value={str}
+          onChange={e => handlePlainTyped(e.target.value)}
+          placeholder={prop.placeholder}
+          disabled={disabled}
+          className="h-8 rounded-[5px] text-[12px]"
+        />
+      )}
     </div>
   )
 }
@@ -120,8 +125,7 @@ type PlainField = HTMLInputElement | HTMLTextAreaElement
  * mode). Clears the flag after focusing so subsequent renders don't yank
  * focus away from later edits.
  *
- * Called unconditionally at the top of `StringRenderer` (which is why it
- * works for either the input or the textarea branch) — switching variants
+ * Called unconditionally at the top of `StringRenderer` — switching variants
  * mid-render would otherwise violate the rules-of-hooks ordering rule.
  */
 function usePlainFieldFocusOnExit(shouldFocus: boolean, onDone: () => void) {
@@ -143,28 +147,34 @@ function usePlainFieldFocusOnExit(shouldFocus: boolean, onDone: () => void) {
 }
 
 interface FxBadgeProps {
+  active: boolean
   onClick: () => void
   disabled?: boolean
 }
 
 /**
  * Small monospace `fx` badge sitting on the label row, right-aligned above
- * the input. Click switches to expression mode.
+ * the input. Always rendered; toggles expression mode on click. In the
+ * active state it carries the accent fill so the current mode is visible.
  */
-function FxBadge({ onClick, disabled }: FxBadgeProps) {
+function FxBadge({ active, onClick, disabled }: FxBadgeProps) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      title="Switch to expression (JSONata)"
+      title={active ? 'Switch to plain text' : 'Switch to expression (JSONata)'}
+      aria-pressed={active}
       // FieldWrapper draws the label with `gap-1.5` (6px) below; the input
       // top is at y=0 in this `relative` wrapper, so -22px lands the badge
       // roughly on the label's baseline.
       className={cn(
         'absolute -top-[22px] right-0 flex h-[16px] items-center rounded-[3px] px-1.5',
         'font-mono text-[10px] font-semibold uppercase tracking-wide leading-none',
-        'text-text-faint transition-colors hover:bg-accent/15 hover:text-accent',
+        'transition-colors',
+        active
+          ? 'bg-accent/15 text-accent hover:bg-accent/25'
+          : 'text-text-faint hover:bg-accent/15 hover:text-accent',
         disabled && 'pointer-events-none opacity-50',
       )}
     >

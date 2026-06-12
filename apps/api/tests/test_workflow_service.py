@@ -16,7 +16,7 @@ class FakeWorkflowRepository:
         return workflow
 
 
-def test_create_workflow_adds_manual_trigger_for_empty_graph():
+def test_create_workflow_starts_with_empty_graph():
     repository = FakeWorkflowRepository()
     service = WorkflowService.__new__(WorkflowService)
     service.repository = repository
@@ -29,6 +29,6 @@ def test_create_workflow_adds_manual_trigger_for_empty_graph():
 
     assert workflow.user_id == user.id
     assert workflow.workspace_id == workspace.id
-    assert workflow.graph["edges"] == []
-    assert workflow.graph["nodes"][0]["type"] == "trigger.manual"
-    assert workflow.graph["nodes"][0]["data"]["properties"]["startWorkflow"] == "manual"
+    # New workflows start with an empty canvas — the editor's empty-state
+    # overlay prompts the user to drag in their first node.
+    assert workflow.graph == {"nodes": [], "edges": []}
