@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn'
 import { useInspectorNode } from './hooks/use-inspector-node'
 import { InspectorHeader } from './components/inspector-header'
 import { PropertyGroupList } from './components/property-group-list'
-import { OutputSchemaSection } from './components/output-schema-section'
+import { UpstreamConnectionsSection } from './components/upstream-connections-section'
 
 interface EditorInspectorProps {
   nodes: Node[]
@@ -96,7 +96,7 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
             )}
           </div>
 
-          <OutputSchemaSection nodeId={selectedNode.id} outputs={definition.outputsSchema} />
+          <UpstreamConnectionsSection nodeId={selectedNode.id} />
         </>
       )}
     </aside>
