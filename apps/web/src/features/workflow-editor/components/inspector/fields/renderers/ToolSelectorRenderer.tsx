@@ -161,6 +161,17 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
     )
   }
 
+  const snapshotFor = (definition: Tool): Pick<ToolEntry, 'name' | 'description' | 'paramsSchema'> => ({
+    name: definition.name,
+    description: definition.description,
+    paramsSchema: Object.fromEntries(
+      Object.entries(definition.params).map(([name, p]) => [
+        name,
+        { type: p.type, required: p.required, description: p.description },
+      ]),
+    ),
+  })
+
   const addTool = (toolId: string) => {
     if (tools.some(t => t.toolId === toolId)) {
       setPickerOpen(false)
@@ -172,18 +183,18 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
     // + paramsSchema into the saved entry so the agent's runtime can build
     // the LLM-facing schema without round-tripping the database.
     if (definition?.category === 'workflow') {
-      entry.name = definition.name
-      entry.description = definition.description
-      entry.paramsSchema = Object.fromEntries(
-        Object.entries(definition.params).map(([name, p]) => [
-          name,
-          { type: p.type, required: p.required, description: p.description },
-        ]),
-      )
+      Object.assign(entry, snapshotFor(definition))
     }
     writeTools([...tools, entry])
     setExpandedIndex(tools.length)
     setPickerOpen(false)
+  }
+
+  const refreshSnapshot = (i: number) => {
+    const entry = tools[i]
+    const definition = catalogById.get(entry.toolId)
+    if (!definition) return
+    writeTools(tools.map((t, j) => (j === i ? { ...t, ...snapshotFor(definition) } : t)))
   }
 
   return (
@@ -200,6 +211,7 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
           onChangeParams={params => updateParams(i, params)}
           onChangeCredential={credId => updateCredential(i, credId)}
           onChangeRetry={retry => updateRetry(i, retry)}
+          onRefreshSnapshot={() => refreshSnapshot(i)}
         />
       ))}
 
@@ -559,6 +571,33 @@ interface SelectedToolRowProps {
   onChangeParams: (params: Record<string, unknown>) => void
   onChangeCredential: (credentialId: string) => void
   onChangeRetry: (retry: RetryOverride | undefined) => void
+  onRefreshSnapshot: () => void
+}
+
+/**
+ * Compare a workflow-tool's saved snapshot against the live catalog
+ * definition. Returns true when the snapshot is out of date — name,
+ * description, or paramsSchema drift. Non-workflow tools always return
+ * false; their schema lives in code, not user data.
+ */
+function isWorkflowSnapshotStale(entry: ToolEntry, definition: Tool | undefined): boolean {
+  if (!definition || definition.category !== 'workflow') return false
+  if (entry.name !== definition.name) return true
+  if (entry.description !== definition.description) return true
+  const saved = entry.paramsSchema ?? {}
+  const live = definition.params
+  const savedKeys = Object.keys(saved)
+  const liveKeys = Object.keys(live)
+  if (savedKeys.length !== liveKeys.length) return true
+  for (const key of liveKeys) {
+    const savedParam = saved[key]
+    const liveParam = live[key]
+    if (!savedParam) return true
+    if (savedParam.type !== liveParam.type) return true
+    if (savedParam.required !== liveParam.required) return true
+    if (savedParam.description !== liveParam.description) return true
+  }
+  return false
 }
 
 function SelectedToolRow({
@@ -571,8 +610,10 @@ function SelectedToolRow({
   onChangeParams,
   onChangeCredential,
   onChangeRetry,
+  onRefreshSnapshot,
 }: SelectedToolRowProps) {
   const isOrphan = definition === undefined
+  const isStale = isWorkflowSnapshotStale(entry, definition)
 
   // Tools become expandable when there's something to configure: at least
   // one user-visible param, OR they need a credential, OR they expose a
@@ -594,7 +635,7 @@ function SelectedToolRow({
     <div
       className={cn(
         'flex flex-col rounded-[5px] border bg-bg',
-        isOrphan ? 'border-warn/40' : 'border-border-faint',
+        isOrphan ? 'border-warn/40' : isStale ? 'border-warn/40' : 'border-border-faint',
       )}
     >
       <div className="flex items-center gap-1.5 px-2.5 py-1.5">
@@ -616,6 +657,13 @@ function SelectedToolRow({
 
         {isOrphan ? (
           <AlertCircle size={11} className="shrink-0 text-warn" />
+        ) : isStale ? (
+          <span
+            title="Snapshot is stale — the referenced workflow's input schema or metadata has changed. Click Refresh to update."
+            className="flex shrink-0 items-center"
+          >
+            <AlertCircle size={11} className="text-warn" />
+          </span>
         ) : definition?.requires_auth ? (
           <Lock size={10} className="shrink-0 text-text-faint" />
         ) : null}
@@ -630,6 +678,18 @@ function SelectedToolRow({
               : entry.toolId}
           </span>
         </div>
+
+        {isStale && (
+          <button
+            type="button"
+            onClick={onRefreshSnapshot}
+            title="Refresh snapshot from current workflow"
+            className="flex h-5 items-center gap-1 rounded-[4px] border border-warn/40 bg-warn/10 px-1.5 text-[10px] font-medium text-warn transition-colors hover:bg-warn/20"
+          >
+            <RefreshCw size={10} />
+            Refresh
+          </button>
+        )}
 
         <button
           type="button"
