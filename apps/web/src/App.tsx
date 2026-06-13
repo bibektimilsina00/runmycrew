@@ -15,6 +15,7 @@ import { Logs } from '@/features/logs'
 import { Tables } from '@/features/tables'
 import { Files } from '@/features/files'
 import { Knowledge, KnowledgeDetail, KnowledgeDocumentView } from '@/features/knowledge'
+import { Skills } from '@/features/skills'
 import { WorkflowEditor } from '@/features/workflow-editor'
 import { Variables } from '@/features/variables'
 import { Connections } from '@/features/connections'
@@ -48,6 +49,7 @@ export default function App() {
             <Route path={APP_ROUTES.KNOWLEDGE} element={<Knowledge />} />
             <Route path="/knowledge/:id" element={<KnowledgeDetail />} />
             <Route path="/knowledge/:id/documents/:docId" element={<KnowledgeDocumentView />} />
+            <Route path={APP_ROUTES.SKILLS} element={<Skills />} />
             <Route path={APP_ROUTES.VARIABLES} element={<Variables />} />
             <Route path={APP_ROUTES.CONNECTIONS} element={<Connections />} />
             <Route path={APP_ROUTES.WORKSPACE_SETTINGS} element={<WorkspaceSettings />} />

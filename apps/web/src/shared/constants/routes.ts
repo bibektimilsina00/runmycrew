@@ -21,6 +21,9 @@ export const APP_ROUTES = {
   KNOWLEDGE_DOCUMENT: (kbId: string, docId: string) => `/knowledge/${kbId}/documents/${docId}`,
   KB_CHUNKS: (kbId: string, docId: string) => `/kb/${kbId}/documents/${docId}/chunks`,
   KB_CHUNK: (kbId: string, chunkId: string) => `/kb/${kbId}/chunks/${chunkId}`,
+  SKILLS: '/skills',
+  SKILL_EDIT: (id: string) => `/skills/${id}`,
+  SKILL_NEW: '/skills/new',
   VARIABLES: '/variables',
   CONNECTIONS: '/connections',
   WORKSPACE_SETTINGS: '/settings/workspace',
@@ -85,6 +88,11 @@ export const API_ROUTES = {
   KB_SEARCH: (id: string) => `/kb/${id}/search`,
   KB_REINDEX: (id: string) => `/kb/${id}/reindex`,
   KB_EMBEDDING_MODELS: '/kb/embedding-models',
+
+  // Skills (agent skills — markdown bodies loaded on-demand via load_skill tool)
+  SKILLS_LIST: '/skills/',
+  SKILL: (id: string) => `/skills/${id}`,
+  SKILL_CREATE: '/skills/',
 
   // Variables (backed by /secrets endpoint)
   VARIABLES_LIST: '/secrets/',

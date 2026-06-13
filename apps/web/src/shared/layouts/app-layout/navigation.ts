@@ -39,6 +39,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: 'tables', label: 'Tables', icon: Icons.Table, to: APP_ROUTES.TABLES },
       { id: 'files', label: 'Files', icon: Icons.Folder, to: APP_ROUTES.FILES },
       { id: 'knowledge', label: 'Knowledge base', icon: Icons.Book, to: APP_ROUTES.KNOWLEDGE },
+      { id: 'skills', label: 'Skills', icon: Icons.Sparkles, to: APP_ROUTES.SKILLS },
       { id: 'variables', label: 'Variables', icon: Icons.Key, to: APP_ROUTES.VARIABLES },
     ],
   },
@@ -58,5 +59,3 @@ export const NAV_LINK_CLASS =
 
 export const ACTIVE_NAV_LINK_CLASS =
   "bg-[var(--surface)] text-[var(--text)] group-data-[collapsed=true]/shell:shadow-[inset_0_0_0_1px_var(--border-soft)] before:content-[''] before:w-[3px] before:h-[14px] before:bg-[var(--text)] before:rounded-[0_2px_2px_0] before:absolute before:left-0 group-data-[collapsed=true]/shell:before:hidden"
-
-
