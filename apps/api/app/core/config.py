@@ -44,6 +44,15 @@ class Settings(BaseSettings):
     LINEAR_CLIENT_ID: str = ""
     LINEAR_CLIENT_SECRET: str = ""
 
+    # Meta (Facebook + Instagram + WhatsApp + Messenger). One developer app
+    # backs every Meta product. The verify token is the shared secret used
+    # for the webhook subscription handshake (Meta calls our endpoint with
+    # `hub.verify_token` — we echo `hub.challenge` only if it matches).
+    META_APP_ID: str = ""
+    META_APP_SECRET: str = ""
+    META_WEBHOOK_VERIFY_TOKEN: str = ""
+    META_GRAPH_API_VERSION: str = "v20.0"
+
     # Environment & CORS
     ENVIRONMENT: str = "development"  # "production" in prod
     CORS_ORIGINS: str = ""  # Comma-separated origins; overrides defaults when set

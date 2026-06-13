@@ -16,6 +16,7 @@ from apps.api.app.features.integrations.router import router as integrations_rou
 from apps.api.app.features.knowledge.router import router as knowledge_router
 from apps.api.app.features.logs.router import router as logs_router
 from apps.api.app.features.logs.websocket import router as logs_ws_router
+from apps.api.app.features.meta.router import router as meta_router
 from apps.api.app.features.nodes.router import router as nodes_router
 from apps.api.app.features.secrets.router import router as secrets_router
 from apps.api.app.features.skills.router import router as skills_router
@@ -47,6 +48,7 @@ router.include_router(skills_router, prefix="/skills", tags=["skills"])
 router.include_router(a2a_router, prefix="/a2a", tags=["a2a"])
 router.include_router(copilot_router, prefix="/copilot", tags=["copilot"])
 router.include_router(triggers_router)
+router.include_router(meta_router)
 router.include_router(knowledge_router, prefix="/kb", tags=["knowledge"])
 router.include_router(secrets_router, prefix="/secrets", tags=["secrets"])
 router.include_router(dashboard_router, prefix="/dashboard", tags=["dashboard"])

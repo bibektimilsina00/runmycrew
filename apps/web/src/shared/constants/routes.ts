@@ -54,6 +54,9 @@ export const API_ROUTES = {
   TOOLS_WORKFLOWS: '/tools/workflows',
   TOOLS_MCP_PROBE: '/tools/mcp/probe',
 
+  // Meta — resource discovery (Pages, IG accounts, WABA, Lead forms)
+  META_RESOURCES: '/meta/resources',
+
   // Workflows / Automations
   WORKFLOWS_WITH_STATS: '/workflows/with-stats',
   WORKFLOW_CREATE: '/workflows/',
