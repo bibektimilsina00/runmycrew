@@ -1,51 +1,119 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Check, ExternalLink, Loader2, Plus, Search, Sparkles, X } from 'lucide-react'
+import { AlertTriangle, Check, ExternalLink, Loader2, Plus, RefreshCw, Search, Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useSkills, SkillIconBadge, type SkillMeta } from '@/features/skills'
 import type { RendererProps } from '../types'
 
 /**
- * Multi-select picker for agent skills. The saved value is a list of skill
- * ids — the runtime resolves each id to a `(name, description, content)`
- * row when the agent boots (see `agent._resolve_skills`). Storing ids
- * rather than name snapshots lets users rename a skill without breaking
- * every agent that references it.
+ * Multi-select picker for agent skills.
+ *
+ * Saved shape (per item):
+ *   { skillId: string, name: string, description: string, updated_at: string }
+ *
+ * Bare UUID strings are accepted for backward compat with the pre-snapshot
+ * format — they're treated as "no snapshot" entries (can't be marked stale,
+ * since there's nothing to compare). Saving any change rewrites the entire
+ * array in the rich format.
+ *
+ * The runtime only reads `skillId`; the snapshot fields exist so the
+ * inspector can show drift (description or content edits made elsewhere)
+ * without round-tripping every saved skill on every editor render.
  */
-function toIdArray(value: unknown): string[] {
+
+interface SkillSnapshot {
+  skillId: string
+  name: string
+  description: string
+  updated_at: string
+}
+
+type SavedEntry = string | SkillSnapshot
+
+function getId(entry: SavedEntry): string {
+  return typeof entry === 'string' ? entry : entry.skillId
+}
+
+function asSnapshot(entry: SavedEntry): SkillSnapshot | null {
+  return typeof entry === 'string' ? null : entry
+}
+
+function buildSnapshot(skill: SkillMeta): SkillSnapshot {
+  return {
+    skillId: skill.id,
+    name: skill.name,
+    description: skill.description,
+    updated_at: skill.updated_at,
+  }
+}
+
+function isStaleSnapshot(snapshot: SkillSnapshot, live: SkillMeta): boolean {
+  // updated_at is an ISO-8601 timestamp string from the backend.
+  // Compare as Date — handles trailing-zero / timezone differences.
+  return new Date(live.updated_at).getTime() > new Date(snapshot.updated_at).getTime()
+}
+
+function toEntryArray(value: unknown): SavedEntry[] {
   if (!value) return []
-  if (Array.isArray(value)) return value.map(String)
-  if (typeof value === 'string') {
+  let arr: unknown = value
+  if (typeof arr === 'string') {
     try {
-      const parsed = JSON.parse(value)
-      return Array.isArray(parsed) ? parsed.map(String) : []
+      arr = JSON.parse(arr)
     } catch {
       return []
     }
   }
-  return []
+  if (!Array.isArray(arr)) return []
+  const out: SavedEntry[] = []
+  for (const item of arr) {
+    if (typeof item === 'string' && item) {
+      out.push(item)
+    } else if (item && typeof item === 'object' && typeof (item as { skillId?: unknown }).skillId === 'string') {
+      const i = item as Record<string, unknown>
+      out.push({
+        skillId: String(i.skillId),
+        name: typeof i.name === 'string' ? i.name : '',
+        description: typeof i.description === 'string' ? i.description : '',
+        updated_at: typeof i.updated_at === 'string' ? i.updated_at : '',
+      })
+    }
+  }
+  return out
 }
 
 export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
-  const selected = useMemo(() => toIdArray(value), [value])
-  const selectedSet = useMemo(() => new Set(selected), [selected])
+  const entries = useMemo(() => toEntryArray(value), [value])
+  const selectedIds = useMemo(() => entries.map(getId), [entries])
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
   const [query, setQuery] = useState('')
 
   const { data: skills = [], isLoading } = useSkills()
 
-  // Stale ids — selected entries whose skill was deleted (or that never
-  // existed). Surfaced as a warning row so the user can prune them; the
-  // agent runtime ignores unknown ids silently, so leaving them won't
-  // break execution, only clutter storage.
-  const knownIds = useMemo(() => new Set(skills.map(s => s.id)), [skills])
+  const liveById = useMemo(() => {
+    const m = new Map<string, SkillMeta>()
+    for (const s of skills) m.set(s.id, s)
+    return m
+  }, [skills])
+
+  // Classify each saved entry once: stale (live exists + drifted), missing
+  // (live deleted), fresh (live matches snapshot), or legacy (no snapshot).
+  const driftIds = useMemo(() => {
+    if (isLoading) return [] as string[]
+    const out: string[] = []
+    for (const entry of entries) {
+      const snap = asSnapshot(entry)
+      if (!snap) continue
+      const live = liveById.get(snap.skillId)
+      if (live && isStaleSnapshot(snap, live)) out.push(snap.skillId)
+    }
+    return out
+  }, [isLoading, entries, liveById])
+
   const staleIds = useMemo(
-    () => (isLoading ? [] : selected.filter(id => !knownIds.has(id))),
-    [isLoading, selected, knownIds],
+    () => (isLoading ? [] : selectedIds.filter(id => !liveById.has(id))),
+    [isLoading, selectedIds, liveById],
   )
 
-  // Selected pinned to the top so users see what's active without scrolling.
-  // Within each section, sort alphabetically — predictable order beats "by
-  // updated_at" which moves rows around between renders.
   const ordered = useMemo(() => {
     const q = query.trim().toLowerCase()
     const filtered = q
@@ -60,15 +128,35 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
     ]
   }, [skills, query, selectedSet])
 
+  const writeIds = (ids: string[]) => {
+    // Always write the rich form when we have live data — falling back to
+    // the bare id (no snapshot) only when the live row hasn't loaded yet.
+    onChange(
+      ids.map(id => {
+        const live = liveById.get(id)
+        if (live) return buildSnapshot(live)
+        const existing = entries.find(e => getId(e) === id)
+        return existing ?? id
+      }),
+    )
+  }
+
   const toggle = (id: string) => {
-    onChange(selectedSet.has(id) ? selected.filter(s => s !== id) : [...selected, id])
+    writeIds(selectedSet.has(id) ? selectedIds.filter(s => s !== id) : [...selectedIds, id])
   }
 
   const clearAll = () => onChange([])
 
   const pruneStale = () => {
     if (!staleIds.length) return
-    onChange(selected.filter(id => knownIds.has(id)))
+    writeIds(selectedIds.filter(id => !staleIds.includes(id)))
+  }
+
+  const refreshDrift = () => {
+    if (!driftIds.length) return
+    // Re-snapshot every selected entry against the latest live data.
+    // We pass through all ids and let writeIds rebuild from `liveById`.
+    writeIds(selectedIds)
   }
 
   if (isLoading) {
@@ -127,20 +215,19 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
             </button>
           )}
         </div>
-        {selected.length > 0 && (
+        {selectedIds.length > 0 && (
           <button
             type="button"
             onClick={clearAll}
             className="rounded-[6px] border border-border-faint bg-bg px-2 py-1 text-[10.5px] text-text-mute hover:text-text"
             aria-label="Clear all selected skills"
           >
-            Clear ({selected.length})
+            Clear ({selectedIds.length})
           </button>
         )}
       </div>
 
-      {/* Stale-skill warning — only shown when selected ids point at
-          deleted skills. PR5 will extend this to detect content drift too. */}
+      {/* Missing-skill warning — selected ids whose live skill was deleted. */}
       {staleIds.length > 0 && (
         <div className="flex items-start gap-2 rounded-[7px] border border-warn/30 bg-warn/10 px-2.5 py-1.5 text-[11px] text-warn">
           <AlertTriangle size={12} className="mt-0.5 shrink-0" />
@@ -157,6 +244,26 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
         </div>
       )}
 
+      {/* Drift warning — saved snapshot diverges from live skill (description
+          or content was edited elsewhere). The agent will use the live values
+          at runtime; this just lets users re-snapshot so the inspector UI
+          matches what the runtime will see. */}
+      {driftIds.length > 0 && (
+        <div className="flex items-start gap-2 rounded-[7px] border border-[var(--accent-line)]/40 bg-[var(--accent-line)]/10 px-2.5 py-1.5 text-[11px] text-text-mute">
+          <RefreshCw size={12} className="mt-0.5 shrink-0 text-[var(--accent)]" />
+          <div className="flex-1">
+            {driftIds.length} selected {driftIds.length === 1 ? 'skill has' : 'skills have'} been edited since this snapshot was taken.
+          </div>
+          <button
+            type="button"
+            onClick={refreshDrift}
+            className="rounded-[5px] border border-[var(--accent-line)]/40 bg-bg px-1.5 py-0.5 text-[10.5px] text-[var(--accent)] hover:bg-surface"
+          >
+            Refresh
+          </button>
+        </div>
+      )}
+
       {/* List */}
       {ordered.length === 0 ? (
         <p className="rounded-[7px] border border-dashed border-border-faint bg-bg p-3 text-center text-[11.5px] text-text-faint">
@@ -169,6 +276,7 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
               key={skill.id}
               skill={skill}
               active={selectedSet.has(skill.id)}
+              stale={driftIds.includes(skill.id)}
               onToggle={toggle}
             />
           ))}
@@ -204,10 +312,11 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
 interface SkillRowProps {
   skill: SkillMeta
   active: boolean
+  stale: boolean
   onToggle: (id: string) => void
 }
 
-function SkillRow({ skill, active, onToggle }: SkillRowProps) {
+function SkillRow({ skill, active, stale, onToggle }: SkillRowProps) {
   return (
     <button
       type="button"
@@ -222,7 +331,17 @@ function SkillRow({ skill, active, onToggle }: SkillRowProps) {
     >
       <SkillIconBadge iconName={skill.icon} color={skill.color} size="sm" />
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[12px] font-medium text-text">{skill.name}</div>
+        <div className="flex items-center gap-1.5">
+          <div className="truncate text-[12px] font-medium text-text">{skill.name}</div>
+          {stale && (
+            <span
+              className="rounded-[3px] bg-[var(--accent)]/15 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-[var(--accent)]"
+              title="Snapshot is stale — the source skill was edited"
+            >
+              Updated
+            </span>
+          )}
+        </div>
         {skill.description ? (
           <div className="truncate text-[10.5px] text-text-faint">{skill.description}</div>
         ) : (

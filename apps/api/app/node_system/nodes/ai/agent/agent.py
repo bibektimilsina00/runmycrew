@@ -77,7 +77,12 @@ class AgentProperties(BaseModel):
     maxIterations: int = 10
     streaming: bool = False
     mcpServers: list[dict[str, Any]] | str | None = Field(default_factory=list)
-    skills: list[str] | str | None = Field(default_factory=list)  # list of skill IDs
+    # Skills selection — accepts either bare UUID strings (legacy shape) or
+    # `{skillId, name, description, updated_at}` snapshot dicts. The snapshot
+    # fields are UI-only metadata used by the inspector to detect drift; the
+    # runtime always re-fetches name/description/content from the source-of-
+    # truth Skill row keyed by `skillId`.
+    skills: list[str | dict[str, Any]] | str | None = Field(default_factory=list)
     reasoningEffort: str = "auto"  # auto | low | medium | high
 
 
