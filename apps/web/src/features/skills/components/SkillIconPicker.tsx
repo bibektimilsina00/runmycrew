@@ -45,11 +45,10 @@ function resolveIcon(name: string): LucideIcons.LucideIcon | null {
 
 interface SkillIconPickerProps {
   value: string
-  color: string
   onChange: (iconName: string) => void
 }
 
-export function SkillIconPicker({ value, color, onChange }: SkillIconPickerProps) {
+export function SkillIconPicker({ value, onChange }: SkillIconPickerProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
 
@@ -71,10 +70,7 @@ export function SkillIconPicker({ value, color, onChange }: SkillIconPickerProps
         onClick={() => setOpen(v => !v)}
         className="flex h-9 items-center gap-2 rounded-[8px] border border-border-faint bg-bg px-3 transition-colors hover:border-border-soft"
       >
-        <span
-          className="flex h-6 w-6 items-center justify-center rounded-[6px]"
-          style={{ background: `${color}22`, color }}
-        >
+        <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-surface text-text-mute">
           {createElement(Selected, { size: 14 })}
         </span>
         <span className="font-mono text-[12px] text-text-mute">{value}</span>
