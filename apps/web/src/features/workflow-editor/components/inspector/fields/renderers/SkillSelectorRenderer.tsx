@@ -182,7 +182,7 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
           href={APP_ROUTES.SKILL_NEW}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-[6px] border border-border-faint bg-bg-2 px-2.5 py-1 text-[11.5px] text-text hover:bg-surface"
+          className="inline-flex items-center gap-1.5 rounded-[6px] border border-border-faint bg-bg2 px-2.5 py-1 text-[11.5px] text-text hover:bg-surface"
         >
           <Plus size={12} />
           Create your first skill

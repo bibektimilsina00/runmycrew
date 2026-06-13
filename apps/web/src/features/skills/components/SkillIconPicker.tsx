@@ -85,7 +85,7 @@ export function SkillIconPicker({ value, onChange }: SkillIconPickerProps) {
             className="fixed inset-0 z-20"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-0 top-11 z-30 w-[320px] overflow-hidden rounded-[10px] border border-border-faint bg-bg-2 shadow-[0_12px_32px_-8px_oklch(0_0_0/0.55)]">
+          <div className="absolute left-0 top-11 z-30 w-[320px] overflow-hidden rounded-[10px] border border-border-faint bg-bg2 shadow-[0_12px_32px_-8px_oklch(0_0_0/0.55)]">
             <div className="flex items-center gap-2 border-b border-border-faint px-3 py-2">
               <Search size={13} className="text-text-faint" />
               <input

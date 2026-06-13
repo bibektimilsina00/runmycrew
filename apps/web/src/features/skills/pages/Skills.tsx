@@ -28,7 +28,7 @@ export function Skills() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="border-b border-border-faint bg-bg-2 px-8 py-6">
+      <div className="border-b border-border-faint bg-bg2 px-8 py-6">
         <div className="mx-auto flex max-w-6xl items-end justify-between gap-6">
           <div>
             <h1 className="text-[22px] font-semibold tracking-tight text-text">Skills</h1>
