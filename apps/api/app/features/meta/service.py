@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import uuid as _uuid
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -668,30 +669,44 @@ class MetaService:
             return 0, []
 
         # Lazy-import to dodge circular: triggers → workflows → executions.
+        from apps.api.app.features.meta.repository import MetaSubscriptionRepository
         from apps.api.app.features.workflows.repository import WorkflowRepository
         from apps.api.app.node_system.execution.execution_engine import execution_engine
 
+        sub_repo = MetaSubscriptionRepository(self.db)
         wf_repo = WorkflowRepository(self.db)
         execution_ids: list[str] = []
         triggered = 0
 
         for entry in entries:
             target_id = str(entry.get("id") or "")
-            # Two envelope shapes: `changes` (FB Page, IG) and `messaging`
-            # (Messenger, WA, IG DMs). Normalize both into trigger events.
+            # Two envelope shapes: `changes` (FB Page, IG, WhatsApp) and
+            # `messaging` (Messenger, IG DMs, IG story reply / mention).
+            # Both normalize through `_flatten_entry` into uniform events.
             events = _flatten_entry(object_type, entry)
             for event in events:
-                trigger_type = _trigger_type_for(object_type, event["field"])
-                if not trigger_type:
+                if not object_type:
                     continue
-                # Find workflows whose graph carries this trigger node bound
-                # to this target_id. Property filter keeps us from triggering
-                # a workflow on the wrong account's events.
-                wfs = await wf_repo.find_by_trigger_type(
-                    trigger_type,
-                    property_filters=_target_filters(trigger_type, target_id),
-                )
-                for wf in wfs:
+                # DB-indexed routing — composite index on
+                # (object_type, target_id, field) makes this O(log N).
+                # Replaces the Phase 1/2 graph scan via
+                # `WorkflowRepository.find_by_trigger_type`.
+                subs = await sub_repo.lookup(object_type, target_id, event["field"])
+                if not subs:
+                    continue
+
+                # Group by workflow_id so each workflow fires at most once
+                # per envelope event, even if it owns multiple trigger
+                # nodes pointing at the same target.
+                seen_workflows: set[Any] = set()
+                for sub in subs:
+                    if sub.workflow_id in seen_workflows:
+                        continue
+                    seen_workflows.add(sub.workflow_id)
+                    wf = await wf_repo.get_by_id(sub.workflow_id)
+                    if wf is None or not wf.is_active:
+                        continue
+
                     trigger_payload = {
                         "object": object_type,
                         "field": event["field"],
@@ -703,7 +718,7 @@ class MetaService:
                         execution_id = await execution_engine.trigger_workflow(
                             workflow_id=wf.id,
                             graph=wf.graph,
-                            trigger_type=trigger_type,
+                            trigger_type=sub.trigger_type,
                             input_data=trigger_payload,
                         )
                         execution_ids.append(str(execution_id))
@@ -886,3 +901,298 @@ def _target_filters(trigger_type: str, target_id: str) -> dict[str, str]:
 
 def get_meta_service(db: AsyncSession) -> MetaService:
     return MetaService(db)
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Workflow ↔ MetaSubscription sync
+#
+# Public hooks called from the workflow lifecycle (see WorkflowService):
+#   sync_workflow_subscriptions(db, workflow) → after every save
+#   cleanup_workflow_subscriptions(db, workflow_id) → before delete
+#
+# These live as module-level functions (not MetaService methods) so the
+# workflow service can call them without importing MetaService's full
+# surface area, keeping the dependency direction one-way.
+# ──────────────────────────────────────────────────────────────────────────
+
+
+# Per-trigger description of how to extract the routing tuple from a
+# workflow node's saved properties. Keeps `sync_workflow_subscriptions`
+# generic — adding a new Meta trigger is one entry here, not a new branch.
+_TRIGGER_SPECS: dict[str, dict[str, str]] = {
+    # Instagram
+    "trigger.meta.ig_comment": {
+        "object_type": "instagram",
+        "field": "comments",
+        "target_prop": "ig_account_id",
+    },
+    "trigger.meta.ig_mention": {
+        "object_type": "instagram",
+        "field": "mentions",
+        "target_prop": "ig_account_id",
+    },
+    "trigger.meta.ig_message": {
+        "object_type": "instagram",
+        "field": "messaging.text",
+        "target_prop": "ig_account_id",
+    },
+    "trigger.meta.ig_story_reply": {
+        "object_type": "instagram",
+        "field": "messaging.ig_story_reply",
+        "target_prop": "ig_account_id",
+    },
+    "trigger.meta.ig_story_mention": {
+        "object_type": "instagram",
+        "field": "messaging.ig_story_mention",
+        "target_prop": "ig_account_id",
+    },
+    # Facebook Page / Messenger
+    "trigger.meta.fb_message": {
+        "object_type": "page",
+        "field": "messaging.text",
+        "target_prop": "page_id",
+    },
+    "trigger.meta.fb_postback": {
+        "object_type": "page",
+        "field": "messaging.postback",
+        "target_prop": "page_id",
+    },
+    "trigger.meta.fb_comment": {
+        "object_type": "page",
+        "field": "feed.comment",
+        "target_prop": "page_id",
+    },
+    "trigger.meta.fb_reaction": {
+        "object_type": "page",
+        "field": "feed.reaction",
+        "target_prop": "page_id",
+    },
+    "trigger.meta.fb_mention": {
+        "object_type": "page",
+        "field": "mention",
+        "target_prop": "page_id",
+    },
+    # Lead Ads (delivered on the page object)
+    "trigger.meta.lead_submission": {
+        "object_type": "page",
+        "field": "leadgen",
+        "target_prop": "page_id",
+    },
+    # WhatsApp
+    "trigger.meta.wa_message": {
+        "object_type": "whatsapp_business_account",
+        "field": "wa.messages",
+        "target_prop": "waba_id",
+    },
+    "trigger.meta.wa_status": {
+        "object_type": "whatsapp_business_account",
+        "field": "wa.statuses",
+        "target_prop": "waba_id",
+    },
+}
+
+
+# Self-check: every entry in `_TRIGGER_SPECS` must round-trip through
+# `_TRIGGER_MAP` so the sync layer and the webhook router can't drift.
+# Triggered at import — if someone edits one map without the other,
+# pytest collection fails immediately rather than at first webhook.
+for _trigger_type, _spec in _TRIGGER_SPECS.items():
+    _expected = _TRIGGER_MAP.get((_spec["object_type"], _spec["field"]))
+    if _expected != _trigger_type:
+        raise RuntimeError(
+            f"_TRIGGER_SPECS / _TRIGGER_MAP drift: {_trigger_type} → "
+            f"({_spec['object_type']}, {_spec['field']}) but _TRIGGER_MAP "
+            f"resolves to {_expected!r}"
+        )
+
+
+def _scan_meta_triggers(workflow: Any) -> list[dict[str, Any]]:
+    """Pull every `trigger.meta.*` node out of a workflow graph alongside
+    its saved properties + the routing spec we'll use to build a row."""
+    graph = getattr(workflow, "graph", None) or {}
+    nodes = graph.get("nodes") or []
+    out: list[dict[str, Any]] = []
+    for node in nodes:
+        if not isinstance(node, dict):
+            continue
+        node_type = str(node.get("type") or "")
+        spec = _TRIGGER_SPECS.get(node_type)
+        if not spec:
+            continue
+        node_id = str(node.get("id") or "")
+        if not node_id:
+            continue
+        props = (node.get("data") or {}).get("properties") or {}
+        target_id = str(props.get(spec["target_prop"]) or "").strip()
+        credential_id = str(props.get("credential") or "").strip()
+        out.append(
+            {
+                "node_id": node_id,
+                "trigger_type": node_type,
+                "object_type": spec["object_type"],
+                "field": spec["field"],
+                "target_id": target_id,
+                "credential_id": credential_id,
+            }
+        )
+    return out
+
+
+async def sync_workflow_subscriptions(db: AsyncSession, workflow: Any) -> None:
+    """Reconcile MetaSubscription rows against the workflow's current graph.
+
+    Called from `WorkflowService.update_workflow` and `create_workflow`
+    after each save. The routing table updates atomically with the user's
+    edit so the very next webhook delivery hits the right row — no lag
+    from a background reconciler.
+
+    Meta-side subscribed_apps registration runs best-effort inside the
+    same call; if Meta returns an error (e.g. revoked permissions) the
+    row is still written so routing works for any user who manually
+    re-subscribes the target in the Meta dashboard. The error message
+    is captured on `last_error` so the editor can surface a banner later.
+    """
+    import uuid as _uuid
+
+    from apps.api.app.features.meta.models import MetaSubscription
+    from apps.api.app.features.meta.repository import MetaSubscriptionRepository
+
+    repo = MetaSubscriptionRepository(db)
+    triggers = _scan_meta_triggers(workflow)
+    keep_node_ids: set[str] = set()
+
+    for entry in triggers:
+        # Skip incomplete configurations — the trigger node carries
+        # required fields, but during in-progress editing the user might
+        # save with no target_id / credential. Don't materialize a useless
+        # row; it'll come back once the user finishes wiring it up.
+        if not entry["target_id"] or not entry["credential_id"]:
+            continue
+        try:
+            credential_uuid = _uuid.UUID(entry["credential_id"])
+        except (ValueError, TypeError):
+            continue
+
+        keep_node_ids.add(entry["node_id"])
+        sub = MetaSubscription(
+            user_id=workflow.user_id,
+            workspace_id=workflow.workspace_id,
+            credential_id=credential_uuid,
+            workflow_id=workflow.id,
+            node_id=entry["node_id"],
+            trigger_type=entry["trigger_type"],
+            object_type=entry["object_type"],
+            target_id=entry["target_id"],
+            field=entry["field"],
+            is_active=bool(getattr(workflow, "is_active", True)),
+        )
+        upserted = await repo.upsert(sub)
+
+        # Meta-side registration only fires if we haven't successfully
+        # subscribed this target before, or the target id changed (upsert
+        # resets `meta_subscribed_at`). Skip the API hop on every save
+        # otherwise — Meta rate-limits these.
+        if upserted.meta_subscribed_at is None:
+            try:
+                await _meta_subscribe_target(db, upserted)
+                upserted.meta_subscribed_at = datetime.now(UTC)
+                upserted.last_error = None
+            except Exception as exc:  # noqa: BLE001 — surface but don't fail save
+                logger.exception(
+                    f"Meta subscribe failed for workflow={workflow.id} node={entry['node_id']}: {exc}"
+                )
+                upserted.last_error = str(exc)[:1024]
+
+    # Drop rows for nodes that are no longer in the graph (deleted or
+    # retyped). We don't unsubscribe from Meta's side here — other
+    # workflows on the same credential may still need the target.
+    await repo.delete_missing_nodes(workflow.id, keep_node_ids)
+
+
+async def cleanup_workflow_subscriptions(db: AsyncSession, workflow_id: Any) -> None:
+    """Drop every MetaSubscription row for the deleted workflow.
+
+    Like `sync_workflow_subscriptions`, we leave Meta-side subscriptions
+    alone — sharing a Page with another workflow under the same
+    credential is the common case, and tearing down would orphan it.
+    """
+    from apps.api.app.features.meta.repository import MetaSubscriptionRepository
+
+    repo = MetaSubscriptionRepository(db)
+    await repo.delete_for_workflow(workflow_id)
+
+
+async def _meta_subscribe_target(db: AsyncSession, sub: Any) -> None:
+    """Register Meta's webhook delivery for the target referenced by `sub`.
+
+    For Page / Instagram (linked through a Page) we hit
+    `POST /{page_id}/subscribed_apps` with the page access token. For
+    WhatsApp we hit `POST /{waba_id}/subscribed_apps` with the user
+    long-lived token. Failures bubble up — `sync_workflow_subscriptions`
+    captures them onto `last_error`.
+    """
+    from apps.api.app.features.credentials.service import CredentialService
+
+    cred_service = CredentialService(db)
+    credential = await cred_service.repo.get_by_id_and_workspace(
+        sub.credential_id, sub.workspace_id
+    )
+    if credential is None:
+        raise ValueError("Meta credential not found")
+    data = await cred_service.get_decrypted_credential(credential)
+
+    if sub.object_type == "whatsapp_business_account":
+        access_token = str((data or {}).get("access_token") or "")
+        if not access_token:
+            raise ValueError("Meta credential missing access_token for WhatsApp subscribe")
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(
+                _graph_url(f"/{sub.target_id}/subscribed_apps"),
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+        body = resp.json()
+        if resp.status_code >= 400 or not body.get("success", True):
+            err = body.get("error", {})
+            raise ValueError(f"WhatsApp subscribe_apps failed: {err.get('message') or body}")
+        return
+
+    # Page / Instagram. IG events flow through the linked Page's
+    # subscribed_apps registration — the Meta dashboard's per-object
+    # subscription is global; per-Page activation is what this call does.
+    pages = (data or {}).get("pages") or []
+    page_token: str | None = None
+    if sub.object_type == "page":
+        for p in pages:
+            if isinstance(p, dict) and str(p.get("id") or "") == sub.target_id:
+                token = p.get("access_token")
+                if isinstance(token, str) and token:
+                    page_token = token
+                page_target_id = sub.target_id
+                break
+    else:  # instagram — find the Page that owns this IG business account
+        page_target_id = None
+        for p in pages:
+            if not isinstance(p, dict):
+                continue
+            ig = p.get("instagram_business_account") or {}
+            if str(ig.get("id") or "") == sub.target_id:
+                token = p.get("access_token")
+                if isinstance(token, str) and token:
+                    page_token = token
+                page_target_id = str(p.get("id") or "")
+                break
+        if not page_target_id:
+            raise ValueError("No Page linked to this Instagram account")
+
+    if not page_token:
+        raise ValueError("No page access token for this target")
+
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.post(
+            _graph_url(f"/{page_target_id}/subscribed_apps"),
+            params={"access_token": page_token},
+        )
+    body = resp.json()
+    if resp.status_code >= 400 or not body.get("success", True):
+        err = body.get("error", {})
+        raise ValueError(f"subscribed_apps failed: {err.get('message') or body}")

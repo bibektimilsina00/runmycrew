@@ -62,7 +62,12 @@ class WorkflowService:
             color=color,
             env=data.env,
         )
-        return await self.repository.create(workflow)
+        created = await self.repository.create(workflow)
+        # New workflows usually start empty, but templates / duplicates
+        # may already carry Meta trigger nodes. Reconcile so subscription
+        # state matches the just-persisted graph.
+        await self._sync_meta_subscriptions(created)
+        return created
 
     async def ensure_default_workflow(self, workspace: Workspace) -> Workflow:
         workflow = Workflow(
@@ -90,9 +95,17 @@ class WorkflowService:
                 },
             )
         update_data = data.model_dump(exclude_unset=True, exclude={"expected_version"})
-        if "graph" in update_data:
+        graph_changed = "graph" in update_data
+        if graph_changed:
             update_data["version_vector"] = workflow.version_vector + 1
-        return await self.repository.update(workflow, update_data)
+        updated = await self.repository.update(workflow, update_data)
+        # Reconcile Meta webhook subscriptions whenever the graph (and
+        # therefore the set of trigger nodes) could have changed. Run
+        # only after a successful save — never speculatively. Failures
+        # bubble inside the sync but never roll back the workflow save.
+        if graph_changed:
+            await self._sync_meta_subscriptions(updated)
+        return updated
 
     async def batch_update_workflows(
         self, data: WorkflowBatchUpdate, user: User, workspace: Workspace
@@ -116,7 +129,31 @@ class WorkflowService:
         self, workflow_id: uuid.UUID, user: User, workspace: Workspace
     ) -> None:
         workflow = await self.get_workflow(workflow_id, user, workspace)
+        # Drop MetaSubscription rows before the cascade fires so any
+        # bookkeeping (logging, audit) sees the workflow id; FK
+        # ondelete=CASCADE would otherwise null-out our view of which
+        # rows belonged to which workflow.
+        await self._cleanup_meta_subscriptions(workflow_id)
         await self.repository.delete(workflow)
+
+    async def _sync_meta_subscriptions(self, workflow: Workflow) -> None:
+        """Best-effort reconcile. Swallow errors so a Meta API hiccup
+        never blocks a workflow save — the sync function records its own
+        per-row failures onto MetaSubscription.last_error."""
+        try:
+            from apps.api.app.features.meta.service import sync_workflow_subscriptions
+
+            await sync_workflow_subscriptions(self.repository.db, workflow)
+        except Exception as exc:  # noqa: BLE001
+            logger.exception(f"Meta subscription sync failed for workflow {workflow.id}: {exc}")
+
+    async def _cleanup_meta_subscriptions(self, workflow_id: uuid.UUID) -> None:
+        try:
+            from apps.api.app.features.meta.service import cleanup_workflow_subscriptions
+
+            await cleanup_workflow_subscriptions(self.repository.db, workflow_id)
+        except Exception as exc:  # noqa: BLE001
+            logger.exception(f"Meta subscription cleanup failed for workflow {workflow_id}: {exc}")
 
     def _initial_graph(self, graph: dict | None) -> dict:
         # New workflows start empty. The editor's empty-state overlay handles
