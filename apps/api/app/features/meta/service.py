@@ -104,7 +104,48 @@ class MetaService:
                 )
             return out
 
-        # waba_phone + lead_form land in later phases.
+        # WhatsApp resources — both WABA accounts and the registered phone
+        # numbers underneath them are exposed. Most nodes care about a
+        # specific phone number id (that's what the Send API uses), so
+        # `waba_phone` is the default selector.
+        wabas = data.get("whatsapp_business_accounts") or []
+        if not isinstance(wabas, list):
+            wabas = []
+
+        if kind == "waba":
+            return [
+                MetaResource(
+                    id=str(w.get("id") or ""),
+                    name=str(w.get("name") or w.get("id") or ""),
+                    kind="waba",
+                    secondary=w.get("business_name"),
+                )
+                for w in wabas
+                if w.get("id")
+            ]
+
+        if kind == "waba_phone":
+            out2: list[MetaResource] = []
+            for w in wabas:
+                phones = (w.get("phone_numbers") or {}).get("data") or []
+                for phone in phones:
+                    if not isinstance(phone, dict) or not phone.get("id"):
+                        continue
+                    label = (
+                        str(phone.get("verified_name") or "")
+                        or str(phone.get("display_phone_number") or "")
+                        or str(phone.get("id"))
+                    )
+                    out2.append(
+                        MetaResource(
+                            id=str(phone["id"]),
+                            name=label,
+                            kind="waba_phone",
+                            secondary=str(phone.get("display_phone_number") or w.get("name") or ""),
+                        )
+                    )
+            return out2
+
         return []
 
     # ------------------------------------------------------------------
@@ -379,6 +420,81 @@ class MetaService:
             return publish
 
     # ------------------------------------------------------------------
+    # WhatsApp Cloud API — text/template sends, mark-as-read, template list.
+    #
+    # The user picks a `phone_number_id` (kind=waba_phone) per node; that
+    # id is what every WA Send API call is keyed on. The access token here
+    # is the *user* long-lived token from the OAuth credential — enterprise
+    # setups should switch to a permanent System User token (PR 2c-B+).
+    # ------------------------------------------------------------------
+
+    async def wa_send_text(
+        self,
+        access_token: str,
+        phone_number_id: str,
+        to: str,
+        text: str,
+        preview_url: bool = False,
+        reply_to_message_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Send a free-form WhatsApp text message.
+
+        Valid only within the 24-hour customer-service window since the
+        recipient's last inbound message. Outside that window Meta returns
+        error 131047 ("Message failed to send because more than 24 hours
+        have passed since the customer last replied to this number"). For
+        outside-window sends, use `wa_send_template`.
+        """
+        payload: dict[str, Any] = {
+            "messaging_product": "whatsapp",
+            "to": to,
+            "type": "text",
+            "text": {"preview_url": preview_url, "body": text},
+        }
+        if reply_to_message_id:
+            payload["context"] = {"message_id": reply_to_message_id}
+        return await self._wa_send(access_token, phone_number_id, payload)
+
+    async def wa_mark_read(
+        self,
+        access_token: str,
+        phone_number_id: str,
+        message_id: str,
+    ) -> dict[str, Any]:
+        """Mark an inbound WhatsApp message as read — surfaces the blue
+        double check in the user's app."""
+        return await self._wa_send(
+            access_token,
+            phone_number_id,
+            {
+                "messaging_product": "whatsapp",
+                "status": "read",
+                "message_id": message_id,
+            },
+        )
+
+    async def _wa_send(
+        self,
+        access_token: str,
+        phone_number_id: str,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(
+                _graph_url(f"/{phone_number_id}/messages"),
+                headers={"Authorization": f"Bearer {access_token}"},
+                json=payload,
+            )
+        body = resp.json()
+        if resp.status_code >= 400:
+            err = body.get("error", {})
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"WhatsApp send failed: {err.get('message') or body}",
+            )
+        return body
+
+    # ------------------------------------------------------------------
     # Lead Ads — fetch the lead details by leadgen_id. The webhook only
     # delivers the id; this hop pulls the full form submission.
     # ------------------------------------------------------------------
@@ -532,6 +648,21 @@ def _flatten_entry(object_type: str | None, entry: dict[str, Any]) -> list[dict[
             else:
                 field = "feed.other"
 
+        # WhatsApp deliveries arrive as `field == "messages"` but the
+        # value carries two distinct payloads — inbound messages (a
+        # `messages[]` array) and status callbacks (a `statuses[]`
+        # array). Fork into one synthesized row per inbound message and
+        # one per status so trigger nodes don't have to loop themselves.
+        if object_type == "whatsapp_business_account" and field == "messages":
+            for m in value.get("messages") or []:
+                if isinstance(m, dict):
+                    out.append({"field": "wa.messages", "value": {**value, "_event": m}})
+            for s in value.get("statuses") or []:
+                if isinstance(s, dict):
+                    out.append({"field": "wa.statuses", "value": {**value, "_event": s}})
+            # Either branch fired (or both empty) — never bubble the raw row.
+            continue
+
         out.append({"field": field, "value": value})
 
     for msg in entry.get("messaging") or []:
@@ -592,6 +723,10 @@ _TRIGGER_MAP: dict[tuple[str, str], str] = {
     ("page", "mention"): "trigger.meta.fb_mention",
     # Lead Ads (delivered under the `page` object)
     ("page", "leadgen"): "trigger.meta.lead_submission",
+    # WhatsApp Cloud API — split inside _flatten_entry into one event
+    # per inbound message (`wa.messages`) or status callback (`wa.statuses`).
+    ("whatsapp_business_account", "wa.messages"): "trigger.meta.wa_message",
+    ("whatsapp_business_account", "wa.statuses"): "trigger.meta.wa_status",
 }
 
 
@@ -622,6 +757,11 @@ _TARGET_FILTER_BY_TRIGGER: dict[str, str] = {
     # inside the trigger node since Meta only sends `form_id` in the
     # value, not as a separate routing key.
     "trigger.meta.lead_submission": "page_id",
+    # WhatsApp — target_id is the WABA id (entry.id in the envelope).
+    # Phone-number filtering happens inside the trigger node since one
+    # WABA can own multiple numbers and users wire one per node.
+    "trigger.meta.wa_message": "waba_id",
+    "trigger.meta.wa_status": "waba_id",
 }
 
 

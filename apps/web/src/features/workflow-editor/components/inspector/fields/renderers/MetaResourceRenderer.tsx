@@ -127,6 +127,7 @@ function labelForKind(kind: string): string {
   switch (kind) {
     case 'page': return 'Pages'
     case 'ig_account': return 'Instagram accounts'
+    case 'waba': return 'WhatsApp Business accounts'
     case 'waba_phone': return 'WhatsApp numbers'
     case 'lead_form': return 'Lead Ads forms'
     default: return 'resources'
