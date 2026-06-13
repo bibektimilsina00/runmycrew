@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import Any, Literal
 
 import httpx
@@ -560,6 +561,20 @@ class AgentNode(BaseNode[AgentProperties]):
                         # Merge: LLM fills blanks, but user-configured values are locked (can't be overridden)
                         merged_params = {**llm_args, **user_params}
 
+                        # Real-time event so the run log can render the call
+                        # before it finishes — matters for long tool runs.
+                        if emitter:
+                            await emitter.emit(
+                                "tool_call_started",
+                                {
+                                    "node_id": context.node_id,
+                                    "iteration": _iteration,
+                                    "tool_id": tool_id,
+                                    "arguments": llm_args,
+                                },
+                            )
+
+                        call_start = time.time()
                         # Duplicate call detection — block same (tool, args) from re-executing
                         call_sig = (tool_id, json.dumps(llm_args, sort_keys=True, default=str))
                         if call_sig in seen_tool_calls:
@@ -605,15 +620,33 @@ class AgentNode(BaseNode[AgentProperties]):
                                 retry_override=_retry_from_dict(overrides.get("retry")),
                             )
 
-                        tool_call_entry = {
+                        duration_ms = int((time.time() - call_start) * 1000)
+                        tool_call_entry: dict[str, Any] = {
                             "name": tool_id,
                             "arguments": llm_args,
                             "result": result.output if result.success else {"error": result.error},
                             "success": result.success,
+                            "duration_ms": duration_ms,
                         }
                         if "id" in tc:
                             tool_call_entry["id"] = tc["id"]
                         all_tool_calls.append(tool_call_entry)
+
+                        # Real-time completion event mirrors the started one
+                        # so the UI can swap "running" for the final status
+                        # without waiting for the agent loop to finish.
+                        if emitter:
+                            await emitter.emit(
+                                "tool_call_completed",
+                                {
+                                    "node_id": context.node_id,
+                                    "iteration": _iteration,
+                                    "tool_id": tool_id,
+                                    "success": result.success,
+                                    "duration_ms": duration_ms,
+                                    "result": tool_call_entry["result"],
+                                },
+                            )
 
                         messages.append(
                             self._build_tool_result_message(tc, result, ai_provider.ai_api_type)
@@ -723,6 +756,18 @@ class AgentNode(BaseNode[AgentProperties]):
                                 user_params = tool_user_params.get(tool_id, {})
                                 merged = {**llm_args, **user_params}
                                 overrides = tool_user_overrides.get(tool_id, {})
+                                if emitter:
+                                    await emitter.emit(
+                                        "tool_call_started",
+                                        {
+                                            "node_id": context.node_id,
+                                            "iteration": _iteration,
+                                            "tool_id": tool_id,
+                                            "arguments": llm_args,
+                                            "phase": "summary",
+                                        },
+                                    )
+                                call_start = time.time()
                                 result = await tool_registry.execute(
                                     tool_id,
                                     merged,
@@ -730,16 +775,30 @@ class AgentNode(BaseNode[AgentProperties]):
                                     credential_id=overrides.get("credential_id"),
                                     retry_override=_retry_from_dict(overrides.get("retry")),
                                 )
-                                all_tool_calls.append(
-                                    {
-                                        "name": tool_id,
-                                        "arguments": llm_args,
-                                        "result": result.output
-                                        if result.success
-                                        else {"error": result.error},
-                                        "success": result.success,
-                                    }
-                                )
+                                duration_ms = int((time.time() - call_start) * 1000)
+                                summary_entry: dict[str, Any] = {
+                                    "name": tool_id,
+                                    "arguments": llm_args,
+                                    "result": result.output
+                                    if result.success
+                                    else {"error": result.error},
+                                    "success": result.success,
+                                    "duration_ms": duration_ms,
+                                }
+                                all_tool_calls.append(summary_entry)
+                                if emitter:
+                                    await emitter.emit(
+                                        "tool_call_completed",
+                                        {
+                                            "node_id": context.node_id,
+                                            "iteration": _iteration,
+                                            "tool_id": tool_id,
+                                            "success": result.success,
+                                            "duration_ms": duration_ms,
+                                            "result": summary_entry["result"],
+                                            "phase": "summary",
+                                        },
+                                    )
                             # If only tool calls and no text, set a brief summary
                             if not final_content:
                                 final_content = f"Completed: {', '.join(tc['name'] for tc in summary_tool_calls)}"

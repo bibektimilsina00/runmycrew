@@ -222,7 +222,13 @@ async def test_agent_node_sends_anthropic_request_with_tools():
     assert captured_payloads[0]["tool_choice"] == {"type": "any"}
     assert result.output_data["provider"] == "anthropic"
     assert result.output_data["content"] == "Need lookup"
-    assert result.output_data["toolCalls"] == [
+    # Tool calls carry a per-call `duration_ms` (PR7) — the value is
+    # non-deterministic so we strip it from the assertion.
+    actual_calls = [
+        {k: v for k, v in tc.items() if k != "duration_ms"}
+        for tc in result.output_data["toolCalls"]
+    ]
+    assert actual_calls == [
         {
             "id": "toolu_1",
             "name": "lookup_customer",
@@ -231,6 +237,7 @@ async def test_agent_node_sends_anthropic_request_with_tools():
             "result": {"error": "Unknown tool: lookup_customer"},
         }
     ]
+    assert all("duration_ms" in tc for tc in result.output_data["toolCalls"])
     assert result.output_data["tokens"]["total_tokens"] == 13
 
 
@@ -338,7 +345,12 @@ async def test_agent_node_sends_google_request_with_response_schema_and_memory()
     assert captured_payloads[0]["tools"][0]["functionDeclarations"][0]["name"] == "search_docs"
     assert result.output_data["provider"] == "google"
     assert result.output_data["status"] == "ok"
-    assert result.output_data["toolCalls"] == [
+    # Strip the non-deterministic `duration_ms` added by PR7.
+    google_actual = [
+        {k: v for k, v in tc.items() if k != "duration_ms"}
+        for tc in result.output_data["toolCalls"]
+    ]
+    assert google_actual == [
         {
             "id": "search_docs",
             "name": "search_docs",
