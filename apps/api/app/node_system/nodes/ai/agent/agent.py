@@ -915,13 +915,20 @@ class AgentNode(BaseNode[AgentProperties]):
     def _inject_skills_system_prompt(
         self, messages: list[dict[str, Any]], skill_meta: list[dict[str, str]]
     ) -> list[dict[str, Any]]:
+        from xml.sax.saxutils import escape as _xml_escape
+        from xml.sax.saxutils import quoteattr as _xml_quoteattr
+
         skills_xml_parts = [
             "You have access to the following skills. Use the load_skill tool to activate a skill when relevant.\n\n<available_skills>"
         ]
         for s in skill_meta:
-            desc = s["description"].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            # `quoteattr` returns the value already wrapped in quotes and
+            # escapes any embedded quotes/ampersands/angle brackets — so a
+            # free-form name like `Bob "the" builder` round-trips cleanly.
+            name_attr = _xml_quoteattr(s["name"])
+            desc = _xml_escape(s["description"])
             skills_xml_parts.append(
-                f'  <skill name="{s["name"]}">\n    <description>{desc}</description>\n  </skill>'
+                f"  <skill name={name_attr}>\n    <description>{desc}</description>\n  </skill>"
             )
         skills_xml_parts.append("</available_skills>")
         skills_section = "\n".join(skills_xml_parts)

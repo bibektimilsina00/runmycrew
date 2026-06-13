@@ -7,30 +7,23 @@ from sqlmodel import Field, SQLModel
 
 
 class SkillCreate(SQLModel):
-    name: str = Field(
-        min_length=1,
-        max_length=64,
-        regex=r"^[a-z0-9]+(-[a-z0-9]+)*$",
-        description="name must be kebab-case (a-z0-9 and hyphens)",
-    )
+    # Free-form human-readable name. The agent system prompt and the
+    # `load_skill` tool use this string verbatim as the lookup key, so
+    # it doubles as the identifier — but the agent injection escapes
+    # XML-unsafe characters, so any printable text is safe to store.
+    name: str = Field(min_length=1, max_length=64)
     description: str = Field(default="", max_length=1024)
     icon: str = Field(default="BookOpen", min_length=1, max_length=64)
     color: str = Field(default="#8b5cf6", min_length=1, max_length=32)
-    content: str = Field(min_length=1, max_length=50_000)
+    content: str = Field(default="", max_length=50_000)
 
 
 class SkillUpdate(SQLModel):
-    name: str | None = Field(
-        default=None,
-        min_length=1,
-        max_length=64,
-        regex=r"^[a-z0-9]+(-[a-z0-9]+)*$",
-        description="name must be kebab-case (a-z0-9 and hyphens)",
-    )
+    name: str | None = Field(default=None, min_length=1, max_length=64)
     description: str | None = Field(default=None, max_length=1024)
     icon: str | None = Field(default=None, min_length=1, max_length=64)
     color: str | None = Field(default=None, min_length=1, max_length=32)
-    content: str | None = Field(default=None, min_length=1, max_length=50_000)
+    content: str | None = Field(default=None, max_length=50_000)
 
 
 class SkillOut(SQLModel):
