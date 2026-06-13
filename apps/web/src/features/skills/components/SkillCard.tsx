@@ -28,7 +28,7 @@ export function SkillCard({ skill, onDelete }: SkillCardProps) {
       />
 
       <div className="relative flex items-start gap-3">
-        <SkillIconBadge iconName={skill.icon} color={skill.color} />
+        <SkillIconBadge iconName={skill.icon} />
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-[14px] font-semibold text-text">{skill.name}</h3>
           <p className="line-clamp-2 text-[11.5px] leading-snug text-text-mute">

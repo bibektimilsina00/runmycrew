@@ -329,7 +329,7 @@ function SkillRow({ skill, active, stale, onToggle }: SkillRowProps) {
       )}
       aria-pressed={active}
     >
-      <SkillIconBadge iconName={skill.icon} color={skill.color} size="sm" />
+      <SkillIconBadge iconName={skill.icon} size="sm" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <div className="truncate text-[12px] font-medium text-text">{skill.name}</div>

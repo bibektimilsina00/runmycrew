@@ -3,7 +3,6 @@ import * as LucideIcons from 'lucide-react'
 
 interface SkillIconBadgeProps {
   iconName: string
-  color: string
   size?: 'sm' | 'md' | 'lg'
 }
 
@@ -20,16 +19,15 @@ const SIZE_MAP: Record<NonNullable<SkillIconBadgeProps['size']>, { box: string; 
   lg: { box: 'h-12 w-12', icon: 22 },
 }
 
-export function SkillIconBadge({ iconName, color, size = 'md' }: SkillIconBadgeProps) {
-  // Lucide icons indirected through their export name; using `React.createElement`
-  // avoids the `react-hooks/static-components` complaint about a JSX component
-  // tag whose identifier is defined during render.
+export function SkillIconBadge({ iconName, size = 'md' }: SkillIconBadgeProps) {
+  // Solid surface background — the previous color-tinted alpha background
+  // looked translucent against the page; users couldn't tell the badge from
+  // its surroundings. Neutral surface keeps icons readable on every row.
   const Icon = resolveIcon(iconName)
   const dims = SIZE_MAP[size]
   return (
     <div
-      className={`flex ${dims.box} shrink-0 items-center justify-center rounded-[8px]`}
-      style={{ background: `${color}22`, color }}
+      className={`flex ${dims.box} shrink-0 items-center justify-center rounded-[8px] bg-surface text-text-mute`}
     >
       {createElement(Icon, { size: dims.icon })}
     </div>

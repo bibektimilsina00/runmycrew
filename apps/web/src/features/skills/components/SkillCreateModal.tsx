@@ -9,29 +9,15 @@ interface SkillCreateModalProps {
 }
 
 const DEFAULT_ICON = 'BookOpen'
-const DEFAULT_COLOR = '#8b5cf6'
-
-const COLOR_SWATCHES = [
-  '#8b5cf6', // violet
-  '#3b82f6', // blue
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#ec4899', // pink
-  '#14b8a6', // teal
-  '#64748b', // slate
-]
 
 export function SkillCreateModal({ open, onClose, onCreated }: SkillCreateModalProps) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [color, setColor] = useState(DEFAULT_COLOR)
   const create = useCreateSkill()
 
   const reset = () => {
     setName('')
     setDescription('')
-    setColor(DEFAULT_COLOR)
   }
 
   const close = () => {
@@ -48,7 +34,6 @@ export function SkillCreateModal({ open, onClose, onCreated }: SkillCreateModalP
         name: trimmed,
         description: description.trim(),
         icon: DEFAULT_ICON,
-        color,
         content: `# ${trimmed}\n\nDescribe how the agent should use this skill, then add the body of the instructions below.\n`,
       })
       reset()
@@ -95,25 +80,6 @@ export function SkillCreateModal({ open, onClose, onCreated }: SkillCreateModalP
             rows={2}
             maxLength={1024}
           />
-        </Field>
-
-        <Field label="Color">
-          <div className="flex flex-wrap gap-1.5">
-            {COLOR_SWATCHES.map(swatch => (
-              <button
-                key={swatch}
-                type="button"
-                onClick={() => setColor(swatch)}
-                className="h-7 w-7 rounded-[6px] transition-transform hover:scale-110"
-                style={{
-                  background: swatch,
-                  boxShadow: color === swatch ? `0 0 0 2px var(--bg2), 0 0 0 4px ${swatch}` : undefined,
-                }}
-                aria-label={`Pick ${swatch}`}
-                aria-pressed={color === swatch}
-              />
-            ))}
-          </div>
         </Field>
 
         {create.isError && (

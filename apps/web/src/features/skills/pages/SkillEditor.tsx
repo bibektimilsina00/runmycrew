@@ -12,18 +12,11 @@ import { SkillDeleteConfirmModal } from '../components/SkillDeleteConfirmModal'
 import type { Skill, SkillMeta } from '../types/skillTypes'
 
 const DEFAULT_ICON = 'BookOpen'
-const DEFAULT_COLOR = '#8b5cf6'
-
-const COLOR_SWATCHES = [
-  '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b',
-  '#ef4444', '#ec4899', '#14b8a6', '#64748b',
-]
 
 interface Draft {
   name: string
   description: string
   icon: string
-  color: string
   content: string
 }
 
@@ -31,7 +24,6 @@ const BLANK_DRAFT: Draft = {
   name: '',
   description: '',
   icon: DEFAULT_ICON,
-  color: DEFAULT_COLOR,
   content: '',
 }
 
@@ -40,7 +32,6 @@ function draftFromSkill(skill: Skill): Draft {
     name: skill.name,
     description: skill.description,
     icon: skill.icon,
-    color: skill.color,
     content: skill.content,
   }
 }
@@ -50,7 +41,6 @@ function isDirty(draft: Draft, baseline: Draft): boolean {
     draft.name !== baseline.name ||
     draft.description !== baseline.description ||
     draft.icon !== baseline.icon ||
-    draft.color !== baseline.color ||
     draft.content !== baseline.content
   )
 }
@@ -105,7 +95,6 @@ export function SkillEditor() {
       name: trimmedName,
       description: draft.description.trim(),
       icon: draft.icon,
-      color: draft.color,
       content: draft.content,
     }
     try {
@@ -154,7 +143,6 @@ export function SkillEditor() {
         name: skillQuery.data.name,
         description: skillQuery.data.description,
         icon: skillQuery.data.icon,
-        color: skillQuery.data.color,
         created_at: skillQuery.data.created_at,
         updated_at: skillQuery.data.updated_at,
       }
@@ -169,7 +157,7 @@ export function SkillEditor() {
             Skills
           </Button>
           <div className="ml-2 flex min-w-0 items-center gap-2.5">
-            <SkillIconBadge iconName={draft.icon} color={draft.color} size="sm" />
+            <SkillIconBadge iconName={draft.icon} size="sm" />
             <span className="truncate text-[14px] font-semibold text-text">
               {draft.name.trim() || (isNew ? 'New skill' : 'Untitled skill')}
             </span>
@@ -216,7 +204,6 @@ export function SkillEditor() {
             <Field label="Icon">
               <SkillIconPicker
                 value={draft.icon}
-                color={draft.color}
                 onChange={icon => update_({ icon })}
               />
             </Field>
@@ -229,25 +216,6 @@ export function SkillEditor() {
                 rows={2}
                 maxLength={1024}
               />
-            </Field>
-
-            <Field label="Color" className="md:col-span-2">
-              <div className="flex flex-wrap gap-1.5">
-                {COLOR_SWATCHES.map(swatch => (
-                  <button
-                    key={swatch}
-                    type="button"
-                    onClick={() => update_({ color: swatch })}
-                    className="h-7 w-7 rounded-[6px] transition-transform hover:scale-110"
-                    style={{
-                      background: swatch,
-                      boxShadow: draft.color === swatch ? `0 0 0 2px var(--bg2), 0 0 0 4px ${swatch}` : undefined,
-                    }}
-                    aria-label={`Pick ${swatch}`}
-                    aria-pressed={draft.color === swatch}
-                  />
-                ))}
-              </div>
             </Field>
           </div>
 
