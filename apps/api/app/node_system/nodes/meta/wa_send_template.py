@@ -51,7 +51,7 @@ class WASendTemplateNode(BaseNode[WASendTemplateProperties]):
                     "label": "WhatsApp Business Account",
                     "type": "meta-resource",
                     "resourceKind": "waba",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {
@@ -59,7 +59,7 @@ class WASendTemplateNode(BaseNode[WASendTemplateProperties]):
                     "label": "Sender Phone Number",
                     "type": "meta-resource",
                     "resourceKind": "waba_phone",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {
@@ -73,7 +73,7 @@ class WASendTemplateNode(BaseNode[WASendTemplateProperties]):
                     "name": "template_name",
                     "label": "Template",
                     "type": "wa-template",
-                    "dependsOn": "credential,waba_id",
+                    "dependsOn": ["credential", "waba_id"],
                     "required": True,
                     "description": (
                         "Only APPROVED templates can be sent. PENDING / "

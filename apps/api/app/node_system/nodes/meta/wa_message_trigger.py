@@ -54,7 +54,7 @@ class WAMessageTriggerNode(BaseNode[WAMessageTriggerProperties]):
                     "label": "WhatsApp Business Account",
                     "type": "meta-resource",
                     "resourceKind": "waba",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {
@@ -62,7 +62,7 @@ class WAMessageTriggerNode(BaseNode[WAMessageTriggerProperties]):
                     "label": "Phone number (optional)",
                     "type": "meta-resource",
                     "resourceKind": "waba_phone",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "description": "Only fire for this specific WhatsApp number.",
                 },
                 {

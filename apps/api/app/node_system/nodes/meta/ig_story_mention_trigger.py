@@ -41,7 +41,7 @@ class IGStoryMentionTriggerNode(BaseNode[IGStoryMentionTriggerProperties]):
                     "label": "Instagram Account",
                     "type": "meta-resource",
                     "resourceKind": "ig_account",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
             ],

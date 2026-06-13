@@ -31,7 +31,12 @@ interface MetaResourcesResponse {
 }
 
 export function MetaResourceRenderer({ prop, properties, value, onChange, disabled }: RendererProps) {
-  const credentialId = readString(properties[(prop as { dependsOn?: string }).dependsOn ?? 'credential'])
+  // By convention every meta-resource field depends on a sibling
+  // `credential` property — the node spec's `dependsOn: ["credential"]`
+  // is a hint to the form for refetch invalidation but the actual lookup
+  // always uses the property named `credential`. Keeps each renderer
+  // free of dependsOn-array parsing.
+  const credentialId = readString(properties.credential)
   const kind = (prop as { resourceKind?: string }).resourceKind ?? 'page'
 
   const query = useQuery({

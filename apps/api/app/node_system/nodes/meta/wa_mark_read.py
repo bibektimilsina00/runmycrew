@@ -45,7 +45,7 @@ class WAMarkReadNode(BaseNode[WAMarkReadProperties]):
                     "label": "Sender Phone Number",
                     "type": "meta-resource",
                     "resourceKind": "waba_phone",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {

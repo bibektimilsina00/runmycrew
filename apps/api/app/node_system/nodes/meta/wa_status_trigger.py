@@ -49,7 +49,7 @@ class WAStatusTriggerNode(BaseNode[WAStatusTriggerProperties]):
                     "label": "WhatsApp Business Account",
                     "type": "meta-resource",
                     "resourceKind": "waba",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {
@@ -57,7 +57,7 @@ class WAStatusTriggerNode(BaseNode[WAStatusTriggerProperties]):
                     "label": "Phone number (optional)",
                     "type": "meta-resource",
                     "resourceKind": "waba_phone",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                 },
                 {
                     "name": "status",

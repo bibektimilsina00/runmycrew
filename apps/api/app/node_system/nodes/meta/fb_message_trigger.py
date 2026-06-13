@@ -48,7 +48,7 @@ class FBMessageTriggerNode(BaseNode[FBMessageTriggerProperties]):
                     "label": "Facebook Page",
                     "type": "meta-resource",
                     "resourceKind": "page",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {

@@ -46,7 +46,7 @@ class LeadSubmissionTriggerNode(BaseNode[LeadSubmissionTriggerProperties]):
                     "label": "Facebook Page",
                     "type": "meta-resource",
                     "resourceKind": "page",
-                    "dependsOn": "credential",
+                    "dependsOn": ["credential"],
                     "required": True,
                 },
                 {
