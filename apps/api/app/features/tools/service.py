@@ -9,10 +9,15 @@ definitions themselves.
 from __future__ import annotations
 
 from dataclasses import asdict
+from typing import Any
+
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Trigger registration side-effects so every built-in tool is in the
 # registry when the service starts handling requests.
 import apps.api.app.node_system.tools.loader  # noqa: F401  (re-export side effect)
+from apps.api.app.core.database import get_db
 from apps.api.app.features.tools.schemas import (
     ToolCategorySchema,
     ToolListResponse,
@@ -143,3 +148,104 @@ class ToolCatalogService:
 
 def get_tool_catalog_service() -> ToolCatalogService:
     return ToolCatalogService()
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Workflow-as-tool catalog
+# ──────────────────────────────────────────────────────────────────────────
+
+
+class WorkflowToolsService:
+    """Serialises a workspace's saved workflows into ToolSchemas.
+
+    Each workflow becomes one selectable tool — id ``workflow:<uuid>``,
+    params lifted from the trigger node's ``input_schema``. The agent's
+    tool-execution loop strips the ``workflow:`` prefix and routes to the
+    generic ``workflow_executor`` with the resolved id pre-bound.
+    """
+
+    def __init__(self, db: Any) -> None:
+        # Local import to keep the module light-weight at import time.
+        from apps.api.app.features.workflows.repository import WorkflowRepository
+
+        self._repository = WorkflowRepository(db)
+
+    async def list_for_user(self, current_user: Any, workspace: Any) -> ToolListResponse:
+        workflows = await self._repository.list_by_workspace(workspace.id)
+        tools: list[ToolSchema] = []
+        for workflow in workflows:
+            tool = self._serialize_workflow(workflow)
+            if tool is not None:
+                tools.append(tool)
+        tools.sort(key=lambda t: t.name.lower())
+
+        # Always one category; the picker still groups under "Workflow"
+        # alongside the built-in catalog so the user sees both in one panel.
+        categories: list[ToolCategorySchema] = (
+            [ToolCategorySchema(id="workflow", label="Workflow", count=len(tools))] if tools else []
+        )
+        return ToolListResponse(tools=tools, total=len(tools), categories=categories)
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _serialize_workflow(workflow: Any) -> ToolSchema | None:
+        params = WorkflowToolsService._extract_params(workflow)
+        name = workflow.name or "Untitled workflow"
+        description = workflow.description or f"Run the workflow “{name}” as a tool."
+        return ToolSchema(
+            id=f"workflow:{workflow.id}",
+            name=name,
+            description=description,
+            category="workflow",
+            category_label="Workflow",
+            params=params,
+            oauth=None,
+            retry=None,
+            requires_auth=False,
+        )
+
+    @staticmethod
+    def _extract_params(workflow: Any) -> dict[str, ToolParamSchema]:
+        """Pull the trigger node's input_schema and shape it as tool params.
+
+        Every input becomes a `user-or-llm` param so the LLM can fill it from
+        what the agent's reasoning produces, but the inspector still lets the
+        user pin a preset value (which wins via the merge in
+        ``agent.py _resolve_tools``).
+        """
+        graph = workflow.graph or {}
+        nodes = graph.get("nodes") or []
+        params: dict[str, ToolParamSchema] = {}
+        for node in nodes:
+            if not isinstance(node, dict):
+                continue
+            if node.get("type") != "trigger.manual":
+                continue
+            data = node.get("data") or {}
+            properties = data.get("properties") or {}
+            input_schema = properties.get("input_schema") or []
+            if not isinstance(input_schema, list):
+                continue
+            for entry in input_schema:
+                if not isinstance(entry, dict):
+                    continue
+                name = entry.get("name")
+                if not isinstance(name, str) or not name:
+                    continue
+                params[name] = ToolParamSchema(
+                    type=str(entry.get("type") or "string"),
+                    required=bool(entry.get("required", False)),
+                    visibility="user-or-llm",
+                    description=str(entry.get("description") or ""),
+                )
+            break
+        return params
+
+
+def get_workflow_tools_service(
+    db: AsyncSession = Depends(get_db),
+) -> WorkflowToolsService:
+    return WorkflowToolsService(db)

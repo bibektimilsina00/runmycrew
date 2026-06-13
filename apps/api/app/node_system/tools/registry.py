@@ -100,7 +100,19 @@ class ToolRegistry:
 
         ``retry_override`` replaces the tool's built-in retry config for this
         call — agent-side overrides set by the user.
+
+        Special tool-id prefix ``workflow:<uuid>`` routes through the generic
+        ``workflow_executor`` with the bound workflow id, so each workflow
+        the inspector exposes as a tool runs without needing its own
+        registered ``ToolDefinition``.
         """
+        # Workflow-as-tool: strip the prefix and forward to the generic
+        # `workflow_executor` with the workflow id baked into params.
+        if tool_id.startswith("workflow:"):
+            workflow_id = tool_id.split(":", 1)[1]
+            params = {**params, "workflowId": workflow_id}
+            tool_id = "workflow_executor"
+
         # Resolve versioned tool IDs first
         tool_id = self.resolve_tool_id(tool_id)
 

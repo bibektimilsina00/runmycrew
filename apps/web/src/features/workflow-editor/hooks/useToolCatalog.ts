@@ -69,3 +69,21 @@ export function useToolCatalog() {
     staleTime: 1000 * 60 * 10,
   })
 }
+
+/**
+ * Per-workspace workflows shaped as tools. Refetches whenever a workflow
+ * is created / renamed / its trigger schema changes — but for editor use
+ * a 30s staleTime keeps the picker responsive without hammering the API.
+ */
+export function useWorkflowTools() {
+  return useQuery({
+    queryKey: ['tool-catalog', 'workflows'],
+    queryFn: ({ signal }) =>
+      requestJson(ToolListResponseSchema, {
+        url: API_ROUTES.TOOLS_WORKFLOWS,
+        method: 'GET',
+        signal,
+      }),
+    staleTime: 1000 * 30,
+  })
+}

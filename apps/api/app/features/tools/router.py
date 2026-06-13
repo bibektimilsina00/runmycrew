@@ -16,10 +16,13 @@ from apps.api.app.features.tools.schemas import (
 )
 from apps.api.app.features.tools.service import (
     ToolCatalogService,
+    WorkflowToolsService,
     get_tool_catalog_service,
+    get_workflow_tools_service,
 )
 from apps.api.app.features.users.models import User
-from apps.api.app.shared.dependencies import get_current_user
+from apps.api.app.features.workspaces.models import Workspace
+from apps.api.app.shared.dependencies import get_current_user, get_current_workspace
 
 router = APIRouter()
 
@@ -49,6 +52,23 @@ async def list_categories(
 ) -> ToolCategoryListResponse:
     """Distinct category buckets with counts."""
     return ToolCategoryListResponse(categories=service.list_categories())
+
+
+@router.get("/workflows", response_model=ToolListResponse)
+async def list_workflow_tools(
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    service: WorkflowToolsService = Depends(get_workflow_tools_service),
+) -> ToolListResponse:
+    """List every workflow in this workspace as a callable tool.
+
+    Each row is shaped like a built-in tool — id is ``workflow:<uuid>``,
+    params are derived from the trigger node's ``input_schema``. The agent
+    routes ``workflow:*`` execution through the same ``workflow_executor``
+    machinery as the manual generic tool, just with the workflow id
+    pre-bound from the saved entry.
+    """
+    return await service.list_for_user(current_user, workspace)
 
 
 @router.get("/{tool_id}", response_model=ToolSchema)

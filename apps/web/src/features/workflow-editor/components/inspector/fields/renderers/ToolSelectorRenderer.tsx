@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn'
 import { Input, Textarea } from '@/shared/components'
 import { CredentialSelector } from '@/shared/components/CredentialSelector'
 import type { RendererProps } from '../types'
-import { useToolCatalog, type Tool } from '../../../../hooks/useToolCatalog'
+import { useToolCatalog, useWorkflowTools, type Tool } from '../../../../hooks/useToolCatalog'
 import { ExpressionEditor } from '../expression/ExpressionEditor'
 
 type UsageControl = 'auto' | 'force' | 'none'
@@ -73,8 +73,14 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const catalogQuery = useToolCatalog()
-  const catalogData = catalogQuery.data?.tools
-  const catalog = useMemo<Tool[]>(() => catalogData ?? [], [catalogData])
+  const workflowToolsQuery = useWorkflowTools()
+  // Merge built-in tools with the workspace's workflows-as-tools. The
+  // picker treats them uniformly — they share the same `Tool` shape and
+  // grouping logic. Workflows surface under their own `workflow` category.
+  const catalog = useMemo<Tool[]>(
+    () => [...(catalogQuery.data?.tools ?? []), ...(workflowToolsQuery.data?.tools ?? [])],
+    [catalogQuery.data?.tools, workflowToolsQuery.data?.tools],
+  )
   const catalogById = useMemo<Map<string, Tool>>(
     () => new Map(catalog.map(t => [t.id, t])),
     [catalog],
@@ -151,8 +157,14 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
         <ToolPicker
           catalog={catalog}
           alreadyAdded={tools.map(t => t.toolId)}
-          loading={catalogQuery.isLoading}
-          error={catalogQuery.error ? String(catalogQuery.error) : null}
+          loading={catalogQuery.isLoading || workflowToolsQuery.isLoading}
+          error={
+            catalogQuery.error
+              ? String(catalogQuery.error)
+              : workflowToolsQuery.error
+                ? String(workflowToolsQuery.error)
+                : null
+          }
           onPick={addTool}
           onClose={() => setPickerOpen(false)}
         />
