@@ -51,18 +51,53 @@ def test_handles_node_id_containing_dots() -> None:
     assert n == 1
 
 
-def test_leaves_trigger_template_untouched() -> None:
-    # `trigger` / `variables` / `env` / `secrets` / `loop` are workflow-wide
-    # bindings; TemplateResolver continues to evaluate them. PR10 is scoped
-    # to the node-id eyesore only.
+def test_migrates_trigger_with_output_marker() -> None:
     out, n = _rewrite_string("{{trigger.output.url}}", {"abc": "X"})
-    assert out == "{{trigger.output.url}}"
-    assert n == 0
+    assert out == "=$trigger.url"
+    assert n == 1
 
 
-def test_leaves_variables_template_untouched() -> None:
+def test_migrates_trigger_without_output_marker() -> None:
+    # Some legacy graphs used `{{trigger.url}}` directly because the runtime
+    # resolver auto-stripped `.output` after a missed lookup.
+    out, n = _rewrite_string("{{trigger.url}}", {"abc": "X"})
+    assert out == "=$trigger.url"
+    assert n == 1
+
+
+def test_migrates_bare_trigger_collapses_to_var() -> None:
+    out, n = _rewrite_string("{{trigger}}", {"abc": "X"})
+    assert out == "=$trigger"
+    assert n == 1
+
+
+def test_migrates_variables_to_vars_binding() -> None:
     out, n = _rewrite_string("{{variables.count}}", {"abc": "X"})
-    assert out == "{{variables.count}}"
+    assert out == "=$vars.count"
+    assert n == 1
+
+
+def test_migrates_env_namespace() -> None:
+    out, n = _rewrite_string("{{env.API_URL}}", {"abc": "X"})
+    assert out == "=$env.API_URL"
+    assert n == 1
+
+
+def test_migrates_secrets_namespace() -> None:
+    out, n = _rewrite_string("{{secrets.DB_PASSWORD}}", {"abc": "X"})
+    assert out == "=$secrets.DB_PASSWORD"
+    assert n == 1
+
+
+def test_migrates_loop_namespace() -> None:
+    out, n = _rewrite_string("{{loop.item}}", {"abc": "X"})
+    assert out == "=$loop.item"
+    assert n == 1
+
+
+def test_namespace_migration_is_idempotent() -> None:
+    out, n = _rewrite_string("=$trigger.url", {})
+    assert out == "=$trigger.url"
     assert n == 0
 
 
@@ -132,12 +167,14 @@ def test_recursive_walk_dict_and_list() -> None:
 
 
 def test_recursive_walk_returns_zero_when_nothing_matched() -> None:
+    # Pure-literal values + an unknown namespace head (`vars` isn't a real
+    # legacy namespace — `variables` is). Nothing matches → no rewrite.
     rewritten, n = _rewrite_value(
-        {"x": "{{trigger.output.x}}", "y": "{{vars.k}}"},
+        {"x": "static", "y": "{{vars.k}}"},
         {"abc": "X"},
     )
     assert n == 0
-    assert rewritten == {"x": "{{trigger.output.x}}", "y": "{{vars.k}}"}
+    assert rewritten == {"x": "static", "y": "{{vars.k}}"}
 
 
 # ──────────────────────────────────────────────────────────────────────────

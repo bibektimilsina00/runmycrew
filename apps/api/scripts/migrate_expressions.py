@@ -1,14 +1,21 @@
-"""One-shot rewrite: legacy `{{nodeId.path}}` → JSONata `=$node('Label').path`.
+"""One-shot rewrite: every legacy `{{...}}` template → JSONata `=…`.
 
-The legacy TemplateResolver still ships and continues to evaluate any
-`{{...}}` strings the migration does NOT touch — workflow-wide bindings
-(`{{trigger.output.x}}`, `{{variables.x}}`, `{{env.X}}`, `{{secrets.X}}`,
-`{{loop.x}}`) stay alive, because users may already use them and there's
-no urgency removing them. The only thing this script rewrites is the
-ugly raw-id node reference the user complained about.
+Covers all six legacy namespaces in one pass:
+- `{{nodeId.output.path}}` / `{{nodeId.path}}` → `=$node('Label').path`
+- `{{trigger.output.path}}` / `{{trigger.path}}` → `=$trigger.path`
+- `{{variables.path}}` → `=$vars.path`
+- `{{env.NAME}}` → `=$env.NAME`
+- `{{secrets.NAME}}` → `=$secrets.NAME`
+- `{{loop.path}}` → `=$loop.path`
 
-Run this once in production after the PR10 deploy. It's idempotent — a
-second run is a no-op because already-rewritten strings start with `=`.
+Only single-template strings are migrated — mixed-text values like
+`"Hello {{x.y}}"` or `"{{a.x}}{{b.y}}"` need JSONata string-concat to
+become safe and are out of scope; the legacy resolver continues to
+serve those until they're rewritten by hand.
+
+Run **before** deploying the follow-up that deletes TemplateResolver.
+Idempotent — re-running is a no-op because rewritten strings start
+with `=`.
 
 Usage:
     python -m apps.api.scripts.migrate_expressions [--dry-run]
@@ -34,9 +41,16 @@ logger = get_logger(__name__)
 # the legacy resolver itself only handles single `{{ }}` pairs without nesting.
 LEGACY_TEMPLATE = re.compile(r"\{\{([^}]+)\}\}")
 
-# Node-id-prefixed paths only — everything else (trigger / variables / env /
-# secrets / loop) is left for the legacy resolver to handle.
-NON_NODE_PREFIXES = ("trigger", "variables", "env", "secrets", "loop")
+# Each legacy namespace and its JSONata replacement variable name. Keys are
+# the saved `{{<head>.…}}` head; values are the binding name we use in
+# JsonataResolver (`variables` → `$vars` matches the existing binding label).
+NAMESPACE_VARS: dict[str, str] = {
+    "trigger": "trigger",
+    "variables": "vars",
+    "env": "env",
+    "secrets": "secrets",
+    "loop": "loop",
+}
 
 
 def _safe_label_for_call(label: str) -> str:
@@ -60,7 +74,7 @@ def _split_node_path(inner: str, id_to_label: dict[str, str]) -> tuple[str, str]
     """
     inner = inner.strip()
     head = inner.split(".", 1)[0]
-    if head in NON_NODE_PREFIXES:
+    if head in NAMESPACE_VARS:
         return None
 
     # Longest-first match — handles ids containing dots.
@@ -75,6 +89,30 @@ def _split_node_path(inner: str, id_to_label: dict[str, str]) -> tuple[str, str]
                 remainder = ""
             return id_to_label[nid], remainder
     return None
+
+
+def _split_namespace_path(inner: str) -> tuple[str, str] | None:
+    """Match the inner against the workflow-wide namespaces.
+
+    Returns ``(jsonata_var, remainder)`` where ``jsonata_var`` is the
+    binding name (e.g. ``trigger`` for ``$trigger``) and ``remainder`` is
+    the dot-path under it. ``{{trigger.output.x}}`` and ``{{trigger.x}}``
+    both collapse to ``("trigger", "x")`` because the legacy resolver
+    stripped the implicit ``.output`` segment too.
+    """
+    inner = inner.strip()
+    head, _, rest = inner.partition(".")
+    var = NAMESPACE_VARS.get(head)
+    if var is None:
+        return None
+    # Only the trigger namespace had an `.output` sub-layer in the legacy
+    # data shape; strip it so the migrated expression doesn't carry a
+    # dead segment.
+    if var == "trigger":
+        rest = rest.removeprefix("output.")
+        if rest == "output":
+            rest = ""
+    return var, rest
 
 
 def _rewrite_string(source: str, id_to_label: dict[str, str]) -> tuple[str, int]:
@@ -101,11 +139,21 @@ def _rewrite_string(source: str, id_to_label: dict[str, str]) -> tuple[str, int]
         return source, 0
 
     inner = stripped[2:-2].strip()
-    parsed = _split_node_path(inner, id_to_label)
-    if parsed is None:
+
+    # Workflow-wide namespaces (`trigger`, `vars`, `env`, `secrets`, `loop`)
+    # take priority — their names cannot collide with node ids because the
+    # node-id lookup explicitly bails on these heads.
+    ns_parsed = _split_namespace_path(inner)
+    if ns_parsed is not None:
+        var, remainder = ns_parsed
+        new_source = f"=${var}.{remainder}" if remainder else f"=${var}"
+        return new_source, 1
+
+    node_parsed = _split_node_path(inner, id_to_label)
+    if node_parsed is None:
         return source, 0
 
-    label, remainder = parsed
+    label, remainder = node_parsed
     call = f"$node('{_safe_label_for_call(label)}')"
     new_source = f"={call}.{remainder}" if remainder else f"={call}"
     return new_source, 1
