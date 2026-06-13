@@ -37,6 +37,14 @@ interface ToolEntry {
    * values instead of the tool's built-in `ToolRetryConfig`.
    */
   retry?: RetryOverride
+  /**
+   * Snapshots stored only for `workflow:<uuid>` entries — the agent's
+   * runtime reads these instead of round-tripping the database to fetch
+   * the referenced workflow's name/description/input schema mid-LLM-call.
+   */
+  name?: string
+  description?: string
+  paramsSchema?: Record<string, { type: string; required: boolean; description: string }>
 }
 
 const DEFAULT_RETRY: RetryOverride = {
@@ -131,7 +139,22 @@ export function ToolSelectorRenderer({ value, onChange }: RendererProps) {
       setPickerOpen(false)
       return
     }
-    onChange([...tools, { toolId, usageControl: 'auto', kind: 'tool' }])
+    const definition = catalogById.get(toolId)
+    const entry: ToolEntry = { toolId, usageControl: 'auto', kind: 'tool' }
+    // For workflow-as-tool entries, snapshot the catalog's name + description
+    // + paramsSchema into the saved entry so the agent's runtime can build
+    // the LLM-facing schema without round-tripping the database.
+    if (definition?.category === 'workflow') {
+      entry.name = definition.name
+      entry.description = definition.description
+      entry.paramsSchema = Object.fromEntries(
+        Object.entries(definition.params).map(([name, p]) => [
+          name,
+          { type: p.type, required: p.required, description: p.description },
+        ]),
+      )
+    }
+    onChange([...tools, entry])
     setExpandedIndex(tools.length)
     setPickerOpen(false)
   }

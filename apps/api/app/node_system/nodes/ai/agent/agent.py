@@ -378,6 +378,7 @@ class AgentNode(BaseNode[AgentProperties]):
                 forced_tool_ids,
                 mcp_clients,
                 tool_user_overrides,
+                name_to_tool_id,
             ) = await self._resolve_tools_async()
 
             # Inject load_skill tool if skills are available
@@ -532,9 +533,11 @@ class AgentNode(BaseNode[AgentProperties]):
                     if not tool_calls:
                         break
 
-                    # Track which forced tools were used this iteration
+                    # Track which forced tools were used this iteration.
+                    # LLM-facing names get translated back to the saved
+                    # tool_id so `workflow:<uuid>` forced entries match.
                     for tc in tool_calls:
-                        tc_name = tc["name"]
+                        tc_name = name_to_tool_id.get(tc["name"], tc["name"])
                         if tc_name in forced_tool_ids:
                             used_forced.add(tc_name)
                             if tc_name in remaining_forced:
@@ -550,7 +553,7 @@ class AgentNode(BaseNode[AgentProperties]):
 
                     blocked_this_iteration = 0
                     for tc in tool_calls:
-                        tool_id = tc["name"]
+                        tool_id = name_to_tool_id.get(tc["name"], tc["name"])
                         llm_args = tc.get("arguments") or {}
                         user_params = tool_user_params.get(tool_id, {})
 
@@ -715,7 +718,7 @@ class AgentNode(BaseNode[AgentProperties]):
                                 )
                             )
                             for tc in summary_tool_calls:
-                                tool_id = tc["name"]
+                                tool_id = name_to_tool_id.get(tc["name"], tc["name"])
                                 llm_args = tc.get("arguments") or {}
                                 user_params = tool_user_params.get(tool_id, {})
                                 merged = {**llm_args, **user_params}
@@ -958,6 +961,56 @@ class AgentNode(BaseNode[AgentProperties]):
 
         return servers
 
+    @staticmethod
+    def _workflow_tool_safe_name(tool_id: str) -> str:
+        """Map a ``workflow:<uuid>`` saved id to an LLM-safe function name.
+
+        OpenAI's function-name grammar is ``[a-zA-Z0-9_-]{1,64}`` — colons
+        are rejected. UUID hyphens stay because hyphens are allowed.
+        """
+        return tool_id.replace(":", "_")
+
+    @classmethod
+    def _build_workflow_tool_schema(cls, tool_id: str, entry: dict[str, Any]) -> dict[str, Any]:
+        """Build the OpenAI function schema for a `workflow:<uuid>` entry.
+
+        Reads the frontend's snapshot of the referenced workflow's
+        ``input_schema`` from ``entry["paramsSchema"]`` so the agent doesn't
+        need to round-trip the DB while the LLM is calling. Missing snapshot
+        degrades to an empty-object schema; the workflow still runs with
+        whatever the user pinned in the inspector via ``tool_user_params``.
+        """
+        params_schema = entry.get("paramsSchema")
+        properties: dict[str, Any] = {}
+        required: list[str] = []
+        if isinstance(params_schema, dict):
+            for name, meta in params_schema.items():
+                if not isinstance(name, str) or not name:
+                    continue
+                if not isinstance(meta, dict):
+                    continue
+                p_type = str(meta.get("type") or "string")
+                properties[name] = {
+                    "type": p_type if p_type != "json" else "object",
+                    "description": str(meta.get("description") or ""),
+                }
+                if meta.get("required"):
+                    required.append(name)
+        display_name = str(entry.get("name") or tool_id)
+        description = str(entry.get("description") or f"Run the workflow {display_name!r}.")
+        return {
+            "type": "function",
+            "function": {
+                "name": cls._workflow_tool_safe_name(tool_id),
+                "description": description,
+                "parameters": {
+                    "type": "object",
+                    "properties": properties,
+                    "required": required,
+                },
+            },
+        }
+
     def _resolve_tools(
         self,
     ) -> tuple[
@@ -965,6 +1018,7 @@ class AgentNode(BaseNode[AgentProperties]):
         dict[str, dict[str, Any]],
         list[str],
         dict[str, dict[str, Any]],
+        dict[str, str],
     ]:
         """Parse tools props and return:
         - tool_specs: list of OpenAI function-call schema objects for the LLM
@@ -974,6 +1028,11 @@ class AgentNode(BaseNode[AgentProperties]):
         - tool_user_overrides: mapping of tool_id → {credential_id?, retry?}
           for per-tool credential and retry-config overrides set in the
           inspector. Passed into ``tool_registry.execute`` at call time.
+        - name_to_tool_id: LLM-facing function name → saved tool_id. Identity
+          for everything except ``workflow:`` entries, whose colons are
+          stripped to satisfy OpenAI's function-name grammar. Tool-call
+          dispatch translates ``tc["name"]`` through this map before any
+          state lookup.
 
         Handles three formats:
         1. New format: [{"toolId": "slack_send_message", "params": {...}, "usageControl": "auto"}, ...]
@@ -984,7 +1043,7 @@ class AgentNode(BaseNode[AgentProperties]):
 
         raw_tools = self.props.tools
         if raw_tools in (None, ""):
-            return [], {}, [], {}
+            return [], {}, [], {}, {}
 
         if isinstance(raw_tools, str):
             try:
@@ -993,11 +1052,11 @@ class AgentNode(BaseNode[AgentProperties]):
                 raise ValueError(f"Tools must be valid JSON: {e.msg}") from e
 
         if not isinstance(raw_tools, list) or not raw_tools:
-            return [], {}, [], {}
+            return [], {}, [], {}, {}
 
         first = raw_tools[0]
         if not isinstance(first, dict):
-            return [], {}, [], {}
+            return [], {}, [], {}, {}
 
         # ----- New format: items have a "toolId" key OR kind='mcp' (skip mcp here) -----
         if "toolId" in first or first.get("kind") in ("tool", "mcp"):
@@ -1005,6 +1064,7 @@ class AgentNode(BaseNode[AgentProperties]):
             tool_user_params: dict[str, dict[str, Any]] = {}
             tool_user_overrides: dict[str, dict[str, Any]] = {}
             forced_tool_ids: list[str] = []
+            name_to_tool_id: dict[str, str] = {}
 
             for item in raw_tools:
                 if not isinstance(item, dict):
@@ -1016,8 +1076,10 @@ class AgentNode(BaseNode[AgentProperties]):
                 if not isinstance(tool_id, str) or not tool_id:
                     continue
 
-                # Resolve versioned tool IDs
-                tool_id = tool_registry.resolve_tool_id(tool_id)
+                # Resolve versioned tool IDs (skip for `workflow:` prefix —
+                # registry doesn't own them).
+                if not tool_id.startswith("workflow:"):
+                    tool_id = tool_registry.resolve_tool_id(tool_id)
 
                 usage_control = item.get("usageControl") or "auto"
 
@@ -1025,7 +1087,11 @@ class AgentNode(BaseNode[AgentProperties]):
                 if usage_control == "none":
                     continue
 
-                schema = tool_registry.to_openai_schema(tool_id)
+                if tool_id.startswith("workflow:"):
+                    schema = self._build_workflow_tool_schema(tool_id, item)
+                    name_to_tool_id[self._workflow_tool_safe_name(tool_id)] = tool_id
+                else:
+                    schema = tool_registry.to_openai_schema(tool_id)
                 if schema is None:
                     logger.warning(f"Tool '{tool_id}' not found in registry, skipping")
                     continue
@@ -1049,7 +1115,13 @@ class AgentNode(BaseNode[AgentProperties]):
                 if usage_control == "force":
                     forced_tool_ids.append(tool_id)
 
-            return tool_specs, tool_user_params, forced_tool_ids, tool_user_overrides
+            return (
+                tool_specs,
+                tool_user_params,
+                forced_tool_ids,
+                tool_user_overrides,
+                name_to_tool_id,
+            )
 
         # ----- Old schema format: items have a "schema" key -----
         if "schema" in first:
@@ -1060,7 +1132,7 @@ class AgentNode(BaseNode[AgentProperties]):
                 schema = item.get("schema")
                 if isinstance(schema, dict):
                     tool_specs.append({"type": "function", "function": schema})
-            return tool_specs, {}, [], {}
+            return tool_specs, {}, [], {}, {}
 
         # ----- Legacy format: raw function spec objects -----
         tool_specs = []
@@ -1071,7 +1143,7 @@ class AgentNode(BaseNode[AgentProperties]):
             if not isinstance(name, str) or not name:
                 continue
             tool_specs.append(self._to_openai_tool(tool))
-        return tool_specs, {}, [], {}
+        return tool_specs, {}, [], {}, {}
 
     async def _resolve_tools_async(
         self,
@@ -1081,16 +1153,23 @@ class AgentNode(BaseNode[AgentProperties]):
         list[str],
         dict[str, Any],
         dict[str, dict[str, Any]],
+        dict[str, str],
     ]:
         """Extend _resolve_tools() with async MCP tool fetching.
 
         Returns:
             (tool_specs, tool_user_params, forced_tool_ids, mcp_clients,
-             tool_user_overrides)
+             tool_user_overrides, name_to_tool_id)
         """
         from apps.api.app.node_system.tools.mcp.client import MCPClient
 
-        tool_specs, tool_user_params, forced_tool_ids, tool_user_overrides = self._resolve_tools()
+        (
+            tool_specs,
+            tool_user_params,
+            forced_tool_ids,
+            tool_user_overrides,
+            name_to_tool_id,
+        ) = self._resolve_tools()
         mcp_clients: dict[str, Any] = {}
 
         mcp_server_configs = self._parse_mcp_servers()
@@ -1131,7 +1210,14 @@ class AgentNode(BaseNode[AgentProperties]):
             except Exception as e:
                 logger.warning(f"Failed to fetch tools from MCP server '{name}' ({url}): {e}")
 
-        return tool_specs, tool_user_params, forced_tool_ids, mcp_clients, tool_user_overrides
+        return (
+            tool_specs,
+            tool_user_params,
+            forced_tool_ids,
+            mcp_clients,
+            tool_user_overrides,
+            name_to_tool_id,
+        )
 
     # ------------------------------------------------------------------
     # LLM call helpers (return raw response data)
