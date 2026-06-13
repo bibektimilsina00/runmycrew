@@ -52,3 +52,5 @@ class SkillMetaOut(SQLModel):
     description: str
     icon: str
     color: str
+    created_at: datetime
+    updated_at: datetime
