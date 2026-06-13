@@ -397,15 +397,22 @@ class MetaOAuthProvider:
     def get_authorization_url(self, state, code_challenge=None):
         from urllib.parse import urlencode
 
-        params = {
+        params: dict[str, str] = {
             "client_id": settings.META_APP_ID,
             "redirect_uri": REDIRECT_URI.format(service="meta"),
             "state": state,
-            "scope": self._SCOPES,
             "response_type": "code",
         }
-        # Meta's OAuth dialog supports PKCE but only on the mobile SDK — the
-        # web flow ignores `code_challenge` so we skip it here to keep parity
+        # Facebook Login for Business uses a Configuration ID to drive the
+        # permission set and asset picker — the legacy `scope` query param is
+        # ignored when `config_id` is present. We send config_id when one is
+        # set in settings, otherwise fall back to the classic scope list.
+        if settings.META_FB_LOGIN_CONFIG_ID:
+            params["config_id"] = settings.META_FB_LOGIN_CONFIG_ID
+        else:
+            params["scope"] = self._SCOPES
+        # Meta's OAuth dialog supports PKCE only on the mobile SDK — the
+        # web flow ignores `code_challenge`, so skip it here to keep parity
         # with what their docs actually accept.
         return f"https://www.facebook.com/{settings.META_GRAPH_API_VERSION}/dialog/oauth?{urlencode(params)}"
 
