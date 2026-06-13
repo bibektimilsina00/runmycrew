@@ -137,8 +137,10 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
         rightActiveTab: s.rightActiveTab,
         bottomActiveTab: s.bottomActiveTab,
         rightOpen: s.rightOpen,
-        bottomOpen: s.bottomOpen,
         bottomHeight: s.bottomHeight,
+        // bottomOpen intentionally NOT persisted — the logs panel is
+        // hidden on every fresh session and only opens when the user
+        // explicitly clicks the tab or runs the workflow.
       }),
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<EditorLayoutState>
@@ -153,7 +155,10 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
         ][]) {
           zones[tab] = lockedZone
         }
-        return { ...current, ...p, panelZones: zones }
+        // Force bottomOpen to default (false) even if a pre-v2 persisted
+        // payload still has it — covers users who upgrade with the panel
+        // open in localStorage.
+        return { ...current, ...p, panelZones: zones, bottomOpen: false }
       },
     },
   ),
