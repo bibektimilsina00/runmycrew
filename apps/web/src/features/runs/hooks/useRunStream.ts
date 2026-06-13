@@ -59,6 +59,28 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
           timestamp: String(data.timestamp ?? data.t ?? new Date().toISOString()),
         }
         appendLog(workflowId, executionId, log)
+      } else if (type === 'tool_call_started' || type === 'tool_call_completed') {
+        // Agent tool-call timeline (PR7). Surfaced as synthetic RunLog
+        // entries scoped to the agent's node id so they appear inline
+        // with the rest of that node's logs.
+        const toolId = String(data.tool_id ?? 'tool')
+        const args = (data.arguments as Record<string, unknown> | null) ?? null
+        const started = type === 'tool_call_started'
+        const success = data.success === true
+        const durationMs = typeof data.duration_ms === 'number' ? data.duration_ms : null
+        const result = (data.result as Record<string, unknown> | null) ?? null
+        appendLog(workflowId, executionId, {
+          id: `live-${executionId}-${++liveCounter}`,
+          nodeId: typeof data.node_id === 'string' ? data.node_id : null,
+          level: started ? 'info' : success ? 'info' : 'error',
+          message: started
+            ? `▶ ${toolId} running`
+            : success
+              ? `✓ ${toolId}${durationMs !== null ? ` · ${durationMs}ms` : ''}`
+              : `✗ ${toolId}${durationMs !== null ? ` · ${durationMs}ms` : ''}`,
+          payload: started ? { arguments: args } : { result, duration_ms: durationMs },
+          timestamp: new Date().toISOString(),
+        })
       } else if (type === 'execution_completed' || type === 'execution_failed') {
         setStatus(workflowId, executionId, type === 'execution_completed' ? 'completed' : 'failed')
       }
