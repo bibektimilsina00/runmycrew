@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { AlertTriangle, Check, ExternalLink, Loader2, Plus, RefreshCw, Search, Sparkles, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { AlertTriangle, Check, ChevronDown, ExternalLink, Loader2, Plus, RefreshCw, Search, Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useSkills, SkillIconBadge, type SkillMeta } from '@/features/skills'
@@ -19,6 +19,11 @@ import type { RendererProps } from '../types'
  * The runtime only reads `skillId`; the snapshot fields exist so the
  * inspector can show drift (description or content edits made elsewhere)
  * without round-tripping every saved skill on every editor render.
+ *
+ * UX: collapsed by default — the closed state shows a count chip + the
+ * selected skill rows. Clicking the trigger opens a searchable dropdown
+ * with the full catalog. This keeps the inspector panel scannable when a
+ * workspace has dozens of skills.
  */
 
 interface SkillSnapshot {
@@ -48,8 +53,6 @@ function buildSnapshot(skill: SkillMeta): SkillSnapshot {
 }
 
 function isStaleSnapshot(snapshot: SkillSnapshot, live: SkillMeta): boolean {
-  // updated_at is an ISO-8601 timestamp string from the backend.
-  // Compare as Date — handles trailing-zero / timezone differences.
   return new Date(live.updated_at).getTime() > new Date(snapshot.updated_at).getTime()
 }
 
@@ -85,7 +88,11 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
   const entries = useMemo(() => toEntryArray(value), [value])
   const selectedIds = useMemo(() => entries.map(getId), [entries])
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
+  const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
 
   const { data: skills = [], isLoading } = useSkills()
 
@@ -95,8 +102,8 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
     return m
   }, [skills])
 
-  // Classify each saved entry once: stale (live exists + drifted), missing
-  // (live deleted), fresh (live matches snapshot), or legacy (no snapshot).
+  // Drift = saved snapshot diverges from live skill. Stale = saved id has
+  // no live row anymore. The two are mutually exclusive per id.
   const driftIds = useMemo(() => {
     if (isLoading) return [] as string[]
     const out: string[] = []
@@ -114,7 +121,8 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
     [isLoading, selectedIds, liveById],
   )
 
-  const ordered = useMemo(() => {
+  // Dropdown list: filtered + alpha-sorted + selected pinned to top.
+  const dropdownRows = useMemo(() => {
     const q = query.trim().toLowerCase()
     const filtered = q
       ? skills.filter(s =>
@@ -128,9 +136,35 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
     ]
   }, [skills, query, selectedSet])
 
+  // Closed-state list: only the user's current selection, in selection order.
+  const selectedRows = useMemo(() => {
+    return selectedIds
+      .map(id => liveById.get(id))
+      .filter((s): s is SkillMeta => Boolean(s))
+  }, [selectedIds, liveById])
+
+  // Close on outside click + Escape, focus search when opening.
+  useEffect(() => {
+    if (!open) return
+    const onClick = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        setQuery('')
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    queueMicrotask(() => searchRef.current?.focus())
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
   const writeIds = (ids: string[]) => {
-    // Always write the rich form when we have live data — falling back to
-    // the bare id (no snapshot) only when the live row hasn't loaded yet.
     onChange(
       ids.map(id => {
         const live = liveById.get(id)
@@ -145,6 +179,8 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
     writeIds(selectedSet.has(id) ? selectedIds.filter(s => s !== id) : [...selectedIds, id])
   }
 
+  const remove = (id: string) => writeIds(selectedIds.filter(s => s !== id))
+
   const clearAll = () => onChange([])
 
   const pruneStale = () => {
@@ -154,8 +190,6 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
 
   const refreshDrift = () => {
     if (!driftIds.length) return
-    // Re-snapshot every selected entry against the latest live data.
-    // We pass through all ids and let writeIds rebuild from `liveById`.
     writeIds(selectedIds)
   }
 
@@ -167,6 +201,7 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
     )
   }
 
+  // Workspace has no skills at all — point users to creation.
   if (skills.length === 0) {
     return (
       <div className="flex flex-col items-start gap-2 rounded-[8px] border border-dashed border-border-faint bg-bg p-4">
@@ -193,41 +228,10 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Toolbar — search + selected count + clear */}
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 flex-1 items-center gap-1.5 rounded-[7px] border border-border-faint bg-bg px-2.5 focus-within:border-border">
-          <Search size={12} className="shrink-0 text-text-faint" />
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Filter…"
-            className="min-w-0 flex-1 bg-transparent text-[12px] text-text outline-none placeholder:text-text-faint"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              aria-label="Clear filter"
-              className="text-text-faint hover:text-text"
-            >
-              <X size={11} />
-            </button>
-          )}
-        </div>
-        {selectedIds.length > 0 && (
-          <button
-            type="button"
-            onClick={clearAll}
-            className="rounded-[6px] border border-border-faint bg-bg px-2 py-1 text-[10.5px] text-text-mute hover:text-text"
-            aria-label="Clear all selected skills"
-          >
-            Clear ({selectedIds.length})
-          </button>
-        )}
-      </div>
-
-      {/* Missing-skill warning — selected ids whose live skill was deleted. */}
+    <div ref={containerRef} className="relative flex flex-col gap-2">
+      {/* Stale + drift banners stay visible whether the dropdown is open or
+          closed — they're actionable even when the user isn't editing the
+          selection. */}
       {staleIds.length > 0 && (
         <div className="flex items-start gap-2 rounded-[7px] border border-warn/30 bg-warn/10 px-2.5 py-1.5 text-[11px] text-warn">
           <AlertTriangle size={12} className="mt-0.5 shrink-0" />
@@ -243,11 +247,6 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
           </button>
         </div>
       )}
-
-      {/* Drift warning — saved snapshot diverges from live skill (description
-          or content was edited elsewhere). The agent will use the live values
-          at runtime; this just lets users re-snapshot so the inspector UI
-          matches what the runtime will see. */}
       {driftIds.length > 0 && (
         <div className="flex items-start gap-2 rounded-[7px] border border-[var(--accent-line)]/40 bg-[var(--accent-line)]/10 px-2.5 py-1.5 text-[11px] text-text-mute">
           <RefreshCw size={12} className="mt-0.5 shrink-0 text-[var(--accent)]" />
@@ -264,47 +263,138 @@ export function SkillSelectorRenderer({ value, onChange }: RendererProps) {
         </div>
       )}
 
-      {/* List */}
-      {ordered.length === 0 ? (
-        <p className="rounded-[7px] border border-dashed border-border-faint bg-bg p-3 text-center text-[11.5px] text-text-faint">
-          No skills match &ldquo;{query}&rdquo;.
-        </p>
-      ) : (
-        <div className="flex max-h-[280px] flex-col gap-1 overflow-y-auto pr-0.5">
-          {ordered.map(skill => (
-            <SkillRow
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className={cn(
+          'flex h-9 items-center gap-2 rounded-[7px] border px-2.5 transition-colors',
+          open
+            ? 'border-border bg-surface'
+            : 'border-border-faint bg-bg hover:border-border-soft hover:bg-surface',
+        )}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <Sparkles size={13} className="text-text-faint" />
+        <span className="flex-1 text-left text-[12px] text-text-mute">
+          {selectedIds.length === 0
+            ? 'Select skills…'
+            : `${selectedIds.length} skill${selectedIds.length === 1 ? '' : 's'} selected`}
+        </span>
+        <ChevronDown
+          size={13}
+          className={cn('text-text-faint transition-transform', open && 'rotate-180')}
+        />
+      </button>
+
+      {/* Closed-state selection summary — only when at least one is picked
+          and the dropdown is closed. Lets users see what's wired in without
+          opening the picker. */}
+      {!open && selectedRows.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {selectedRows.map(skill => (
+            <div
               key={skill.id}
-              skill={skill}
-              active={selectedSet.has(skill.id)}
-              stale={driftIds.includes(skill.id)}
-              onToggle={toggle}
-            />
+              className="flex items-center gap-2 rounded-[7px] border border-border-faint bg-bg px-2 py-1.5"
+            >
+              <SkillIconBadge iconName={skill.icon} size="sm" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[12px] font-medium text-text">{skill.name}</div>
+                {skill.description && (
+                  <div className="truncate text-[10.5px] text-text-faint">{skill.description}</div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => remove(skill.id)}
+                className="text-text-faint hover:text-err"
+                aria-label={`Remove ${skill.name}`}
+              >
+                <X size={12} />
+              </button>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Footer actions */}
-      <div className="flex items-center justify-between gap-2 border-t border-border-faint pt-2 text-[11px]">
-        <a
-          href={APP_ROUTES.SKILL_NEW}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 text-text-mute hover:text-text"
-        >
-          <Plus size={11} />
-          New skill
-          <ExternalLink size={9} className="text-text-faint" />
-        </a>
-        <a
-          href={APP_ROUTES.SKILLS}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 text-text-faint hover:text-text-mute"
-        >
-          Manage all
-          <ExternalLink size={9} />
-        </a>
-      </div>
+      {/* Dropdown popover */}
+      {open && (
+        <div className="absolute left-0 right-0 top-11 z-30 flex flex-col overflow-hidden rounded-[10px] border border-border-faint bg-bg2 shadow-[0_12px_32px_-8px_oklch(0_0_0/0.55)]">
+          {/* Search + count + clear */}
+          <div className="flex items-center gap-2 border-b border-border-faint px-2.5 py-2">
+            <Search size={12} className="shrink-0 text-text-faint" />
+            <input
+              ref={searchRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Filter skills…"
+              className="min-w-0 flex-1 bg-transparent text-[12px] text-text outline-none placeholder:text-text-faint"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear filter"
+                className="text-text-faint hover:text-text"
+              >
+                <X size={11} />
+              </button>
+            )}
+            {selectedIds.length > 0 && (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="rounded-[5px] border border-border-faint bg-bg px-1.5 py-0.5 text-[10.5px] text-text-mute hover:text-text"
+              >
+                Clear ({selectedIds.length})
+              </button>
+            )}
+          </div>
+
+          {/* List */}
+          {dropdownRows.length === 0 ? (
+            <p className="px-3 py-4 text-center text-[11.5px] text-text-faint">
+              No skills match &ldquo;{query}&rdquo;.
+            </p>
+          ) : (
+            <div className="flex max-h-[280px] flex-col gap-1 overflow-y-auto p-1.5">
+              {dropdownRows.map(skill => (
+                <SkillRow
+                  key={skill.id}
+                  skill={skill}
+                  active={selectedSet.has(skill.id)}
+                  stale={driftIds.includes(skill.id)}
+                  onToggle={toggle}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="flex items-center justify-between gap-2 border-t border-border-faint px-2.5 py-1.5 text-[11px]">
+            <a
+              href={APP_ROUTES.SKILL_NEW}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-text-mute hover:text-text"
+            >
+              <Plus size={11} />
+              New skill
+              <ExternalLink size={9} className="text-text-faint" />
+            </a>
+            <a
+              href={APP_ROUTES.SKILLS}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-text-faint hover:text-text-mute"
+            >
+              Manage all
+              <ExternalLink size={9} />
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -325,7 +415,7 @@ function SkillRow({ skill, active, stale, onToggle }: SkillRowProps) {
         'group flex items-center gap-2.5 rounded-[7px] border px-2 py-1.5 text-left transition-colors',
         active
           ? 'border-[var(--accent-line)]/40 bg-[var(--accent-line)]/10'
-          : 'border-border-faint bg-bg hover:bg-surface',
+          : 'border-transparent bg-transparent hover:bg-surface',
       )}
       aria-pressed={active}
     >
