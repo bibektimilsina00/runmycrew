@@ -44,7 +44,7 @@ export function SkillCard({ skill, onDelete }: SkillCardProps) {
               e.stopPropagation()
               setMenuOpen(v => !v)
             }}
-            className="flex h-7 w-7 items-center justify-center rounded-[6px] text-text-faint opacity-0 transition-opacity hover:bg-bg-2 hover:text-text group-hover:opacity-100"
+            className="flex h-7 w-7 items-center justify-center rounded-[6px] text-text-faint opacity-0 transition-opacity hover:bg-bg2 hover:text-text group-hover:opacity-100"
             aria-label="Open card menu"
           >
             <MoreVertical size={14} />
@@ -61,7 +61,7 @@ export function SkillCard({ skill, onDelete }: SkillCardProps) {
                   setMenuOpen(false)
                 }}
               />
-              <div className="absolute right-0 top-8 z-30 w-[140px] overflow-hidden rounded-[8px] border border-border-faint bg-bg-2 shadow-[0_8px_24px_-8px_oklch(0_0_0/0.4)]">
+              <div className="absolute right-0 top-8 z-30 w-[140px] overflow-hidden rounded-[8px] border border-border-faint bg-bg2 shadow-[0_8px_24px_-8px_oklch(0_0_0/0.4)]">
                 <Link
                   to={APP_ROUTES.SKILL_EDIT(skill.id)}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-text hover:bg-surface"

@@ -150,7 +150,7 @@ export function SkillEditor() {
   return (
     <div className="flex h-full flex-col">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 border-b border-border-faint bg-bg-2 px-6 py-3">
+      <div className="sticky top-0 z-10 border-b border-border-faint bg-bg2 px-6 py-3">
         <div className="mx-auto flex max-w-5xl items-center gap-3">
           <Button variant="ghost" onClick={back} disabled={saving}>
             <ArrowLeft size={13} />
