@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from apps.api.app.core.config import settings
 from apps.api.app.core.logger import get_logger
@@ -468,6 +469,40 @@ class MetaOAuthProvider:
             pages_data = pages_resp.json()
             pages = pages_data.get("data", [])
 
+            # Step 5 — fetch every WhatsApp Business Account (WABA) the user
+            # owns plus the registered phone numbers underneath each one.
+            # Mirrors the page-enrichment hop above: nodes can read WABA +
+            # phone metadata straight from credential storage instead of
+            # round-tripping the Graph API on every send. Failures here are
+            # non-fatal — Pages-only setups still work; only WhatsApp nodes
+            # would surface "no WABAs" later.
+            waba_accounts: list[dict[str, Any]] = []
+            try:
+                biz_resp = await client.get(
+                    self._graph_url(f"/{me_data['id']}/businesses"),
+                    params={
+                        "access_token": user_token,
+                        "fields": (
+                            "id,name,"
+                            "owned_whatsapp_business_accounts"
+                            "{id,name,phone_numbers"
+                            "{id,display_phone_number,verified_name,quality_rating}}"
+                        ),
+                        "limit": 50,
+                    },
+                )
+                biz_data = biz_resp.json()
+                for biz in biz_data.get("data", []) or []:
+                    owned = (biz.get("owned_whatsapp_business_accounts") or {}).get("data") or []
+                    for waba in owned:
+                        # Inline business id so the resource picker can
+                        # display "WABA · Business" without another hop.
+                        waba["business_id"] = biz.get("id")
+                        waba["business_name"] = biz.get("name")
+                        waba_accounts.append(waba)
+            except Exception:  # noqa: BLE001 — enrichment is best-effort
+                waba_accounts = []
+
         return with_expiry_metadata(
             {
                 "access_token": user_token,
@@ -476,6 +511,7 @@ class MetaOAuthProvider:
                 "user_id": me_data["id"],
                 "user_name": me_data.get("name"),
                 "pages": pages,
+                "whatsapp_business_accounts": waba_accounts,
             }
         )
 

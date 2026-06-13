@@ -150,4 +150,103 @@ def test_target_filters_use_correct_property_per_trigger() -> None:
     assert _target_filters("trigger.meta.ig_story_reply", "ig1") == {"ig_account_id": "ig1"}
     assert _target_filters("trigger.meta.fb_message", "page1") == {"page_id": "page1"}
     assert _target_filters("trigger.meta.lead_submission", "page1") == {"page_id": "page1"}
+    assert _target_filters("trigger.meta.wa_message", "waba1") == {"waba_id": "waba1"}
+    assert _target_filters("trigger.meta.wa_status", "waba1") == {"waba_id": "waba1"}
     assert _target_filters("trigger.meta.unknown", "x") == {}
+
+
+# ── WhatsApp envelope normalization ───────────────────────────────────────
+
+
+def test_wa_inbound_message_fans_out_one_event_per_message() -> None:
+    entry = {
+        "id": "WABA_ID",
+        "changes": [
+            {
+                "field": "messages",
+                "value": {
+                    "messaging_product": "whatsapp",
+                    "metadata": {
+                        "display_phone_number": "15551234567",
+                        "phone_number_id": "PHONE_ID",
+                    },
+                    "contacts": [{"profile": {"name": "Alice"}, "wa_id": "15557654321"}],
+                    "messages": [
+                        {
+                            "from": "15557654321",
+                            "id": "wamid.HBgL1",
+                            "timestamp": "1700000000",
+                            "type": "text",
+                            "text": {"body": "hi"},
+                        },
+                        {
+                            "from": "15557654321",
+                            "id": "wamid.HBgL2",
+                            "timestamp": "1700000005",
+                            "type": "text",
+                            "text": {"body": "again"},
+                        },
+                    ],
+                },
+            }
+        ],
+    }
+    events = _flatten_entry("whatsapp_business_account", entry)
+    assert len(events) == 2
+    assert all(e["field"] == "wa.messages" for e in events)
+    assert events[0]["value"]["_event"]["id"] == "wamid.HBgL1"
+    assert events[1]["value"]["_event"]["text"]["body"] == "again"
+    # Outer metadata is preserved on every fanned-out event so the trigger
+    # node doesn't have to re-thread display_phone_number / contacts.
+    assert events[0]["value"]["metadata"]["phone_number_id"] == "PHONE_ID"
+
+
+def test_wa_status_callback_fans_out_one_event_per_status() -> None:
+    entry = {
+        "id": "WABA_ID",
+        "changes": [
+            {
+                "field": "messages",
+                "value": {
+                    "messaging_product": "whatsapp",
+                    "metadata": {"phone_number_id": "PHONE_ID"},
+                    "statuses": [
+                        {"id": "wamid.X1", "status": "sent", "timestamp": "1"},
+                        {"id": "wamid.X1", "status": "delivered", "timestamp": "2"},
+                        {"id": "wamid.X1", "status": "read", "timestamp": "3"},
+                    ],
+                },
+            }
+        ],
+    }
+    events = _flatten_entry("whatsapp_business_account", entry)
+    assert len(events) == 3
+    assert all(e["field"] == "wa.statuses" for e in events)
+    assert [e["value"]["_event"]["status"] for e in events] == ["sent", "delivered", "read"]
+
+
+def test_wa_envelope_does_not_bubble_raw_messages_field() -> None:
+    """Phase 2c forks `field == messages` into `wa.messages` / `wa.statuses`.
+    The raw `messages` field MUST be consumed — otherwise downstream
+    `_trigger_type_for` would mis-route via the empty mapping it has for
+    the raw key under whatsapp_business_account."""
+    entry = {
+        "id": "WABA_ID",
+        "changes": [
+            {
+                "field": "messages",
+                "value": {"messaging_product": "whatsapp", "metadata": {}},
+            }
+        ],
+    }
+    events = _flatten_entry("whatsapp_business_account", entry)
+    # Both inner arrays empty → zero events, NOT one event with the raw
+    # `messages` field.
+    assert events == []
+
+
+def test_wa_routing_table_covers_phase2c_events() -> None:
+    assert (
+        _trigger_type_for("whatsapp_business_account", "wa.messages") == "trigger.meta.wa_message"
+    )
+    assert _trigger_type_for("whatsapp_business_account", "wa.statuses") == "trigger.meta.wa_status"
