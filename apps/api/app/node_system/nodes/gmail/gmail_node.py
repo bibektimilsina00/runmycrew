@@ -158,7 +158,7 @@ class GmailNode(BaseNode[GmailProperties]):
                     "label": "To",
                     "type": "string",
                     "required": True,
-                    "placeholder": "person@example.com, =$step.from_email",
+                    "placeholder": "person@example.com, {{ $step.from_email }}",
                     "condition": _cond_any("send_email", "forward"),
                 },
                 {
@@ -222,7 +222,7 @@ class GmailNode(BaseNode[GmailProperties]):
                     "label": "Thread ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.threadId",
+                    "placeholder": "{{ $step.threadId }}",
                     "condition": _cond("reply"),
                 },
                 {
@@ -230,7 +230,7 @@ class GmailNode(BaseNode[GmailProperties]):
                     "label": "Message ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.id",
+                    "placeholder": "{{ $step.id }}",
                     "condition": _cond_any(
                         "forward",
                         "get_email",

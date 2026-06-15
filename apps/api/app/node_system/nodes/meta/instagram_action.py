@@ -108,7 +108,7 @@ class InstagramActionNode(BaseNode[InstagramActionProperties]):
                     "label": "Recipient IGSID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.from_id",
+                    "placeholder": "{{ $step.from_id }}",
                     "description": (
                         "Instagram scoped user id. From a comment / DM trigger, "
                         "use the upstream `from_id` output."
@@ -130,7 +130,7 @@ class InstagramActionNode(BaseNode[InstagramActionProperties]):
                     "label": "Comment ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.comment_id",
+                    "placeholder": "{{ $step.comment_id }}",
                     "condition": cond_reply_comment,
                 },
                 {

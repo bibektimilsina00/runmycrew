@@ -75,7 +75,7 @@ class LeadActionNode(BaseNode[LeadActionProperties]):
                     "label": "Leadgen ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.leadgen_id",
+                    "placeholder": "{{ $step.leadgen_id }}",
                     "condition": {"field": "operation", "value": "fetch"},
                 },
             ],

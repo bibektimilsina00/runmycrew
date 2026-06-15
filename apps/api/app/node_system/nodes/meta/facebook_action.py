@@ -105,7 +105,7 @@ class FacebookActionNode(BaseNode[FacebookActionProperties]):
                     "label": "Recipient PSID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.from_id",
+                    "placeholder": "{{ $step.from_id }}",
                     "condition": cond_send,
                 },
                 {
@@ -152,7 +152,7 @@ class FacebookActionNode(BaseNode[FacebookActionProperties]):
                     "label": "Comment ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.comment_id",
+                    "placeholder": "{{ $step.comment_id }}",
                     "condition": cond_reply,
                 },
                 {

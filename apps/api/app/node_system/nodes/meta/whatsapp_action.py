@@ -158,7 +158,7 @@ class WhatsAppActionNode(BaseNode[WhatsAppActionProperties]):
                     "label": "Inbound Message ID (wamid)",
                     "type": "string",
                     "required": True,
-                    "placeholder": "=$step.message_id",
+                    "placeholder": "{{ $step.message_id }}",
                     "condition": cond_mark_read,
                 },
             ],
