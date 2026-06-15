@@ -231,13 +231,19 @@ export function ExpressionEditor({
         disabled && 'pointer-events-none opacity-60',
       )
 
+  // Both layers share the same font metrics + line-height so the input's
+  // native caret lines up perfectly with the highlighted glyphs in the
+  // overlay. Any mismatch (font family, size, line-height) leaves the
+  // caret floating in empty space — visible as the bug where the cursor
+  // appears in the middle of the field while you type at the start.
   const sharedInputClass = cn(
     'w-full bg-transparent outline-none text-sm text-transparent caret-text',
+    'font-mono leading-normal',
     'placeholder:text-text-faint',
   )
 
   const sharedPreClass = cn(
-    'pointer-events-none m-0 text-sm leading-normal whitespace-pre-wrap break-words',
+    'pointer-events-none m-0 text-sm leading-normal whitespace-pre-wrap break-words font-mono',
   )
 
   return (
@@ -334,7 +340,7 @@ function buildHighlights(source: string, ghost: string = ''): React.ReactNode[] 
     nodes.push(
       <span key={keySeq++} className={regionClass}>
         <span className="font-semibold">{open}</span>
-        <span className="font-mono">{inner}</span>
+        <span>{inner}</span>
         {closed && <span className="font-semibold">{close}</span>}
       </span>,
     )
