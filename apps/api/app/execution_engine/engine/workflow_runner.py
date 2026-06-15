@@ -44,6 +44,7 @@ class WorkflowRunner:
         on_log: Any = None,
         credentials: list[dict[str, Any]] | None = None,
         emitter: Any = None,
+        workspace_id: str | None = None,
         _depth: int = 0,
         _budget: dict[str, int] | None = None,
     ):
@@ -54,6 +55,11 @@ class WorkflowRunner:
         self.edges = graph.get("edges", [])
         self.credentials = credentials or []
         self.db = db
+        # Carried through to every NodeContext so polling triggers can
+        # persist cursors against the correct workspace row. Optional —
+        # synthetic test runs that don't supply it gracefully fall back
+        # to stateless preview mode inside the trigger.
+        self.workspace_id = workspace_id
         self.on_log = on_log
         self.emitter = emitter
         self.variables: dict[str, Any] = {}
@@ -302,6 +308,7 @@ class WorkflowRunner:
             emitter=self.emitter,
             run_downstream=run_downstream,
             pause=pause_execution,
+            workspace_id=self.workspace_id,
         )
 
         await self._emit(

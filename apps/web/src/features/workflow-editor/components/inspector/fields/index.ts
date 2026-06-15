@@ -17,6 +17,7 @@ import { SkillSelectorRenderer } from './renderers/SkillSelectorRenderer'
 import { MetaResourceRenderer } from './renderers/MetaResourceRenderer'
 import { WATemplateRenderer } from './renderers/WATemplateRenderer'
 import { MediaRenderer } from './renderers/MediaRenderer'
+import { GmailQueryRenderer } from './renderers/GmailQueryRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
 
@@ -41,6 +42,7 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'meta-resource':    MetaResourceRenderer,
   'wa-template':      WATemplateRenderer,
   media:              MediaRenderer,
+  'gmail-query':      GmailQueryRenderer,
 }
 
 export { JsonRenderer as FallbackRenderer }

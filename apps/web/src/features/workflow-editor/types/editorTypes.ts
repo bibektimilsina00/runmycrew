@@ -33,7 +33,7 @@ export type KnownNodePropertyType =
   | 'string' | 'number' | 'boolean' | 'json' | 'options' | 'multi-options'
   | 'credential' | 'key-value' | 'list' | 'messages' | 'schema' | 'file-list'
   | 'tool-selector' | 'skill-selector' | 'meta-resource' | 'wa-template'
-  | 'code' | 'collection' | 'fixed-collection' | 'media'
+  | 'code' | 'collection' | 'fixed-collection' | 'media' | 'gmail-query'
 
 export type NodePropertyType = KnownNodePropertyType | (string & {})
 

@@ -139,6 +139,7 @@ async def _run_workflow(
                 on_log=log_and_emit,
                 credentials=credentials_list,
                 emitter=emitter,
+                workspace_id=workspace_id_str,
             )
             if workflow:
                 runner.env = workflow.env or {}

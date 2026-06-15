@@ -60,3 +60,68 @@ class TriggerFixture(SQLModelBase, table=True):
 
     created_at: datetime = created_at_field()
     updated_at: datetime = updated_at_field()
+
+
+class IntegrationTriggerState(SQLModelBase, table=True):
+    """Per-(workflow, node) cursor for polling-based trigger nodes.
+
+    Polling triggers (Gmail / Calendar / Drive / Sheets / Notion search /
+    HubSpot timeline / …) need a checkpoint so each poll only surfaces
+    *new* items, not every item that has ever existed. We park that
+    checkpoint here keyed by the trigger node it belongs to.
+
+    The `cursor` payload shape is provider-specific — Gmail keeps a
+    `historyId`, Calendar keeps a `syncToken`, Drive keeps a
+    `pageToken`. The trigger node owns the shape; this table just keeps
+    bytes safe across polls. `provider` is stamped alongside so the
+    background poller can fan out by integration type.
+
+    One row per `(workflow_id, node_id)`. Activation creates the row +
+    a fresh snapshot; deactivation/delete cascades drop it so a
+    re-enable starts from scratch.
+    """
+
+    __table_args__ = (
+        UniqueConstraint(
+            "workflow_id",
+            "node_id",
+            name="uq_integration_trigger_state_workflow_node",
+        ),
+    )
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    workflow_id: uuid.UUID = Field(foreign_key="workflow.id", ondelete="CASCADE", index=True)
+    workspace_id: uuid.UUID = Field(foreign_key="workspace.id", ondelete="CASCADE", index=True)
+    node_id: str = Field(max_length=128)
+
+    # Short tag so the polling scheduler can group by integration
+    # ("gmail", "calendar", "drive", …) and per-tenant rate-limit
+    # against the right provider.
+    provider: str = Field(max_length=32, index=True)
+
+    # Opaque per-provider cursor — e.g. `{"history_id": "12345"}` for
+    # Gmail, `{"sync_token": "…"}` for Calendar. Schema lives with the
+    # trigger node implementation, not here.
+    cursor: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+
+    # When the scheduler last ran a poll for this row. Used both to
+    # surface "last fired" in the editor and to enforce per-node
+    # cooldowns when the user has configured a long polling cadence.
+    last_polled_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(UTCDateTime(), nullable=True),
+    )
+    # When the next poll should happen. The scheduler reads rows where
+    # `next_poll_at <= now()` and processes them in id order to avoid
+    # double-processing under concurrent workers.
+    next_poll_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(UTCDateTime(), nullable=True, index=True),
+    )
+    # Last error from the poller (e.g. token revoked, 5xx from Google).
+    # Cleared on the next successful poll. Surfaced in the editor so the
+    # user knows why their trigger went quiet.
+    last_error: str | None = Field(default=None, max_length=1024)
+
+    created_at: datetime = created_at_field()
+    updated_at: datetime = updated_at_field()

@@ -14,6 +14,7 @@ celery_app = Celery(
     include=[
         "apps.worker.app.jobs.tasks",
         "apps.api.app.execution_engine.scheduler.cron",
+        "apps.api.app.execution_engine.scheduler.integration_polling",
     ],
 )
 
@@ -30,6 +31,10 @@ celery_app.conf.update(
         "check-cron-triggers": {
             "task": "check_cron_triggers",
             "schedule": crontab(minute="*"),
+        },
+        "poll-integration-triggers": {
+            "task": "poll_integration_triggers",
+            "schedule": 30.0,
         },
     },
 )
