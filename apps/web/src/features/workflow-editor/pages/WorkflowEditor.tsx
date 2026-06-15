@@ -82,12 +82,6 @@ export function WorkflowEditor() {
               onSelectNode={selectNode}
               interactive={!diffActive}
             />
-            <BottomPanel
-              nodes={nodes}
-              updateNodeData={updateNodeData}
-              onRun={() => run()}
-              isRunning={isRunning}
-            />
           </div>
           <EditorRightPanel
             nodes={nodes}
@@ -96,6 +90,12 @@ export function WorkflowEditor() {
             isRunning={isRunning}
           />
         </div>
+        <BottomPanel
+          nodes={nodes}
+          updateNodeData={updateNodeData}
+          onRun={() => run()}
+          isRunning={isRunning}
+        />
       </div>
     </ReactFlowProvider>
   )

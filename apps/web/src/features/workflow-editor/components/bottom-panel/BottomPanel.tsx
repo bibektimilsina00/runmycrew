@@ -28,6 +28,7 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
 
   const tabs = PANEL_TABS.filter((t) => panelZones[t.id] === 'bottom')
   const [dragOver, setDragOver] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
 
   // ── Resize ──────────────────────────────────────────────────────────────────
   const dragState = useRef<{ startY: number; startH: number } | null>(null)
@@ -35,6 +36,7 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
     (e: React.MouseEvent) => {
       e.preventDefault()
       dragState.current = { startY: e.clientY, startH: bottomHeight }
+      setIsResizing(true)
     },
     [bottomHeight],
   )
@@ -44,7 +46,10 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
       if (!s) return
       setBottomHeight(s.startH - (e.clientY - s.startY))
     }
-    const onUp = () => { dragState.current = null }
+    const onUp = () => {
+      dragState.current = null
+      setIsResizing(false)
+    }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
     return () => {
@@ -82,7 +87,8 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
   return (
     <div
       className={cn(
-        'pointer-events-auto absolute inset-x-0 bottom-0 z-10 flex flex-col overflow-hidden border-t border-[var(--border-faint)] bg-[var(--bg-2)]',
+        'pointer-events-auto relative w-full shrink-0 z-10 flex flex-col overflow-hidden border-t border-[var(--border-faint)] bg-[var(--bg-2)]',
+        !isResizing && 'transition-[height] duration-300 ease-in-out',
         dragOver && 'ring-1 ring-inset ring-[var(--accent)]',
       )}
       style={{ height: totalHeight }}
