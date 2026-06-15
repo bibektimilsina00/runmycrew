@@ -12,8 +12,8 @@ export function AppLayout() {
   return (
     <div
       className={cn(
-        'group/shell relative h-screen grid grid-cols-[244px_1fr] z-10 bg-[var(--bg)]',
-        'data-[collapsed=true]:grid-cols-[64px_1fr]',
+        'group/shell relative h-screen grid grid-cols-[244px_1fr] z-10 bg-[var(--bg)] transition-[grid-template-columns] duration-300 ease-in-out',
+        'data-[collapsed=true]:grid-cols-[80px_1fr]',
       )}
       data-collapsed={controller.collapsed}
     >
