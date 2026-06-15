@@ -16,9 +16,9 @@ export function EditorLayout() {
       )}
       data-collapsed={controller.collapsed}
     >
-      <AppSidebar controller={controller} variant="flat" />
+      <AppSidebar controller={controller} variant="floating" />
 
-      <div className="relative flex h-screen min-h-0 flex-col overflow-hidden">
+      <div className="relative flex h-[calc(100vh-28px)] my-[14px] mr-[14px] ml-0 min-h-0 flex-col overflow-hidden bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]">
         <Outlet context={controller} />
       </div>
 

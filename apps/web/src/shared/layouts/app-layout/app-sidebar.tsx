@@ -68,7 +68,7 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
         'relative flex flex-col overflow-hidden transition-all duration-150 z-20',
         isFlat
           ? 'h-screen bg-[var(--bg-2)] border-r border-[var(--border-faint)]'
-          : 'h-[calc(100vh-28px)] my-[14px] ml-[14px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]'
+          : 'h-[calc(100vh-28px)] my-[14px] mx-[14px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]'
       )}
     >
       <SidebarHeader collapsed={collapsed} onToggleCollapsed={() => setCollapsed(value => !value)} />
