@@ -3,6 +3,7 @@ import { cn } from '@/lib/cn'
 import { CompletionPopup } from './CompletionPopup'
 import { useExpressionCompletions, type Completion } from './useExpressionCompletions'
 import { findActiveExpressionRegion, findAllExpressionRegions } from './regionUtils'
+import { TOKEN_CLASS, tokenize } from './highlightTokens'
 
 /**
  * Single text field that handles plain text + embedded `{{ expression }}`
@@ -336,12 +337,21 @@ function buildHighlights(source: string, ghost: string = ''): React.ReactNode[] 
     const inner = source.slice(r.open + 2, r.close)
     const closed = r.closed
     const close = closed ? source.slice(r.close, r.close + 2) : ''
-    const regionClass = closed ? 'text-[#9333ea]' : 'text-[#9333ea] opacity-70'
+    // Closed regions get the full delimiter accent; an unclosed trailing
+    // `{{` dims so users immediately see they're still typing it.
+    const braceClass = closed
+      ? 'font-semibold text-[#c678dd]'
+      : 'font-semibold text-[#c678dd] opacity-70'
+    const tokens = tokenize(inner)
     nodes.push(
-      <span key={keySeq++} className={regionClass}>
-        <span className="font-semibold">{open}</span>
-        <span>{inner}</span>
-        {closed && <span className="font-semibold">{close}</span>}
+      <span key={keySeq++}>
+        <span className={braceClass}>{open}</span>
+        {tokens.map((t, i) => (
+          <span key={`tok-${keySeq}-${i}`} className={TOKEN_CLASS[t.kind]}>
+            {t.text}
+          </span>
+        ))}
+        {closed && <span className={braceClass}>{close}</span>}
       </span>,
     )
     cursor = closed ? r.close + 2 : source.length
