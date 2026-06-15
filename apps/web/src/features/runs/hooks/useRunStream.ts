@@ -22,9 +22,14 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
   const appendLog = useRunsStore((s) => s.appendLog)
   const setStatus = useRunsStore((s) => s.setStatus)
   const startRun = useRunsStore((s) => s.startRun)
+  const setNodeStatus = useRunsStore((s) => s.setNodeStatus)
+  const setWaiting = useRunsStore((s) => s.setWaiting)
 
   useEffect(() => {
     if (!workflowId || !executionId) return
+    // Synthetic ids minted by recordRunFailure() never had a server-side
+    // execution row, so opening a WS to them would 404 in a loop.
+    if (executionId.startsWith('local-fail-')) return
 
     const token =
       useAuthStore.getState().token || localStorage.getItem('fuse-auth-token') || ''
@@ -81,6 +86,30 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
           payload: started ? { arguments: args } : { result, duration_ms: durationMs },
           timestamp: new Date().toISOString(),
         })
+      } else if (type === 'node_started' || type === 'node_completed' || type === 'node_failed') {
+        // Per-node lifecycle stream. Drives canvas status indicators
+        // independent of whether the node also emits logs — triggers and
+        // instant-finish nodes still get a visible state transition.
+        const nodeId = typeof data.node_id === 'string' ? data.node_id : null
+        if (nodeId) {
+          const next =
+            type === 'node_started'
+              ? 'running'
+              : type === 'node_completed'
+                ? 'completed'
+                : 'failed'
+          setNodeStatus(workflowId, executionId, nodeId, next)
+        }
+      } else if (type === 'execution_waiting') {
+        const waitingFor =
+          typeof data.waiting_for === 'string' ? data.waiting_for : null
+        setWaiting(workflowId, executionId, waitingFor)
+      } else if (type === 'execution_cancelled') {
+        setStatus(workflowId, executionId, 'cancelled')
+      } else if (type === 'execution_started') {
+        // Listen slot fired — flip out of `waiting` so the canvas
+        // unfreezes the "Waiting…" badge. node_started events follow.
+        setStatus(workflowId, executionId, 'running')
       } else if (type === 'execution_completed' || type === 'execution_failed') {
         setStatus(workflowId, executionId, type === 'execution_completed' ? 'completed' : 'failed')
       }
@@ -97,5 +126,5 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
       ws?.close()
       ws = null
     }
-  }, [workflowId, executionId, appendLog, setStatus, startRun])
+  }, [workflowId, executionId, appendLog, setStatus, startRun, setNodeStatus, setWaiting])
 }

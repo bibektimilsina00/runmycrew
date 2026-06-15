@@ -16,6 +16,7 @@ import { ToolSelectorRenderer } from './renderers/ToolSelectorRenderer'
 import { SkillSelectorRenderer } from './renderers/SkillSelectorRenderer'
 import { MetaResourceRenderer } from './renderers/MetaResourceRenderer'
 import { WATemplateRenderer } from './renderers/WATemplateRenderer'
+import { MediaRenderer } from './renderers/MediaRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
 
@@ -39,6 +40,7 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'skill-selector':   SkillSelectorRenderer,
   'meta-resource':    MetaResourceRenderer,
   'wa-template':      WATemplateRenderer,
+  media:              MediaRenderer,
 }
 
 export { JsonRenderer as FallbackRenderer }

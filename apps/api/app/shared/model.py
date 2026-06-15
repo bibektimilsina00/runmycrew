@@ -12,5 +12,6 @@ import apps.api.app.features.meta.models  # noqa: F401
 import apps.api.app.features.secrets.models  # noqa: F401
 import apps.api.app.features.skills.models  # noqa: F401
 import apps.api.app.features.tables.models  # noqa: F401
+import apps.api.app.features.triggers.models  # noqa: F401
 import apps.api.app.features.users.models  # noqa: F401
 import apps.api.app.features.workflows.models  # noqa: F401

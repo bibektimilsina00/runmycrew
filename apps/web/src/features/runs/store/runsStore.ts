@@ -10,12 +10,36 @@ export interface RunLog {
   timestamp: string
 }
 
-export type RunStatus = 'pending' | 'running' | 'completed' | 'failed'
+export type RunStatus =
+  | 'pending'
+  | 'waiting'   // Listen-for-test-event mode — slot open, no webhook yet
+  | 'running'
+  | 'completed'
+  | 'failed'
+  | 'cancelled'
+
+/** Per-node lifecycle status, fed by `node_started` / `node_completed` /
+ *  `node_failed` events streamed from the execution engine. Keyed by node
+ *  id within a run. Decouples canvas indicators from log-scan heuristics
+ *  so triggers + nodes that emit no logs still surface a running state. */
+export type NodeRunStatus = 'running' | 'completed' | 'failed'
 
 export interface Run {
   executionId: string
   status: RunStatus
   logs: RunLog[]
+  nodeStatuses: Record<string, NodeRunStatus>
+  /** Human label shown while a listen slot waits for the next event. */
+  waitingFor?: string | null
+  /** Trigger node holding the listen slot — surfaced as the "waiting" row
+   * in the runs list so the user sees *which* node is listening. */
+  listenNodeId?: string | null
+  /** Resource the slot is bound to (Page id / IG user id / WABA id). */
+  listenTargetId?: string | null
+  /** Slot TTL in seconds at open time — fed into the countdown UI. */
+  listenTtlSeconds?: number | null
+  /** ISO timestamp when the slot was opened (countdown reference). */
+  listenStartedAt?: string | null
 }
 
 export interface WorkflowRunsSlice {
@@ -30,6 +54,33 @@ interface RunsState {
   startRun: (workflowId: string, executionId: string) => void
   appendLog: (workflowId: string, executionId: string, log: RunLog) => void
   setStatus: (workflowId: string, executionId: string, status: RunStatus) => void
+  setNodeStatus: (
+    workflowId: string,
+    executionId: string,
+    nodeId: string,
+    status: NodeRunStatus,
+  ) => void
+  setWaiting: (
+    workflowId: string,
+    executionId: string,
+    waitingFor: string | null,
+  ) => void
+  startListen: (
+    workflowId: string,
+    executionId: string,
+    waitingFor: string,
+    detail?: {
+      nodeId?: string
+      targetId?: string
+      ttlSeconds?: number
+      startedAt?: string
+    },
+  ) => void
+  recordRunFailure: (
+    workflowId: string,
+    message: string,
+    nodeId: string,
+  ) => string
   setSelectedLogId: (workflowId: string, id: string | null) => void
   clearRuns: (workflowId: string) => void
 }
@@ -86,7 +137,10 @@ export const useRunsStore = create<RunsState>()(
         if (slice.runs.some((r) => r.executionId === executionId)) return slice
         return {
           ...slice,
-          runs: [...slice.runs, { executionId, status: 'running', logs: [] }],
+          runs: [
+            ...slice.runs,
+            { executionId, status: 'running', logs: [], nodeStatuses: {} },
+          ],
         }
       }),
     ),
@@ -128,6 +182,115 @@ export const useRunsStore = create<RunsState>()(
       })),
     ),
 
+  setNodeStatus: (workflowId, executionId, nodeId, status) =>
+    set((s) =>
+      withSlice(s, workflowId, (slice) => ({
+        ...slice,
+        runs: slice.runs.map((r) => {
+          if (r.executionId !== executionId) return r
+          // `running` never overwrites a terminal state — late `node_started`
+          // events arriving after `node_completed` (out-of-order delivery)
+          // would otherwise blink the indicator back to running.
+          if (status === 'running' && (r.nodeStatuses[nodeId] === 'completed' || r.nodeStatuses[nodeId] === 'failed')) {
+            return r
+          }
+          return {
+            ...r,
+            nodeStatuses: { ...r.nodeStatuses, [nodeId]: status },
+          }
+        }),
+      })),
+    ),
+
+  setWaiting: (workflowId, executionId, waitingFor) =>
+    set((s) =>
+      withSlice(s, workflowId, (slice) => ({
+        ...slice,
+        runs: slice.runs.map((r) =>
+          r.executionId === executionId
+            ? { ...r, status: 'waiting' as const, waitingFor }
+            : r,
+        ),
+      })),
+    ),
+
+  startListen: (workflowId, executionId, waitingFor, detail) =>
+    set((s) =>
+      withSlice(s, workflowId, (slice) => {
+        const listenFields = {
+          listenNodeId: detail?.nodeId ?? null,
+          listenTargetId: detail?.targetId ?? null,
+          listenTtlSeconds: detail?.ttlSeconds ?? null,
+          listenStartedAt: detail?.startedAt ?? new Date().toISOString(),
+        }
+        if (slice.runs.some((r) => r.executionId === executionId)) {
+          return {
+            ...slice,
+            activeExecutionId: executionId,
+            runs: slice.runs.map((r) =>
+              r.executionId === executionId
+                ? { ...r, status: 'waiting' as const, waitingFor, ...listenFields }
+                : r,
+            ),
+          }
+        }
+        return {
+          ...slice,
+          activeExecutionId: executionId,
+          // Pre-select the waiting row so the right pane opens straight to
+          // WaitingView without an extra click.
+          selectedLogId: detail?.nodeId ? `${executionId}-waiting` : slice.selectedLogId,
+          runs: [
+            ...slice.runs,
+            {
+              executionId,
+              status: 'waiting' as const,
+              logs: [],
+              nodeStatuses: {},
+              waitingFor,
+              ...listenFields,
+            },
+          ],
+        }
+      }),
+    ),
+
+  recordRunFailure: (workflowId, message, nodeId) => {
+    // Synthetic execution id — no row exists on the server because the
+    // request never made it past the listen/run handler. Prefixed so it
+    // can't collide with real UUIDs and so the WS hook can ignore it.
+    // The log is shaped like a real node-failure log (nodeId + payload.error)
+    // so it lights up LogsPanel's per-node row and ErrorView on the right.
+    const executionId = `local-fail-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const logId = `${executionId}-log`
+    set((s) =>
+      withSlice(s, workflowId, (slice) => ({
+        ...slice,
+        activeExecutionId: executionId,
+        selectedLogId: logId,
+        runs: [
+          ...slice.runs,
+          {
+            executionId,
+            status: 'failed' as const,
+            logs: [
+              {
+                id: logId,
+                nodeId,
+                level: 'error' as const,
+                message,
+                payload: { error: message },
+                timestamp: new Date().toISOString(),
+              },
+            ],
+            nodeStatuses: { [nodeId]: 'failed' as const },
+          },
+        ],
+      })),
+    )
+    return executionId
+  },
+
   setSelectedLogId: (workflowId, selectedLogId) =>
     set((s) => withSlice(s, workflowId, (slice) => ({ ...slice, selectedLogId }))),
 
@@ -142,7 +305,7 @@ export const useRunsStore = create<RunsState>()(
 }),
     {
       name: 'fuse-runs',
-      version: 2,
+      version: 3,
       partialize: (s) => ({ byWorkflow: s.byWorkflow }),
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<RunsState>
@@ -150,7 +313,12 @@ export const useRunsStore = create<RunsState>()(
         for (const [wfId, slice] of Object.entries(p.byWorkflow ?? {})) {
           // Cap log history to the last MAX_RUNS_PER_WORKFLOW runs to keep
           // localStorage from growing unbounded across long-lived sessions.
-          const runs = slice.runs.slice(-MAX_RUNS_PER_WORKFLOW)
+          // Backfill `nodeStatuses` on runs persisted under v2 so selectors
+          // don't crash on `r.nodeStatuses[nodeId]` for older entries.
+          const runs = slice.runs.slice(-MAX_RUNS_PER_WORKFLOW).map((r) => ({
+            ...r,
+            nodeStatuses: r.nodeStatuses ?? {},
+          }))
           trimmed[wfId] = { ...slice, runs }
         }
         return { ...current, ...p, byWorkflow: trimmed }

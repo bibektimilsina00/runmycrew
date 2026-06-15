@@ -3,10 +3,15 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Index, UniqueConstraint
+from sqlalchemy import Column, Index, UniqueConstraint
 from sqlmodel import Field
 
-from apps.api.app.shared.sqlmodel import SQLModelBase, created_at_field, updated_at_field
+from apps.api.app.shared.sqlmodel import (
+    SQLModelBase,
+    UTCDateTime,
+    created_at_field,
+    updated_at_field,
+)
 
 
 class MetaSubscription(SQLModelBase, table=True):
@@ -57,7 +62,10 @@ class MetaSubscription(SQLModelBase, table=True):
     # so we can retry failed `subscribed_apps` calls without losing the
     # routing knowledge the row already provides.
     is_active: bool = Field(default=True)
-    meta_subscribed_at: datetime | None = Field(default=None)
+    meta_subscribed_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(UTCDateTime(), nullable=True),
+    )
     last_error: str | None = Field(default=None, max_length=1024)
 
     created_at: datetime = created_at_field()

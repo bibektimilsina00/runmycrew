@@ -89,8 +89,36 @@ class WorkflowRunner:
             logger.info(f"Workflow {self.workflow_id} has no nodes — completing immediately")
             return {}
 
+        # If the caller passed no trigger payload (manual Run from the
+        # editor), replay each trigger start node's last captured fixture.
+        # Lets the user iterate on downstream nodes without re-triggering
+        # the external event each time. Falls back to `{}` per node so
+        # `require_webhook_payload` still surfaces a clear error when
+        # nothing has ever been captured.
+        per_node_input: dict[str, dict[str, Any]] = {}
+        if not trigger_data and self.db is not None:
+            import uuid as _uuid
+
+            from apps.api.app.features.triggers.repository import TriggerFixtureRepository
+
+            try:
+                wf_uuid = _uuid.UUID(str(self.workflow_id))
+            except (ValueError, TypeError):
+                wf_uuid = None
+            if wf_uuid is not None:
+                fixture_repo = TriggerFixtureRepository(self.db)
+                for node_id in start_nodes:
+                    node_type = str(self.nodes.get(node_id, {}).get("type") or "")
+                    if not node_type.startswith("trigger."):
+                        continue
+                    fixture = await fixture_repo.get(wf_uuid, node_id)
+                    if fixture and isinstance(fixture.payload, dict):
+                        per_node_input[node_id] = fixture.payload
+
         try:
-            await asyncio.gather(*[self._execute_node(n, trigger_data) for n in start_nodes])
+            await asyncio.gather(
+                *[self._execute_node(n, per_node_input.get(n, trigger_data)) for n in start_nodes]
+            )
         except PauseSignal:
             raise  # propagate to Celery task
         except CancelledException:

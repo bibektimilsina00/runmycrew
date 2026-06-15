@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     ALGORITHM: str = "HS256"
     BASE_URL: str = "http://localhost:8000"
+    # Externally-reachable origin used when minting signed URLs handed off
+    # to third-party services (Meta's content-publishing endpoint pulls
+    # uploaded assets through this). When unset, BASE_URL is used — fine
+    # for local-only flows, but Meta won't be able to fetch from
+    # `http://localhost:8000`, so production deployments MUST set this to
+    # the Cloudflare tunnel / public hostname.
+    PUBLIC_BASE_URL: str = ""
     FRONTEND_URL: str = "http://localhost:5173"
     BACKEND_CORS_ORIGINS: list[str] = Field(
         default_factory=lambda: [
@@ -57,6 +64,22 @@ class Settings(BaseSettings):
     # Dashboard → Facebook Login for Business → Configurations, then paste
     # the numeric id here. Required for the Meta OAuth flow to work.
     META_FB_LOGIN_CONFIG_ID: str = ""
+
+    # Instagram API with Instagram Login — standalone OAuth path for users
+    # who only have an Instagram Business account and don't want to link a
+    # Facebook Page. App-level credentials come from Meta App Dashboard →
+    # Instagram → API setup with Instagram login. Different app id/secret
+    # than META_APP_ID — Meta provisions a sibling app for the IG flow.
+    META_INSTAGRAM_APP_ID: str = ""
+    META_INSTAGRAM_APP_SECRET: str = ""
+    # Loose webhook → listen-slot matching for dev environments. When the
+    # cred-aware id fallback (see MetaService._claim_slots_with_id_fallback)
+    # also misses — e.g. Meta delivers a messaging-scoped id we never saw
+    # during OAuth — set this to "true" to claim any open slot for the
+    # same (object_type, field) tuple. Off in production: it can let one
+    # workspace's webhook fire another workspace's listen slot if the two
+    # are sitting on the same field at the same instant.
+    META_WEBHOOK_LOOSE_LISTEN_MATCH: bool = False
 
     # Environment & CORS
     ENVIRONMENT: str = "development"  # "production" in prod

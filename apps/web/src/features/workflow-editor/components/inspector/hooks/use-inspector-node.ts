@@ -56,6 +56,19 @@ export function useInspectorNode({ nodes, updateNodeData }: UseInspectorNodePara
     })
   }, [selectedNode, updateNodeData])
 
+  /** Apply a multi-field patch in a single write. Used by renderers that
+   *  derive sibling fields from their own value — e.g. MediaRenderer
+   *  setting `kind=VIDEO` automatically when the user picks an MP4. */
+  const updateProperties = useCallback((patch: Record<string, unknown>) => {
+    if (!selectedNode) return
+    updateNodeData(selectedNode.id, {
+      properties: {
+        ...((selectedNode.data?.properties as Record<string, unknown> | undefined) ?? {}),
+        ...patch,
+      },
+    })
+  }, [selectedNode, updateNodeData])
+
   /**
    * Rename the selected node atomically with `$node('Old')` → `$node('New')`
    * rewriting across every other node's properties. Returns the user-facing
@@ -93,6 +106,7 @@ export function useInspectorNode({ nodes, updateNodeData }: UseInspectorNodePara
     showAdvanced,
     toggleAdvanced,
     updateProperty,
+    updateProperties,
     updateLabel,
     closeInspector,
   }

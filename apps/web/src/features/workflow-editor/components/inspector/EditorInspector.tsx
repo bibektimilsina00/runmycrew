@@ -5,6 +5,7 @@ import { cn } from '@/lib/cn'
 import { useInspectorNode } from './hooks/use-inspector-node'
 import { InspectorHeader } from './components/inspector-header'
 import { PropertyGroupList } from './components/property-group-list'
+import { TriggerFixtureChip } from './components/trigger-fixture-chip'
 import { UpstreamConnectionsSection } from './components/upstream-connections-section'
 
 interface EditorInspectorProps {
@@ -23,6 +24,7 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
     showAdvanced,
     toggleAdvanced,
     updateProperty,
+    updateProperties,
     updateLabel,
   } = useInspectorNode({ nodes, updateNodeData })
 
@@ -48,6 +50,10 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
             onLabelChange={updateLabel}
           />
 
+          {definition.category === 'trigger' && (
+            <TriggerFixtureChip nodeId={selectedNode.id} />
+          )}
+
           {/* Scrollable body */}
           <div className="min-h-0 flex-1 overflow-y-auto">
             {basicGroups.length === 0 && advancedGroups.length === 0 ? (
@@ -63,6 +69,7 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
                   definition={definition}
                   properties={properties}
                   onPropertyChange={updateProperty}
+                  onPropertiesChange={updateProperties}
                 />
 
                 {advancedGroups.length > 0 && (
@@ -88,6 +95,7 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
                         definition={definition}
                         properties={properties}
                         onPropertyChange={updateProperty}
+                  onPropertiesChange={updateProperties}
                       />
                     )}
                   </div>

@@ -30,6 +30,18 @@ class AssetService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found")
         return asset
 
+    async def get_asset_unscoped(self, asset_id: uuid.UUID) -> Asset:
+        """Fetch an asset by id without a workspace check.
+
+        ONLY callable from the signed public URL handler — the HMAC over
+        `(asset_id, exp)` is the authorization that takes the place of the
+        workspace filter. Don't expose this from other surfaces.
+        """
+        asset = await self.repo.get_by_id(asset_id)
+        if asset is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found")
+        return asset
+
     async def get_stats(self, workspace: Workspace) -> AssetStats:
         count, total_size = await self.repo.stats_by_workspace(workspace.id)
         return AssetStats(count=count, total_size=total_size)

@@ -37,6 +37,36 @@ export const editorAPI = {
       method: 'POST',
     }),
 
+  /**
+   * Open a "Listen for next event" slot on the workflow's Meta trigger.
+   * Returns an execution_id that the editor immediately subscribes to over
+   * WebSocket — the row stays in `waiting` until a real Meta event lands.
+   */
+  listen: (id: string, body?: { node_id?: string }) =>
+    requestJson(
+      z.object({
+        execution_id: z.string(),
+        node_id: z.string(),
+        waiting_for: z.string(),
+        target_id: z.string(),
+        ttl_seconds: z.number(),
+      }),
+      {
+        url: `/workflows/${id}/listen`,
+        method: 'POST',
+        data: body,
+      },
+    ),
+
+  cancelListen: (workflowId: string, nodeId: string) =>
+    requestJson(
+      z.object({ cancelled: z.boolean(), execution_id: z.string().optional() }),
+      {
+        url: `/workflows/${workflowId}/triggers/${nodeId}/listen/cancel`,
+        method: 'POST',
+      },
+    ),
+
   getNodeDefinitions: (signal?: AbortSignal) =>
     requestJson(ApiNodeDefinitionListSchema, {
       url: API_ROUTES.NODES_LIST,

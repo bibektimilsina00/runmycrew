@@ -23,14 +23,18 @@ def _graph_url(path: str) -> str:
     return f"https://graph.facebook.com/{settings.META_GRAPH_API_VERSION}{path}"
 
 
-def verify_webhook_signature(raw_body: bytes, signature_header: str | None) -> bool:
+def verify_webhook_signature(
+    raw_body: bytes, signature_header: str | None, app_id: str | None = None
+) -> bool:
     """Verify Meta's `X-Hub-Signature-256` header against the app secret.
 
     Meta signs the raw payload bytes (NOT the JSON-decoded version) with
-    HMAC-SHA256, formatted as `sha256=<hex>`. Returns False on missing
-    header, missing app secret, or any mismatch — never raises.
+    HMAC-SHA256, formatted as `sha256=<hex>`. We try both configured app
+    secrets (Facebook app + Instagram standalone) so deployments that use
+    either or both surfaces work without extra wiring. Returns False on
+    missing header, no configured secret, or any mismatch — never raises.
     """
-    if not signature_header or not settings.META_APP_SECRET:
+    if not signature_header:
         return False
     try:
         scheme, sig = signature_header.split("=", 1)
@@ -38,12 +42,33 @@ def verify_webhook_signature(raw_body: bytes, signature_header: str | None) -> b
         return False
     if scheme.lower() != "sha256":
         return False
-    expected = hmac.new(
-        settings.META_APP_SECRET.encode("utf-8"),
-        raw_body,
-        hashlib.sha256,
-    ).hexdigest()
-    return hmac.compare_digest(expected, sig)
+
+    candidates: list[str] = []
+    if app_id and settings.META_INSTAGRAM_APP_ID and app_id == settings.META_INSTAGRAM_APP_ID:
+        if settings.META_INSTAGRAM_APP_SECRET:
+            candidates.append(settings.META_INSTAGRAM_APP_SECRET)
+    elif app_id and settings.META_APP_ID and app_id == settings.META_APP_ID:
+        if settings.META_APP_SECRET:
+            candidates.append(settings.META_APP_SECRET)
+    else:
+        # Unknown / unspecified app — fall back to trying every secret we
+        # have configured so the call site doesn't have to know the routing.
+        if settings.META_APP_SECRET:
+            candidates.append(settings.META_APP_SECRET)
+        if settings.META_INSTAGRAM_APP_SECRET:
+            candidates.append(settings.META_INSTAGRAM_APP_SECRET)
+    if not candidates:
+        return False
+
+    for secret in candidates:
+        expected = hmac.new(
+            secret.encode("utf-8"),
+            raw_body,
+            hashlib.sha256,
+        ).hexdigest()
+        if hmac.compare_digest(expected, sig):
+            return True
+    return False
 
 
 class MetaService:
@@ -63,13 +88,45 @@ class MetaService:
     ) -> list[MetaResource]:
         """Return the resources of `kind` reachable through `credential_id`.
 
-        Phase 1 supports `page` and `ig_account`. WhatsApp + Lead Ads
-        forms come in subsequent phases.
+        Supports both credential types:
+          - `meta_oauth` (FB Login for Business): pages, ig_account via
+            Page link, WABA + waba_phone via business portfolios.
+          - `instagram_oauth` (standalone Instagram Login): only
+            `ig_account` — the single IG user the credential was issued
+            for. `page` / `waba` kinds return [].
         """
         cred_service = CredentialService(self.db)
-        data = await cred_service.get_decrypted(credential_id, user, workspace)
+        cred = await cred_service.repo.get_by_id_and_workspace(credential_id, workspace.id)
+        if cred is None:
+            return []
+        data = await cred_service.get_decrypted_credential(cred)
+        cred_type = cred.type or ""
 
-        # Pages are already enriched in the OAuth callback (see
+        # Standalone Instagram Login credentials only expose IG accounts.
+        if cred_type == "instagram_oauth":
+            if kind != "ig_account":
+                return []
+            ig_accounts = data.get("ig_accounts") or []
+            if not isinstance(ig_accounts, list):
+                return []
+            out_ig: list[MetaResource] = []
+            for acc in ig_accounts:
+                if not isinstance(acc, dict):
+                    continue
+                acc_id = acc.get("id")
+                if not acc_id:
+                    continue
+                out_ig.append(
+                    MetaResource(
+                        id=str(acc_id),
+                        name=str(acc.get("username") or acc_id),
+                        kind="ig_account",
+                        secondary=acc.get("account_type"),
+                    )
+                )
+            return out_ig
+
+        # meta_oauth — pages enriched in OAuth callback (see
         # MetaOAuthProvider.exchange_code), so resource lookup is a cheap
         # in-memory read instead of an extra Graph API hop.
         pages = data.get("pages") or []
@@ -161,21 +218,26 @@ class MetaService:
         ig_user_id: str,
         recipient_id: str,
         text: str,
+        graph_base: str | None = None,
     ) -> dict[str, Any]:
         """Send an Instagram DM via the Graph API.
 
         - `ig_user_id` is the IG *business* account id (NOT the FB Page id).
         - `recipient_id` is the IGSID of the user who interacted (from the
           webhook payload).
-        - `page_access_token` is the page-level token derived from the user
-          token; stored under `data.pages[].access_token`.
+        - `page_access_token` is either the FB-Page-level token
+          (meta_oauth path) or the IG user token (instagram_oauth path).
+        - `graph_base` overrides the default `graph.facebook.com` base.
+          Standalone Instagram Login credentials must pass
+          `https://graph.instagram.com/<version>`.
         - Meta enforces a 24-hour messaging window from the last user
           interaction. Outside that window the API returns error 10/2018278
           and we surface it to the caller unchanged.
         """
+        base = graph_base or f"https://graph.facebook.com/{settings.META_GRAPH_API_VERSION}"
         async with httpx.AsyncClient(timeout=20.0) as client:
             resp = await client.post(
-                _graph_url(f"/{ig_user_id}/messages"),
+                f"{base}/{ig_user_id}/messages",
                 params={"access_token": page_access_token},
                 json={
                     "recipient": {"id": recipient_id},
@@ -257,10 +319,12 @@ class MetaService:
         page_access_token: str,
         comment_id: str,
         message: str,
+        graph_base: str | None = None,
     ) -> dict[str, Any]:
+        base = graph_base or f"https://graph.facebook.com/{settings.META_GRAPH_API_VERSION}"
         async with httpx.AsyncClient(timeout=20.0) as client:
             resp = await client.post(
-                _graph_url(f"/{comment_id}/replies"),
+                f"{base}/{comment_id}/replies",
                 params={"access_token": page_access_token, "message": message},
             )
         body = resp.json()
@@ -293,28 +357,120 @@ class MetaService:
             )
         return body
 
+    async def register_messenger_get_started(
+        self,
+        page_access_token: str,
+        page_id: str,
+        payload: str = "GET_STARTED_FUSE",
+    ) -> dict[str, Any]:
+        """Install a Messenger Get Started button on the Page.
+
+        Required (per Meta) for any new conversation to fire a postback
+        webhook — without the button, tapping a Messenger thread for the
+        first time doesn't dispatch anything Fuse can route. Idempotent
+        on Meta's side: re-POSTing the same payload is a no-op.
+
+        Called automatically from the `/listen` and activation paths
+        when the workflow contains a `messaging.postback` trigger, so end
+        users never have to run a manual API call to make postbacks work.
+        """
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(
+                _graph_url(f"/{page_id}/messenger_profile"),
+                params={"access_token": page_access_token},
+                json={"get_started": {"payload": payload}},
+            )
+        body = resp.json()
+        if resp.status_code >= 400 or body.get("error"):
+            err = body.get("error", {}) or {}
+            logger.error(
+                "Messenger get_started setup failed status=%s page=%s body=%s",
+                resp.status_code,
+                page_id,
+                body,
+            )
+            parts = [err.get("message") or "unknown error"]
+            if err.get("code") is not None:
+                parts.append(f"code={err.get('code')}")
+            if err.get("error_subcode") is not None:
+                parts.append(f"subcode={err.get('error_subcode')}")
+            if err.get("fbtrace_id"):
+                parts.append(f"trace={err.get('fbtrace_id')}")
+            raise ValueError("Messenger get_started setup failed: " + " | ".join(parts))
+        return body
+
     async def fb_publish_post(
         self,
         page_access_token: str,
         page_id: str,
         message: str,
         link: str | None = None,
+        media_url: str | None = None,
+        media_kind: str = "IMAGE",
     ) -> dict[str, Any]:
-        payload: dict[str, Any] = {"message": message}
-        if link:
-            payload["link"] = link
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        """Publish to a Facebook Page.
+
+        Routes to one of three endpoints based on what the caller passed:
+
+          - `media_url` + kind=IMAGE → POST `/{page_id}/photos`
+            (image post — `message` becomes the caption)
+          - `media_url` + kind=VIDEO → POST `/{page_id}/videos`
+            (video post — `message` becomes the description)
+          - text-only → POST `/{page_id}/feed`
+            (status update + optional link preview)
+
+        `link` is ignored on media routes because the Page UI already
+        renders the media as the post's primary content; a link card on
+        top of an image looks broken to viewers.
+        """
+        kind_upper = (media_kind or "IMAGE").upper()
+        if media_url:
+            if kind_upper == "IMAGE":
+                endpoint = f"/{page_id}/photos"
+                payload: dict[str, Any] = {"url": media_url}
+                if message:
+                    payload["caption"] = message
+            elif kind_upper == "VIDEO":
+                endpoint = f"/{page_id}/videos"
+                payload = {"file_url": media_url}
+                if message:
+                    payload["description"] = message
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Unsupported FB media kind '{media_kind}'",
+                )
+        else:
+            endpoint = f"/{page_id}/feed"
+            payload = {"message": message}
+            if link:
+                payload["link"] = link
+
+        async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
-                _graph_url(f"/{page_id}/feed"),
+                _graph_url(endpoint),
                 params={"access_token": page_access_token},
                 json=payload,
             )
         body = resp.json()
         if resp.status_code >= 400:
-            err = body.get("error", {})
+            err = body.get("error", {}) or {}
+            logger.error(
+                "FB post publish failed status=%s endpoint=%s body=%s",
+                resp.status_code,
+                endpoint,
+                body,
+            )
+            parts = [err.get("message") or "unknown error"]
+            if err.get("code") is not None:
+                parts.append(f"code={err.get('code')}")
+            if err.get("error_subcode") is not None:
+                parts.append(f"subcode={err.get('error_subcode')}")
+            if err.get("fbtrace_id"):
+                parts.append(f"trace={err.get('fbtrace_id')}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"FB post publish failed: {err.get('message') or body}",
+                detail="FB post publish failed: " + " | ".join(parts),
             )
         return body
 
@@ -333,6 +489,7 @@ class MetaService:
         kind: str,  # 'IMAGE' | 'VIDEO' | 'REELS' | 'STORIES'
         caption: str | None = None,
         max_poll_seconds: int = 60,
+        graph_base: str | None = None,
     ) -> dict[str, Any]:
         """Synchronous IG publish — creates the media container, polls until
         Meta finishes processing it, then publishes. Caller's workflow run
@@ -342,14 +499,20 @@ class MetaService:
         """
         import asyncio
 
+        base = graph_base or f"https://graph.facebook.com/{settings.META_GRAPH_API_VERSION}"
         kind_upper = kind.upper()
         params: dict[str, Any] = {"access_token": page_access_token}
-        # `image_url` for IMAGE; `video_url` + `media_type` for VIDEO / REELS / STORIES.
+        # Meta's v20+ /media container endpoint requires `media_type` on
+        # every call — older deployments could omit it for image posts
+        # and Meta would default to IMAGE, but current versions reject
+        # the call ("Only photo or video can be accepted as media type")
+        # when media_type is absent. Always send it; pair with the right
+        # url field for the asset kind.
+        params["media_type"] = kind_upper
         if kind_upper == "IMAGE":
             params["image_url"] = media_url
         else:
             params["video_url"] = media_url
-            params["media_type"] = kind_upper
         if caption is not None:
             params["caption"] = caption
         if kind_upper == "STORIES":
@@ -359,15 +522,28 @@ class MetaService:
 
         async with httpx.AsyncClient(timeout=60.0) as client:
             container_resp = await client.post(
-                _graph_url(f"/{ig_user_id}/media"),
+                f"{base}/{ig_user_id}/media",
                 params=params,
             )
             container = container_resp.json()
             if container_resp.status_code >= 400 or "id" not in container:
-                err = container.get("error", {})
+                err = container.get("error", {}) or {}
+                logger.error(
+                    "IG media container failed status=%s ig_user_id=%s body=%s",
+                    container_resp.status_code,
+                    ig_user_id,
+                    container,
+                )
+                parts = [err.get("message") or "unknown error"]
+                if err.get("code") is not None:
+                    parts.append(f"code={err.get('code')}")
+                if err.get("error_subcode") is not None:
+                    parts.append(f"subcode={err.get('error_subcode')}")
+                if err.get("fbtrace_id"):
+                    parts.append(f"trace={err.get('fbtrace_id')}")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"IG media container failed: {err.get('message') or container}",
+                    detail="IG media container failed: " + " | ".join(parts),
                 )
             creation_id = container["id"]
 
@@ -378,7 +554,7 @@ class MetaService:
             poll_interval = 2
             while elapsed < max_poll_seconds:
                 status_resp = await client.get(
-                    _graph_url(f"/{creation_id}"),
+                    f"{base}/{creation_id}",
                     params={
                         "access_token": page_access_token,
                         "fields": "status_code",
@@ -405,7 +581,7 @@ class MetaService:
                 )
 
             publish_resp = await client.post(
-                _graph_url(f"/{ig_user_id}/media_publish"),
+                f"{base}/{ig_user_id}/media_publish",
                 params={
                     "access_token": page_access_token,
                     "creation_id": creation_id,
@@ -643,18 +819,126 @@ class MetaService:
     # dispatches matching trigger nodes onto the execution engine.
     # ------------------------------------------------------------------
 
+    async def _credential_account_ids(self, credential_id_str: str) -> set[str]:
+        """Return every id string that, through `credential_id`, could
+        refer to the same account.
+
+        Instagram exposes up to three distinct ids per business account
+        (Login-scoped `id`, IG Graph `user_id`, Messaging-scoped id) and
+        Meta's webhook envelope doesn't always echo the id the caller used
+        to register the subscription. The webhook receiver folds all
+        equivalent ids from the cred's stored profile data into one set
+        and treats any match in the set as the same account — strict
+        enough that two unrelated credentials can't claim each other's
+        slots, loose enough to bridge the cross-namespace mismatch.
+        """
+        try:
+            cred_uuid = _uuid.UUID(credential_id_str)
+        except (ValueError, TypeError):
+            return set()
+        cred_service = CredentialService(self.db)
+        cred = await cred_service.repo.get_by_id(cred_uuid)
+        if cred is None:
+            return set()
+        data = await cred_service.get_decrypted_credential(cred) or {}
+        ids: set[str] = set()
+        for acc in data.get("ig_accounts") or []:
+            if not isinstance(acc, dict):
+                continue
+            for k in ("id", "user_id"):
+                v = acc.get(k)
+                if v:
+                    ids.add(str(v))
+        for p in data.get("pages") or []:
+            if not isinstance(p, dict):
+                continue
+            pid = p.get("id")
+            if pid:
+                ids.add(str(pid))
+            ig = p.get("instagram_business_account") or {}
+            ig_id = ig.get("id")
+            if ig_id:
+                ids.add(str(ig_id))
+        return ids
+
+    async def _claim_slots_with_id_fallback(
+        self,
+        object_type: str,
+        target_id: str,
+        field: str,
+    ) -> list:
+        """Cred-aware id-namespace fallback.
+
+        Called only when the exact `(object, target_id, field)` slot
+        lookup returned nothing. Lists every open slot waiting on
+        `(object, field)`, resolves each slot's credential to its full
+        account-id-set, and atomically claims the slots whose cred
+        considers `target_id` one of its accounts.
+
+        Special-cases Meta's "Send Test Event" delivery (entry.id == "0")
+        — that payload carries no real account binding, so we accept any
+        slot for `(object, field)` regardless of its cred.
+        """
+        from apps.api.app.features.triggers.listen_service import (
+            claim_slot,
+            list_slots_for_event,
+        )
+
+        candidates = await list_slots_for_event(object_type, field)
+        if not candidates:
+            return []
+
+        is_meta_test = target_id == "0"
+        loose = bool(getattr(settings, "META_WEBHOOK_LOOSE_LISTEN_MATCH", False))
+        claimed: list = []
+        for cand in candidates:
+            if is_meta_test or loose:
+                # Meta test envelope carries no real id; loose mode is an
+                # explicit dev-only opt-in for the same effect.
+                if await claim_slot(cand):
+                    claimed.append(cand)
+                continue
+            if not cand.credential_id:
+                continue
+            account_ids = await self._credential_account_ids(cand.credential_id)
+            if target_id not in account_ids:
+                continue
+            if await claim_slot(cand):
+                claimed.append(cand)
+
+        if claimed:
+            logger.info(
+                "Meta webhook id-namespace fallback claimed %d slot(s) "
+                "(object=%s field=%s target_id=%s — exact match missed)",
+                len(claimed),
+                object_type,
+                field,
+                target_id,
+            )
+        return claimed
+
     async def receive_webhook(
         self,
         app_id: str,
         raw_body: bytes,
         signature: str | None,
     ) -> tuple[int, list[str]]:
-        # Only accept events for the configured app. The path param exists so
-        # future tenancy / per-app routing has a place to grow.
-        if settings.META_APP_ID and app_id != settings.META_APP_ID:
+        # Only accept events for a configured app. Two app ids are
+        # supported: the Facebook app (META_APP_ID) for Page / Messenger /
+        # WhatsApp / Lead Ads, and the standalone Instagram Login app
+        # (META_INSTAGRAM_APP_ID) for IG-only deployments. Either one alone
+        # is fine — rejecting unrecognized ids stops random callers from
+        # poking the webhook endpoint.
+        allowed_app_ids = {
+            settings.META_APP_ID,
+            settings.META_INSTAGRAM_APP_ID,
+        }
+        allowed_app_ids.discard("")
+        allowed_app_ids.discard(None)
+        if allowed_app_ids and app_id not in allowed_app_ids:
             raise HTTPException(status_code=404, detail="Unknown Meta app id")
 
-        if not verify_webhook_signature(raw_body, signature):
+        if not verify_webhook_signature(raw_body, signature, app_id):
             raise HTTPException(status_code=401, detail="Invalid X-Hub-Signature-256")
 
         try:
@@ -667,14 +951,24 @@ class MetaService:
         entries = payload.get("entry") or []
         if not isinstance(entries, list):
             return 0, []
+        logger.info(
+            "Meta webhook raw payload object=%s entries=%s",
+            object_type,
+            json.dumps(entries),
+        )
 
         # Lazy-import to dodge circular: triggers → workflows → executions.
+        from apps.api.app.execution_engine.engine import execution_engine
         from apps.api.app.features.meta.repository import MetaSubscriptionRepository
+        from apps.api.app.features.triggers.listen_service import (
+            claim_slots_for_event,
+        )
+        from apps.api.app.features.triggers.repository import TriggerFixtureRepository
         from apps.api.app.features.workflows.repository import WorkflowRepository
-        from apps.api.app.node_system.execution.execution_engine import execution_engine
 
         sub_repo = MetaSubscriptionRepository(self.db)
         wf_repo = WorkflowRepository(self.db)
+        fixture_repo = TriggerFixtureRepository(self.db)
         execution_ids: list[str] = []
         triggered = 0
 
@@ -687,10 +981,60 @@ class MetaService:
             for event in events:
                 if not object_type:
                     continue
+
+                logger.info(
+                    "Meta webhook routing tuple: object=%s target_id=%s field=%s",
+                    object_type,
+                    target_id,
+                    event["field"],
+                )
+
+                # ── Listen slots ─────────────────────────────────────
+                # Fire any debug "Listen for next event" slots waiting
+                # on this exact routing tuple, BEFORE production
+                # subscription dispatch. Slots are single-shot and
+                # claimed atomically; firing one does NOT suppress the
+                # normal subscription path below — both are independent
+                # observers of the same event.
+                trigger_payload = {
+                    "object": object_type,
+                    "field": event["field"],
+                    "target_id": target_id,
+                    "value": event["value"],
+                    "received_at": entry.get("time"),
+                }
+                try:
+                    slots = await claim_slots_for_event(object_type, target_id, event["field"])
+                    if not slots:
+                        slots = await self._claim_slots_with_id_fallback(
+                            object_type, target_id, event["field"]
+                        )
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning(f"Meta webhook: listen-slot claim failed ({exc})")
+                    slots = []
+                for slot in slots:
+                    try:
+                        wf = await wf_repo.get_by_id(_uuid.UUID(slot.workflow_id))
+                        if wf is None:
+                            continue
+                        await execution_engine.dispatch_existing(
+                            execution_id=_uuid.UUID(slot.execution_id),
+                            workflow_id=wf.id,
+                            graph=wf.graph,
+                            trigger_type="listen",
+                            input_data=trigger_payload,
+                        )
+                        execution_ids.append(slot.execution_id)
+                        triggered += 1
+                    except Exception as exc:  # noqa: BLE001
+                        logger.exception(
+                            f"Meta webhook: listen-slot dispatch failed "
+                            f"workflow={slot.workflow_id} execution={slot.execution_id}: {exc}"
+                        )
+
+                # ── Production subscriptions ─────────────────────────
                 # DB-indexed routing — composite index on
                 # (object_type, target_id, field) makes this O(log N).
-                # Replaces the Phase 1/2 graph scan via
-                # `WorkflowRepository.find_by_trigger_type`.
                 subs = await sub_repo.lookup(object_type, target_id, event["field"])
                 if not subs:
                     continue
@@ -707,13 +1051,6 @@ class MetaService:
                     if wf is None or not wf.is_active:
                         continue
 
-                    trigger_payload = {
-                        "object": object_type,
-                        "field": event["field"],
-                        "target_id": target_id,
-                        "value": event["value"],
-                        "received_at": entry.get("time"),
-                    }
                     try:
                         execution_id = await execution_engine.trigger_workflow(
                             workflow_id=wf.id,
@@ -725,6 +1062,24 @@ class MetaService:
                         triggered += 1
                     except Exception as exc:  # noqa: BLE001 — keep loop alive
                         logger.exception(f"Meta webhook: failed to trigger {wf.id} ({exc})")
+                        continue
+
+                    # Pin payload to the trigger node so the editor can
+                    # replay it on a manual Run. Best-effort — pinning
+                    # failure must not break a successful dispatch.
+                    try:
+                        await fixture_repo.upsert(
+                            workflow_id=wf.id,
+                            workspace_id=wf.workspace_id,
+                            node_id=sub.node_id,
+                            payload=trigger_payload,
+                            source="meta",
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        logger.warning(
+                            f"Meta webhook: fixture upsert failed for "
+                            f"workflow={wf.id} node={sub.node_id}: {exc}"
+                        )
 
         logger.info(
             f"Meta webhook ({object_type}): {triggered} workflow(s) triggered, "
@@ -768,7 +1123,7 @@ def _flatten_entry(object_type: str | None, entry: dict[str, Any]) -> list[dict[
             item = str(value.get("item") or "").lower()
             if item == "comment":
                 field = "feed.comment"
-            elif item == "post":
+            elif item in ("post", "status", "share", "photo", "video"):
                 field = "feed.post"
             elif item == "reaction":
                 field = "feed.reaction"
@@ -808,7 +1163,10 @@ def _classify_messaging(object_type: str | None, msg: dict[str, Any]) -> str:
     if "reaction" in msg:
         return "messaging.reaction"
 
-    message = msg.get("message")
+    # Meta wraps text DMs in either `message` (new) or `message_edit` (edited
+    # within the 15-minute edit window). Both carry the same intent — a text
+    # message landed in the conversation — so the trigger fires for both.
+    message = msg.get("message") or msg.get("message_edit")
     if not isinstance(message, dict):
         return "messaging.unknown"
 
@@ -829,66 +1187,65 @@ def _classify_messaging(object_type: str | None, msg: dict[str, Any]) -> str:
     return "messaging.text"
 
 
-# (object, synthesized_field) → Fuse trigger node type. The fields here
-# are the ones `_flatten_entry` emits, NOT Meta's raw envelope fields.
-# Phase 2 routes every Messenger / IG inbox / Page feed / Lead Ads event
-# through this map; Phase 2b will add the `whatsapp_business_account`
-# entries. PR B in Phase 2 only adds node modules — the routing is
-# already in place here.
-_TRIGGER_MAP: dict[tuple[str, str], str] = {
+# (object, synthesized_field) → (consolidated trigger node type, event_type).
+# Consolidated nodes carry an `event_type` dropdown — webhook routing now
+# names the surface-level trigger node (e.g. `trigger.meta.instagram`)
+# and a `_FIELD_TO_EVENT` lookup tells the matcher which event_type that
+# entry corresponds to. The MetaSubscription row already carries the raw
+# `field`, so DB lookups remain unchanged.
+_TRIGGER_MAP: dict[tuple[str, str], tuple[str, str]] = {
     # Instagram
-    ("instagram", "comments"): "trigger.meta.ig_comment",
-    ("instagram", "mentions"): "trigger.meta.ig_mention",
-    ("instagram", "messaging.text"): "trigger.meta.ig_message",
-    ("instagram", "messaging.ig_story_reply"): "trigger.meta.ig_story_reply",
-    ("instagram", "messaging.ig_story_mention"): "trigger.meta.ig_story_mention",
+    ("instagram", "comments"): ("trigger.meta.instagram", "comment"),
+    ("instagram", "mentions"): ("trigger.meta.instagram", "mention"),
+    ("instagram", "messaging.text"): ("trigger.meta.instagram", "message"),
+    ("instagram", "messaging.ig_story_reply"): ("trigger.meta.instagram", "story_reply"),
+    ("instagram", "messaging.ig_story_mention"): ("trigger.meta.instagram", "story_mention"),
     # Facebook Page / Messenger
-    ("page", "messaging.text"): "trigger.meta.fb_message",
-    ("page", "messaging.postback"): "trigger.meta.fb_postback",
-    ("page", "feed.comment"): "trigger.meta.fb_comment",
-    ("page", "feed.reaction"): "trigger.meta.fb_reaction",
-    ("page", "mention"): "trigger.meta.fb_mention",
-    # Lead Ads (delivered under the `page` object)
-    ("page", "leadgen"): "trigger.meta.lead_submission",
+    ("page", "messaging.text"): ("trigger.meta.facebook", "message"),
+    ("page", "messaging.postback"): ("trigger.meta.facebook", "postback"),
+    ("page", "feed.comment"): ("trigger.meta.facebook", "comment"),
+    ("page", "feed.reaction"): ("trigger.meta.facebook", "reaction"),
+    ("page", "mention"): ("trigger.meta.facebook", "mention"),
+    # Lead Ads (delivered under the `page` object — consolidated separately
+    # from the Facebook trigger because the surface, credentials, and
+    # downstream resource picker semantics all differ).
+    ("page", "leadgen"): ("trigger.meta.lead", "submission"),
     # WhatsApp Cloud API — split inside _flatten_entry into one event
     # per inbound message (`wa.messages`) or status callback (`wa.statuses`).
-    ("whatsapp_business_account", "wa.messages"): "trigger.meta.wa_message",
-    ("whatsapp_business_account", "wa.statuses"): "trigger.meta.wa_status",
+    ("whatsapp_business_account", "wa.messages"): ("trigger.meta.whatsapp", "message"),
+    ("whatsapp_business_account", "wa.statuses"): ("trigger.meta.whatsapp", "status"),
 }
+
+
+# Reverse lookup used by `_scan_meta_triggers`: given a consolidated
+# trigger node + the `event_type` chosen by the user, return the
+# webhook routing tuple (object_type, field) that the MetaSubscription
+# row must be keyed on.
+_EVENT_TO_FIELD: dict[str, dict[str, tuple[str, str]]] = {}
+for _key, _value in _TRIGGER_MAP.items():
+    _obj, _field = _key
+    _node_type, _event_type = _value
+    _EVENT_TO_FIELD.setdefault(_node_type, {})[_event_type] = (_obj, _field)
 
 
 def _trigger_type_for(object_type: str | None, field: str) -> str | None:
     if not object_type:
         return None
-    return _TRIGGER_MAP.get((object_type, field))
+    pair = _TRIGGER_MAP.get((object_type, field))
+    if pair is None:
+        return None
+    return pair[0]
 
 
 # Per-trigger property filter so webhook routing only fires the workflow
 # whose trigger node points at the *same* target id Meta delivered the
-# event for. Keep these aligned with the trigger node's saved properties
-# (the property names below must match the node's Pydantic model fields).
+# event for. Keys are the consolidated node types — each surface only
+# binds one resource kind regardless of which event was selected.
 _TARGET_FILTER_BY_TRIGGER: dict[str, str] = {
-    # Instagram triggers — target_id is the IG business account id.
-    "trigger.meta.ig_comment": "ig_account_id",
-    "trigger.meta.ig_mention": "ig_account_id",
-    "trigger.meta.ig_message": "ig_account_id",
-    "trigger.meta.ig_story_reply": "ig_account_id",
-    "trigger.meta.ig_story_mention": "ig_account_id",
-    # Page triggers — target_id is the FB Page id.
-    "trigger.meta.fb_message": "page_id",
-    "trigger.meta.fb_postback": "page_id",
-    "trigger.meta.fb_comment": "page_id",
-    "trigger.meta.fb_reaction": "page_id",
-    "trigger.meta.fb_mention": "page_id",
-    # Lead Ads — target_id is the FB Page id; lead-form filtering happens
-    # inside the trigger node since Meta only sends `form_id` in the
-    # value, not as a separate routing key.
-    "trigger.meta.lead_submission": "page_id",
-    # WhatsApp — target_id is the WABA id (entry.id in the envelope).
-    # Phone-number filtering happens inside the trigger node since one
-    # WABA can own multiple numbers and users wire one per node.
-    "trigger.meta.wa_message": "waba_id",
-    "trigger.meta.wa_status": "waba_id",
+    "trigger.meta.instagram": "ig_account_id",
+    "trigger.meta.facebook": "page_id",
+    "trigger.meta.lead": "page_id",
+    "trigger.meta.whatsapp": "waba_id",
 }
 
 
@@ -916,99 +1273,59 @@ def get_meta_service(db: AsyncSession) -> MetaService:
 # ──────────────────────────────────────────────────────────────────────────
 
 
-# Per-trigger description of how to extract the routing tuple from a
-# workflow node's saved properties. Keeps `sync_workflow_subscriptions`
-# generic — adding a new Meta trigger is one entry here, not a new branch.
+# Per-surface description of how to extract the routing tuple from a
+# consolidated trigger node's saved properties. `field` is omitted here
+# because it depends on the user-picked `event_type` — `_scan_meta_triggers`
+# resolves it via `_EVENT_TO_FIELD`. Keeps `sync_workflow_subscriptions`
+# generic; adding a Meta surface is one entry here.
 _TRIGGER_SPECS: dict[str, dict[str, str]] = {
-    # Instagram
-    "trigger.meta.ig_comment": {
+    "trigger.meta.instagram": {
         "object_type": "instagram",
-        "field": "comments",
         "target_prop": "ig_account_id",
     },
-    "trigger.meta.ig_mention": {
-        "object_type": "instagram",
-        "field": "mentions",
-        "target_prop": "ig_account_id",
-    },
-    "trigger.meta.ig_message": {
-        "object_type": "instagram",
-        "field": "messaging.text",
-        "target_prop": "ig_account_id",
-    },
-    "trigger.meta.ig_story_reply": {
-        "object_type": "instagram",
-        "field": "messaging.ig_story_reply",
-        "target_prop": "ig_account_id",
-    },
-    "trigger.meta.ig_story_mention": {
-        "object_type": "instagram",
-        "field": "messaging.ig_story_mention",
-        "target_prop": "ig_account_id",
-    },
-    # Facebook Page / Messenger
-    "trigger.meta.fb_message": {
+    "trigger.meta.facebook": {
         "object_type": "page",
-        "field": "messaging.text",
         "target_prop": "page_id",
     },
-    "trigger.meta.fb_postback": {
+    "trigger.meta.lead": {
         "object_type": "page",
-        "field": "messaging.postback",
         "target_prop": "page_id",
     },
-    "trigger.meta.fb_comment": {
-        "object_type": "page",
-        "field": "feed.comment",
-        "target_prop": "page_id",
-    },
-    "trigger.meta.fb_reaction": {
-        "object_type": "page",
-        "field": "feed.reaction",
-        "target_prop": "page_id",
-    },
-    "trigger.meta.fb_mention": {
-        "object_type": "page",
-        "field": "mention",
-        "target_prop": "page_id",
-    },
-    # Lead Ads (delivered on the page object)
-    "trigger.meta.lead_submission": {
-        "object_type": "page",
-        "field": "leadgen",
-        "target_prop": "page_id",
-    },
-    # WhatsApp
-    "trigger.meta.wa_message": {
+    "trigger.meta.whatsapp": {
         "object_type": "whatsapp_business_account",
-        "field": "wa.messages",
-        "target_prop": "waba_id",
-    },
-    "trigger.meta.wa_status": {
-        "object_type": "whatsapp_business_account",
-        "field": "wa.statuses",
         "target_prop": "waba_id",
     },
 }
 
 
-# Self-check: every entry in `_TRIGGER_SPECS` must round-trip through
-# `_TRIGGER_MAP` so the sync layer and the webhook router can't drift.
-# Triggered at import — if someone edits one map without the other,
-# pytest collection fails immediately rather than at first webhook.
-for _trigger_type, _spec in _TRIGGER_SPECS.items():
-    _expected = _TRIGGER_MAP.get((_spec["object_type"], _spec["field"]))
-    if _expected != _trigger_type:
+# Self-check: every consolidated trigger node type in _EVENT_TO_FIELD
+# must exist in _TRIGGER_SPECS with a matching object_type. Triggers at
+# import so a desynced edit fails pytest collection instead of swallowing
+# webhooks at runtime.
+for _trigger_type, _event_map in _EVENT_TO_FIELD.items():
+    _spec = _TRIGGER_SPECS.get(_trigger_type)
+    if _spec is None:
         raise RuntimeError(
-            f"_TRIGGER_SPECS / _TRIGGER_MAP drift: {_trigger_type} → "
-            f"({_spec['object_type']}, {_spec['field']}) but _TRIGGER_MAP "
-            f"resolves to {_expected!r}"
+            f"_EVENT_TO_FIELD references {_trigger_type!r} but _TRIGGER_SPECS has no entry"
         )
+    for _event_type, (_obj, _field) in _event_map.items():
+        if _obj != _spec["object_type"]:
+            raise RuntimeError(
+                f"_TRIGGER_SPECS / _TRIGGER_MAP drift: {_trigger_type}/{_event_type} → "
+                f"object={_obj} but spec says {_spec['object_type']!r}"
+            )
 
 
 def _scan_meta_triggers(workflow: Any) -> list[dict[str, Any]]:
     """Pull every `trigger.meta.*` node out of a workflow graph alongside
-    its saved properties + the routing spec we'll use to build a row."""
+    its saved properties + the routing spec we'll use to build a row.
+
+    Consolidated triggers carry an `event_type` property; the (object,
+    field) tuple for the MetaSubscription row is derived from
+    `_EVENT_TO_FIELD[node_type][event_type]`. A node with no / unknown
+    event_type is skipped so a half-configured trigger doesn't create a
+    stranded routing row.
+    """
     graph = getattr(workflow, "graph", None) or {}
     nodes = graph.get("nodes") or []
     out: list[dict[str, Any]] = []
@@ -1019,10 +1336,17 @@ def _scan_meta_triggers(workflow: Any) -> list[dict[str, Any]]:
         spec = _TRIGGER_SPECS.get(node_type)
         if not spec:
             continue
+        event_map = _EVENT_TO_FIELD.get(node_type) or {}
+        if not event_map:
+            continue
         node_id = str(node.get("id") or "")
         if not node_id:
             continue
         props = (node.get("data") or {}).get("properties") or {}
+        event_type = str(props.get("event_type") or "").strip()
+        if not event_type or event_type not in event_map:
+            continue
+        _, field = event_map[event_type]
         target_id = str(props.get(spec["target_prop"]) or "").strip()
         credential_id = str(props.get("credential") or "").strip()
         out.append(
@@ -1030,7 +1354,7 @@ def _scan_meta_triggers(workflow: Any) -> list[dict[str, Any]]:
                 "node_id": node_id,
                 "trigger_type": node_type,
                 "object_type": spec["object_type"],
-                "field": spec["field"],
+                "field": field,
                 "target_id": target_id,
                 "credential_id": credential_id,
             }
@@ -1103,6 +1427,35 @@ async def sync_workflow_subscriptions(db: AsyncSession, workflow: Any) -> None:
                 )
                 upserted.last_error = str(exc)[:1024]
 
+        # Postback triggers need a Get Started button on the Page so the
+        # first conversation tap dispatches a `messaging_postback` event.
+        # Best-effort + idempotent — Meta no-ops the call when the same
+        # payload is already installed.
+        if upserted.object_type == "page" and upserted.field == "messaging.postback":
+            try:
+                from apps.api.app.features.credentials.service import CredentialService
+                from apps.api.app.node_system.nodes.meta._helpers import page_token_by_page_id
+
+                cred_service = CredentialService(db)
+                cred = await cred_service.repo.get_by_id_and_workspace(
+                    upserted.credential_id, upserted.workspace_id
+                )
+                if cred is not None:
+                    cred_data = await cred_service.get_decrypted_credential(cred)
+                    page_token = page_token_by_page_id(cred_data, upserted.target_id)
+                    if page_token:
+                        await MetaService(db).register_messenger_get_started(
+                            page_access_token=page_token,
+                            page_id=upserted.target_id,
+                        )
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(
+                    "Messenger get_started auto-setup failed for workflow=%s page=%s: %s",
+                    workflow.id,
+                    upserted.target_id,
+                    exc,
+                )
+
     # Drop rows for nodes that are no longer in the graph (deleted or
     # retyped). We don't unsubscribe from Meta's side here — other
     # workflows on the same credential may still need the target.
@@ -1122,32 +1475,102 @@ async def cleanup_workflow_subscriptions(db: AsyncSession, workflow_id: Any) -> 
     await repo.delete_for_workflow(workflow_id)
 
 
-async def _meta_subscribe_target(db: AsyncSession, sub: Any) -> None:
-    """Register Meta's webhook delivery for the target referenced by `sub`.
+async def register_meta_subscription(
+    db: AsyncSession,
+    *,
+    credential_id: _uuid.UUID,
+    workspace_id: _uuid.UUID,
+    object_type: str,
+    target_id: str,
+) -> None:
+    """POST `subscribed_apps` to Meta so events for `target_id` start
+    flowing to our webhook endpoint.
 
-    For Page / Instagram (linked through a Page) we hit
-    `POST /{page_id}/subscribed_apps` with the page access token. For
-    WhatsApp we hit `POST /{waba_id}/subscribed_apps` with the user
-    long-lived token. Failures bubble up — `sync_workflow_subscriptions`
-    captures them onto `last_error`.
+    Three credential / object-type combinations are handled:
+
+      1. `meta_oauth` + page / instagram via Page: hits
+         `graph.facebook.com/{page_id}/subscribed_apps` with the page
+         access token. IG events flow through the linked Page's
+         subscription.
+      2. `meta_oauth` + whatsapp_business_account: hits
+         `graph.facebook.com/{waba_id}/subscribed_apps` with the user
+         long-lived token.
+      3. `instagram_oauth` + instagram: hits
+         `graph.instagram.com/{ig_user_id}/subscribed_apps` with the IG
+         user token. No Page involved.
+
+    Idempotent on Meta's side — re-subscribing an already-subscribed
+    target succeeds. Exposed publicly so the listen-slot endpoint can
+    register on behalf of an inactive workflow (so the user can debug
+    without flipping the workflow live).
+
+    Failures bubble up to the caller.
     """
     from apps.api.app.features.credentials.service import CredentialService
 
     cred_service = CredentialService(db)
-    credential = await cred_service.repo.get_by_id_and_workspace(
-        sub.credential_id, sub.workspace_id
-    )
+    credential = await cred_service.repo.get_by_id_and_workspace(credential_id, workspace_id)
     if credential is None:
         raise ValueError("Meta credential not found")
     data = await cred_service.get_decrypted_credential(credential)
+    cred_type = credential.type or ""
 
-    if sub.object_type == "whatsapp_business_account":
+    # Standalone Instagram Login — own Graph host + own subscribed_apps shape.
+    if cred_type == "instagram_oauth" and object_type == "instagram":
+        accounts = (data or {}).get("ig_accounts") or []
+        ig_token: str | None = None
+        for acc in accounts:
+            if not isinstance(acc, dict):
+                continue
+            if str(acc.get("id") or "") == target_id:
+                token = acc.get("access_token")
+                if isinstance(token, str) and token:
+                    ig_token = token
+                break
+        if not ig_token:
+            ig_token = str((data or {}).get("access_token") or "") or None
+        if not ig_token:
+            raise ValueError("Instagram credential missing access token")
+        version = settings.META_GRAPH_API_VERSION
+        url = f"https://graph.instagram.com/{version}/{target_id}/subscribed_apps"
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(
+                url,
+                params={
+                    "subscribed_fields": (
+                        "comments,messages,mentions,live_comments,messaging_postbacks"
+                    ),
+                },
+                headers={"Authorization": f"Bearer {ig_token}"},
+            )
+        body = resp.json()
+        if resp.status_code >= 400 or not body.get("success", True):
+            err = body.get("error", {}) or {}
+            logger.error(
+                "Instagram subscribed_apps failed (status=%s) target=%s body=%s",
+                resp.status_code,
+                target_id,
+                body,
+            )
+            parts = [err.get("message") or "unknown error"]
+            if err.get("code") is not None:
+                parts.append(f"code={err.get('code')}")
+            if err.get("error_subcode") is not None:
+                parts.append(f"subcode={err.get('error_subcode')}")
+            if err.get("error_user_msg"):
+                parts.append(f"user_msg={err.get('error_user_msg')}")
+            if err.get("fbtrace_id"):
+                parts.append(f"trace={err.get('fbtrace_id')}")
+            raise ValueError("Instagram subscribed_apps failed: " + " | ".join(parts))
+        return
+
+    if object_type == "whatsapp_business_account":
         access_token = str((data or {}).get("access_token") or "")
         if not access_token:
             raise ValueError("Meta credential missing access_token for WhatsApp subscribe")
         async with httpx.AsyncClient(timeout=20.0) as client:
             resp = await client.post(
-                _graph_url(f"/{sub.target_id}/subscribed_apps"),
+                _graph_url(f"/{target_id}/subscribed_apps"),
                 headers={"Authorization": f"Bearer {access_token}"},
             )
         body = resp.json()
@@ -1156,26 +1579,25 @@ async def _meta_subscribe_target(db: AsyncSession, sub: Any) -> None:
             raise ValueError(f"WhatsApp subscribe_apps failed: {err.get('message') or body}")
         return
 
-    # Page / Instagram. IG events flow through the linked Page's
-    # subscribed_apps registration — the Meta dashboard's per-object
-    # subscription is global; per-Page activation is what this call does.
+    # meta_oauth — Page / Instagram. IG events flow through the linked
+    # Page's subscribed_apps registration.
     pages = (data or {}).get("pages") or []
     page_token: str | None = None
-    if sub.object_type == "page":
+    page_target_id: str | None = None
+    if object_type == "page":
         for p in pages:
-            if isinstance(p, dict) and str(p.get("id") or "") == sub.target_id:
+            if isinstance(p, dict) and str(p.get("id") or "") == target_id:
                 token = p.get("access_token")
                 if isinstance(token, str) and token:
                     page_token = token
-                page_target_id = sub.target_id
+                page_target_id = target_id
                 break
     else:  # instagram — find the Page that owns this IG business account
-        page_target_id = None
         for p in pages:
             if not isinstance(p, dict):
                 continue
             ig = p.get("instagram_business_account") or {}
-            if str(ig.get("id") or "") == sub.target_id:
+            if str(ig.get("id") or "") == target_id:
                 token = p.get("access_token")
                 if isinstance(token, str) and token:
                     page_token = token
@@ -1187,12 +1609,62 @@ async def _meta_subscribe_target(db: AsyncSession, sub: Any) -> None:
     if not page_token:
         raise ValueError("No page access token for this target")
 
+    # Meta's v20+ Page subscribed_apps endpoint requires an explicit
+    # `subscribed_fields` list — older calls that relied on the app's
+    # webhook configuration to provide the default now fail with
+    # "(#100) The parameter subscribed_fields is required."
+    # The list below covers every Page / Messenger / IG-via-Page / Lead
+    # Ads field Fuse triggers consume — subscribe broadly so a single
+    # workflow activation doesn't have to re-call subscribed_apps for
+    # each new trigger node type the same Page already owns.
+    page_subscribed_fields = ",".join(
+        [
+            "feed",
+            "mention",
+            "messages",
+            "messaging_postbacks",
+            "message_reactions",
+            "message_reads",
+            "messaging_optins",
+            "messaging_referrals",
+            "leadgen",
+        ]
+    )
     async with httpx.AsyncClient(timeout=20.0) as client:
         resp = await client.post(
             _graph_url(f"/{page_target_id}/subscribed_apps"),
-            params={"access_token": page_token},
+            params={
+                "access_token": page_token,
+                "subscribed_fields": page_subscribed_fields,
+            },
         )
     body = resp.json()
     if resp.status_code >= 400 or not body.get("success", True):
-        err = body.get("error", {})
-        raise ValueError(f"subscribed_apps failed: {err.get('message') or body}")
+        err = body.get("error", {}) or {}
+        logger.error(
+            "Page subscribed_apps failed status=%s target=%s body=%s",
+            resp.status_code,
+            page_target_id,
+            body,
+        )
+        parts = [err.get("message") or "unknown error"]
+        if err.get("code") is not None:
+            parts.append(f"code={err.get('code')}")
+        if err.get("error_subcode") is not None:
+            parts.append(f"subcode={err.get('error_subcode')}")
+        if err.get("fbtrace_id"):
+            parts.append(f"trace={err.get('fbtrace_id')}")
+        raise ValueError("subscribed_apps failed: " + " | ".join(parts))
+
+
+async def _meta_subscribe_target(db: AsyncSession, sub: Any) -> None:
+    """Backwards-compatible wrapper for `sync_workflow_subscriptions`.
+    Lifts the routing tuple off a MetaSubscription row + delegates to
+    `register_meta_subscription`."""
+    await register_meta_subscription(
+        db,
+        credential_id=sub.credential_id,
+        workspace_id=sub.workspace_id,
+        object_type=sub.object_type,
+        target_id=sub.target_id,
+    )

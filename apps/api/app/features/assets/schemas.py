@@ -19,6 +19,10 @@ class AssetOut(SQLModel):
     updated_at: datetime
     url: str
     download_url: str
+    # Short-lived HMAC-signed public URL, suitable for `<img src>` in the
+    # editor (which can't pass the Authorization header) and for handing to
+    # external services like Meta's content-publishing endpoint.
+    preview_url: str
 
 
 class AssetUpdate(SQLModel):

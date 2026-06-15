@@ -26,6 +26,10 @@ class AssetRepository:
         )
         return result.scalar_one_or_none()
 
+    async def get_by_id(self, asset_id: uuid.UUID) -> Asset | None:
+        result = await self.db.execute(select(Asset).where(Asset.id == asset_id))
+        return result.scalar_one_or_none()
+
     async def stats_by_workspace(self, workspace_id: uuid.UUID) -> tuple[int, int]:
         result = await self.db.execute(
             select(func.count(Asset.id), func.coalesce(func.sum(Asset.file_size), 0)).where(

@@ -1,3 +1,10 @@
+"""Consolidated Lead Ads action node.
+
+Replaces `lead_fetch`. Single operation today (`fetch`); the dropdown
+keeps room for future Lead Ads write ops without re-introducing a
+per-task node.
+"""
+
 from __future__ import annotations
 
 from typing import Any
@@ -14,24 +21,27 @@ from apps.api.app.node_system.nodes.meta._helpers import (
     page_token_by_page_id,
 )
 
+LEAD_ACTION_OPS: tuple[str, ...] = ("fetch",)
 
-class LeadFetchProperties(BaseModel):
+
+class LeadActionProperties(BaseModel):
     credential: str | None = None
-    page_id: str = ""  # Page that owns the form (used to look up the right page token)
+    operation: str = "fetch"
+    page_id: str = ""
     leadgen_id: str = ""
 
 
-class LeadFetchNode(BaseNode[LeadFetchProperties]):
+class LeadActionNode(BaseNode[LeadActionProperties]):
     @classmethod
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
-            type="action.meta.lead_fetch",
-            name="Fetch Lead Ad Details",
+            type="action.meta.lead",
+            name="Lead Ads",
             category="action",
             description=(
-                "Resolve a Lead Ads `leadgen_id` (from the lead-submission "
-                "trigger) into the full submitted form data. Requires the "
-                "Page admin to have granted Lead Access to your Meta app."
+                "Resolve a Lead Ads `leadgen_id` (from the lead trigger) into "
+                "the full submitted form data. Requires the Page admin to "
+                "have granted Lead Access to your Meta app."
             ),
             icon="ListChecks",
             color="#1877F2",
@@ -52,35 +62,56 @@ class LeadFetchNode(BaseNode[LeadFetchProperties]):
                     "required": True,
                 },
                 {
+                    "name": "operation",
+                    "label": "Operation",
+                    "type": "options",
+                    "default": "fetch",
+                    "options": [
+                        {"label": "Fetch Lead Details", "value": "fetch"},
+                    ],
+                },
+                {
                     "name": "leadgen_id",
                     "label": "Leadgen ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $node('Lead Ad Submission').leadgen_id }}",
+                    "placeholder": "=$step.leadgen_id",
+                    "condition": {"field": "operation", "value": "fetch"},
                 },
             ],
             inputs=1,
             outputs=1,
             outputs_schema=[
+                {"label": "operation", "type": "string"},
                 {"label": "id", "type": "string"},
-                {"label": "created_time", "type": "string"},
-                {"label": "ad_id", "type": "string"},
                 {"label": "form_id", "type": "string"},
                 {"label": "field_data", "type": "array"},
-                {"label": "partner_name", "type": "string"},
+                {"label": "created_time", "type": "string"},
                 {"label": "response", "type": "object"},
             ],
             credential_type="meta_oauth",
         )
 
     @classmethod
-    def get_properties_model(cls) -> type[LeadFetchProperties]:
-        return LeadFetchProperties
+    def get_properties_model(cls) -> type[LeadActionProperties]:
+        return LeadActionProperties
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
         if context.db is None:
             return NodeResult(success=False, error="Database session unavailable")
-        if not self.props.leadgen_id:
+
+        op = (self.props.operation or "").strip()
+        if op not in LEAD_ACTION_OPS:
+            return NodeResult(
+                success=False,
+                error=f"Unsupported operation '{op}'",
+            )
+
+        page_id = (self.props.page_id or "").strip()
+        leadgen_id = (self.props.leadgen_id or "").strip()
+        if not page_id:
+            return NodeResult(success=False, error="page_id is required")
+        if not leadgen_id:
             return NodeResult(success=False, error="leadgen_id is required")
 
         credential = find_credential(context.credentials, self.props.credential)
@@ -90,24 +121,24 @@ class LeadFetchNode(BaseNode[LeadFetchProperties]):
         if not isinstance(data, dict):
             return NodeResult(success=False, error="Meta credential is missing data")
 
-        token = page_token_by_page_id(data, self.props.page_id)
+        token = page_token_by_page_id(data, page_id)
         if not token:
             return NodeResult(success=False, error="No page access token for this Page.")
 
         service = MetaService(context.db)
         try:
-            resp = await service.lead_fetch(token, self.props.leadgen_id)
+            response = await service.lead_fetch(token, leadgen_id)
         except Exception as exc:  # noqa: BLE001
             return NodeResult(success=False, error=str(exc))
+
         return NodeResult(
             success=True,
             output_data={
-                "id": str(resp.get("id") or ""),
-                "created_time": str(resp.get("created_time") or ""),
-                "ad_id": str(resp.get("ad_id") or ""),
-                "form_id": str(resp.get("form_id") or ""),
-                "field_data": resp.get("field_data") or [],
-                "partner_name": str(resp.get("partner_name") or ""),
-                "response": resp,
+                "operation": "fetch",
+                "id": str(response.get("id") or leadgen_id),
+                "form_id": str(response.get("form_id") or ""),
+                "field_data": response.get("field_data") or [],
+                "created_time": str(response.get("created_time") or ""),
+                "response": response,
             },
         )

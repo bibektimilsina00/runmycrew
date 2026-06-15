@@ -1,5 +1,6 @@
 export { LogRow } from './LogRow'
 export { ErrorView } from './ErrorView'
+export { WaitingView } from './WaitingView'
 export { JsonInspector } from './JsonInspector'
 export { JsonTreeView } from './JsonTreeView'
 export { JsonCodeView } from './JsonCodeView'

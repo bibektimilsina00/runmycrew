@@ -187,12 +187,90 @@ export function useWorkflowEditor(workflowId: string) {
   }, [setSelectedNodeId, focusTab])
 
   // ── Run ───────────────────────────────────────────────────────────────────
+  //
+  // Two modes:
+  //
+  //   - Workflows whose first node is a Meta trigger use the listen-slot
+  //     path: the editor opens a "Listen for next event" slot, the run
+  //     row sits in `waiting` until a real webhook lands, and the canvas
+  //     animates the real event end-to-end. Matches n8n's debug UX.
+  //
+  //   - All other workflows (manual triggers, action-only graphs,
+  //     non-Meta triggers) fall through to the existing `/run` path
+  //     which dispatches immediately with whatever `trigger_data` the
+  //     fixture replay (or empty payload) provides.
+  //
+  // The choice is made at click-time off the live graph so a user
+  // doesn't need to know which mode they're in.
+  const hasMetaTrigger = useCallback(() => {
+    const { nodes } = useWorkflowEditorStore.getState()
+    return nodes.some(
+      (n) => typeof n.type === 'string' && n.type.startsWith('trigger.meta.'),
+    )
+  }, [])
+
   const runMutation = useMutation({
-    mutationFn: () => editorAPI.run(workflowId),
+    mutationFn: async () => {
+      if (hasMetaTrigger()) {
+        const res = await editorAPI.listen(workflowId)
+        return {
+          execution_id: res.execution_id,
+          waiting_for: res.waiting_for,
+          node_id: res.node_id,
+          target_id: res.target_id,
+          ttl_seconds: res.ttl_seconds,
+          mode: 'listen' as const,
+        }
+      }
+      const res = await editorAPI.run(workflowId)
+      return {
+        execution_id: res.execution_id,
+        waiting_for: null,
+        node_id: null,
+        target_id: null,
+        ttl_seconds: null,
+        mode: 'run' as const,
+      }
+    },
     onSuccess: (res) => {
-      useRunsStore.getState().setActiveExecutionId(workflowId, res.execution_id)
+      const runs = useRunsStore.getState()
+      if (res.mode === 'listen' && res.waiting_for) {
+        runs.startListen(workflowId, res.execution_id, res.waiting_for, {
+          nodeId: res.node_id ?? undefined,
+          targetId: res.target_id ?? undefined,
+          ttlSeconds: res.ttl_seconds ?? undefined,
+        })
+      } else {
+        runs.setActiveExecutionId(workflowId, res.execution_id)
+      }
       focusTab('logs')
     },
+    onError: (err: unknown) => {
+      // Surface the API failure in the Logs panel so users see *why* their
+      // Run/Listen click didn't open a slot, instead of an empty
+      // "Run the workflow to see execution logs here" state.
+      const e = err as { detail?: string; message?: string; status?: number } | undefined
+      const detail = e?.detail || e?.message || 'Run failed'
+      const status = e?.status ? ` (HTTP ${e.status})` : ''
+      // Attach the failure to the offending trigger node so it renders as
+      // a normal node-failure row + clicking it shows ErrorView on the right.
+      // For Meta /listen the failure is always at the trigger; for plain /run
+      // fall back to the first node so the user still gets a clickable entry.
+      const { nodes } = useWorkflowEditorStore.getState()
+      const triggerNode =
+        nodes.find((n) => typeof n.type === 'string' && n.type.startsWith('trigger.meta.')) ??
+        nodes.find((n) => typeof n.type === 'string' && n.type.startsWith('trigger.')) ??
+        nodes[0]
+      if (!triggerNode) return
+      useRunsStore
+        .getState()
+        .recordRunFailure(workflowId, `${detail}${status}`, triggerNode.id)
+      focusTab('logs')
+    },
+  })
+
+  const cancelListenMutation = useMutation({
+    mutationFn: (nodeId: string) => editorAPI.cancelListen(workflowId, nodeId),
   })
 
   // ── Rename ────────────────────────────────────────────────────────────────
@@ -232,6 +310,7 @@ export function useWorkflowEditor(workflowId: string) {
     selectNode,
     // Actions
     run: runMutation.mutate,
+    cancelListen: cancelListenMutation.mutate,
     rename: renameMutation.mutate,
     toggle: toggleMutation.mutate,
     isRunning: runMutation.isPending,
