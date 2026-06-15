@@ -68,8 +68,7 @@ class FacebookActionNode(BaseNode[FacebookActionProperties]):
             name="Facebook",
             category="action",
             description=(
-                "Send Messenger DMs, reply to Page comments, or publish "
-                "posts on a Facebook Page."
+                "Send Messenger DMs, reply to Page comments, or publish posts on a Facebook Page."
             ),
             icon="Facebook",
             color="#1877F2",

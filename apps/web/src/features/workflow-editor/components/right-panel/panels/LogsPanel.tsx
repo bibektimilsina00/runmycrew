@@ -3,7 +3,7 @@ import { CheckCircle2, Loader2, Terminal, Trash2, XCircle } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { getIcon } from '../../../utils/icon-map'
 import { Empty } from '@/shared/components'
-import { useRunsStore, useWorkflowRuns, type RunLog } from '@/features/runs/store/runsStore'
+import { useRunsStore, useWorkflowRuns, type Run, type RunLog } from '@/features/runs/store/runsStore'
 import { useRunStream } from '@/features/runs/hooks/useRunStream'
 import { useWorkflowEditorStore } from '../../../stores/workflowEditorStore'
 import {
@@ -187,7 +187,7 @@ export function LogsPanel() {
 // ── Runs list ────────────────────────────────────────────────────────────────
 
 interface RunsListProps {
-  runs: { executionId: string; status: string; logs: RunLog[] }[]
+  runs: Run[]
   selectedLogId: string | null
   nodeInfoById: Map<string, NodeInfo>
   onSelectLog: (log: RunLog) => void

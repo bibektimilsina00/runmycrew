@@ -54,7 +54,7 @@ export const editorAPI = {
       {
         url: `/workflows/${id}/listen`,
         method: 'POST',
-        body,
+        data: body,
       },
     ),
 
