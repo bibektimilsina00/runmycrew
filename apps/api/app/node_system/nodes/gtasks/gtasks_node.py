@@ -15,6 +15,7 @@ OAuth scope: `tasks` (already in GoogleOAuthProvider).
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import httpx
@@ -212,12 +213,13 @@ class GoogleTasksNode(BaseNode[GoogleTasksProperties]):
                 },
                 {
                     "name": "task_due",
-                    "label": "Due (RFC3339)",
+                    "label": "Due date",
                     "type": "string",
-                    "placeholder": "2025-01-15T00:00:00Z",
+                    "placeholder": "2025-01-15  or  2025-01-15T00:00:00Z",
                     "description": (
-                        "ISO-8601 / RFC3339 timestamp. Google Tasks ignores the "
-                        "time portion — date-only is fine."
+                        "Date (YYYY-MM-DD) or full RFC3339 timestamp. Google "
+                        "Tasks ignores the time portion but rejects bare dates "
+                        "in the request — we pad to midnight UTC for you."
                     ),
                     "condition": _cond_any("create_task", "update_task"),
                 },
@@ -368,6 +370,22 @@ def _require_task_id(node: GoogleTasksNode) -> str | NodeResult:
     return tid
 
 
+_DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _normalise_due(value: str) -> str:
+    """Coerce date-only input (`YYYY-MM-DD`) to full RFC3339 at midnight
+    UTC. The Tasks API rejects bare dates with a 400 even though the
+    docs say "only date information is used" — Google parses the field
+    strictly first, then drops the time portion.
+
+    Already-RFC3339 strings pass through unchanged.
+    """
+    if _DATE_ONLY_RE.match(value):
+        return f"{value}T00:00:00Z"
+    return value
+
+
 def _build_task_body(node: GoogleTasksNode, *, require_title: bool) -> dict[str, Any] | NodeResult:
     """Shape the JSON body for create_task / update_task. Only fields
     the user actually set get sent — preserves untouched fields on
@@ -382,7 +400,7 @@ def _build_task_body(node: GoogleTasksNode, *, require_title: bool) -> dict[str,
         body["notes"] = str(node.props.task_notes)
     due = (node.props.task_due or "").strip()
     if due:
-        body["due"] = due
+        body["due"] = _normalise_due(due)
     if node.props.task_parent:
         body["parent"] = node.props.task_parent
     if node.props.task_status:
