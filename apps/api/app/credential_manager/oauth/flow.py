@@ -281,11 +281,16 @@ class GoogleOAuthProvider:
     #   short keeps the OAuth UX honest about what the user is granting.
     @classmethod
     def _scope_str(cls) -> str:
-        """Build the scope list — appends `drive.readonly` when the
+        """Build the scope list — appends the full Drive scope when the
         deployment has opted into folder-watch via the
-        `GOOGLE_DRIVE_WATCH_EXTERNAL` env flag. `drive.readonly` is a
-        Restricted Scope (needs CASA review for production); keep off
-        by default."""
+        `GOOGLE_DRIVE_WATCH_EXTERNAL` env flag.
+
+        The full `drive` scope (vs the narrower `drive.readonly`) is
+        what unlocks **write** access to externally-uploaded files —
+        without it, action nodes can't rename / share / delete a file
+        the user uploaded via Drive web UI (only read it). `drive` is
+        a Restricted Scope and needs CASA review before shipping to
+        general production users; keep off by default."""
         base = [
             "https://www.googleapis.com/auth/gmail.modify",
             "https://www.googleapis.com/auth/calendar",
@@ -298,7 +303,7 @@ class GoogleOAuthProvider:
             "profile",
         ]
         if getattr(settings, "GOOGLE_DRIVE_WATCH_EXTERNAL", False):
-            base.insert(3, "https://www.googleapis.com/auth/drive.readonly")
+            base.insert(3, "https://www.googleapis.com/auth/drive")
         return " ".join(base)
 
     _SCOPE_STR = ""  # populated dynamically — kept for back-compat readers
