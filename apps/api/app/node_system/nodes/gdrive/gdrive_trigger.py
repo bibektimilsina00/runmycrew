@@ -328,18 +328,21 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         headers = {"Authorization": f"Bearer {token}"}
         async with httpx.AsyncClient(timeout=30) as client:
-            if not cursor or (not cursor.get("page_token") and not cursor.get("last_modified_iso")):
+            # `last_modified_iso` is the legacy extended-mode key —
+            # treat as missing so old saved rows auto-migrate to
+            # `page_token` on next poll.
+            if not cursor or not cursor.get("page_token"):
                 return [], await self._snapshot_cursor(client, headers)
             return await self._poll_changes(client, headers, cursor)
 
     async def _snapshot_cursor(
         self, client: httpx.AsyncClient, headers: dict[str, str]
     ) -> dict[str, Any]:
-        """Initial cursor for whichever mode is active. Extended-scope
-        + folder picked → ISO modifiedTime; default → opaque page token."""
-        parent_id = _folder_id(self.props.parent_folder_id)
-        if _extended_scope_enabled() and parent_id:
-            return {"last_modified_iso": _now_iso()}
+        """Initial cursor. Always uses Drive's `changes/startPageToken`
+        which is real-time across both scope tiers (`drive.file` shows
+        only files Fuse owns; `drive.readonly` shows everything). The
+        parent_folder_id filter is applied client-side in `_poll_changes`.
+        """
         return {"page_token": await self._snapshot_page_token(client, headers)}
 
     async def _snapshot_page_token(self, client: httpx.AsyncClient, headers: dict[str, str]) -> str:
@@ -353,26 +356,31 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
         headers: dict[str, str],
         cursor_or_state: IntegrationTriggerState | dict[str, Any],
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        """Pull every change since the cursor. Two strategies:
+        """Pull every change since the cursor using Drive's real-time
+        `changes.list?pageToken=...` feed. Same path for both scope
+        tiers:
 
-        - **`drive.file` only** (default): `changes.list?pageToken=…`
-          — sees only files Fuse created.
-        - **`drive.readonly` + folder picked** (extended, requires
-          `GOOGLE_DRIVE_WATCH_EXTERNAL=true`): switch to
-          `files.list?q="'<folder>' in parents and modifiedTime >
-          '<iso>'"` so external uploads become visible. Cursor
-          flips from `page_token` to `last_modified_iso`.
+        - **`drive.file` only** — Drive returns changes restricted to
+          files Fuse created. Parent / mime / name filters apply
+          client-side.
+        - **`drive.readonly`** (with `GOOGLE_DRIVE_WATCH_EXTERNAL=true`)
+          — Drive returns every change the user can see. The
+          `parent_folder_id` filter narrows down to the picked folder
+          client-side.
+
+        Why not `files.list?q="...modifiedTime > ..."` for the extended
+        path: Drive's search index lags uploads by 30 s–2 min, so
+        listen-mode misses files. The change feed is near-real-time.
         """
         cursor = (
             cursor_or_state.cursor
             if isinstance(cursor_or_state, IntegrationTriggerState)
             else cursor_or_state
         )
-        parent_id = _folder_id(self.props.parent_folder_id)
-        if _extended_scope_enabled() and parent_id:
-            return await self._poll_folder_files(client, headers, cursor or {}, parent_id)
         page_token = str((cursor or {}).get("page_token") or "")
         if not page_token:
+            # Old `last_modified_iso` cursors auto-migrate by snapshotting
+            # a fresh page token here — no schema migration needed.
             return [], {"page_token": await self._snapshot_page_token(client, headers)}
 
         event_filter = (self.props.event_filter or "any").lower()
@@ -424,72 +432,6 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                 break
         return matches, {"page_token": new_page_token}
 
-    async def _poll_folder_files(
-        self,
-        client: httpx.AsyncClient,
-        headers: dict[str, str],
-        cursor: dict[str, Any],
-        parent_id: str,
-    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        """Extended-scope folder-watching path. Uses
-        `files.list?q="'<parent>' in parents and modifiedTime > '<iso>'"`
-        so uploads from any source (web UI, mobile, other apps) become
-        visible. Cursor is the most recent file's `modifiedTime`."""
-        last_iso = str(cursor.get("last_modified_iso") or "").strip()
-        if not last_iso:
-            return [], {"last_modified_iso": _now_iso()}
-
-        event_filter = (self.props.event_filter or "any").lower()
-        if event_filter not in EVENT_FILTERS:
-            event_filter = "any"
-        mime_type = (self.props.mime_type or "").strip()
-        name_substr = (self.props.name_contains or "").strip().lower()
-        max_take = max(1, min(self.props.max_changes_per_poll, 100))
-
-        q_parts = [
-            f"'{parent_id}' in parents",
-            f"modifiedTime > '{last_iso}'",
-        ]
-        if event_filter == "trashed":
-            q_parts.append("trashed = true")
-        else:
-            q_parts.append("trashed = false")
-        if mime_type:
-            q_parts.append(f"mimeType = '{mime_type}'")
-        if name_substr:
-            q_parts.append(f"name contains '{name_substr}'")
-
-        resp = await client.get(
-            f"{GDRIVE_API}/files",
-            headers=headers,
-            params={
-                "q": " and ".join(q_parts),
-                "orderBy": "modifiedTime",
-                "pageSize": max_take,
-                "fields": (
-                    "files(id,name,mimeType,trashed,createdTime,"
-                    "modifiedTime,webViewLink,iconLink,parents,"
-                    "owners(emailAddress),size)"
-                ),
-            },
-        )
-        resp.raise_for_status()
-        files = resp.json().get("files") or []
-
-        matches: list[dict[str, Any]] = []
-        newest = last_iso
-        for file in files:
-            change_type = _classify_change({}, file)
-            if event_filter != "any" and change_type != event_filter:
-                continue
-            if name_substr and name_substr not in (file.get("name") or "").lower():
-                continue
-            matches.append(_normalize({}, file, change_type))
-            modified = file.get("modifiedTime") or ""
-            if modified > newest:
-                newest = modified
-        return matches, {"last_modified_iso": newest}
-
     async def _stateless_first_match(self, token: str) -> NodeResult:
         """Preview path — return the most recently modified file the
         cred can see. Drive has no equivalent of Gmail's `messages.list`
@@ -530,21 +472,6 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
 
 
 # ── helpers ──────────────────────────────────────────────────────────────
-
-
-def _extended_scope_enabled() -> bool:
-    """True when the deployment has opted into `drive.readonly` for
-    folder-watch. CASA required before production rollout."""
-    try:
-        from apps.api.app.core.config import settings
-
-        return bool(getattr(settings, "GOOGLE_DRIVE_WATCH_EXTERNAL", False))
-    except Exception:  # noqa: BLE001
-        return False
-
-
-def _now_iso() -> str:
-    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def _folder_id(value: Any) -> str:

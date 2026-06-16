@@ -211,9 +211,7 @@ async def list_drive_folders(
                 headers=headers,
                 params={
                     "q": (
-                        f"'{parent}' in parents and "
-                        f"mimeType = '{folder_mime}' and "
-                        "trashed = false"
+                        f"'{parent}' in parents and mimeType = '{folder_mime}' and trashed = false"
                     ),
                     "orderBy": "name",
                     "pageSize": 1000,
@@ -264,8 +262,7 @@ async def list_drive_folders(
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=(
-                f"Drive folder list failed ({exc.response.status_code}): "
-                f"{exc.response.text[:200]}"
+                f"Drive folder list failed ({exc.response.status_code}): {exc.response.text[:200]}"
             ),
         ) from exc
 
