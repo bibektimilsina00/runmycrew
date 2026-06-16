@@ -75,6 +75,23 @@ def get_entry_for_provider(provider: str) -> PollerEntry | None:
     return _BY_PROVIDER.get(provider)
 
 
+def eager_register_polling_providers() -> None:
+    """Import every polling-trigger module so its module-scope
+    `register_poller(...)` has fired before the first scheduler or
+    listener tick. Idempotent — re-imports are no-ops, re-registrations
+    overwrite with the same entry.
+
+    Adding a new polling integration means one extra line here. Calling
+    from both `_poll_due_rows` (scheduler tick) and the listen-mode
+    Celery task means a worker that only ever runs one of those paths
+    still sees the right providers."""
+    from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
+    from apps.api.app.node_system.nodes.gdrive import (
+        gdrive_trigger as _gdrive_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.gmail import gmail_trigger as _gmail_trigger  # noqa: F401
+
+
 @celery_app.task(name="poll_integration_triggers")
 def poll_integration_triggers() -> None:
     asyncio.run(_poll_due_rows())
@@ -86,16 +103,15 @@ async def _poll_due_rows() -> None:
     from apps.api.app.core.database import AsyncSessionLocal
     from apps.api.app.execution_engine.engine import execution_engine
     from apps.api.app.features.credentials.service import CredentialService
-
-    # Register the providers we ship with. Each module's `register_poller`
-    # call is idempotent so reloading the worker doesn't double-fire.
     from apps.api.app.features.triggers.listen_service import is_polling_listen_active
     from apps.api.app.features.triggers.repository import (
         IntegrationTriggerStateRepository,
     )
     from apps.api.app.features.workflows.repository import WorkflowRepository
-    from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
-    from apps.api.app.node_system.nodes.gmail import gmail_trigger as _gmail_trigger  # noqa: F401
+
+    # Make sure every polling-trigger module has its `_register()` call
+    # in the worker's process before we hit `_BY_PROVIDER`.
+    eager_register_polling_providers()
 
     if not _BY_PROVIDER:
         return

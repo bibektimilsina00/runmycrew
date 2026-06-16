@@ -71,6 +71,7 @@ async def _run(
     from apps.api.app.core.database import AsyncSessionLocal
     from apps.api.app.execution_engine.engine import execution_engine
     from apps.api.app.execution_engine.scheduler.integration_polling import (
+        eager_register_polling_providers,
         get_entry_for_provider,
     )
     from apps.api.app.features.credentials.service import CredentialService
@@ -83,6 +84,12 @@ async def _run(
         IntegrationTriggerStateRepository,
     )
     from apps.api.app.features.workflows.repository import WorkflowRepository
+
+    # Worker may have come up only running the listen-mode task and
+    # never hit the scheduler tick that pulls trigger modules in —
+    # without this call `get_entry_for_provider('gdrive')` returns
+    # None even though `register_poller("gdrive", ...)` is in the file.
+    eager_register_polling_providers()
 
     try:
         deadline = datetime.fromisoformat(deadline_iso.replace("Z", "+00:00"))
