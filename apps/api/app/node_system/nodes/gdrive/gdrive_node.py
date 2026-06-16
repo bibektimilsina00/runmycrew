@@ -174,10 +174,6 @@ class GDriveNode(BaseNode[GDriveProperties]):
                     "name": "parent_folder_id",
                     "label": "Parent folder",
                     "type": "gdrive-folder",
-                    "description": (
-                        "Pick the Drive folder this lives in. Leave blank to "
-                        "drop the file at the root of My Drive."
-                    ),
                     "condition": _cond_any("upload_file", "create_folder"),
                 },
                 {
@@ -185,12 +181,7 @@ class GDriveNode(BaseNode[GDriveProperties]):
                     "label": "File",
                     "type": "media",
                     "required": True,
-                    "typeOptions": {"accept": "*/*"},
-                    "description": (
-                        "Upload from URL, drop a file in, or pick from your "
-                        "Library. Fuse fetches the bytes server-side and "
-                        "streams them up to Drive."
-                    ),
+                    "typeOptions": {"accept": "*/*", "nameField": "name"},
                     "condition": _cond("upload_file"),
                 },
                 {
@@ -202,10 +193,7 @@ class GDriveNode(BaseNode[GDriveProperties]):
                     "allowCustom": True,
                     "typeOptions": {"searchable": True, "allowCustom": True},
                     "options": _MIME_TYPE_OPTIONS,
-                    "description": (
-                        "MIME type of the upload. Auto-detected from the "
-                        "source when blank; override for explicit content."
-                    ),
+                    "description": "Auto-detected if blank.",
                     "condition": _cond("upload_file"),
                     "mode": "advanced",
                 },
@@ -215,9 +203,6 @@ class GDriveNode(BaseNode[GDriveProperties]):
                     "type": "options",
                     "default": "",
                     "options": _CONVERSION_OPTIONS,
-                    "description": (
-                        "Optional — converts the upload to a Google-native format on the way in."
-                    ),
                     "condition": _cond("upload_file"),
                     "mode": "advanced",
                 },
