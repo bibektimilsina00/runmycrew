@@ -55,6 +55,7 @@ logger = get_logger(__name__)
 _POLLING_TRIGGER_PROVIDERS: dict[str, str] = {
     "trigger.gmail": "gmail",
     "trigger.gcal_event": "gcalendar",
+    "trigger.gdrive_change": "gdrive",
 }
 
 
