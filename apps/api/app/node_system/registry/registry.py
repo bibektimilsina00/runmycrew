@@ -33,6 +33,7 @@ from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
+from apps.api.app.node_system.nodes.gdocs.gdocs_node import GoogleDocsNode
 from apps.api.app.node_system.nodes.gdrive.gdrive_node import GDriveNode
 from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
@@ -125,6 +126,7 @@ node_registry.register(GDriveTriggerNode)
 node_registry.register(GDriveNode)
 node_registry.register(GoogleSheetsNode)
 node_registry.register(GoogleSheetsTriggerNode)
+node_registry.register(GoogleDocsNode)
 node_registry.register(LinearNode)
 # Meta surfaces — one consolidated trigger + action per surface
 # (Instagram, Facebook/Messenger, WhatsApp, Lead Ads) carrying
