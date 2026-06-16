@@ -413,19 +413,6 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                     continue
                 file = change.get("file") or {}
                 change_type = _classify_change(change, file)
-                logger.info(
-                    "gdrive change: id=%s name=%s mime=%s parents=%s class=%s "
-                    "filters[event=%s mime=%s parent=%s name=%s]",
-                    file.get("id"),
-                    file.get("name"),
-                    file.get("mimeType"),
-                    file.get("parents"),
-                    change_type,
-                    event_filter,
-                    mime_type,
-                    parent_id,
-                    name_substr,
-                )
                 if event_filter != "any" and change_type != event_filter:
                     continue
                 if mime_type and (file.get("mimeType") or "") != mime_type:
@@ -528,7 +515,12 @@ def _classify_change(change: dict[str, Any], file: dict[str, Any]) -> str:
         try:
             c = datetime.fromisoformat(created.replace("Z", "+00:00"))
             m = datetime.fromisoformat(modified.replace("Z", "+00:00"))
-            if abs((m - c).total_seconds()) <= 1:
+            # 60 s tolerance — Drive routinely bumps modifiedTime by a
+            # few seconds after upload (background metadata writes,
+            # thumbnail generation, virus scan, OCR). A 1-second window
+            # mis-classified real uploads as "modified" and they got
+            # dropped by users with `event_filter='added'`.
+            if abs((m - c).total_seconds()) <= 60:
                 return "added"
         except ValueError:
             pass
