@@ -66,6 +66,35 @@ class GoogleSheetsProperties(BaseModel):
     # batch_update — raw API requests array
     requests: Any = None
 
+    # lookup_row / add_row / update_row / delete_row — row-level CRUD
+    # ergonomics on top of values.get / append / update.
+    lookup_column: str | None = None  # e.g. "Email" (header name) — picker emits string
+    lookup_value: str | None = None
+    row_index: int | None = None  # 1-based row index for update_row / delete_row
+    row_data: Any = None  # dict {column_header: value} for add_row / update_row
+
+    # rename_sheet
+    new_sheet_title: str | None = None
+
+    # share — Drive ACL
+    share_email: str | None = None
+    share_role: str = "reader"  # reader / commenter / writer
+    share_send_notification: bool = False
+
+    # export — Drive export
+    export_format: str = "pdf"  # pdf / xlsx / csv / ods / html
+
+    # sort_range
+    sort_column_index: int = 0  # zero-based column index inside the range
+    sort_order: str = "ASCENDING"  # ASCENDING / DESCENDING
+
+    # format_range — pick common knobs; power users still have batch_update
+    format_bold: bool = False
+    format_italic: bool = False
+    format_background_color: str | None = None  # "#rrggbb"
+    format_text_color: str | None = None
+    format_number_format: str | None = None  # e.g. "0.00", "yyyy-mm-dd", "$#,##0.00"
+
     @field_validator("spreadsheet_id", mode="before")
     @classmethod
     def _coerce_spreadsheet_id(cls, value: Any) -> str | None:
@@ -157,6 +186,16 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                         {"label": "Duplicate Sheet", "value": "duplicate_sheet"},
                         {"label": "Delete Sheet", "value": "delete_sheet"},
                         {"label": "Find & Replace", "value": "find_replace"},
+                        {"label": "Lookup Row", "value": "lookup_row"},
+                        {"label": "Add Row", "value": "add_row"},
+                        {"label": "Update Row", "value": "update_row"},
+                        {"label": "Delete Row", "value": "delete_row"},
+                        {"label": "Rename Sheet", "value": "rename_sheet"},
+                        {"label": "Share Spreadsheet", "value": "share"},
+                        {"label": "Export Spreadsheet", "value": "export"},
+                        {"label": "Sort Range", "value": "sort_range"},
+                        {"label": "Format Range", "value": "format_range"},
+                        {"label": "Auto-resize Columns", "value": "auto_resize_columns"},
                         {"label": "Batch Update (Raw)", "value": "batch_update"},
                     ],
                 },
@@ -164,8 +203,14 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 {
                     "name": "spreadsheet_id",
                     "label": "Spreadsheet",
-                    "type": "gsheet-spreadsheet",
+                    "type": "google-file",
                     "required": True,
+                    "typeOptions": {
+                        "mimeType": "application/vnd.google-apps.spreadsheet",
+                        "placeholder": "Pick a spreadsheet…",
+                        "searchPlaceholder": "Search your spreadsheets…",
+                        "createPlaceholder": "Create new spreadsheet…",
+                    },
                     "condition": _cond_any(
                         "get_spreadsheet",
                         "get_values",
@@ -177,9 +222,19 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                         "delete_sheet",
                         "find_replace",
                         "batch_update",
+                        "lookup_row",
+                        "add_row",
+                        "update_row",
+                        "delete_row",
+                        "rename_sheet",
+                        "share",
+                        "export",
+                        "sort_range",
+                        "format_range",
+                        "auto_resize_columns",
                     ),
                 },
-                # range_name — used by value-based ops
+                # range_name — used by value-based ops + sort / format / auto-resize
                 {
                     "name": "range_name",
                     "label": "Range",
@@ -187,7 +242,12 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                     "placeholder": "Sheet1!A1:D10",
                     "required": True,
                     "condition": _cond_any(
-                        "get_values", "update_values", "append_values", "clear_values"
+                        "get_values",
+                        "update_values",
+                        "append_values",
+                        "clear_values",
+                        "sort_range",
+                        "format_range",
                     ),
                 },
                 # update / append shared options
@@ -250,11 +310,20 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 },
                 {
                     "name": "sheet_id_num",
-                    "label": "Sheet to delete",
+                    "label": "Sheet",
                     "type": "gsheet-tab",
                     "required": True,
                     "typeOptions": {"valueAs": "sheet_id"},
-                    "condition": _cond("delete_sheet"),
+                    "condition": _cond_any("delete_sheet", "rename_sheet"),
+                },
+                # rename_sheet — new tab title
+                {
+                    "name": "new_sheet_title",
+                    "label": "New title",
+                    "type": "string",
+                    "required": True,
+                    "placeholder": "Renamed",
+                    "condition": _cond("rename_sheet"),
                 },
                 # find_replace
                 {
@@ -295,6 +364,162 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                     "type": "boolean",
                     "default": False,
                     "condition": _cond("find_replace"),
+                    "mode": "advanced",
+                },
+                # lookup_row / add_row / update_row / delete_row — row-level CRUD
+                # Tab + header-aware. Headers are read live so the user types
+                # the column NAME, not the letter — matches n8n / Zapier UX.
+                {
+                    "name": "sheet_name",
+                    "label": "Sheet (tab)",
+                    "type": "gsheet-tab",
+                    "typeOptions": {"valueAs": "title"},
+                    "required": True,
+                    "condition": _cond_any(
+                        "lookup_row",
+                        "add_row",
+                        "update_row",
+                        "delete_row",
+                        "auto_resize_columns",
+                    ),
+                },
+                {
+                    "name": "lookup_column",
+                    "label": "Look up by column",
+                    "type": "string",
+                    "required": True,
+                    "placeholder": "Email",
+                    "description": "Column header name to search in (row 1 holds headers).",
+                    "condition": _cond("lookup_row"),
+                },
+                {
+                    "name": "lookup_value",
+                    "label": "Match this value",
+                    "type": "string",
+                    "required": True,
+                    "placeholder": "{{ $trigger.email }}",
+                    "condition": _cond("lookup_row"),
+                },
+                {
+                    "name": "row_data",
+                    "label": "Row data",
+                    "type": "json",
+                    "required": True,
+                    "placeholder": '{"Name": "Alice", "Email": "a@b.com"}',
+                    "description": "Object keyed by header name. Missing headers get blank cells.",
+                    "condition": _cond_any("add_row", "update_row"),
+                },
+                {
+                    "name": "row_index",
+                    "label": "Row number",
+                    "type": "number",
+                    "required": True,
+                    "placeholder": "2",
+                    "description": "1-based row number (row 1 is the header).",
+                    "condition": _cond_any("update_row", "delete_row"),
+                },
+                # share — via Drive ACL API
+                {
+                    "name": "share_email",
+                    "label": "Share with email",
+                    "type": "string",
+                    "required": True,
+                    "placeholder": "person@example.com",
+                    "condition": _cond("share"),
+                },
+                {
+                    "name": "share_role",
+                    "label": "Role",
+                    "type": "options",
+                    "default": "reader",
+                    "options": [
+                        {"label": "Reader", "value": "reader"},
+                        {"label": "Commenter", "value": "commenter"},
+                        {"label": "Writer", "value": "writer"},
+                    ],
+                    "condition": _cond("share"),
+                },
+                {
+                    "name": "share_send_notification",
+                    "label": "Send notification email",
+                    "type": "boolean",
+                    "default": False,
+                    "condition": _cond("share"),
+                    "mode": "advanced",
+                },
+                # export — Drive export
+                {
+                    "name": "export_format",
+                    "label": "Format",
+                    "type": "options",
+                    "default": "pdf",
+                    "options": [
+                        {"label": "PDF", "value": "pdf"},
+                        {"label": "Excel (.xlsx)", "value": "xlsx"},
+                        {"label": "CSV", "value": "csv"},
+                        {"label": "OpenDocument (.ods)", "value": "ods"},
+                        {"label": "HTML (zip)", "value": "html"},
+                    ],
+                    "condition": _cond("export"),
+                },
+                # sort_range
+                {
+                    "name": "sort_column_index",
+                    "label": "Sort by column index",
+                    "type": "number",
+                    "default": 0,
+                    "description": "Zero-based column position inside the range.",
+                    "condition": _cond("sort_range"),
+                },
+                {
+                    "name": "sort_order",
+                    "label": "Order",
+                    "type": "options",
+                    "default": "ASCENDING",
+                    "options": [
+                        {"label": "Ascending (A → Z)", "value": "ASCENDING"},
+                        {"label": "Descending (Z → A)", "value": "DESCENDING"},
+                    ],
+                    "condition": _cond("sort_range"),
+                },
+                # format_range
+                {
+                    "name": "format_bold",
+                    "label": "Bold",
+                    "type": "boolean",
+                    "default": False,
+                    "condition": _cond("format_range"),
+                },
+                {
+                    "name": "format_italic",
+                    "label": "Italic",
+                    "type": "boolean",
+                    "default": False,
+                    "condition": _cond("format_range"),
+                },
+                {
+                    "name": "format_background_color",
+                    "label": "Background colour",
+                    "type": "string",
+                    "placeholder": "#fff3a3",
+                    "description": "Hex like `#rrggbb`.",
+                    "condition": _cond("format_range"),
+                },
+                {
+                    "name": "format_text_color",
+                    "label": "Text colour",
+                    "type": "string",
+                    "placeholder": "#111111",
+                    "description": "Hex like `#rrggbb`.",
+                    "condition": _cond("format_range"),
+                },
+                {
+                    "name": "format_number_format",
+                    "label": "Number format",
+                    "type": "string",
+                    "placeholder": "0.00 or $#,##0.00 or yyyy-mm-dd",
+                    "description": "Google Sheets number-format pattern.",
+                    "condition": _cond("format_range"),
                     "mode": "advanced",
                 },
                 # batch_update
@@ -603,6 +828,535 @@ async def _batch_update(
     return NodeResult(success=True, output_data=result)
 
 
+# ── row-level helpers ───────────────────────────────────────────────────
+
+
+def _require_sheet_name(node: GoogleSheetsNode) -> str | NodeResult:
+    name = (node.props.sheet_name or "").strip()
+    if not name:
+        return NodeResult(success=False, error="Sheet (tab) is required.")
+    return name
+
+
+def _column_letter(n: int) -> str:
+    """Convert a zero-based column index to A1 letters (0 → A, 25 → Z, 26 → AA)."""
+    letters = ""
+    n += 1
+    while n > 0:
+        n, rem = divmod(n - 1, 26)
+        letters = chr(65 + rem) + letters
+    return letters
+
+
+async def _fetch_headers(
+    client: httpx.AsyncClient,
+    headers: dict[str, str],
+    sid: str,
+    sheet_name: str,
+) -> list[str]:
+    """Read row 1 of the sheet — headers used to map dict → row array."""
+    r = await client.get(
+        f"{SHEETS_API}/{sid}/values/{sheet_name}!1:1",
+        headers=headers,
+    )
+    r.raise_for_status()
+    rows = r.json().get("values") or []
+    return [str(c) for c in (rows[0] if rows else [])]
+
+
+def _row_dict_to_values(row_data: dict[str, Any], headers_list: list[str]) -> list[Any]:
+    """Slot a dict-of-cells into a positional row matching the headers.
+
+    Unknown keys are dropped — silently mapping a typo to an arbitrary
+    column would corrupt user data. We log them at the row payload level
+    instead by surfacing them in the response output (`ignored_keys`)."""
+    return [row_data.get(h, "") for h in headers_list]
+
+
+# ── new operation handlers ──────────────────────────────────────────────
+
+
+async def _lookup_row(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    sheet_name = _require_sheet_name(node)
+    if isinstance(sheet_name, NodeResult):
+        return sheet_name
+    column = (node.props.lookup_column or "").strip()
+    if not column:
+        return NodeResult(success=False, error="`lookup_column` is required.")
+    target = node.props.lookup_value if node.props.lookup_value is not None else ""
+
+    headers_list = await _fetch_headers(client, headers, sid, sheet_name)
+    if column not in headers_list:
+        return NodeResult(
+            success=False,
+            error=f"Column header {column!r} not found in row 1 of {sheet_name!r}.",
+        )
+    col_idx = headers_list.index(column)
+    # Pull every populated row from row 2 onwards.
+    r = await client.get(
+        f"{SHEETS_API}/{sid}/values/{sheet_name}!A2:{_column_letter(len(headers_list) - 1)}",
+        headers=headers,
+    )
+    r.raise_for_status()
+    rows = r.json().get("values") or []
+    for offset, row in enumerate(rows):
+        if col_idx < len(row) and str(row[col_idx]) == str(target):
+            return NodeResult(
+                success=True,
+                output_data={
+                    "row_index": 2 + offset,
+                    "values": row,
+                    "row": dict(
+                        zip(headers_list, row + [""] * (len(headers_list) - len(row)), strict=False)
+                    ),
+                    "matched": True,
+                },
+            )
+    return NodeResult(
+        success=True,
+        output_data={"matched": False, "row_index": None, "values": [], "row": {}},
+    )
+
+
+async def _add_row(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    sheet_name = _require_sheet_name(node)
+    if isinstance(sheet_name, NodeResult):
+        return sheet_name
+    if not isinstance(node.props.row_data, dict):
+        return NodeResult(success=False, error="`row_data` must be a JSON object.")
+
+    headers_list = await _fetch_headers(client, headers, sid, sheet_name)
+    if not headers_list:
+        return NodeResult(
+            success=False,
+            error=f"Sheet {sheet_name!r} has no header row. Add column headers in row 1 first.",
+        )
+    row_values = _row_dict_to_values(node.props.row_data, headers_list)
+    ignored = [k for k in node.props.row_data if k not in headers_list]
+
+    body = {"range": sheet_name, "majorDimension": "ROWS", "values": [row_values]}
+    r = await client.post(
+        f"{SHEETS_API}/{sid}/values/{sheet_name}:append",
+        headers=headers,
+        json=body,
+        params={
+            "valueInputOption": node.props.value_input_option,
+            "insertDataOption": "INSERT_ROWS",
+        },
+    )
+    r.raise_for_status()
+    data = r.json()
+    data["ignored_keys"] = ignored
+    return NodeResult(success=True, output_data=data)
+
+
+async def _update_row(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    sheet_name = _require_sheet_name(node)
+    if isinstance(sheet_name, NodeResult):
+        return sheet_name
+    if node.props.row_index is None or node.props.row_index < 1:
+        return NodeResult(success=False, error="`row_index` is required (1-based).")
+    if not isinstance(node.props.row_data, dict):
+        return NodeResult(success=False, error="`row_data` must be a JSON object.")
+
+    headers_list = await _fetch_headers(client, headers, sid, sheet_name)
+    if not headers_list:
+        return NodeResult(
+            success=False,
+            error=f"Sheet {sheet_name!r} has no header row. Add column headers in row 1 first.",
+        )
+    row_values = _row_dict_to_values(node.props.row_data, headers_list)
+    ignored = [k for k in node.props.row_data if k not in headers_list]
+
+    last_col = _column_letter(len(headers_list) - 1)
+    rng = f"{sheet_name}!A{node.props.row_index}:{last_col}{node.props.row_index}"
+    r = await client.put(
+        f"{SHEETS_API}/{sid}/values/{rng}",
+        headers=headers,
+        json={"range": rng, "majorDimension": "ROWS", "values": [row_values]},
+        params={"valueInputOption": node.props.value_input_option},
+    )
+    r.raise_for_status()
+    data = r.json()
+    data["ignored_keys"] = ignored
+    return NodeResult(success=True, output_data=data)
+
+
+async def _delete_row(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    sheet_name = _require_sheet_name(node)
+    if isinstance(sheet_name, NodeResult):
+        return sheet_name
+    if node.props.row_index is None or node.props.row_index < 1:
+        return NodeResult(success=False, error="`row_index` is required (1-based).")
+
+    # `deleteDimension` needs the numeric sheetId. Look it up by name.
+    meta = await client.get(
+        f"{SHEETS_API}/{sid}",
+        headers=headers,
+        params={"fields": "sheets.properties(sheetId,title)"},
+    )
+    meta.raise_for_status()
+    sheet_id_num: int | None = None
+    for sh in meta.json().get("sheets") or []:
+        props = (sh or {}).get("properties") or {}
+        if str(props.get("title") or "") == sheet_name:
+            sheet_id_num = int(props.get("sheetId"))
+            break
+    if sheet_id_num is None:
+        return NodeResult(success=False, error=f"Sheet {sheet_name!r} not found.")
+
+    result = await _batch_update_request(
+        client,
+        headers,
+        sid,
+        [
+            {
+                "deleteDimension": {
+                    "range": {
+                        "sheetId": sheet_id_num,
+                        "dimension": "ROWS",
+                        "startIndex": node.props.row_index - 1,
+                        "endIndex": node.props.row_index,
+                    }
+                }
+            }
+        ],
+    )
+    return NodeResult(success=True, output_data=result)
+
+
+async def _rename_sheet(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    if node.props.sheet_id_num is None:
+        return NodeResult(success=False, error="Sheet is required.")
+    new_title = (node.props.new_sheet_title or "").strip()
+    if not new_title:
+        return NodeResult(success=False, error="`new_sheet_title` is required.")
+    result = await _batch_update_request(
+        client,
+        headers,
+        sid,
+        [
+            {
+                "updateSheetProperties": {
+                    "properties": {
+                        "sheetId": int(node.props.sheet_id_num),
+                        "title": new_title,
+                    },
+                    "fields": "title",
+                }
+            }
+        ],
+    )
+    return NodeResult(success=True, output_data=result)
+
+
+async def _share(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    email = (node.props.share_email or "").strip()
+    if not email:
+        return NodeResult(success=False, error="`share_email` is required.")
+    role = node.props.share_role or "reader"
+    body = {"type": "user", "role": role, "emailAddress": email}
+    r = await client.post(
+        f"https://www.googleapis.com/drive/v3/files/{sid}/permissions",
+        headers=headers,
+        json=body,
+        params={
+            "sendNotificationEmail": ("true" if node.props.share_send_notification else "false"),
+            "supportsAllDrives": "true",
+        },
+    )
+    r.raise_for_status()
+    return NodeResult(success=True, output_data=r.json())
+
+
+_EXPORT_MIME: dict[str, str] = {
+    "pdf": "application/pdf",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "csv": "text/csv",
+    "ods": "application/vnd.oasis.opendocument.spreadsheet",
+    "html": "application/zip",  # Drive ships HTML exports as a zip
+}
+
+
+async def _export(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    import base64
+
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    fmt = (node.props.export_format or "pdf").lower()
+    mime = _EXPORT_MIME.get(fmt)
+    if not mime:
+        return NodeResult(success=False, error=f"Unsupported export format: {fmt}")
+    r = await client.get(
+        f"https://www.googleapis.com/drive/v3/files/{sid}/export",
+        headers=headers,
+        params={"mimeType": mime},
+    )
+    r.raise_for_status()
+    payload = base64.b64encode(r.content).decode("ascii")
+    return NodeResult(
+        success=True,
+        output_data={
+            "format": fmt,
+            "mime_type": mime,
+            "size_bytes": len(r.content),
+            "content_b64": payload,
+        },
+    )
+
+
+def _parse_range_for_grid(range_str: str) -> dict[str, Any] | None:
+    """Best-effort A1 → grid-range parsing. Supports `Sheet1!A1:D10` and
+    `Sheet1!A:D` (column-only) forms. Returns None when the parse fails
+    — the caller surfaces a user-friendly error."""
+    import re
+
+    if "!" not in range_str:
+        return None
+    sheet_name, a1 = range_str.split("!", 1)
+    sheet_name = sheet_name.strip().strip("'")
+    m = re.match(r"^([A-Z]+)(\d*):([A-Z]+)(\d*)$", a1.replace(" ", ""))
+    if not m:
+        return None
+    start_col_letters, start_row, end_col_letters, end_row = m.groups()
+
+    def letters_to_idx(letters: str) -> int:
+        n = 0
+        for ch in letters:
+            n = n * 26 + (ord(ch) - 64)
+        return n - 1
+
+    out: dict[str, Any] = {
+        "sheet_name": sheet_name,
+        "startColumnIndex": letters_to_idx(start_col_letters),
+        "endColumnIndex": letters_to_idx(end_col_letters) + 1,
+    }
+    if start_row:
+        out["startRowIndex"] = int(start_row) - 1
+    if end_row:
+        out["endRowIndex"] = int(end_row)
+    return out
+
+
+async def _resolve_sheet_id_from_range(
+    client: httpx.AsyncClient,
+    headers: dict[str, str],
+    sid: str,
+    sheet_name: str,
+) -> int | None:
+    meta = await client.get(
+        f"{SHEETS_API}/{sid}",
+        headers=headers,
+        params={"fields": "sheets.properties(sheetId,title)"},
+    )
+    meta.raise_for_status()
+    for sh in meta.json().get("sheets") or []:
+        props = (sh or {}).get("properties") or {}
+        if str(props.get("title") or "") == sheet_name:
+            return int(props.get("sheetId"))
+    return None
+
+
+async def _sort_range(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    rng = _require_range(node)
+    if isinstance(rng, NodeResult):
+        return rng
+    parsed = _parse_range_for_grid(rng)
+    if parsed is None:
+        return NodeResult(success=False, error=f"Could not parse range: {rng!r}.")
+    sheet_id_num = await _resolve_sheet_id_from_range(client, headers, sid, parsed["sheet_name"])
+    if sheet_id_num is None:
+        return NodeResult(success=False, error=f"Sheet {parsed['sheet_name']!r} not found.")
+    grid_range: dict[str, Any] = {
+        "sheetId": sheet_id_num,
+        "startColumnIndex": parsed["startColumnIndex"],
+        "endColumnIndex": parsed["endColumnIndex"],
+    }
+    if "startRowIndex" in parsed:
+        grid_range["startRowIndex"] = parsed["startRowIndex"]
+    if "endRowIndex" in parsed:
+        grid_range["endRowIndex"] = parsed["endRowIndex"]
+    result = await _batch_update_request(
+        client,
+        headers,
+        sid,
+        [
+            {
+                "sortRange": {
+                    "range": grid_range,
+                    "sortSpecs": [
+                        {
+                            "dimensionIndex": (
+                                parsed["startColumnIndex"]
+                                + max(0, int(node.props.sort_column_index or 0))
+                            ),
+                            "sortOrder": node.props.sort_order or "ASCENDING",
+                        }
+                    ],
+                }
+            }
+        ],
+    )
+    return NodeResult(success=True, output_data=result)
+
+
+def _hex_to_rgb01(hex_str: str) -> dict[str, float] | None:
+    """`#rrggbb` → Sheets RGB struct (0..1 floats). Returns None on parse
+    failure so the caller can decide whether to drop or error."""
+    h = (hex_str or "").strip().lstrip("#")
+    if len(h) != 6:
+        return None
+    try:
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    except ValueError:
+        return None
+    return {"red": r / 255, "green": g / 255, "blue": b / 255}
+
+
+async def _format_range(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    rng = _require_range(node)
+    if isinstance(rng, NodeResult):
+        return rng
+    parsed = _parse_range_for_grid(rng)
+    if parsed is None:
+        return NodeResult(success=False, error=f"Could not parse range: {rng!r}.")
+    sheet_id_num = await _resolve_sheet_id_from_range(client, headers, sid, parsed["sheet_name"])
+    if sheet_id_num is None:
+        return NodeResult(success=False, error=f"Sheet {parsed['sheet_name']!r} not found.")
+
+    fmt_cell: dict[str, Any] = {}
+    text_fmt: dict[str, Any] = {}
+    fields_parts: list[str] = []
+
+    if node.props.format_bold:
+        text_fmt["bold"] = True
+        fields_parts.append("userEnteredFormat.textFormat.bold")
+    if node.props.format_italic:
+        text_fmt["italic"] = True
+        fields_parts.append("userEnteredFormat.textFormat.italic")
+    if node.props.format_text_color:
+        rgb = _hex_to_rgb01(node.props.format_text_color)
+        if rgb is None:
+            return NodeResult(success=False, error="`format_text_color` must be a `#rrggbb` hex.")
+        text_fmt["foregroundColor"] = rgb
+        fields_parts.append("userEnteredFormat.textFormat.foregroundColor")
+    if text_fmt:
+        fmt_cell["textFormat"] = text_fmt
+    if node.props.format_background_color:
+        rgb = _hex_to_rgb01(node.props.format_background_color)
+        if rgb is None:
+            return NodeResult(
+                success=False, error="`format_background_color` must be a `#rrggbb` hex."
+            )
+        fmt_cell["backgroundColor"] = rgb
+        fields_parts.append("userEnteredFormat.backgroundColor")
+    if node.props.format_number_format:
+        fmt_cell["numberFormat"] = {
+            "type": "NUMBER",
+            "pattern": node.props.format_number_format,
+        }
+        fields_parts.append("userEnteredFormat.numberFormat")
+
+    if not fields_parts:
+        return NodeResult(success=False, error="Pick at least one formatting knob.")
+
+    grid_range: dict[str, Any] = {
+        "sheetId": sheet_id_num,
+        "startColumnIndex": parsed["startColumnIndex"],
+        "endColumnIndex": parsed["endColumnIndex"],
+    }
+    if "startRowIndex" in parsed:
+        grid_range["startRowIndex"] = parsed["startRowIndex"]
+    if "endRowIndex" in parsed:
+        grid_range["endRowIndex"] = parsed["endRowIndex"]
+    result = await _batch_update_request(
+        client,
+        headers,
+        sid,
+        [
+            {
+                "repeatCell": {
+                    "range": grid_range,
+                    "cell": {"userEnteredFormat": fmt_cell},
+                    "fields": ",".join(fields_parts),
+                }
+            }
+        ],
+    )
+    return NodeResult(success=True, output_data=result)
+
+
+async def _auto_resize_columns(
+    node: GoogleSheetsNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    sid = _require_spreadsheet_id(node)
+    if isinstance(sid, NodeResult):
+        return sid
+    sheet_name = _require_sheet_name(node)
+    if isinstance(sheet_name, NodeResult):
+        return sheet_name
+    sheet_id_num = await _resolve_sheet_id_from_range(client, headers, sid, sheet_name)
+    if sheet_id_num is None:
+        return NodeResult(success=False, error=f"Sheet {sheet_name!r} not found.")
+    # Optional range_name narrows to specific columns; absent → resize all.
+    dim_range: dict[str, Any] = {"sheetId": sheet_id_num, "dimension": "COLUMNS"}
+    if node.props.range_name:
+        parsed = _parse_range_for_grid(node.props.range_name)
+        if parsed is not None:
+            dim_range["startIndex"] = parsed["startColumnIndex"]
+            dim_range["endIndex"] = parsed["endColumnIndex"]
+    result = await _batch_update_request(
+        client,
+        headers,
+        sid,
+        [{"autoResizeDimensions": {"dimensions": dim_range}}],
+    )
+    return NodeResult(success=True, output_data=result)
+
+
 _HANDLERS: dict[str, Any] = {
     "get_spreadsheet": _get_spreadsheet,
     "get_values": _get_values,
@@ -615,4 +1369,14 @@ _HANDLERS: dict[str, Any] = {
     "delete_sheet": _delete_sheet,
     "find_replace": _find_replace,
     "batch_update": _batch_update,
+    "lookup_row": _lookup_row,
+    "add_row": _add_row,
+    "update_row": _update_row,
+    "delete_row": _delete_row,
+    "rename_sheet": _rename_sheet,
+    "share": _share,
+    "export": _export,
+    "sort_range": _sort_range,
+    "format_range": _format_range,
+    "auto_resize_columns": _auto_resize_columns,
 }

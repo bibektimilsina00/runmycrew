@@ -3,29 +3,42 @@ import {
   Check,
   ChevronDown,
   FileSpreadsheet,
+  FileText,
+  Folder,
   Loader2,
   Plus,
+  Presentation,
   Search,
   X,
+  type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import apiClient from '@/shared/utils/apiClient'
 import type { RendererProps } from '../types'
 
 /**
- * Google Sheets spreadsheet picker — inline searchable dropdown that
- * auto-loads the user's spreadsheets the moment a credential is set.
+ * Generic Google file picker — works for any Google-native mime type.
+ * One inline searchable dropdown auto-loads the user's files of the
+ * requested mime as soon as a credential is set. A "Create new" row at
+ * the top calls the backend's generic create endpoint, which routes to
+ * the right native API (Sheets / Docs / Slides / …).
  *
- * Backend endpoints
- *   GET  /credentials/{id}/sheets/spreadsheets?query=...
- *   POST /credentials/{id}/sheets/spreadsheets  body:{title}
+ * typeOptions:
+ *   - `mimeType` (required) — Google-native MIME of the files to list.
+ *   - `placeholder`         — empty-state label (default: "Pick a file…").
+ *   - `createPlaceholder`   — placeholder for the create-new input
+ *                             (default: "Create new…").
+ *   - `searchPlaceholder`   — search input placeholder
+ *                             (default: "Search…").
+ *   - `disableCreate`       — true → hide the inline create row (use
+ *                             for mime types whose API can't create).
  *
  * Stored value: `{ id, name }`. Pydantic on the runtime side accepts
- * both the dict shape and a bare string id so legacy graphs keep working.
+ * both the dict shape and a bare string id so existing graphs work.
  *
- * UX shape: Notion/Linear-style combobox — trigger shows the picked
- * name, click opens a dropdown with search + a "Create new spreadsheet"
- * row at the top. Creating auto-selects the new spreadsheet.
+ * Backend endpoints:
+ *   GET  /credentials/{cid}/google-files?mime_type=…&query=…
+ *   POST /credentials/{cid}/google-files  body:{mime_type, title}
  */
 
 interface PickerValue {
@@ -33,21 +46,46 @@ interface PickerValue {
   name: string
 }
 
-interface SpreadsheetEntry {
+interface FileEntry {
   id: string
   name: string
   modifiedTime?: string
   webViewLink?: string
 }
 
-interface SpreadsheetsResponse {
-  spreadsheets: SpreadsheetEntry[]
+interface FilesResponse {
+  files: FileEntry[]
 }
 
 interface CreateResponse {
   id: string
   name: string
   webViewLink?: string
+}
+
+// Well-known Google mime types get a friendly icon + accent colour.
+// Unknown mimes fall back to a generic file icon.
+const MIME_LOOKS: Record<string, { Icon: LucideIcon; color: string }> = {
+  'application/vnd.google-apps.spreadsheet': {
+    Icon: FileSpreadsheet,
+    color: '#0f9d58',
+  },
+  'application/vnd.google-apps.document': {
+    Icon: FileText,
+    color: '#4285f4',
+  },
+  'application/vnd.google-apps.presentation': {
+    Icon: Presentation,
+    color: '#f4b400',
+  },
+  'application/vnd.google-apps.folder': {
+    Icon: Folder,
+    color: '#80868b',
+  },
+}
+
+function looksForMime(mime: string): { Icon: LucideIcon; color: string } {
+  return MIME_LOOKS[mime] || { Icon: FileText, color: 'currentColor' }
 }
 
 function parseValue(v: unknown): PickerValue | null {
@@ -64,19 +102,34 @@ function parseValue(v: unknown): PickerValue | null {
   return null
 }
 
-export function GSheetsPickerRenderer({
+export function GoogleFilePickerRenderer({
+  prop,
   value,
   onChange,
   disabled,
   properties,
 }: RendererProps) {
+  const opts = (prop.typeOptions ?? {}) as Record<string, unknown>
+  const mimeType = typeof opts.mimeType === 'string' ? opts.mimeType : ''
+  const placeholder =
+    typeof opts.placeholder === 'string' ? opts.placeholder : 'Pick a file…'
+  const createPlaceholder =
+    typeof opts.createPlaceholder === 'string'
+      ? opts.createPlaceholder
+      : 'Create new…'
+  const searchPlaceholder =
+    typeof opts.searchPlaceholder === 'string'
+      ? opts.searchPlaceholder
+      : 'Search…'
+  const disableCreate = opts.disableCreate === true
+
   const selected = parseValue(value)
   const credentialId =
     typeof properties?.credential === 'string' ? properties.credential : ''
 
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [items, setItems] = useState<SpreadsheetEntry[] | null>(null)
+  const [items, setItems] = useState<FileEntry[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
@@ -87,31 +140,32 @@ export function GSheetsPickerRenderer({
   const searchRef = useRef<HTMLInputElement | null>(null)
 
   const debouncedQuery = useDebounced(query, 250)
+  const { Icon, color } = looksForMime(mimeType)
 
-  // Auto-load when the dropdown opens, when the credential changes,
-  // or when the debounced query changes. List stays cached across
-  // open/close so reopening is instant.
   useEffect(() => {
-    if (!open || !credentialId) return
+    if (!open || !credentialId || !mimeType) return
     let alive = true
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true)
     setError(null)
     apiClient
-      .get<SpreadsheetsResponse>(
-        `/credentials/${credentialId}/sheets/spreadsheets`,
-        { params: { query: debouncedQuery, page_size: 100 } },
-      )
+      .get<FilesResponse>(`/credentials/${credentialId}/google-files`, {
+        params: {
+          mime_type: mimeType,
+          query: debouncedQuery,
+          page_size: 100,
+        },
+      })
       .then(({ data }) => {
         if (!alive) return
-        setItems(data.spreadsheets)
+        setItems(data.files)
       })
       .catch((err) => {
         if (!alive) return
         const msg =
           (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
           (err as Error)?.message ||
-          'Could not load spreadsheets'
+          'Could not load files'
         setError(String(msg))
       })
       .finally(() => {
@@ -120,10 +174,10 @@ export function GSheetsPickerRenderer({
     return () => {
       alive = false
     }
-  }, [open, credentialId, debouncedQuery])
+  }, [open, credentialId, mimeType, debouncedQuery])
 
-  // Reset transient state when credential changes — the cached list
-  // belongs to the previous account.
+  // Reset cached state when the credential changes — list belongs to
+  // the previous account.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(null)
@@ -132,7 +186,6 @@ export function GSheetsPickerRenderer({
     setNewTitle('')
   }, [credentialId])
 
-  // Close on outside-click / Escape.
   useEffect(() => {
     if (!open) return
     const onMouse = (e: MouseEvent) => {
@@ -151,26 +204,25 @@ export function GSheetsPickerRenderer({
     }
   }, [open])
 
-  // Focus the search input the moment the dropdown opens for keyboard-first UX.
   useEffect(() => {
     if (open && !creating) searchRef.current?.focus()
   }, [open, creating])
 
   const handleCreate = async () => {
     const t = newTitle.trim()
-    if (!t || !credentialId) return
+    if (!t || !credentialId || !mimeType) return
     setCreateErr(null)
     setCreating(true)
     try {
       const { data } = await apiClient.post<CreateResponse>(
-        `/credentials/${credentialId}/sheets/spreadsheets`,
-        { title: t },
+        `/credentials/${credentialId}/google-files`,
+        { mime_type: mimeType, title: t },
       )
       onChange({ id: data.id, name: data.name })
       setOpen(false)
       setNewTitle('')
-      // Optimistically prepend so reopening the dropdown shows it
-      // without waiting for a fresh list call.
+      // Prepend optimistically so the next reopen shows the new file
+      // even if the list query is still in flight.
       setItems((prev) =>
         prev
           ? [{ id: data.id, name: data.name }, ...prev.filter((s) => s.id !== data.id)]
@@ -184,8 +236,8 @@ export function GSheetsPickerRenderer({
     }
   }
 
-  const pickAndClose = (sheet: { id: string; name: string }) => {
-    onChange({ id: sheet.id, name: sheet.name })
+  const pickAndClose = (file: { id: string; name: string }) => {
+    onChange({ id: file.id, name: file.name })
     setOpen(false)
     setQuery('')
   }
@@ -198,29 +250,25 @@ export function GSheetsPickerRenderer({
         type="button"
         onClick={() => setOpen((o) => !o)}
         disabled={triggerDisabled}
-        title={
-          !credentialId ? 'Pick a Google account on this node first.' : undefined
-        }
+        title={!credentialId ? 'Pick a Google account on this node first.' : undefined}
         className={cn(
           'flex w-full items-center gap-2 rounded-[6px] border bg-surface px-2.5 py-1.5',
           'text-left text-[12px] transition-colors',
-          open
-            ? 'border-accent'
-            : 'border-border-faint hover:border-text-faint',
+          open ? 'border-accent' : 'border-border-faint hover:border-text-faint',
           triggerDisabled && 'cursor-not-allowed opacity-50',
         )}
       >
-        <FileSpreadsheet className="h-3.5 w-3.5 shrink-0 text-[#0f9d58]" />
+        <Icon className="h-3.5 w-3.5 shrink-0" style={{ color }} />
         <span
           className={cn(
             'min-w-0 flex-1 truncate',
-            selected ? 'text-text font-medium' : 'text-text-faint',
+            selected ? 'font-medium text-text' : 'text-text-faint',
           )}
         >
           {selected
             ? selected.name
             : credentialId
-              ? 'Pick a spreadsheet…'
+              ? placeholder
               : 'Pick a Google account first'}
         </span>
         {selected && !triggerDisabled && (
@@ -258,7 +306,7 @@ export function GSheetsPickerRenderer({
                 ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search your spreadsheets…"
+                placeholder={searchPlaceholder}
                 className={cn(
                   'h-7 w-full rounded-[5px] bg-surface pl-7 pr-2 text-[12px] text-text',
                   'outline-none placeholder:text-text-faint',
@@ -268,13 +316,16 @@ export function GSheetsPickerRenderer({
             </div>
           </div>
 
-          <CreateRow
-            title={newTitle}
-            onTitleChange={setNewTitle}
-            onSubmit={handleCreate}
-            creating={creating}
-            error={createErr}
-          />
+          {!disableCreate && (
+            <CreateRow
+              title={newTitle}
+              placeholder={createPlaceholder}
+              onTitleChange={setNewTitle}
+              onSubmit={handleCreate}
+              creating={creating}
+              error={createErr}
+            />
+          )}
 
           <div className="max-h-[300px] overflow-y-auto">
             {loading && !items && (
@@ -291,33 +342,38 @@ export function GSheetsPickerRenderer({
             {!loading && !error && items && items.length === 0 && (
               <div className="px-3 py-6 text-center text-[11.5px] text-text-muted">
                 {query
-                  ? `No spreadsheets matching "${query}".`
-                  : 'No spreadsheets yet — create one above.'}
+                  ? `No files matching "${query}".`
+                  : disableCreate
+                    ? 'No files found.'
+                    : 'No files yet — create one above.'}
               </div>
             )}
             {!error && items && items.length > 0 && (
               <ul>
-                {items.map((sheet) => {
-                  const isSelected = selected?.id === sheet.id
+                {items.map((file) => {
+                  const isSelected = selected?.id === file.id
                   return (
-                    <li key={sheet.id}>
+                    <li key={file.id}>
                       <button
                         type="button"
-                        onClick={() => pickAndClose(sheet)}
+                        onClick={() => pickAndClose(file)}
                         className={cn(
                           'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px]',
                           'transition-colors hover:bg-surface-2',
                           isSelected && 'bg-surface-2',
                         )}
                       >
-                        <FileSpreadsheet className="h-3.5 w-3.5 shrink-0 text-[#0f9d58]" />
+                        <Icon
+                          className="h-3.5 w-3.5 shrink-0"
+                          style={{ color }}
+                        />
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-text" title={sheet.name}>
-                            {sheet.name}
+                          <div className="truncate text-text" title={file.name}>
+                            {file.name}
                           </div>
-                          {sheet.modifiedTime && (
+                          {file.modifiedTime && (
                             <div className="truncate text-[10px] text-text-faint">
-                              Modified {formatDate(sheet.modifiedTime)}
+                              Modified {formatDate(file.modifiedTime)}
                             </div>
                           )}
                         </div>
@@ -339,12 +395,14 @@ export function GSheetsPickerRenderer({
 
 function CreateRow({
   title,
+  placeholder,
   onTitleChange,
   onSubmit,
   creating,
   error,
 }: {
   title: string
+  placeholder: string
   onTitleChange: (v: string) => void
   onSubmit: () => void
   creating: boolean
@@ -363,7 +421,7 @@ function CreateRow({
               onSubmit()
             }
           }}
-          placeholder="Create new spreadsheet…"
+          placeholder={placeholder}
           className={cn(
             'h-6 flex-1 bg-transparent text-[12px] text-text outline-none',
             'placeholder:text-text-faint',
@@ -383,7 +441,10 @@ function CreateRow({
         </button>
       </div>
       {error && (
-        <div className="mt-1 text-[10.5px] text-[var(--err,#dc2626)]" title={error}>
+        <div
+          className="mt-1 text-[10.5px] text-[var(--err,#dc2626)]"
+          title={error}
+        >
           {error}
         </div>
       )}

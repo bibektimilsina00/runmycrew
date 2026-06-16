@@ -130,8 +130,14 @@ class GoogleSheetsTriggerNode(BaseNode[GoogleSheetsTriggerProperties]):
                 {
                     "name": "spreadsheet_id",
                     "label": "Spreadsheet",
-                    "type": "gsheet-spreadsheet",
+                    "type": "google-file",
                     "required": True,
+                    "typeOptions": {
+                        "mimeType": "application/vnd.google-apps.spreadsheet",
+                        "placeholder": "Pick a spreadsheet…",
+                        "searchPlaceholder": "Search your spreadsheets…",
+                        "createPlaceholder": "Create new spreadsheet…",
+                    },
                 },
                 {
                     "name": "sheet_name",

@@ -298,12 +298,33 @@ async def _resolve_google_token(
     return str(access_token)
 
 
-# ── Sheets pickers ──────────────────────────────────────────────────────
+# ── Google file pickers (generic — any Google-native mime) ──────────────
 
 
-@router.get("/{credential_id}/sheets/spreadsheets")
-async def list_sheets_spreadsheets(
+# Map Google-native MIME types to the API that creates them. Any mime
+# in this table can be created via POST /google-files; others get a 400.
+_GOOGLE_CREATE_DISPATCH: dict[str, tuple[str, dict]] = {
+    "application/vnd.google-apps.spreadsheet": (
+        "https://sheets.googleapis.com/v4/spreadsheets",
+        # response keys: id from `spreadsheetId`, name from `properties.title`,
+        # link from `spreadsheetUrl`.
+        {"id_key": "spreadsheetId", "url_key": "spreadsheetUrl"},
+    ),
+    "application/vnd.google-apps.document": (
+        "https://docs.googleapis.com/v1/documents",
+        {"id_key": "documentId", "url_key": None},
+    ),
+    "application/vnd.google-apps.presentation": (
+        "https://slides.googleapis.com/v1/presentations",
+        {"id_key": "presentationId", "url_key": None},
+    ),
+}
+
+
+@router.get("/{credential_id}/google-files")
+async def list_google_files(
     credential_id: uuid.UUID,
+    mime_type: str,
     query: str = "",
     page_size: int = 50,
     current_user: User = Depends(get_current_user),
@@ -311,18 +332,21 @@ async def list_sheets_spreadsheets(
     db: AsyncSession = Depends(get_db),
     service: CredentialService = Depends(get_credential_service),
 ):
-    """List Google Sheets the credential can see, via Drive `files.list`
-    filtered to the spreadsheet MIME type. Supports a name-substring
-    search and a page-size cap."""
+    """Generic Google file picker — lists files of the requested MIME type
+    via Drive's `files.list`. Used by the inspector's file-picker renderer
+    for Sheets / Docs / Slides / folders / any other Google-native type."""
     import httpx
 
-    token = await _resolve_google_token(credential_id, workspace, service)
+    if not mime_type:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="`mime_type` is required.",
+        )
 
+    token = await _resolve_google_token(credential_id, workspace, service)
     safe_query = (query or "").strip().replace("'", "\\'")
-    q_parts = [
-        "mimeType = 'application/vnd.google-apps.spreadsheet'",
-        "trashed = false",
-    ]
+    safe_mime = mime_type.replace("'", "\\'")
+    q_parts = [f"mimeType = '{safe_mime}'", "trashed = false"]
     if safe_query:
         q_parts.append(f"name contains '{safe_query}'")
 
@@ -344,14 +368,14 @@ async def list_sheets_spreadsheets(
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=(f"Sheets list failed ({exc.response.status_code}): {exc.response.text[:200]}"),
+            detail=(f"Drive list failed ({exc.response.status_code}): {exc.response.text[:200]}"),
         ) from exc
 
-    return {"spreadsheets": resp.json().get("files") or []}
+    return {"files": resp.json().get("files") or []}
 
 
-@router.post("/{credential_id}/sheets/spreadsheets", status_code=status.HTTP_201_CREATED)
-async def create_sheets_spreadsheet(
+@router.post("/{credential_id}/google-files", status_code=status.HTTP_201_CREATED)
+async def create_google_file(
     credential_id: uuid.UUID,
     payload: dict,
     current_user: User = Depends(get_current_user),
@@ -359,32 +383,53 @@ async def create_sheets_spreadsheet(
     db: AsyncSession = Depends(get_db),
     service: CredentialService = Depends(get_credential_service),
 ):
-    """Create a new spreadsheet from inside the picker — title plus an
-    optional list of initial sheet titles. Returns the new spreadsheet's
-    id + name so the picker can auto-select it."""
+    """Create a new Google-native file (Sheet / Doc / Slides) of the
+    requested mime type. Routes to the right native API based on
+    `_GOOGLE_CREATE_DISPATCH`. Returns `{id, name, webViewLink}`."""
     import httpx
 
-    token = await _resolve_google_token(credential_id, workspace, service)
-
+    mime = str((payload or {}).get("mime_type") or "").strip()
     title = str((payload or {}).get("title") or "").strip()
+    if not mime:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="`mime_type` is required.",
+        )
     if not title:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="`title` is required.",
         )
-    raw_sheets = (payload or {}).get("sheet_titles") or []
-    sheet_titles: list[str] = []
-    if isinstance(raw_sheets, list):
-        sheet_titles = [str(t) for t in raw_sheets if str(t).strip()]
+    if mime not in _GOOGLE_CREATE_DISPATCH:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Mime type {mime!r} is not creatable via this endpoint.",
+        )
 
-    body: dict = {"properties": {"title": title}}
-    if sheet_titles:
-        body["sheets"] = [{"properties": {"title": t}} for t in sheet_titles]
+    token = await _resolve_google_token(credential_id, workspace, service)
+    endpoint, response_shape = _GOOGLE_CREATE_DISPATCH[mime]
+
+    # Shape the create body per surface. Sheets accepts an optional
+    # initial-tabs list; other surfaces only take a title.
+    if mime == "application/vnd.google-apps.spreadsheet":
+        body: dict = {"properties": {"title": title}}
+        raw_sheets = (payload or {}).get("sheet_titles") or []
+        if isinstance(raw_sheets, list):
+            sheet_titles = [str(t) for t in raw_sheets if str(t).strip()]
+            if sheet_titles:
+                body["sheets"] = [{"properties": {"title": t}} for t in sheet_titles]
+    elif mime in (
+        "application/vnd.google-apps.document",
+        "application/vnd.google-apps.presentation",
+    ):
+        body = {"title": title}
+    else:  # pragma: no cover - guarded above
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="unreachable")
 
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
-                "https://sheets.googleapis.com/v4/spreadsheets",
+                endpoint,
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
@@ -395,16 +440,17 @@ async def create_sheets_spreadsheet(
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=(
-                f"Sheets create failed ({exc.response.status_code}): {exc.response.text[:200]}"
-            ),
+            detail=(f"Create failed ({exc.response.status_code}): {exc.response.text[:200]}"),
         ) from exc
 
     data = resp.json()
+    file_id = data.get(response_shape["id_key"])
+    name = ((data.get("properties") or {}).get("title")) or data.get("title") or title
     return {
-        "id": data.get("spreadsheetId"),
-        "name": ((data.get("properties") or {}).get("title")) or title,
-        "webViewLink": data.get("spreadsheetUrl"),
+        "id": file_id,
+        "name": name,
+        "webViewLink": data.get(response_shape["url_key"]) if response_shape["url_key"] else None,
+        "mime_type": mime,
     }
 
 
