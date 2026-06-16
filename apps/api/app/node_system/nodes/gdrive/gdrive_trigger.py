@@ -267,13 +267,13 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
             async with httpx.AsyncClient(timeout=30) as client:
                 headers = {"Authorization": f"Bearer {token}"}
                 if state is None:
-                    page_token = await self._snapshot_page_token(client, headers)
+                    initial_cursor = await self._snapshot_cursor(client, headers)
                     await repo.upsert(
                         workflow_id=wf_uuid,
                         workspace_id=ws_uuid,
                         node_id=node_id,
                         provider=PROVIDER,
-                        cursor={"page_token": page_token},
+                        cursor=initial_cursor,
                         next_poll_at=_next_poll_at(self.props.poll_interval_seconds),
                         last_error=None,
                     )
@@ -284,11 +284,11 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                             "matched": 0,
                             "changes": [],
                             "cursor_initialised": True,
-                            "page_token": page_token,
+                            **initial_cursor,
                         },
                         handled_successors=True,
                     )
-                changes, new_page_token = await self._poll_changes(client, headers, state)
+                changes, new_cursor = await self._poll_changes(client, headers, state)
         except httpx.HTTPStatusError as exc:
             return NodeResult(
                 success=False,
@@ -303,7 +303,7 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
             workspace_id=ws_uuid,
             node_id=node_id,
             provider=PROVIDER,
-            cursor={"page_token": new_page_token},
+            cursor=new_cursor,
             next_poll_at=_next_poll_at(self.props.poll_interval_seconds),
             last_error=None,
         )
@@ -315,7 +315,7 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                 output_data={
                     "matched": 0,
                     "changes": [],
-                    "page_token": new_page_token,
+                    **new_cursor,
                 },
                 handled_successors=True,
             )
@@ -325,13 +325,22 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
 
     async def poll(
         self, token: str, cursor: dict[str, Any] | None
-    ) -> tuple[list[dict[str, Any]], str]:
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         headers = {"Authorization": f"Bearer {token}"}
         async with httpx.AsyncClient(timeout=30) as client:
-            if not cursor or not cursor.get("page_token"):
-                page_token = await self._snapshot_page_token(client, headers)
-                return [], page_token
+            if not cursor or (not cursor.get("page_token") and not cursor.get("last_modified_iso")):
+                return [], await self._snapshot_cursor(client, headers)
             return await self._poll_changes(client, headers, cursor)
+
+    async def _snapshot_cursor(
+        self, client: httpx.AsyncClient, headers: dict[str, str]
+    ) -> dict[str, Any]:
+        """Initial cursor for whichever mode is active. Extended-scope
+        + folder picked → ISO modifiedTime; default → opaque page token."""
+        parent_id = _folder_id(self.props.parent_folder_id)
+        if _extended_scope_enabled() and parent_id:
+            return {"last_modified_iso": _now_iso()}
+        return {"page_token": await self._snapshot_page_token(client, headers)}
 
     async def _snapshot_page_token(self, client: httpx.AsyncClient, headers: dict[str, str]) -> str:
         resp = await client.get(f"{GDRIVE_API}/changes/startPageToken", headers=headers)
@@ -343,17 +352,28 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
         client: httpx.AsyncClient,
         headers: dict[str, str],
         cursor_or_state: IntegrationTriggerState | dict[str, Any],
-    ) -> tuple[list[dict[str, Any]], str]:
-        """Pull every change since the cursor, filter, normalise.
-        Returns `(matches, new_page_token)`."""
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        """Pull every change since the cursor. Two strategies:
+
+        - **`drive.file` only** (default): `changes.list?pageToken=…`
+          — sees only files Fuse created.
+        - **`drive.readonly` + folder picked** (extended, requires
+          `GOOGLE_DRIVE_WATCH_EXTERNAL=true`): switch to
+          `files.list?q="'<folder>' in parents and modifiedTime >
+          '<iso>'"` so external uploads become visible. Cursor
+          flips from `page_token` to `last_modified_iso`.
+        """
         cursor = (
             cursor_or_state.cursor
             if isinstance(cursor_or_state, IntegrationTriggerState)
             else cursor_or_state
         )
+        parent_id = _folder_id(self.props.parent_folder_id)
+        if _extended_scope_enabled() and parent_id:
+            return await self._poll_folder_files(client, headers, cursor or {}, parent_id)
         page_token = str((cursor or {}).get("page_token") or "")
         if not page_token:
-            return [], await self._snapshot_page_token(client, headers)
+            return [], {"page_token": await self._snapshot_page_token(client, headers)}
 
         event_filter = (self.props.event_filter or "any").lower()
         if event_filter not in EVENT_FILTERS:
@@ -402,7 +422,73 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
             current_token = body.get("nextPageToken")
             if len(matches) >= max_take:
                 break
-        return matches, new_page_token
+        return matches, {"page_token": new_page_token}
+
+    async def _poll_folder_files(
+        self,
+        client: httpx.AsyncClient,
+        headers: dict[str, str],
+        cursor: dict[str, Any],
+        parent_id: str,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        """Extended-scope folder-watching path. Uses
+        `files.list?q="'<parent>' in parents and modifiedTime > '<iso>'"`
+        so uploads from any source (web UI, mobile, other apps) become
+        visible. Cursor is the most recent file's `modifiedTime`."""
+        last_iso = str(cursor.get("last_modified_iso") or "").strip()
+        if not last_iso:
+            return [], {"last_modified_iso": _now_iso()}
+
+        event_filter = (self.props.event_filter or "any").lower()
+        if event_filter not in EVENT_FILTERS:
+            event_filter = "any"
+        mime_type = (self.props.mime_type or "").strip()
+        name_substr = (self.props.name_contains or "").strip().lower()
+        max_take = max(1, min(self.props.max_changes_per_poll, 100))
+
+        q_parts = [
+            f"'{parent_id}' in parents",
+            f"modifiedTime > '{last_iso}'",
+        ]
+        if event_filter == "trashed":
+            q_parts.append("trashed = true")
+        else:
+            q_parts.append("trashed = false")
+        if mime_type:
+            q_parts.append(f"mimeType = '{mime_type}'")
+        if name_substr:
+            q_parts.append(f"name contains '{name_substr}'")
+
+        resp = await client.get(
+            f"{GDRIVE_API}/files",
+            headers=headers,
+            params={
+                "q": " and ".join(q_parts),
+                "orderBy": "modifiedTime",
+                "pageSize": max_take,
+                "fields": (
+                    "files(id,name,mimeType,trashed,createdTime,"
+                    "modifiedTime,webViewLink,iconLink,parents,"
+                    "owners(emailAddress),size)"
+                ),
+            },
+        )
+        resp.raise_for_status()
+        files = resp.json().get("files") or []
+
+        matches: list[dict[str, Any]] = []
+        newest = last_iso
+        for file in files:
+            change_type = _classify_change({}, file)
+            if event_filter != "any" and change_type != event_filter:
+                continue
+            if name_substr and name_substr not in (file.get("name") or "").lower():
+                continue
+            matches.append(_normalize({}, file, change_type))
+            modified = file.get("modifiedTime") or ""
+            if modified > newest:
+                newest = modified
+        return matches, {"last_modified_iso": newest}
 
     async def _stateless_first_match(self, token: str) -> NodeResult:
         """Preview path — return the most recently modified file the
@@ -444,6 +530,21 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
 
 
 # ── helpers ──────────────────────────────────────────────────────────────
+
+
+def _extended_scope_enabled() -> bool:
+    """True when the deployment has opted into `drive.readonly` for
+    folder-watch. CASA required before production rollout."""
+    try:
+        from apps.api.app.core.config import settings
+
+        return bool(getattr(settings, "GOOGLE_DRIVE_WATCH_EXTERNAL", False))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _now_iso() -> str:
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def _folder_id(value: Any) -> str:
@@ -535,8 +636,8 @@ async def _poll_for_scheduler(
             props.get("poll_interval_seconds") or DEFAULT_POLL_INTERVAL_SECONDS
         ),
     )
-    changes, new_page_token = await node.poll(token, cursor)
-    return changes, {"page_token": new_page_token}
+    # node.poll returns the cursor in its native shape — pass through.
+    return await node.poll(token, cursor)
 
 
 def _register() -> None:

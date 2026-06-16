@@ -279,8 +279,14 @@ class GoogleOAuthProvider:
     # - Future surfaces (YouTube / Ads / Cloud APIs / Admin) get their
     #   own sibling provider — keeping this provider's consent screen
     #   short keeps the OAuth UX honest about what the user is granting.
-    _SCOPE_STR = " ".join(
-        [
+    @classmethod
+    def _scope_str(cls) -> str:
+        """Build the scope list — appends `drive.readonly` when the
+        deployment has opted into folder-watch via the
+        `GOOGLE_DRIVE_WATCH_EXTERNAL` env flag. `drive.readonly` is a
+        Restricted Scope (needs CASA review for production); keep off
+        by default."""
+        base = [
             "https://www.googleapis.com/auth/gmail.modify",
             "https://www.googleapis.com/auth/calendar",
             "https://www.googleapis.com/auth/drive.file",
@@ -291,7 +297,11 @@ class GoogleOAuthProvider:
             "email",
             "profile",
         ]
-    )
+        if getattr(settings, "GOOGLE_DRIVE_WATCH_EXTERNAL", False):
+            base.insert(3, "https://www.googleapis.com/auth/drive.readonly")
+        return " ".join(base)
+
+    _SCOPE_STR = ""  # populated dynamically — kept for back-compat readers
 
     def get_authorization_url(self, state, code_challenge=None):
         from urllib.parse import urlencode
@@ -300,7 +310,7 @@ class GoogleOAuthProvider:
             "client_id": settings.GOOGLE_CLIENT_ID if hasattr(settings, "GOOGLE_CLIENT_ID") else "",
             "redirect_uri": REDIRECT_URI.format(service="google"),
             "response_type": "code",
-            "scope": self._SCOPE_STR,
+            "scope": self._scope_str(),
             "access_type": "offline",
             "state": state,
             "prompt": "consent",

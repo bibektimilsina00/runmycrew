@@ -61,6 +61,15 @@ class Settings(BaseSettings):
     # bake project ids into the frontend bundle.
     GOOGLE_API_KEY: str = ""
     GOOGLE_APP_ID: str = ""
+    # Drive trigger scope tier. False (default) → request only
+    # `drive.file` — Drive trigger sees uploads done via Fuse's action
+    # node, but NOT external uploads (Drive web UI, mobile app, other
+    # apps). True → also request `drive.readonly` so the trigger can
+    # watch a Picker-selected folder for ALL uploads regardless of
+    # source. `drive.readonly` is a Restricted Scope that requires
+    # Google's CASA security assessment before shipping to general
+    # users in production. Safe defaults stay off.
+    GOOGLE_DRIVE_WATCH_EXTERNAL: bool = False
 
     # Meta (Facebook + Instagram + WhatsApp + Messenger). One developer app
     # backs every Meta product. The verify token is the shared secret used
