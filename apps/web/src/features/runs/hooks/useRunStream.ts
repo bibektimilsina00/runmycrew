@@ -1,6 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { useRunsStore, normalizeLevel, type RunLog } from '../store/runsStore'
+
+// React StrictMode runs effect mount → cleanup → mount in dev, which
+// would otherwise spawn two WebSockets for the same execution. The
+// backend handles a vanished client cleanly now, but the duplicate
+// socket still costs a connect/subscribe round-trip and shows up as
+// two open lines in the run timeline. We defer cleanup-driven close
+// by a tick — if the same effect re-mounts (StrictMode), it cancels
+// the pending close and reuses the same socket. Real unmounts still
+// close (after the short delay).
+const STRICTMODE_REUSE_WINDOW_MS = 150
 
 function buildWsUrl(): string {
   const rawApiUrl = import.meta.env.VITE_API_URL || '/api/v1'
@@ -25,6 +35,16 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
   const setNodeStatus = useRunsStore((s) => s.setNodeStatus)
   const setWaiting = useRunsStore((s) => s.setWaiting)
 
+  // Persisted across StrictMode mount-cleanup-mount cycles for the
+  // same component instance. Carries the live socket + a pending-close
+  // timer so the second mount can cancel the timer and reuse the
+  // socket instead of opening a new one.
+  const socketRef = useRef<{
+    ws: WebSocket
+    executionId: string
+    closeTimer: ReturnType<typeof setTimeout> | null
+  } | null>(null)
+
   useEffect(() => {
     if (!workflowId || !executionId) return
     // Synthetic ids minted by recordRunFailure() never had a server-side
@@ -37,8 +57,41 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
 
     startRun(workflowId, executionId)
 
+    // Reuse the socket from a just-cancelled cleanup if it's still open
+    // for the same execution. StrictMode mount → cleanup → mount lands
+    // inside the reuse window, so we skip the new-WebSocket round-trip
+    // entirely.
+    const existing = socketRef.current
+    if (
+      existing &&
+      existing.executionId === executionId &&
+      existing.ws.readyState === WebSocket.OPEN
+    ) {
+      if (existing.closeTimer) {
+        clearTimeout(existing.closeTimer)
+        existing.closeTimer = null
+      }
+      return () => {
+        if (socketRef.current) {
+          socketRef.current.closeTimer = setTimeout(() => {
+            socketRef.current?.ws.close()
+            socketRef.current = null
+          }, STRICTMODE_REUSE_WINDOW_MS)
+        }
+      }
+    }
+
+    // Different execution or no live socket — close any prior one and
+    // open a fresh connection.
+    if (existing) {
+      if (existing.closeTimer) clearTimeout(existing.closeTimer)
+      existing.ws.close()
+      socketRef.current = null
+    }
+
     const url = `${buildWsUrl()}/ws/executions/${executionId}?token=${encodeURIComponent(token)}`
-    let ws: WebSocket | null = new WebSocket(url)
+    const ws: WebSocket = new WebSocket(url)
+    socketRef.current = { ws, executionId, closeTimer: null }
     let alive = true
     let liveCounter = 0
 
@@ -128,12 +181,22 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
       if (!alive) return
       // Server closes on terminal status; if no terminal event arrived, leave
       // status as-is (it may have streamed during the session).
+      if (socketRef.current?.ws === ws) socketRef.current = null
     }
 
     return () => {
       alive = false
-      ws?.close()
-      ws = null
+      // Defer the close so a StrictMode re-mount can reclaim the socket.
+      // A real unmount (or executionId change) hits the timer and closes
+      // for real.
+      if (socketRef.current?.ws === ws) {
+        socketRef.current.closeTimer = setTimeout(() => {
+          ws.close()
+          if (socketRef.current?.ws === ws) socketRef.current = null
+        }, STRICTMODE_REUSE_WINDOW_MS)
+      } else {
+        ws.close()
+      }
     }
   }, [workflowId, executionId, appendLog, setStatus, startRun, setNodeStatus, setWaiting])
 }

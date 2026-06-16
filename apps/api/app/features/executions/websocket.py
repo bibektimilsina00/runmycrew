@@ -7,6 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.websockets import WebSocketState
+from uvicorn.protocols.utils import ClientDisconnected
 
 from apps.api.app.core.database import get_db
 from apps.api.app.core.logger import get_logger
@@ -58,43 +59,49 @@ async def execution_websocket(
         try:
             terminal_status: str | None = None
 
-            # Send initial catch-up data from DB.
-            repo = ExecutionRepository(db)
-            execution = await repo.get_by_id(execution_id)
-            if execution:
-                terminal_status = (
-                    execution.status if execution.status in ("completed", "failed") else None
-                )
-                for log in execution.logs:
-                    # Ensure timestamp is UTC and has 'Z' for consistent JS parsing
-                    ts = log.timestamp.isoformat()
-                    if not ts.endswith("Z") and "+00:00" not in ts:
-                        ts += "Z"
+            # Send initial catch-up data from DB. Disconnects during this
+            # window (the client navigated away, dev double-mount closed
+            # the prior socket, etc) are benign — log at debug and bail.
+            try:
+                repo = ExecutionRepository(db)
+                execution = await repo.get_by_id(execution_id)
+                if execution:
+                    terminal_status = (
+                        execution.status if execution.status in ("completed", "failed") else None
+                    )
+                    for log in execution.logs:
+                        # Ensure timestamp is UTC and has 'Z' for consistent JS parsing
+                        ts = log.timestamp.isoformat()
+                        if not ts.endswith("Z") and "+00:00" not in ts:
+                            ts += "Z"
 
+                        await websocket.send_json(
+                            {
+                                "type": "log_synced",
+                                "id": str(log.id),
+                                "execution_id": str(execution_id),
+                                "timestamp": ts,
+                                "node_id": log.node_id,
+                                "level": log.level,
+                                "message": log.message,
+                                "payload": log.payload,
+                            }
+                        )
+
+                if terminal_status:
                     await websocket.send_json(
                         {
-                            "type": "log_synced",
-                            "id": str(log.id),
+                            "type": f"execution_{terminal_status}",
                             "execution_id": str(execution_id),
-                            "timestamp": ts,
-                            "node_id": log.node_id,
-                            "level": log.level,
-                            "message": log.message,
-                            "payload": log.payload,
+                            "timestamp": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+                            "status": terminal_status,
                         }
                     )
-
-            if terminal_status:
-                await websocket.send_json(
-                    {
-                        "type": f"execution_{terminal_status}",
-                        "execution_id": str(execution_id),
-                        "timestamp": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-                        "status": terminal_status,
-                    }
-                )
-                logger.info(f"Execution {execution_id} already finished, closing websocket")
-                await websocket.close(code=1000)
+                    logger.info(f"Execution {execution_id} already finished, closing websocket")
+                    await websocket.close(code=1000)
+                    return
+            except (WebSocketDisconnect, ClientDisconnected):
+                logger.debug(f"Client disconnected during catch-up for {execution_id} — closing")
                 return
 
             await _stream_pubsub(
@@ -107,6 +114,10 @@ async def execution_websocket(
             with suppress(Exception):
                 await pubsub.unsubscribe(channel)
 
+    except (WebSocketDisconnect, ClientDisconnected):
+        logger.debug(f"Client closed WS for {execution_id} before init completed")
+        with suppress(Exception):
+            await websocket.close(code=1000)
     except Exception as e:
         logger.error(f"Failed to initialize WebSocket for {execution_id}: {e}", exc_info=True)
         with suppress(Exception):
