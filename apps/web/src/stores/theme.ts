@@ -44,7 +44,9 @@ export function useTheme() {
     applyTheme(theme)
     try {
       localStorage.setItem('fuse-app-theme', theme)
-    } catch {}
+    } catch {
+      // ignore
+    }
   }, [theme])
 
   const setTheme = useCallback((t: AppTheme) => setThemeState(t), [])

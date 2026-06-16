@@ -24,7 +24,7 @@ export function GreetingRow() {
   return (
     <div className="flex items-end justify-between gap-[24px]">
       <div className="flex flex-col">
-        <span className="inline-flex items-center gap-[8px] font-mono text-[10.5px] tracking-widest uppercase text-[var(--text-faint)] font-medium">
+        <span className="inline-flex items-center gap-[8px] font-sans text-[11px] tracking-wider uppercase text-[var(--text-mute)] font-semibold">
           <span className="w-[6px] h-[6px] rounded-full bg-[var(--ok)] shadow-[0_0_6px_oklch(0.78_0.14_145/0.6)]" />
           All systems operational · {formattedDate}
         </span>

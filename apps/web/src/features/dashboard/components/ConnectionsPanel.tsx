@@ -52,7 +52,7 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
             return (
               <div
                 key={c.id}
-                className="flex items-center gap-[12px] py-[10px] px-[16px] border-b border-[var(--border-faint)] last:border-b-0 cursor-pointer hover:bg-[var(--surface)] transition-colors"
+                className="flex items-center gap-[12px] py-[12px] px-[16px] border-b border-[var(--border-faint)] last:border-b-0 cursor-pointer hover:bg-[var(--surface)] transition-colors"
                 onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
               >
                 {iconUrl ? (
@@ -67,12 +67,14 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
                     {initial}
                   </span>
                 )}
-                <span className="flex flex-col gap-[2px] min-w-0 flex-1">
-                  <span className="text-[12.5px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">{c.name}</span>
-                  <span className="text-[11px] text-[var(--text-faint)] font-mono">{provider?.name ?? c.type}</span>
+                <span className="flex flex-col gap-[1px] min-w-0 flex-1">
+                  <span className="text-[13px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">{c.name}</span>
+                  {c.name.toLowerCase() !== (provider?.name ?? c.type).toLowerCase() && (
+                    <span className="text-[11px] text-[var(--text-faint)] font-sans">{provider?.name ?? c.type}</span>
+                  )}
                 </span>
                 <span className={cn(
-                  "font-mono text-[10px] tracking-widest uppercase py-[3px] px-[7px] pb-[2px] rounded-sm font-medium",
+                  "font-sans text-[10px] tracking-wider uppercase py-[2.5px] px-[6px] rounded-sm font-semibold",
                   c.state === 'ok'   && 'bg-emerald-500/15 text-emerald-500',
                   c.state === 'warn' && 'bg-amber-500/15 text-amber-500',
                   c.state === 'err'  && 'bg-red-500/15 text-red-500',
