@@ -412,4 +412,5 @@ def polling_expected_event_label(provider: str) -> str:
         "gdrive": "Drive change",
         "google_sheets": "Sheet row",
         "google_tasks": "Google Task event",
+        "google_forms": "Form response",
     }.get(provider, provider)

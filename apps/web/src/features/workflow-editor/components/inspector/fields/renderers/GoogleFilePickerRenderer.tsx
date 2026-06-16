@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Check,
   ChevronDown,
+  ClipboardList,
   FileSpreadsheet,
   FileText,
   Folder,
@@ -81,6 +82,10 @@ const MIME_LOOKS: Record<string, { Icon: LucideIcon; color: string }> = {
   'application/vnd.google-apps.folder': {
     Icon: Folder,
     color: '#80868b',
+  },
+  'application/vnd.google-apps.form': {
+    Icon: ClipboardList,
+    color: '#673ab7',
   },
 }
 

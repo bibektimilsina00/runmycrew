@@ -213,6 +213,7 @@ export function useWorkflowEditor(workflowId: string) {
     'trigger.gdrive_change',
     'trigger.google_sheets',
     'trigger.gtasks_change',
+    'trigger.gforms_response',
   ])
 
   const hasMetaTrigger = useCallback(() => {
