@@ -68,6 +68,7 @@ interface GooglePickerBuilder {
   setOAuthToken(t: string): GooglePickerBuilder
   setDeveloperKey(k: string): GooglePickerBuilder
   setAppId(a: string): GooglePickerBuilder
+  setOrigin(o: string): GooglePickerBuilder
   enableFeature(f: string): GooglePickerBuilder
   setCallback(cb: (data: PickerCallbackData) => void): GooglePickerBuilder
   setTitle(s: string): GooglePickerBuilder
@@ -213,6 +214,13 @@ export function GDrivePickerRenderer({ value, onChange, disabled, properties }: 
       const picker = window.google?.picker
       if (!picker) throw new Error('Google Picker SDK not available')
 
+      console.log('[gdrive-picker] SDK ready, building Picker', {
+        hasToken: !!data.access_token,
+        hasKey: !!data.developer_key,
+        appId: data.app_id,
+        origin: window.location.origin,
+      })
+
       const docsView = new picker.DocsView()
         .setIncludeFolders(true)
         .setSelectFolderEnabled(true)
@@ -223,16 +231,23 @@ export function GDrivePickerRenderer({ value, onChange, disabled, properties }: 
         .setOAuthToken(data.access_token)
         .setDeveloperKey(data.developer_key)
         .setAppId(data.app_id)
+        // Picker iframes are blocked unless we declare the page's origin
+        // up-front. Without this, the picker silently refuses to render
+        // in some browser / referrer combinations.
+        .setOrigin(window.location.protocol + '//' + window.location.host)
         .enableFeature(picker.Feature.SUPPORT_DRIVES)
         .setTitle('Pick a Google Drive folder to watch')
         .setCallback((evt) => {
+          console.log('[gdrive-picker] callback', evt.action)
           if (evt.action === picker.Action.PICKED && evt.docs && evt.docs[0]) {
             const doc = evt.docs[0]
             onChange({ id: doc.id, name: doc.name })
           }
         })
 
-      builder.build().setVisible(true)
+      const built = builder.build()
+      built.setVisible(true)
+      console.log('[gdrive-picker] setVisible(true) called')
     } catch (err) {
       const msg =
         (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
