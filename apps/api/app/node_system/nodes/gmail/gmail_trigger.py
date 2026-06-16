@@ -229,9 +229,7 @@ class GmailTriggerNode(BaseNode[GmailTriggerProperties]):
         except httpx.HTTPStatusError as exc:
             return NodeResult(
                 success=False,
-                error=(
-                    f"Gmail API error {exc.response.status_code}: " f"{exc.response.text[:200]}"
-                ),
+                error=(f"Gmail API error {exc.response.status_code}: {exc.response.text[:200]}"),
             )
         except Exception as exc:  # noqa: BLE001
             logger.error(f"GmailTriggerNode poll failed: {exc}", exc_info=True)
@@ -398,9 +396,7 @@ class GmailTriggerNode(BaseNode[GmailTriggerProperties]):
         except httpx.HTTPStatusError as exc:
             return NodeResult(
                 success=False,
-                error=(
-                    f"Gmail API error {exc.response.status_code}: " f"{exc.response.text[:200]}"
-                ),
+                error=(f"Gmail API error {exc.response.status_code}: {exc.response.text[:200]}"),
             )
         except Exception as exc:  # noqa: BLE001
             logger.error(f"GmailTriggerNode stateless poll failed: {exc}", exc_info=True)
