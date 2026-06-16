@@ -44,6 +44,7 @@ class WorkflowRunner:
         on_log: Any = None,
         credentials: list[dict[str, Any]] | None = None,
         emitter: Any = None,
+        workspace_id: str | None = None,
         _depth: int = 0,
         _budget: dict[str, int] | None = None,
     ):
@@ -54,6 +55,11 @@ class WorkflowRunner:
         self.edges = graph.get("edges", [])
         self.credentials = credentials or []
         self.db = db
+        # Carried through to every NodeContext so polling triggers can
+        # persist cursors against the correct workspace row. Optional —
+        # synthetic test runs that don't supply it gracefully fall back
+        # to stateless preview mode inside the trigger.
+        self.workspace_id = workspace_id
         self.on_log = on_log
         self.emitter = emitter
         self.variables: dict[str, Any] = {}
@@ -89,8 +95,36 @@ class WorkflowRunner:
             logger.info(f"Workflow {self.workflow_id} has no nodes — completing immediately")
             return {}
 
+        # If the caller passed no trigger payload (manual Run from the
+        # editor), replay each trigger start node's last captured fixture.
+        # Lets the user iterate on downstream nodes without re-triggering
+        # the external event each time. Falls back to `{}` per node so
+        # `require_webhook_payload` still surfaces a clear error when
+        # nothing has ever been captured.
+        per_node_input: dict[str, dict[str, Any]] = {}
+        if not trigger_data and self.db is not None:
+            import uuid as _uuid
+
+            from apps.api.app.features.triggers.repository import TriggerFixtureRepository
+
+            try:
+                wf_uuid = _uuid.UUID(str(self.workflow_id))
+            except (ValueError, TypeError):
+                wf_uuid = None
+            if wf_uuid is not None:
+                fixture_repo = TriggerFixtureRepository(self.db)
+                for node_id in start_nodes:
+                    node_type = str(self.nodes.get(node_id, {}).get("type") or "")
+                    if not node_type.startswith("trigger."):
+                        continue
+                    fixture = await fixture_repo.get(wf_uuid, node_id)
+                    if fixture and isinstance(fixture.payload, dict):
+                        per_node_input[node_id] = fixture.payload
+
         try:
-            await asyncio.gather(*[self._execute_node(n, trigger_data) for n in start_nodes])
+            await asyncio.gather(
+                *[self._execute_node(n, per_node_input.get(n, trigger_data)) for n in start_nodes]
+            )
         except PauseSignal:
             raise  # propagate to Celery task
         except CancelledException:
@@ -169,6 +203,9 @@ class WorkflowRunner:
         from apps.api.app.execution_engine.engine.property_resolver import resolve_properties
         from apps.api.app.execution_engine.engine.template_resolver import TemplateResolver
 
+        # `jsonata_resolver` is created a few lines down — defer the binding
+        # by assigning after construction so the template resolver picks it
+        # up for inline `{{ $step.x }}` lookups inside mixed-text fields.
         template_resolver = TemplateResolver(
             node_outputs=self._outputs,
             trigger_data=self._trigger_data,
@@ -201,6 +238,9 @@ class WorkflowRunner:
             secrets=self.secrets,
             loop_data=self.loop_data,
         )
+        # Late-bind so inline `{{ $step.x }}` chunks inside literal-text
+        # fields route through the same JSONata engine as `=expression`.
+        template_resolver._jsonata = jsonata_resolver  # noqa: SLF001
         resolved_properties = resolve_properties(
             node_data.get("data", {}).get("properties", {}),
             jsonata_resolver,
@@ -268,6 +308,7 @@ class WorkflowRunner:
             emitter=self.emitter,
             run_downstream=run_downstream,
             pause=pause_execution,
+            workspace_id=self.workspace_id,
         )
 
         await self._emit(

@@ -8,6 +8,9 @@ export interface PropertyFieldProps {
   properties: Record<string, unknown>
   value: unknown
   onChange: (value: unknown) => void
+  /** Multi-field patch — used by renderers that derive sibling fields
+   *  (e.g. MediaRenderer deriving `kind` from the picked file's mime). */
+  onPropertiesChange?: (patch: Record<string, unknown>) => void
 
   /** Render the field as read-only (greys out + disables inputs). */
   readOnly?: boolean
@@ -23,6 +26,7 @@ export function PropertyField({
   properties,
   value,
   onChange,
+  onPropertiesChange,
   readOnly,
   defaultValue,
   onReset,
@@ -41,6 +45,7 @@ export function PropertyField({
         properties={properties}
         value={value}
         onChange={onChange}
+        onPropertiesChange={onPropertiesChange}
         disabled={readOnly}
       />
     </FieldWrapper>

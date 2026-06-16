@@ -26,6 +26,7 @@ class TemplateResolver:
         env: dict[str, str] | None = None,
         secrets: dict[str, str] | None = None,
         loop_data: dict[str, Any] | None = None,
+        jsonata_resolver: Any = None,
     ):
         self._context = {
             "trigger": {"output": trigger_data},
@@ -36,6 +37,13 @@ class TemplateResolver:
             or {},  # {{loop.item}}, {{loop.index}}, {{loop.total}}, {{loop.value}}
             **{node_id: {"output": output} for node_id, output in node_outputs.items()},
         }
+        # Optional handle on the JSONata resolver so inline `{{ $step.x }}` /
+        # `{{ $node('Trigger').field }}` chunks inside a literal-text field
+        # (e.g. an email subject "Re: {{ $step.subject }}") evaluate through
+        # the same engine that handles full `=expression` fields. When
+        # absent, `$`-prefixed paths fall back to None — the field then
+        # renders as empty string in the mixed-text branch.
+        self._jsonata = jsonata_resolver
 
     def resolve_properties(self, properties: dict[str, Any]) -> dict[str, Any]:
         """Resolve all template strings in a node's properties dict recursively."""
@@ -115,12 +123,12 @@ class TemplateResolver:
         # If the entire string is exactly one template "{{path}}", preserve the resolved type
         # (e.g. if it resolves to a number, return a number, not a string "42")
         if len(matches) == 1 and template.strip() == f"{{{{{matches[0]}}}}}":
-            return self._resolve_path(matches[0].strip())
+            return self._resolve_one(matches[0].strip())
 
         # If it's a mix of text and templates, always return a string
         def replace_match(match: re.Match) -> str:
             path = match.group(1).strip()
-            resolved = self._resolve_path(path)
+            resolved = self._resolve_one(path)
             if resolved is None:
                 return ""
             if isinstance(resolved, dict | list):
@@ -128,6 +136,20 @@ class TemplateResolver:
             return str(resolved)
 
         return TEMPLATE_PATTERN.sub(replace_match, template)
+
+    def _resolve_one(self, path: str) -> Any:
+        """Resolve one `{{ }}` inner expression. Routes `$`-prefixed paths
+        (`$step.x`, `$node('Trigger').x`, `$item`, ...) to JSONata when a
+        resolver was supplied; everything else stays on the legacy dot-path
+        lookup so existing graphs keep working."""
+        path = path.strip()
+        if path.startswith("$") and self._jsonata is not None:
+            try:
+                return self._jsonata.evaluate(path)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Inline JSONata expression failed; resolving to None: %s", exc)
+                return None
+        return self._resolve_path(path)
 
     def _resolve_path(self, path: str) -> Any:
         """Resolve a dot-path like 'node_1.output.body.id'."""

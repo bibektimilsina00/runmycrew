@@ -9,11 +9,7 @@ export function CredentialRenderer({ prop, definition, properties, value, onChan
     [definition, prop, properties],
   )
 
-  // If the node defines multiple acceptable credential types (e.g. OAuth or
-  // API key), we use the first. Most nodes have exactly one; this matches the
-  // previous behaviour and keeps the inspector contract simple.
-  const credType = credentialTypes[0]
-  if (!credType) {
+  if (credentialTypes.length === 0) {
     return (
       <p className="text-[11px] text-text-faint">
         This node does not declare a credential type.
@@ -23,7 +19,7 @@ export function CredentialRenderer({ prop, definition, properties, value, onChan
 
   return (
     <CredentialSelector
-      credType={credType}
+      credType={credentialTypes.length === 1 ? credentialTypes[0] : credentialTypes}
       value={value !== undefined && value !== null ? String(value) : ''}
       onChange={onChange}
       disabled={disabled}

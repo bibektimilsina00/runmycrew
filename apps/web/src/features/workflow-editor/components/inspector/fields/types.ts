@@ -12,6 +12,11 @@ export interface RendererProps {
   properties: Record<string, unknown>
   value: unknown
   onChange: (value: unknown) => void
+  /** Patch multiple properties in a single write. Set when the renderer
+   *  derives sibling fields from its own value (e.g. MediaRenderer auto-
+   *  selecting `kind` from a picked file's mime). Renderers that don't
+   *  need it can ignore the prop entirely. */
+  onPropertiesChange?: (patch: Record<string, unknown>) => void
   disabled?: boolean
 }
 

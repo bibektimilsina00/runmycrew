@@ -26,8 +26,16 @@ const RUNTIME_VAR_REGEX = /\$(step|node|trigger|vars|env|secrets|loop)\b/
  *   single-cell display).
  */
 function tryResolveDesignTime(value: string): string | null {
-  if (!value.startsWith('=')) return null
-  const expr = value.slice(1).trim()
+  let expr: string | null = null
+  const trimmed = value.trim()
+  if (trimmed.startsWith('{{') && trimmed.endsWith('}}')) {
+    expr = trimmed.slice(2, -2).trim()
+  } else if (trimmed.startsWith('=')) {
+    // Legacy `=expression` saves still resolve so old graphs render the
+    // same way until the user touches them and the editor migrates the
+    // value to the new `{{ … }}` shape.
+    expr = trimmed.slice(1).trim()
+  }
   if (!expr) return null
   if (RUNTIME_VAR_REGEX.test(expr)) return null
   try {
@@ -43,15 +51,18 @@ function tryResolveDesignTime(value: string): string | null {
 
 export const getPropValuePreview = (val: unknown, propType: string): string => {
   if (val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)) return '-'
-  if (typeof val === 'string' && val.startsWith('=')) {
+  if (
+    typeof val === 'string' &&
+    (val.startsWith('=') || (val.trim().startsWith('{{') && val.trim().endsWith('}}')))
+  ) {
     const resolved = tryResolveDesignTime(val)
     if (resolved !== null) {
-      // Same truncation rule as plain strings so a `=$sum(1..1000)` doesn't
-      // explode the node card.
+      // Same truncation rule as plain strings so a `{{ $sum(1..1000) }}`
+      // doesn't explode the node card.
       return resolved.length > 10 ? `${resolved.substring(0, 10)}…` : resolved
     }
-    // Fall through to the raw-text path so the user still sees `=…` on the
-    // canvas — same as before.
+    // Fall through to the raw-text path so the user still sees the
+    // expression on the canvas — same as before.
   }
   if (propType === 'boolean') return val ? 'True' : 'False'
   if (propType === 'json' || propType === 'key-value') return '...'
@@ -89,8 +100,17 @@ export const getVisibleNodeProperties = (
   properties: NodeProperty[],
   values: Record<string, unknown>,
   showAdvanced: boolean,
-): NodeProperty[] =>
-  properties
+): NodeProperty[] => {
+  // Match the inspector: condition evaluation must see each property's
+  // `default` when the saved props don't have it yet, otherwise a freshly
+  // dropped node hides every default-driven conditional field until the
+  // user re-clicks the dropdown.
+  const merged: Record<string, unknown> = { ...values }
+  for (const p of properties) {
+    if (merged[p.name] === undefined && p.default !== undefined) merged[p.name] = p.default
+  }
+  return properties
     .filter(p => p.visibility !== 'hidden')
     .filter(p => p.mode !== 'advanced' || showAdvanced)
-    .filter(p => shouldShowProperty(p, values))
+    .filter(p => shouldShowProperty(p, merged))
+}

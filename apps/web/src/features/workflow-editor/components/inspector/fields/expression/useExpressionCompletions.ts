@@ -164,6 +164,23 @@ export function useExpressionCompletions(
       }
     }
 
+    // Fallback: the user just opened a `{{ }}` block (empty or whitespace
+    // before the caret) — surface the root completions so the popup is
+    // visible from the moment they enter expression mode, without having
+    // to type `$` first. The replaceRange collapses onto the caret so a
+    // fresh insertion writes the picked completion verbatim.
+    if (/^\s*$/.test(before)) {
+      const items = rootCompletions('', ancestors)
+      if (items.length > 0) {
+        return {
+          active: true,
+          prefix: '',
+          replaceRange: { start: caretIndex, end: caretIndex },
+          completions: items,
+        }
+      }
+    }
+
     return EMPTY_STATE
   }, [expression, caretIndex, ancestors])
 }

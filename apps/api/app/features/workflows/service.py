@@ -67,6 +67,7 @@ class WorkflowService:
         # may already carry Meta trigger nodes. Reconcile so subscription
         # state matches the just-persisted graph.
         await self._sync_meta_subscriptions(created)
+        await self._sync_integration_polling(created)
         return created
 
     async def ensure_default_workflow(self, workspace: Workspace) -> Workflow:
@@ -105,6 +106,11 @@ class WorkflowService:
         # bubble inside the sync but never roll back the workflow save.
         if graph_changed:
             await self._sync_meta_subscriptions(updated)
+        # The polling-cursor side cares about both graph changes (added /
+        # removed trigger nodes) and `is_active` flips (so the scheduler
+        # stops polling paused workflows). Run on every save — the inner
+        # function is a no-op when nothing actionable changed.
+        await self._sync_integration_polling(updated)
         return updated
 
     async def batch_update_workflows(
@@ -134,6 +140,7 @@ class WorkflowService:
         # ondelete=CASCADE would otherwise null-out our view of which
         # rows belonged to which workflow.
         await self._cleanup_meta_subscriptions(workflow_id)
+        await self._cleanup_integration_polling(workflow_id)
         await self.repository.delete(workflow)
 
     async def _sync_meta_subscriptions(self, workflow: Workflow) -> None:
@@ -154,6 +161,75 @@ class WorkflowService:
             await cleanup_workflow_subscriptions(self.repository.db, workflow_id)
         except Exception as exc:  # noqa: BLE001
             logger.exception(f"Meta subscription cleanup failed for workflow {workflow_id}: {exc}")
+
+    async def _sync_integration_polling(self, workflow: Workflow) -> None:
+        """Reconcile `integration_trigger_state` rows so the polling
+        scheduler sees exactly the set of trigger nodes currently in
+        `workflow.graph` — and only when the workflow is active. Newly
+        added trigger nodes start with `cursor={}` and `next_poll_at=now`
+        so the very next beat tick takes its snapshot. Errors are
+        swallowed (logged) so a poll-state hiccup never blocks a save."""
+        try:
+            from datetime import UTC, datetime
+
+            from apps.api.app.execution_engine.scheduler.integration_polling import (
+                get_entry_for_node_type,
+            )
+            from apps.api.app.features.triggers.repository import (
+                IntegrationTriggerStateRepository,
+            )
+
+            repo = IntegrationTriggerStateRepository(self.repository.db)
+            nodes = (workflow.graph or {}).get("nodes") or []
+
+            # When the workflow is paused we drop every cursor row — the
+            # scheduler won't have anything to poll, and on re-activation
+            # the next save re-seeds a fresh snapshot (which is correct
+            # since the user wants new mail *from re-activation onward*,
+            # not the backlog accumulated while paused).
+            if not workflow.is_active:
+                await repo.delete_by_workflow_and_nodes(workflow.id, set())
+                return
+
+            keep: set[str] = set()
+            for node in nodes:
+                if not isinstance(node, dict):
+                    continue
+                node_type = str(node.get("type") or "")
+                node_id = str(node.get("id") or "")
+                if not node_type or not node_id:
+                    continue
+                entry = get_entry_for_node_type(node_type)
+                if entry is None:
+                    continue
+                keep.add(node_id)
+                # Only insert if missing — never overwrite a live cursor
+                # on a graph save, which would re-emit history.
+                if await repo.get(workflow.id, node_id) is None:
+                    await repo.upsert(
+                        workflow_id=workflow.id,
+                        workspace_id=workflow.workspace_id,
+                        node_id=node_id,
+                        provider=entry.provider,
+                        cursor={},
+                        next_poll_at=datetime.now(UTC),
+                    )
+            await repo.delete_by_workflow_and_nodes(workflow.id, keep)
+        except Exception as exc:  # noqa: BLE001
+            logger.exception(f"Integration polling sync failed for workflow {workflow.id}: {exc}")
+
+    async def _cleanup_integration_polling(self, workflow_id: uuid.UUID) -> None:
+        try:
+            from apps.api.app.features.triggers.repository import (
+                IntegrationTriggerStateRepository,
+            )
+
+            repo = IntegrationTriggerStateRepository(self.repository.db)
+            await repo.delete_by_workflow_and_nodes(workflow_id, set())
+        except Exception as exc:  # noqa: BLE001
+            logger.exception(
+                f"Integration polling cleanup failed for workflow {workflow_id}: {exc}"
+            )
 
     def _initial_graph(self, graph: dict | None) -> dict:
         # New workflows start empty. The editor's empty-state overlay handles

@@ -16,6 +16,13 @@ import { ToolSelectorRenderer } from './renderers/ToolSelectorRenderer'
 import { SkillSelectorRenderer } from './renderers/SkillSelectorRenderer'
 import { MetaResourceRenderer } from './renderers/MetaResourceRenderer'
 import { WATemplateRenderer } from './renderers/WATemplateRenderer'
+import { MediaRenderer } from './renderers/MediaRenderer'
+import { GmailQueryRenderer } from './renderers/GmailQueryRenderer'
+import { GDrivePickerRenderer } from './renderers/GDrivePickerRenderer'
+import { GoogleFilePickerRenderer } from './renderers/GoogleFilePickerRenderer'
+import { GSheetsTabPickerRenderer } from './renderers/GSheetsTabPickerRenderer'
+import { GTasksListPickerRenderer } from './renderers/GTasksListPickerRenderer'
+import { DateTimeRenderer } from './renderers/DateTimeRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
 
@@ -39,6 +46,13 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'skill-selector':   SkillSelectorRenderer,
   'meta-resource':    MetaResourceRenderer,
   'wa-template':      WATemplateRenderer,
+  media:              MediaRenderer,
+  'gmail-query':      GmailQueryRenderer,
+  'gdrive-folder':    GDrivePickerRenderer,
+  'google-file':      GoogleFilePickerRenderer,
+  'gsheet-tab':       GSheetsTabPickerRenderer,
+  'gtasks-tasklist':  GTasksListPickerRenderer,
+  datetime:           DateTimeRenderer,
 }
 
 export { JsonRenderer as FallbackRenderer }

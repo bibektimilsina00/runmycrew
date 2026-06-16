@@ -55,7 +55,7 @@ def test_fb_feed_post_distinct_from_comment() -> None:
 def test_fb_feed_unknown_item_falls_through() -> None:
     entry = {
         "id": "page123",
-        "changes": [{"field": "feed", "value": {"item": "share"}}],
+        "changes": [{"field": "feed", "value": {"item": "totally_unknown_item_type"}}],
     }
     events = _flatten_entry("page", entry)
     assert events[0]["field"] == "feed.other"
@@ -116,21 +116,25 @@ def test_messaging_without_message_or_action_is_unknown() -> None:
 
 
 def test_routing_table_covers_all_phase2_events() -> None:
+    """Every webhook field Fuse triggers care about must map to its
+    consolidated node type. After Phase 2-consolidation, every IG /
+    Page / Lead event routes through one node per surface — the
+    event_type dropdown picks which of its events to filter on."""
     cases = [
-        # IG
-        ("instagram", "comments", "trigger.meta.ig_comment"),
-        ("instagram", "mentions", "trigger.meta.ig_mention"),
-        ("instagram", "messaging.text", "trigger.meta.ig_message"),
-        ("instagram", "messaging.ig_story_reply", "trigger.meta.ig_story_reply"),
-        ("instagram", "messaging.ig_story_mention", "trigger.meta.ig_story_mention"),
-        # Page / Messenger
-        ("page", "messaging.text", "trigger.meta.fb_message"),
-        ("page", "messaging.postback", "trigger.meta.fb_postback"),
-        ("page", "feed.comment", "trigger.meta.fb_comment"),
-        ("page", "feed.reaction", "trigger.meta.fb_reaction"),
-        ("page", "mention", "trigger.meta.fb_mention"),
-        # Lead Ads
-        ("page", "leadgen", "trigger.meta.lead_submission"),
+        # IG — all five events live under trigger.meta.instagram
+        ("instagram", "comments", "trigger.meta.instagram"),
+        ("instagram", "mentions", "trigger.meta.instagram"),
+        ("instagram", "messaging.text", "trigger.meta.instagram"),
+        ("instagram", "messaging.ig_story_reply", "trigger.meta.instagram"),
+        ("instagram", "messaging.ig_story_mention", "trigger.meta.instagram"),
+        # Page / Messenger — all live under trigger.meta.facebook
+        ("page", "messaging.text", "trigger.meta.facebook"),
+        ("page", "messaging.postback", "trigger.meta.facebook"),
+        ("page", "feed.comment", "trigger.meta.facebook"),
+        ("page", "feed.reaction", "trigger.meta.facebook"),
+        ("page", "mention", "trigger.meta.facebook"),
+        # Lead Ads — own per-surface node
+        ("page", "leadgen", "trigger.meta.lead"),
     ]
     for obj, field, expected in cases:
         assert _trigger_type_for(obj, field) == expected, (obj, field)
@@ -146,12 +150,13 @@ def test_unknown_combinations_return_none() -> None:
 
 
 def test_target_filters_use_correct_property_per_trigger() -> None:
-    assert _target_filters("trigger.meta.ig_comment", "ig1") == {"ig_account_id": "ig1"}
-    assert _target_filters("trigger.meta.ig_story_reply", "ig1") == {"ig_account_id": "ig1"}
-    assert _target_filters("trigger.meta.fb_message", "page1") == {"page_id": "page1"}
-    assert _target_filters("trigger.meta.lead_submission", "page1") == {"page_id": "page1"}
-    assert _target_filters("trigger.meta.wa_message", "waba1") == {"waba_id": "waba1"}
-    assert _target_filters("trigger.meta.wa_status", "waba1") == {"waba_id": "waba1"}
+    """Every surface binds exactly one resource kind — the consolidated
+    trigger node carries an `event_type` dropdown but the target prop is
+    fixed per surface."""
+    assert _target_filters("trigger.meta.instagram", "ig1") == {"ig_account_id": "ig1"}
+    assert _target_filters("trigger.meta.facebook", "page1") == {"page_id": "page1"}
+    assert _target_filters("trigger.meta.lead", "page1") == {"page_id": "page1"}
+    assert _target_filters("trigger.meta.whatsapp", "waba1") == {"waba_id": "waba1"}
     assert _target_filters("trigger.meta.unknown", "x") == {}
 
 
@@ -246,7 +251,5 @@ def test_wa_envelope_does_not_bubble_raw_messages_field() -> None:
 
 
 def test_wa_routing_table_covers_phase2c_events() -> None:
-    assert (
-        _trigger_type_for("whatsapp_business_account", "wa.messages") == "trigger.meta.wa_message"
-    )
-    assert _trigger_type_for("whatsapp_business_account", "wa.statuses") == "trigger.meta.wa_status"
+    assert _trigger_type_for("whatsapp_business_account", "wa.messages") == "trigger.meta.whatsapp"
+    assert _trigger_type_for("whatsapp_business_account", "wa.statuses") == "trigger.meta.whatsapp"

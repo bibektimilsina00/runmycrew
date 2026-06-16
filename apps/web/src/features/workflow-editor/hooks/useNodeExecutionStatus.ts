@@ -5,11 +5,13 @@ export type ExecutionStatus = 'running' | 'completed' | 'failed' | null
 
 /**
  * Derives a node's execution status from the current workflow's latest run.
- *  - `failed`    — terminal log carries `payload.error`
- *  - `completed` — terminal log carries `payload.output`
- *  - `running`   — run is in flight and the node has produced at least one log
- *                  without a terminal payload yet
- *  - `null`      — no run, or the node has not been touched
+ *
+ * Source of truth is the per-node lifecycle map (`nodeStatuses`) populated
+ * by `useRunStream` from the engine's `node_started` / `node_completed` /
+ * `node_failed` events. Falls back to log scanning only when no explicit
+ * status was recorded — that's the case for very old runs persisted before
+ * v3 of the runs store + the unlikely path where the WS dropped a status
+ * event but logs still landed.
  */
 export function useNodeExecutionStatus(nodeId: string): ExecutionStatus {
   const workflowId = useWorkflowEditorStore((s) => s.workflow?.id ?? null)
@@ -19,6 +21,9 @@ export function useNodeExecutionStatus(nodeId: string): ExecutionStatus {
     if (!slice) return null
     const latest = slice.runs[slice.runs.length - 1]
     if (!latest) return null
+
+    const explicit = latest.nodeStatuses?.[nodeId]
+    if (explicit) return explicit
 
     let touched = false
     for (const log of latest.logs) {

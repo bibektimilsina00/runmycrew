@@ -7,6 +7,7 @@ interface PropertyGroupListProps {
   definition: NodeDefinition
   properties: Record<string, unknown>
   onPropertyChange: (name: string, value: unknown) => void
+  onPropertiesChange?: (patch: Record<string, unknown>) => void
 }
 
 export function PropertyGroupList({
@@ -14,6 +15,7 @@ export function PropertyGroupList({
   definition,
   properties,
   onPropertyChange,
+  onPropertiesChange,
 }: PropertyGroupListProps) {
   // Single group ('Settings' default bucket) → no header. Multiple groups →
   // render each with a small label so the user can see structure (e.g.
@@ -39,6 +41,7 @@ export function PropertyGroupList({
               definition={definition}
               properties={properties}
               onPropertyChange={onPropertyChange}
+              onPropertiesChange={onPropertiesChange}
             />
           ))}
         </section>
@@ -52,6 +55,7 @@ interface SlotProps {
   definition: NodeDefinition
   properties: Record<string, unknown>
   onPropertyChange: (name: string, value: unknown) => void
+  onPropertiesChange?: (patch: Record<string, unknown>) => void
 }
 
 function PropertyFieldSlot({
@@ -59,6 +63,7 @@ function PropertyFieldSlot({
   definition,
   properties,
   onPropertyChange,
+  onPropertiesChange,
 }: SlotProps) {
   const value = properties[prop.name] ?? prop.default
   return (
@@ -68,6 +73,7 @@ function PropertyFieldSlot({
       properties={properties}
       value={value}
       onChange={v => onPropertyChange(prop.name, v)}
+      onPropertiesChange={onPropertiesChange}
       defaultValue={prop.default}
       onReset={prop.default !== undefined ? () => onPropertyChange(prop.name, prop.default) : undefined}
     />

@@ -58,6 +58,7 @@ apps/web/.vite/
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
 celerybeat-schedule
+celerybeat-schedule-*
 celerybeat.pid
 
 # ── OS ────────────────────────────────────────────────────────────────────────
@@ -87,3 +88,5 @@ tempfile/
 
 temp/
 *_doc/
+# ── Uploaded user assets (per-workspace media) ───────────────────────────────
+apps/api/uploads/

@@ -24,15 +24,34 @@ export function getDefaultPropertyValue(prop: NodeProperty): unknown {
   }
 }
 
+/** Build a values dict that falls back to each property's `default` when
+ *  the saved props haven't recorded a value yet. Condition evaluation runs
+ *  against this so a freshly-dropped node shows its conditional fields
+ *  immediately — without it, an `operation: send_email` dropdown would
+ *  read as undefined on first paint and every send_email-gated field
+ *  would stay hidden until the user clicks the dropdown to "set" it. */
+export function valuesWithDefaults(
+  definitionProperties: NodeProperty[],
+  properties: Record<string, unknown>,
+): Record<string, unknown> {
+  const merged: Record<string, unknown> = { ...properties }
+  for (const p of definitionProperties) {
+    if (merged[p.name] !== undefined) continue
+    if (p.default !== undefined) merged[p.name] = p.default
+  }
+  return merged
+}
+
 export function splitPropertyGroups(
   definitionProperties: NodeProperty[],
   properties: Record<string, unknown>,
 ): { basicGroups: InspectorPropertyGroup[]; advancedGroups: InspectorPropertyGroup[] } {
+  const merged = valuesWithDefaults(definitionProperties, properties)
   const visible = definitionProperties.filter(p =>
-    p.visibility !== 'hidden' && p.mode !== 'advanced' && shouldShowProperty(p, properties),
+    p.visibility !== 'hidden' && p.mode !== 'advanced' && shouldShowProperty(p, merged),
   )
   const advanced = definitionProperties.filter(p =>
-    p.visibility !== 'hidden' && p.mode === 'advanced' && shouldShowProperty(p, properties),
+    p.visibility !== 'hidden' && p.mode === 'advanced' && shouldShowProperty(p, merged),
   )
   return {
     basicGroups: groupProperties(visible),

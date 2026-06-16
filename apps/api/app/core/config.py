@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     ALGORITHM: str = "HS256"
     BASE_URL: str = "http://localhost:8000"
+    # Externally-reachable origin used when minting signed URLs handed off
+    # to third-party services (Meta's content-publishing endpoint pulls
+    # uploaded assets through this). When unset, BASE_URL is used — fine
+    # for local-only flows, but Meta won't be able to fetch from
+    # `http://localhost:8000`, so production deployments MUST set this to
+    # the Cloudflare tunnel / public hostname.
+    PUBLIC_BASE_URL: str = ""
     FRONTEND_URL: str = "http://localhost:5173"
     BACKEND_CORS_ORIGINS: list[str] = Field(
         default_factory=lambda: [
@@ -46,6 +53,23 @@ class Settings(BaseSettings):
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
+    # Google Picker SDK keys (separate from OAuth client). The
+    # `developer key` is a browser-restricted API key for the Picker
+    # library; the `app id` is the numeric Cloud-project number used by
+    # Picker to bind the session to the verified consent screen. Both
+    # are returned by the picker-token endpoint so the editor doesn't
+    # bake project ids into the frontend bundle.
+    GOOGLE_API_KEY: str = ""
+    GOOGLE_APP_ID: str = ""
+    # Drive trigger scope tier. False (default) → request only
+    # `drive.file` — Drive trigger sees uploads done via Fuse's action
+    # node, but NOT external uploads (Drive web UI, mobile app, other
+    # apps). True → also request `drive.readonly` so the trigger can
+    # watch a Picker-selected folder for ALL uploads regardless of
+    # source. `drive.readonly` is a Restricted Scope that requires
+    # Google's CASA security assessment before shipping to general
+    # users in production. Safe defaults stay off.
+    GOOGLE_DRIVE_WATCH_EXTERNAL: bool = False
 
     # Meta (Facebook + Instagram + WhatsApp + Messenger). One developer app
     # backs every Meta product. The verify token is the shared secret used
@@ -60,6 +84,22 @@ class Settings(BaseSettings):
     # Dashboard → Facebook Login for Business → Configurations, then paste
     # the numeric id here. Required for the Meta OAuth flow to work.
     META_FB_LOGIN_CONFIG_ID: str = ""
+
+    # Instagram API with Instagram Login — standalone OAuth path for users
+    # who only have an Instagram Business account and don't want to link a
+    # Facebook Page. App-level credentials come from Meta App Dashboard →
+    # Instagram → API setup with Instagram login. Different app id/secret
+    # than META_APP_ID — Meta provisions a sibling app for the IG flow.
+    META_INSTAGRAM_APP_ID: str = ""
+    META_INSTAGRAM_APP_SECRET: str = ""
+    # Loose webhook → listen-slot matching for dev environments. When the
+    # cred-aware id fallback (see MetaService._claim_slots_with_id_fallback)
+    # also misses — e.g. Meta delivers a messaging-scoped id we never saw
+    # during OAuth — set this to "true" to claim any open slot for the
+    # same (object_type, field) tuple. Off in production: it can let one
+    # workspace's webhook fire another workspace's listen slot if the two
+    # are sitting on the same field at the same instant.
+    META_WEBHOOK_LOOSE_LISTEN_MATCH: bool = False
 
     # Environment & CORS
     ENVIRONMENT: str = "development"  # "production" in prod

@@ -7,8 +7,11 @@ import { useCredentials, useProviders } from '@/features/connections/hooks/useCo
 import { ConnectModal } from '@/features/connections/components/ConnectModal'
 
 interface Props {
-  /** Credential type to filter by (e.g. 'openai_api_key', 'google_api_key'). */
-  credType: string
+  /** Credential type(s) to filter by. Pass an array when a feature accepts
+   *  multiple types (e.g. IG nodes accept both `meta_oauth` and
+   *  `instagram_oauth`). The "+ Create new" modal opens preselected to
+   *  the first entry; user can switch inside the modal. */
+  credType: string | string[]
   /** Currently selected credential id (empty string = none selected). */
   value: string
   onChange: (credentialId: string) => void
@@ -43,18 +46,23 @@ export function CredentialSelector({
 
   const [showConnect, setShowConnect] = useState(false)
 
+  const credTypes = useMemo<string[]>(
+    () => (Array.isArray(credType) ? credType : [credType]),
+    [credType]
+  )
+  const primaryType = credTypes[0] ?? ''
   const relevant = useMemo(
-    () => credentials.filter(c => c.type === credType),
-    [credentials, credType]
+    () => credentials.filter(c => credTypes.includes(c.type)),
+    [credentials, credTypes]
   )
   const selected = relevant.find(c => c.id === value)
 
   // Provider name for ConnectModal preselection. If providers haven't loaded
-  // yet, fall back to credType so the modal at least shows the catalog.
-  const providerId = providers.find(p => p.id === credType)?.id ?? credType
+  // yet, fall back to the primary credType so the modal at least shows the catalog.
+  const providerId = providers.find(p => p.id === primaryType)?.id ?? primaryType
   const label = providerLabel
-    ?? providers.find(p => p.id === credType)?.name
-    ?? credType.replace(/_/g, ' ')
+    ?? providers.find(p => p.id === primaryType)?.name
+    ?? primaryType.replace(/_/g, ' ')
 
   return (
     <>

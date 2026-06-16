@@ -31,12 +31,22 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
+from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
+from apps.api.app.node_system.nodes.gdocs.gdocs_node import GoogleDocsNode
+from apps.api.app.node_system.nodes.gdrive.gdrive_node import GDriveNode
+from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNode
+from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
+from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
+from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
 )
+from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
+from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTriggerNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
@@ -50,36 +60,14 @@ from apps.api.app.node_system.nodes.logic.human_input.human_input import HumanIn
 from apps.api.app.node_system.nodes.logic.loop.loop_node import LoopNode
 from apps.api.app.node_system.nodes.logic.sub_workflow.sub_workflow_node import SubWorkflowNode
 from apps.api.app.node_system.nodes.logic.while_loop.while_loop import WhileLoopNode
-from apps.api.app.node_system.nodes.meta.fb_comment_trigger import FBCommentTriggerNode
-from apps.api.app.node_system.nodes.meta.fb_mention_trigger import FBMentionTriggerNode
-from apps.api.app.node_system.nodes.meta.fb_message_trigger import FBMessageTriggerNode
-from apps.api.app.node_system.nodes.meta.fb_postback_trigger import FBPostbackTriggerNode
-from apps.api.app.node_system.nodes.meta.fb_publish_post import FBPublishPostNode
-from apps.api.app.node_system.nodes.meta.fb_reaction_trigger import FBReactionTriggerNode
-from apps.api.app.node_system.nodes.meta.fb_reply_comment import FBReplyCommentNode
-from apps.api.app.node_system.nodes.meta.fb_send_message import FBSendMessageNode
-from apps.api.app.node_system.nodes.meta.ig_comment_trigger import IGCommentTriggerNode
-from apps.api.app.node_system.nodes.meta.ig_mention_trigger import IGMentionTriggerNode
-from apps.api.app.node_system.nodes.meta.ig_message_trigger import IGMessageTriggerNode
-from apps.api.app.node_system.nodes.meta.ig_publish_post import IGPublishPostNode
-from apps.api.app.node_system.nodes.meta.ig_publish_story import IGPublishStoryNode
-from apps.api.app.node_system.nodes.meta.ig_reply_comment import IGReplyCommentNode
-from apps.api.app.node_system.nodes.meta.ig_send_dm import IGSendDMNode
-from apps.api.app.node_system.nodes.meta.ig_story_mention_trigger import (
-    IGStoryMentionTriggerNode,
-)
-from apps.api.app.node_system.nodes.meta.ig_story_reply_trigger import (
-    IGStoryReplyTriggerNode,
-)
-from apps.api.app.node_system.nodes.meta.lead_fetch import LeadFetchNode
-from apps.api.app.node_system.nodes.meta.lead_submission_trigger import (
-    LeadSubmissionTriggerNode,
-)
-from apps.api.app.node_system.nodes.meta.wa_mark_read import WAMarkReadNode
-from apps.api.app.node_system.nodes.meta.wa_message_trigger import WAMessageTriggerNode
-from apps.api.app.node_system.nodes.meta.wa_send_message import WASendMessageNode
-from apps.api.app.node_system.nodes.meta.wa_send_template import WASendTemplateNode
-from apps.api.app.node_system.nodes.meta.wa_status_trigger import WAStatusTriggerNode
+from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
+from apps.api.app.node_system.nodes.meta.facebook_trigger import FacebookTriggerNode
+from apps.api.app.node_system.nodes.meta.instagram_action import InstagramActionNode
+from apps.api.app.node_system.nodes.meta.instagram_trigger import InstagramTriggerNode
+from apps.api.app.node_system.nodes.meta.lead_action import LeadActionNode
+from apps.api.app.node_system.nodes.meta.lead_trigger import LeadTriggerNode
+from apps.api.app.node_system.nodes.meta.whatsapp_action import WhatsAppActionNode
+from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTriggerNode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
@@ -135,38 +123,31 @@ node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)
 node_registry.register(GmailNode)
+node_registry.register(GmailTriggerNode)
+node_registry.register(GCalTriggerNode)
+node_registry.register(GCalNode)
+node_registry.register(GDriveTriggerNode)
+node_registry.register(GDriveNode)
 node_registry.register(GoogleSheetsNode)
 node_registry.register(GoogleSheetsTriggerNode)
+node_registry.register(GoogleDocsNode)
+node_registry.register(GoogleTasksNode)
+node_registry.register(GoogleTasksTriggerNode)
+node_registry.register(GoogleFormsNode)
+node_registry.register(GoogleFormsTriggerNode)
 node_registry.register(LinearNode)
-node_registry.register(IGCommentTriggerNode)
-node_registry.register(IGSendDMNode)
-node_registry.register(FBMessageTriggerNode)
-node_registry.register(FBSendMessageNode)
-# Phase 2 — IG triggers
-node_registry.register(IGMessageTriggerNode)
-node_registry.register(IGStoryReplyTriggerNode)
-node_registry.register(IGStoryMentionTriggerNode)
-node_registry.register(IGMentionTriggerNode)
-# Phase 2 — FB triggers
-node_registry.register(FBPostbackTriggerNode)
-node_registry.register(FBCommentTriggerNode)
-node_registry.register(FBMentionTriggerNode)
-node_registry.register(FBReactionTriggerNode)
-# Phase 2 — Lead Ads trigger
-node_registry.register(LeadSubmissionTriggerNode)
-# Phase 2 — actions
-node_registry.register(IGReplyCommentNode)
-node_registry.register(FBReplyCommentNode)
-node_registry.register(FBPublishPostNode)
-node_registry.register(IGPublishPostNode)
-node_registry.register(IGPublishStoryNode)
-node_registry.register(LeadFetchNode)
-# Phase 2c — WhatsApp Cloud API
-node_registry.register(WAMessageTriggerNode)
-node_registry.register(WASendMessageNode)
-node_registry.register(WAMarkReadNode)
-node_registry.register(WASendTemplateNode)
-node_registry.register(WAStatusTriggerNode)
+# Meta surfaces — one consolidated trigger + action per surface
+# (Instagram, Facebook/Messenger, WhatsApp, Lead Ads) carrying
+# event_type / operation dropdowns. Replaces the 24 per-task nodes
+# shipped in earlier phases — see service.py _TRIGGER_SPECS.
+node_registry.register(InstagramTriggerNode)
+node_registry.register(InstagramActionNode)
+node_registry.register(FacebookTriggerNode)
+node_registry.register(FacebookActionNode)
+node_registry.register(LeadTriggerNode)
+node_registry.register(LeadActionNode)
+node_registry.register(WhatsAppTriggerNode)
+node_registry.register(WhatsAppActionNode)
 node_registry.register(SetVariableNode)
 node_registry.register(JsonTransformNode)
 node_registry.register(MergeNode)

@@ -2,38 +2,48 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { CompletionPopup } from './CompletionPopup'
 import { useExpressionCompletions, type Completion } from './useExpressionCompletions'
+import { findActiveExpressionRegion, findAllExpressionRegions } from './regionUtils'
+import { TOKEN_CLASS, tokenize } from './highlightTokens'
 
 /**
- * In-line editor for JSONata expressions saved with a leading `=` prefix.
+ * Single text field that handles plain text + embedded `{{ expression }}`
+ * regions in one component.
  *
- * Visual chrome mirrors the regular Input / Textarea components exactly —
- * same border, padding, height, hover / focus states. The only difference
- * is a transparent input layered over a `<pre>` that syntax-colours the
- * value, so users see structure without any extra UI noise (no fx pill,
- * no boxed accent border, no close button).
- *
- * The saved value always starts with `=`; the editor displays it verbatim.
- * When the user deletes the `=`, StringRenderer swaps the field back to a
- * plain Input on the next render, so no explicit "exit expression mode"
- * affordance is needed.
+ * UX contract:
+ *   - The user types into one field, no mode switching.
+ *   - The completion popup opens automatically while the caret sits inside
+ *     a `{{ … }}` block, fed the expression substring around the caret.
+ *   - When the caret moves outside the braces (or there is no `{{` before
+ *     it), the popup closes and the field behaves like plain text.
+ *   - `{{ … }}` regions are highlighted via a `<pre>` overlay so users see
+ *     structure without needing extra UI affordances.
+ *   - The legacy `=expression` saved format is auto-migrated to
+ *     `{{ expression }}` on first edit. Old graphs continue to render until
+ *     someone touches them.
  */
+
 interface ExpressionEditorProps {
-  value: string                       // includes the leading `=`
+  value: string
   onChange: (next: string) => void
   placeholder?: string
   multiline?: boolean
   rows?: number
   disabled?: boolean
-  /**
-   * Grab focus + place the caret at the end of the value on mount. Set by
-   * StringRenderer when the mode change came from a user action (typing
-   * `$`, clicking the fx button) so the user's typing stays uninterrupted
-   * across the renderer swap.
-   */
+  /** Accepted for backwards compatibility with renderers that still drive
+   *  their own mode-swap (MessagesRenderer / ToolSelectorRenderer). Wired
+   *  up to the input's focus on mount; the parent callback fires once. */
   autoFocus?: boolean
-  /** Called once after the auto-focus effect runs, so the parent can clear
-   *  its `autoFocus` state without re-triggering on subsequent renders. */
   onAutoFocusDone?: () => void
+}
+
+/** Migrate a legacy `=expression` save into the unified `{{ expression }}`
+ *  shape so the user always sees the new syntax in the field. The original
+ *  `=` form keeps working server-side via the property resolver — this is a
+ *  purely cosmetic / one-way display migration. */
+function migrateLegacyEquals(raw: string): string {
+  if (!raw.startsWith('=')) return raw
+  const body = raw.slice(1).trim()
+  return `{{ ${body} }}`
 }
 
 export function ExpressionEditor({
@@ -46,22 +56,31 @@ export function ExpressionEditor({
   autoFocus,
   onAutoFocusDone,
 }: ExpressionEditorProps) {
+  // One-time migration on first render: if the parent handed us a legacy
+  // `=expression`, surface it as `{{ expression }}` (and persist the
+  // migration so the next save writes the new shape).
+  useEffect(() => {
+    if (value.startsWith('=')) onChange(migrateLegacyEquals(value))
+    // Intentionally only on initial value — subsequent changes are already
+    // in the new shape.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
 
   const [caret, setCaret] = useState(value.length)
-  const [popupOpen, setPopupOpen] = useState(false)
   const [popupAnchor, setPopupAnchor] = useState<{ left: number; top: number } | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  // Completion engine works on the expression body (without the leading `=`)
-  // since the caret index inside `value` is offset by 1 from the body.
-  const inner = value.startsWith('=') ? value.slice(1) : value
-  const innerCaret = Math.max(0, caret - (value.startsWith('=') ? 1 : 0))
-  const completionState = useExpressionCompletions(inner, innerCaret)
+  // Active `{{ … }}` region around the caret (if any). Determines whether
+  // the completion engine fires at all.
+  const region = useMemo(() => findActiveExpressionRegion(value, caret), [value, caret])
+  const innerExpression = region?.inner ?? ''
+  const innerCaret = region?.innerCaret ?? 0
+  const completionState = useExpressionCompletions(innerExpression, innerCaret)
 
-  // Auto-grow multiline textarea up to a cap so long expressions stay
-  // visible without the rest of the inspector exploding.
+  // Auto-grow multiline textarea up to a cap so long values stay visible.
   useEffect(() => {
     if (!multiline) return
     const el = inputRef.current as HTMLTextAreaElement | null
@@ -70,10 +89,8 @@ export function ExpressionEditor({
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
   }, [value, multiline])
 
-  // Grab focus + place caret at the end on first mount whenever the parent
-  // signalled this transition came from a user action. Without this the
-  // renderer swap unmounts the input the user was typing into and they'd
-  // have to click to resume — see StringRenderer.autoFocusOnEnter.
+  // Honour `autoFocus` from legacy parents that still manage their own
+  // mode swap. Fires once and clears the parent's flag.
   useEffect(() => {
     if (!autoFocus) return
     const el = inputRef.current
@@ -83,9 +100,6 @@ export function ExpressionEditor({
     el.setSelectionRange(pos, pos)
     setCaret(pos)
     onAutoFocusDone?.()
-    // Intentionally empty deps — fires exactly once per mount. The parent
-    // resets its flag in `onAutoFocusDone`, so subsequent renders don't
-    // re-focus and steal focus away from later edits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -106,15 +120,16 @@ export function ExpressionEditor({
       const r = wrapperRef.current.getBoundingClientRect()
       setPopupAnchor({ left: r.left, top: r.bottom + 4 })
     }
-    setPopupOpen(true)
   }, [value.length])
 
+  // Map the completion's inner replace-range up to full-text coords and
+  // insert the chosen completion text in place.
   const acceptCompletion = useCallback(
     (item: Completion) => {
-      // ReplaceRange is in inner-string coords; lift to full-value coords.
-      const offset = value.startsWith('=') ? 1 : 0
-      const start = completionState.replaceRange.start + offset
-      const end = completionState.replaceRange.end + offset
+      if (!region) return
+      const innerStart = region.open + 2
+      const start = innerStart + completionState.replaceRange.start
+      const end = innerStart + completionState.replaceRange.end
       const next = value.slice(0, start) + item.insertText + value.slice(end)
       commit(next)
       Promise.resolve().then(() => {
@@ -124,29 +139,24 @@ export function ExpressionEditor({
         el.focus()
         el.setSelectionRange(pos, pos)
         setCaret(pos)
-        // Re-open the popup at the new caret. The follow-up trigger surface
-        // (e.g. `$step.` → field names) renders immediately rather than
-        // requiring the user to click or type again.
         if (wrapperRef.current) {
           const r = wrapperRef.current.getBoundingClientRect()
           setPopupAnchor({ left: r.left, top: r.bottom + 4 })
         }
-        setPopupOpen(true)
         setSelectedIndex(0)
       })
     },
-    [completionState.replaceRange, value, commit],
+    [region, completionState.replaceRange, value, commit],
   )
 
   const handleDrop = (e: React.DragEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    // Drops from the Inputs / Logs JSON tree carry `=<expression>` because
-    // they're designed to drop on a plain text field that needs the `=` to
-    // enter expression mode. We're already in expression mode — strip the
-    // leading `=` so the result is `... $step.x ...`, not `... =$step.x ...`.
     const raw = e.dataTransfer.getData('text/plain')
     if (!raw) return
     e.preventDefault()
-    const cleaned = raw.startsWith('=') ? raw.slice(1) : raw
+    // Drops from the Inputs / Logs JSON tree carry `=<expression>` for
+    // backwards compatibility — wrap as `{{ expression }}` since our new
+    // syntax is `{{ }}` only.
+    const cleaned = raw.startsWith('=') ? `{{ ${raw.slice(1)} }}` : raw
     const el = e.currentTarget
     const start = el.selectionStart ?? value.length
     const end = el.selectionEnd ?? start
@@ -160,8 +170,10 @@ export function ExpressionEditor({
     })
   }
 
+  const popupOpen = !!region && completionState.active && completionState.completions.length > 0
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!popupOpen || !completionState.active || completionState.completions.length === 0) {
+    if (!popupOpen) {
       if (e.key === 'Escape') (e.target as HTMLElement).blur()
       return
     }
@@ -181,34 +193,22 @@ export function ExpressionEditor({
       }
     } else if (e.key === 'Escape') {
       e.preventDefault()
-      setPopupOpen(false)
+      setCaret(value.length + 1) // force region to null, hiding popup
     }
   }
 
-  // Ghost preview: shows the tail of the highlighted completion as dim text
-  // at the end of the input, so users can see what Tab/Enter will insert
-  // without leaving the keyboard. Only fires when:
-  //   - the popup is open and has a highlighted item
-  //   - the candidate's insertText is a true prefix-extension of what the
-  //     user has typed
-  //   - the caret is at the end of the value (no clean way to render a
-  //     ghost in the middle without restructuring the two-layer overlay).
+  // Ghost preview at end of field (only when caret is at end + inside a region).
   const ghost = useMemo(() => {
-    if (!popupOpen || !completionState.active) return ''
-    if (caret !== value.length) return ''
+    if (!popupOpen || !region || caret !== value.length) return ''
     const item = completionState.completions[selectedIndex]
     if (!item) return ''
     const prefix = completionState.prefix
     if (!item.insertText.toLowerCase().startsWith(prefix.toLowerCase())) return ''
     return item.insertText.slice(prefix.length)
-  }, [popupOpen, completionState, selectedIndex, caret, value.length])
+  }, [popupOpen, region, completionState, selectedIndex, caret, value.length])
 
   const highlights = useMemo(() => buildHighlights(value, ghost), [value, ghost])
 
-  // Hide the popup when the only remaining match is what the user already
-  // typed in full — keeps `=$step.input_data` from leaving a stale popup
-  // covering the field after the user finished. Multiple matches stay open
-  // (the user still has choices); zero matches close naturally.
   const shouldShowPopup =
     completionState.completions.length > 0 &&
     !(
@@ -217,9 +217,6 @@ export function ExpressionEditor({
         completionState.prefix.toLowerCase()
     )
 
-  // Chrome that mirrors `Input` (single-line) or `Textarea` (multiline).
-  // No accent tint, no `fx` pill, no exit button — the syntax colouring is
-  // the only signal that we're in expression mode.
   const wrapperClass = multiline
     ? cn(
         'relative w-full bg-bg border border-border-faint rounded-[5px] px-3 py-2.5',
@@ -235,13 +232,19 @@ export function ExpressionEditor({
         disabled && 'pointer-events-none opacity-60',
       )
 
+  // Both layers share the same font metrics + line-height so the input's
+  // native caret lines up perfectly with the highlighted glyphs in the
+  // overlay. Any mismatch (font family, size, line-height) leaves the
+  // caret floating in empty space — visible as the bug where the cursor
+  // appears in the middle of the field while you type at the start.
   const sharedInputClass = cn(
     'w-full bg-transparent outline-none text-sm text-transparent caret-text',
+    'font-mono leading-normal',
     'placeholder:text-text-faint',
   )
 
   const sharedPreClass = cn(
-    'pointer-events-none m-0 font-mono text-sm leading-normal whitespace-pre-wrap break-words',
+    'pointer-events-none m-0 text-sm leading-normal whitespace-pre-wrap break-words font-mono',
   )
 
   return (
@@ -265,12 +268,11 @@ export function ExpressionEditor({
             onKeyDown={handleKeyDown}
             onDrop={handleDrop}
             onFocus={syncCaret}
-            onBlur={() => setPopupOpen(false)}
-            placeholder={placeholder ?? 'JSONata expression'}
+            placeholder={placeholder}
             disabled={disabled}
             rows={rows}
             spellCheck={false}
-            className={cn(sharedInputClass, 'relative z-10 resize-none font-mono')}
+            className={cn(sharedInputClass, 'relative z-10 resize-none')}
           />
         </div>
       ) : (
@@ -292,16 +294,15 @@ export function ExpressionEditor({
             onKeyDown={handleKeyDown}
             onDrop={handleDrop}
             onFocus={syncCaret}
-            onBlur={() => setPopupOpen(false)}
-            placeholder={placeholder ?? 'JSONata expression'}
+            placeholder={placeholder}
             disabled={disabled}
             spellCheck={false}
-            className={cn(sharedInputClass, 'relative z-10 h-full font-mono border-none')}
+            className={cn(sharedInputClass, 'relative z-10 h-full border-none')}
           />
         </div>
       )}
 
-      {popupOpen && popupAnchor && completionState.active && shouldShowPopup && (
+      {popupOpen && popupAnchor && shouldShowPopup && (
         <CompletionPopup
           completions={completionState.completions}
           selectedIndex={selectedIndex}
@@ -314,71 +315,56 @@ export function ExpressionEditor({
 }
 
 /**
- * Cheap tokeniser for JSONata source. Splits the string into spans with
- * semantic colour classes. Order matters — longer / more-specific patterns
- * are matched first. The leading `=` (when present) is given its own dim
- * class so users see the mode marker without it dominating the value.
+ * Render the input value as a sequence of styled spans:
+ *   - plain text stays inherit-coloured.
+ *   - `{{ … }}` regions get a purple-ish tint with a slightly darker pair
+ *     of braces; an unclosed trailing `{{` gets a dimmer "in-progress"
+ *     look so users know it isn't a valid expression yet.
+ *   - A ghost preview span renders the popup's selected completion tail
+ *     after the cursor when the caret is at end of value.
  */
 function buildHighlights(source: string, ghost: string = ''): React.ReactNode[] {
-  // Tokenise the body (without the leading `=`) and prepend a dim `=` span
-  // if the source is in expression mode. Appends a dimmer ghost span at the
-  // very end (after all tokens) when a completion preview is requested.
-  const equalsPrefix = source.startsWith('=')
-  const body = equalsPrefix ? source.slice(1) : source
-
-  const tokens: { regex: RegExp; className: string }[] = [
-    { regex: /\$[A-Za-z_][A-Za-z0-9_]*/g, className: 'text-accent' },        // $step / $sum
-    { regex: /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, className: 'text-ok' }, // strings
-    { regex: /\b\d+(?:\.\d+)?\b/g, className: 'text-warn' },                  // numbers
-    { regex: /[+\-*/%=!<>&|?:.()[\]{},]/g, className: 'text-text-mute' },     // operators
-  ]
-
-  type Range = { start: number; end: number; className: string }
-  const ranges: Range[] = []
-  for (const { regex, className } of tokens) {
-    let m: RegExpExecArray | null
-    regex.lastIndex = 0
-    while ((m = regex.exec(body)) !== null) {
-      const start = m.index
-      const end = start + m[0].length
-      if (ranges.some(r => start < r.end && end > r.start)) continue
-      ranges.push({ start, end, className })
-    }
-  }
-  ranges.sort((a, b) => a.start - b.start)
-
-  const out: React.ReactNode[] = []
-  if (equalsPrefix) {
-    out.push(
-      <span key="eq" className="text-text-faint">
-        =
-      </span>,
-    )
-  }
+  const nodes: React.ReactNode[] = []
+  const regions = findAllExpressionRegions(source)
   let cursor = 0
-  ranges.forEach((r, i) => {
-    if (cursor < r.start) out.push(body.slice(cursor, r.start))
-    out.push(
-      <span key={`t-${i}`} className={r.className}>
-        {body.slice(r.start, r.end)}
+  let keySeq = 0
+
+  for (const r of regions) {
+    if (r.open > cursor) {
+      nodes.push(<span key={keySeq++}>{source.slice(cursor, r.open)}</span>)
+    }
+    const open = source.slice(r.open, r.open + 2)
+    const inner = source.slice(r.open + 2, r.close)
+    const closed = r.closed
+    const close = closed ? source.slice(r.close, r.close + 2) : ''
+    // Closed regions get the full delimiter accent; an unclosed trailing
+    // `{{` dims so users immediately see they're still typing it.
+    const braceClass = closed
+      ? 'font-semibold text-[#c678dd]'
+      : 'font-semibold text-[#c678dd] opacity-70'
+    const tokens = tokenize(inner)
+    nodes.push(
+      <span key={keySeq++}>
+        <span className={braceClass}>{open}</span>
+        {tokens.map((t, i) => (
+          <span key={`tok-${keySeq}-${i}`} className={TOKEN_CLASS[t.kind]}>
+            {t.text}
+          </span>
+        ))}
+        {closed && <span className={braceClass}>{close}</span>}
       </span>,
     )
-    cursor = r.end
-  })
-  if (cursor < body.length) out.push(body.slice(cursor))
+    cursor = closed ? r.close + 2 : source.length
+  }
+  if (cursor < source.length) {
+    nodes.push(<span key={keySeq++}>{source.slice(cursor)}</span>)
+  }
   if (ghost) {
-    out.push(
-      <span
-        key="ghost"
-        className="italic opacity-50"
-        // Explicit color — the `/60` modifier on `text-text-faint` wasn't
-        // compiling cleanly in the Tailwind setup; ghost was rendering in
-        // the default text color and looked like real input.
-        style={{ color: 'var(--text-faint)' }}
-      >
+    nodes.push(
+      <span key={`ghost-${keySeq}`} className="text-text-faint italic">
         {ghost}
       </span>,
     )
   }
-  return out
+  return nodes
 }
