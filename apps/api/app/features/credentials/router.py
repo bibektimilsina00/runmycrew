@@ -174,6 +174,55 @@ async def rename_credential(
     return credential
 
 
+@router.post("/{credential_id}/picker-token")
+async def get_picker_token(
+    credential_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """Return the fields the Google Picker SDK needs to render its file
+    browser against the user's Drive: a fresh OAuth access token from
+    the stored credential, plus the workspace's `GOOGLE_API_KEY` (Picker
+    developer key) and `GOOGLE_APP_ID` (Cloud project number).
+
+    The endpoint is per-credential because the OAuth token has to be
+    the same one the trigger / action node will run against — Picker
+    grants `drive.file` access tied to *that* OAuth client, so a
+    mismatch would let the user pick a folder the runtime then can't
+    see.
+    """
+    from apps.api.app.core.config import settings
+
+    cred = await service.repo.get_by_id_and_workspace(credential_id, workspace.id)
+    if cred is None or cred.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Credential not found")
+    # `get_decrypted_credential` runs the same refresh-if-near-expiry
+    # path the runtime hits, so the token we hand to Picker is the same
+    # one a polling-trigger HTTP call would use moments later.
+    data = await service.get_decrypted_credential(cred)
+    access_token = (data or {}).get("access_token") if isinstance(data, dict) else None
+    if not access_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Credential has no access_token. Re-connect the account.",
+        )
+    if not settings.GOOGLE_API_KEY or not settings.GOOGLE_APP_ID:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Google Picker is not configured on this Fuse instance "
+                "(missing GOOGLE_API_KEY / GOOGLE_APP_ID)."
+            ),
+        )
+    return {
+        "access_token": access_token,
+        "developer_key": settings.GOOGLE_API_KEY,
+        "app_id": settings.GOOGLE_APP_ID,
+    }
+
+
 @router.delete("/{credential_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def delete_credential(
     credential_id: uuid.UUID,

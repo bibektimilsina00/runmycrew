@@ -32,7 +32,7 @@ from typing import Any
 from uuid import UUID
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from apps.api.app.core.logger import get_logger
 from apps.api.app.features.triggers.models import IntegrationTriggerState
@@ -103,14 +103,23 @@ class GDriveTriggerProperties(BaseModel):
     # Drive returns the full MIME type ("application/pdf",
     # "application/vnd.google-apps.document"). Empty matches anything.
     mime_type: str = ""
-    # Limit to one folder. Drive uses the file's `parents` array — we
-    # match on substring containment so the user can paste the bare
-    # folder id from a URL.
+    # Limit to one folder. The Picker field emits `{id, name}` so the
+    # editor can show the folder's name back to the user, but the
+    # runtime only cares about the id — the validator coerces both
+    # shapes into the id string.
     parent_folder_id: str = ""
     # Case-insensitive substring filter on file.name.
     name_contains: str = ""
     max_changes_per_poll: int = 25
     poll_interval_seconds: int = DEFAULT_POLL_INTERVAL_SECONDS
+
+    @field_validator("parent_folder_id", mode="before")
+    @classmethod
+    def _coerce_folder_id(cls, value: Any) -> str:
+        if isinstance(value, dict):
+            v = value.get("id")
+            return str(v) if isinstance(v, str) else ""
+        return str(value) if value is not None else ""
 
 
 class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
@@ -168,13 +177,16 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                 },
                 {
                     "name": "parent_folder_id",
-                    "label": "Parent folder",
-                    "type": "string",
+                    "label": "Folder to watch",
+                    "type": "gdrive-folder",
                     "default": "",
-                    "placeholder": "1aBcDeFGhIjKlMnOpQrStUvWxYz",
                     "description": (
-                        "Optional — only fire when the file lives inside this "
-                        "folder. Find IDs in a Drive folder URL after `/folders/`."
+                        "Pick a Drive folder via Google's Picker. Drive's "
+                        "`drive.file` scope only surfaces files Fuse created "
+                        "OR files inside a folder the user explicitly picked "
+                        "here — that's how Fuse stays inside the non-sensitive "
+                        "scope that doesn't need Google's security review. "
+                        "Leave blank to fall back to whatever Fuse created."
                     ),
                 },
                 {
@@ -347,7 +359,7 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
         if event_filter not in EVENT_FILTERS:
             event_filter = "any"
         mime_type = (self.props.mime_type or "").strip()
-        parent_id = (self.props.parent_folder_id or "").strip()
+        parent_id = _folder_id(self.props.parent_folder_id)
         name_substr = (self.props.name_contains or "").strip().lower()
         max_take = max(1, min(self.props.max_changes_per_poll, 100))
 
@@ -434,6 +446,19 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
 # ── helpers ──────────────────────────────────────────────────────────────
 
 
+def _folder_id(value: Any) -> str:
+    """Drive folder fields accept either a bare id string (legacy) or a
+    Picker-emitted `{id, name}` dict (current). Normalise to the id
+    string so downstream code can stay shape-agnostic. Empty string
+    means "no folder filter"."""
+    if isinstance(value, dict):
+        v = value.get("id")
+        return str(v).strip() if isinstance(v, str) else ""
+    if isinstance(value, str):
+        return value.strip()
+    return ""
+
+
 def _safe_uuid(value: Any) -> UUID | None:
     if value is None:
         return None
@@ -503,7 +528,7 @@ async def _poll_for_scheduler(
         credential=None,
         event_filter=str(props.get("event_filter") or "any"),
         mime_type=str(props.get("mime_type") or ""),
-        parent_folder_id=str(props.get("parent_folder_id") or ""),
+        parent_folder_id=_folder_id(props.get("parent_folder_id")),
         name_contains=str(props.get("name_contains") or ""),
         max_changes_per_poll=int(props.get("max_changes_per_poll") or 25),
         poll_interval_seconds=int(

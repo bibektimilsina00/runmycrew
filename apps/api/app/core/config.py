@@ -53,6 +53,14 @@ class Settings(BaseSettings):
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
+    # Google Picker SDK keys (separate from OAuth client). The
+    # `developer key` is a browser-restricted API key for the Picker
+    # library; the `app id` is the numeric Cloud-project number used by
+    # Picker to bind the session to the verified consent screen. Both
+    # are returned by the picker-token endpoint so the editor doesn't
+    # bake project ids into the frontend bundle.
+    GOOGLE_API_KEY: str = ""
+    GOOGLE_APP_ID: str = ""
 
     # Meta (Facebook + Instagram + WhatsApp + Messenger). One developer app
     # backs every Meta product. The verify token is the shared secret used

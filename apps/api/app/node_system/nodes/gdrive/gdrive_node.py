@@ -25,7 +25,7 @@ import base64
 from typing import Any
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from apps.api.app.core.logger import get_logger
 from apps.api.app.node_system.base.base_node import BaseNode
@@ -80,6 +80,18 @@ class GDriveProperties(BaseModel):
     name: str | None = None
     mime_type: str | None = None
     parent_folder_id: str | None = None
+
+    @field_validator("parent_folder_id", mode="before")
+    @classmethod
+    def _coerce_folder_id(cls, value: Any) -> str | None:
+        # Same coercion as `GDriveTriggerProperties` — accept either the
+        # bare id string or the Picker-emitted `{id, name}` dict.
+        if isinstance(value, dict):
+            v = value.get("id")
+            return str(v) if isinstance(v, str) else None
+        if value in (None, ""):
+            return None
+        return str(value)
 
     # upload
     # Source mode for upload — "url" downloads from a public URL; "text"
@@ -162,9 +174,12 @@ class GDriveNode(BaseNode[GDriveProperties]):
                 },
                 {
                     "name": "parent_folder_id",
-                    "label": "Parent folder ID",
-                    "type": "string",
-                    "placeholder": "Drive folder ID (blank = My Drive root)",
+                    "label": "Parent folder",
+                    "type": "gdrive-folder",
+                    "description": (
+                        "Pick the Drive folder this lives in. Leave blank to "
+                        "drop the file at the root of My Drive."
+                    ),
                     "condition": _cond_any("upload_file", "create_folder"),
                 },
                 {
