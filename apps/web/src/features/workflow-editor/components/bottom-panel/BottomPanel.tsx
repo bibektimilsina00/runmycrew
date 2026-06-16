@@ -15,7 +15,12 @@ interface BottomPanelProps {
 
 const COLLAPSED_HEIGHT = 36
 
-export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomPanelProps) {
+export function BottomPanel({
+  nodes,
+  updateNodeData,
+  onRun,
+  isRunning,
+}: BottomPanelProps) {
   const panelZones      = useEditorLayoutStore((s) => s.panelZones)
   const bottomActiveTab = useEditorLayoutStore((s) => s.bottomActiveTab)
   const bottomOpen      = useEditorLayoutStore((s) => s.bottomOpen)
@@ -28,6 +33,7 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
 
   const tabs = PANEL_TABS.filter((t) => panelZones[t.id] === 'bottom')
   const [dragOver, setDragOver] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
 
   // ── Resize ──────────────────────────────────────────────────────────────────
   const dragState = useRef<{ startY: number; startH: number } | null>(null)
@@ -35,6 +41,7 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
     (e: React.MouseEvent) => {
       e.preventDefault()
       dragState.current = { startY: e.clientY, startH: bottomHeight }
+      setIsResizing(true)
     },
     [bottomHeight],
   )
@@ -44,7 +51,10 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
       if (!s) return
       setBottomHeight(s.startH - (e.clientY - s.startY))
     }
-    const onUp = () => { dragState.current = null }
+    const onUp = () => {
+      dragState.current = null
+      setIsResizing(false)
+    }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
     return () => {
@@ -77,13 +87,17 @@ export function BottomPanel({ nodes, updateNodeData, onRun, isRunning }: BottomP
     e.dataTransfer.setData('text/plain', tab)
   }
 
+  // collapsed = 36px header, open = bottomHeight.
   const totalHeight = bottomOpen ? bottomHeight : COLLAPSED_HEIGHT
 
   return (
     <div
+      data-role="editor-bottom-panel"
       className={cn(
-        'pointer-events-auto absolute inset-x-0 bottom-0 z-10 flex flex-col overflow-hidden border-t border-[var(--border-faint)] bg-[var(--bg-2)]',
+        'pointer-events-auto relative w-full shrink-0 z-10 flex flex-col overflow-hidden bg-[var(--bg-2)]',
+        !isResizing && 'transition-[height] duration-300 ease-in-out',
         dragOver && 'ring-1 ring-inset ring-[var(--accent)]',
+        totalHeight > 0 ? 'border-t border-[var(--border-faint)]' : 'border-t-0'
       )}
       style={{ height: totalHeight }}
     >

@@ -11,19 +11,18 @@ export function AppLayout() {
 
   return (
     <div
-      className={cn('group/shell relative h-screen grid grid-cols-[244px_1fr] gap-[14px] z-10 data-[collapsed=true]:grid-cols-[64px_1fr]')}
+      className={cn(
+        'group/shell relative h-screen grid grid-cols-[244px_1fr] z-10 bg-[var(--bg)] transition-[grid-template-columns] duration-300 ease-in-out',
+        'data-[collapsed=true]:grid-cols-[80px_1fr]',
+      )}
       data-collapsed={controller.collapsed}
     >
-      <div className="dot-grid" />
+      <AppSidebar controller={controller} variant="floating" />
 
-      <AppSidebar controller={controller} />
-
-      <div className="relative overflow-hidden h-screen pt-[14px] pr-[14px] pb-[14px] pl-0 flex flex-col">
-        <div className="bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] h-full overflow-hidden shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)] flex flex-col flex-1 min-h-0">
-          <AppTopBar controller={controller} />
-          <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]" style={{ height: '100%' }}>
-            <Outlet />
-          </div>
+      <div className="relative flex h-[calc(100vh-28px)] my-[14px] mr-[14px] ml-0 min-h-0 flex-col overflow-hidden bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]">
+        <AppTopBar controller={controller} />
+        <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-[var(--bg)]" style={{ height: '100%' }}>
+          <Outlet />
         </div>
       </div>
 

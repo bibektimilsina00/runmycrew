@@ -9,7 +9,7 @@ export function AppTopBar({ controller }: AppTopBarProps) {
   const { currentWorkspace, pageLabel, selectedTableName } = controller
 
   return (
-    <header className="flex items-center justify-between py-[14px] px-[22px] border-b border-[var(--border-faint)] shrink-0">
+    <header className="flex items-center justify-between py-[8px] px-[22px] border-b border-[var(--border-faint)] bg-[var(--bg-2)] shrink-0">
       <div className="flex items-center gap-[8px] text-[13px] text-[var(--text-mute)]">
         <span>{currentWorkspace?.name ?? 'My workspace'}</span>
         <span className="text-[var(--text-dim)]">/</span>

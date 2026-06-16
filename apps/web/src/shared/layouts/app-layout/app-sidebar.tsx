@@ -1,6 +1,8 @@
 import { DndContext } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { NavLink } from 'react-router-dom'
+import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { SidebarFolderItem } from '@/features/folders'
 import { SidebarWorkflowItem, WorkflowDragOverlay } from '@/features/workflows'
 import { WorkspaceSelector } from '@/features/workspaces'
@@ -13,11 +15,12 @@ import { DropdownMenu } from './dropdown-menu'
 
 interface AppSidebarProps {
   controller: AppLayoutController
+  variant?: 'floating' | 'flat'
 }
 
 /** Base class for all nav items — used by NavLink, workflow and folder rows */
 const NAV_ITEM =
-  'flex items-center gap-[10px] py-[6px] px-[10px] rounded-[8px] text-[13px] font-medium text-[var(--text-mute)] w-full cursor-pointer transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[15px] [&_svg]:h-[15px] [&_svg]:shrink-0 [&_svg]:text-current [&_svg]:opacity-80 relative no-underline'
+  'flex items-center gap-[10px] py-[6px] px-[10px] rounded-[8px] text-[13px] font-medium text-[var(--text-mute)] w-full cursor-pointer transition-all duration-200 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[15px] [&_svg]:h-[15px] [&_svg]:shrink-0 [&_svg]:text-current [&_svg]:opacity-80 relative no-underline group-data-[collapsed=true]/shell:w-[36px] group-data-[collapsed=true]/shell:h-[36px] group-data-[collapsed=true]/shell:p-0 group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:mx-auto'
 
 const NAV_ITEM_ACTIVE =
   "bg-[var(--surface)] text-[var(--text)] [&_svg]:opacity-100"
@@ -31,7 +34,23 @@ const ACTION_BTN =
 const MENU_ITEM =
   'flex items-center gap-[9px] py-[8px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors duration-80 font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] [&_svg]:shrink-0'
 
-export function AppSidebar({ controller }: AppSidebarProps) {
+export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps) {
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [helpPos, setHelpPos] = useState<{ top: number; left: number } | null>(null)
+  const helpTriggerRef = useRef<HTMLButtonElement>(null)
+
+  const toggleHelp = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const rect = helpTriggerRef.current?.getBoundingClientRect()
+    if (rect) {
+      setHelpPos({
+        top: rect.top - 84, // height of support menu + offset
+        left: rect.left,
+      })
+    }
+    setHelpOpen(!helpOpen)
+  }
+
   const {
     collapsed,
     setCollapsed,
@@ -59,19 +78,28 @@ export function AppSidebar({ controller }: AppSidebarProps) {
     showPendingFeature,
   } = controller
 
+  const isFlat = variant === 'flat'
+
   return (
-    <aside className="relative h-[calc(100vh-28px)] my-[14px] ml-[14px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] flex flex-col overflow-hidden shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)] z-20">
+    <aside
+      className={cn(
+        'relative flex flex-col overflow-hidden transition-all duration-300 ease-in-out z-20',
+        isFlat
+          ? 'h-screen bg-[var(--bg-2)] border-r border-[var(--border-faint)]'
+          : 'h-[calc(100vh-28px)] my-[14px] mx-[14px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]'
+      )}
+    >
       <SidebarHeader collapsed={collapsed} onToggleCollapsed={() => setCollapsed(value => !value)} />
 
       {/* ── Nav scroll area ─────────────────────────────────── */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-[8px] pb-[8px] flex flex-col [&::-webkit-scrollbar]:hidden [scrollbar-width:none] group-data-[collapsed=true]/shell:px-[6px]">
+      <div className="flex-1 min-h-0 overflow-y-auto px-[8px] pb-[8px] flex flex-col [&::-webkit-scrollbar]:hidden [scrollbar-width:none] group-data-[collapsed=true]/shell:px-[6px] group-data-[collapsed=true]/shell:pt-[10px]">
         {NAV_GROUPS.map((section, index) => (
           <div
             key={section.group}
             className={cn(
               'flex flex-col',
               section.isWorkflows && 'relative flex-1',
-              index > 0 && 'mt-[4px] pt-[8px] border-t border-[var(--border-faint)] group-data-[collapsed=true]/shell:border-none group-data-[collapsed=true]/shell:mt-0 group-data-[collapsed=true]/shell:pt-0'
+              index > 0 && 'mt-[4px] pt-[8px] border-t border-[var(--border-faint)] group-data-[collapsed=true]/shell:mt-[10px] group-data-[collapsed=true]/shell:pt-[10px] group-data-[collapsed=true]/shell:border-t group-data-[collapsed=true]/shell:border-[var(--border-faint)]'
             )}
           >
             {/* Section header */}
@@ -137,10 +165,10 @@ export function AppSidebar({ controller }: AppSidebarProps) {
             <div
               className={cn(
                 'grid transition-[grid-template-rows] duration-200 ease-in-out',
-                openGroups[section.group] ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                (collapsed || openGroups[section.group]) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
               )}
             >
-              <div className="overflow-hidden min-h-0 pl-[14px] flex flex-col gap-[2px]">
+              <div className="overflow-hidden min-h-0 pl-[14px] group-data-[collapsed=true]/shell:pl-0 flex flex-col gap-[2px]">
                 {!section.isWorkflows && section.items?.map(item => (
                   <NavLink
                     key={item.id}
@@ -167,7 +195,7 @@ export function AppSidebar({ controller }: AppSidebarProps) {
                 openGroups[section.group] ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
               )}
             >
-              <div className="overflow-hidden min-h-0 pl-[14px]">
+              <div className="overflow-hidden min-h-0 pl-[14px] group-data-[collapsed=true]/shell:pl-0">
                 {section.isWorkflows && (
                   <DndContext
                     sensors={workflowDnd.sensors}
@@ -217,22 +245,61 @@ export function AppSidebar({ controller }: AppSidebarProps) {
       </div>
 
       {/* ── Footer ──────────────────────────────────────────── */}
-      <div className="shrink-0 px-[8px] py-[6px] border-t border-[var(--border-faint)] flex items-center gap-[2px] group-data-[collapsed=true]/shell:hidden">
+      {/* ── Footer ──────────────────────────────────────────── */}
+      <div className="shrink-0 h-[36px] px-[8px] border-t border-[var(--border-faint)] flex items-center gap-[2px] group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:h-[48px] group-data-[collapsed=true]/shell:px-0">
+        <div className="flex w-full gap-[2px] group-data-[collapsed=true]/shell:hidden">
+          <button
+            className="flex-1 h-[24px] inline-flex items-center justify-center gap-[6px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
+            type="button"
+          >
+            <Icons.Help />
+            <span>Help & docs</span>
+          </button>
+          <button
+            className="flex-1 h-[24px] inline-flex items-center justify-center gap-[6px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
+            type="button"
+          >
+            <Icons.Feedback />
+            <span>Feedback</span>
+          </button>
+        </div>
+
         <button
-          className="flex-1 inline-flex items-center justify-center gap-[6px] py-[5px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
+          ref={helpTriggerRef}
+          onClick={toggleHelp}
+          className="hidden group-data-[collapsed=true]/shell:inline-flex w-[36px] h-[36px] items-center justify-center rounded-[8px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[15px] [&_svg]:h-[15px]"
           type="button"
+          title="Help & feedback"
         >
           <Icons.Help />
-          <span>Help & docs</span>
-        </button>
-        <button
-          className="flex-1 inline-flex items-center justify-center gap-[6px] py-[5px] px-[8px] rounded-[7px] text-[12px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px]"
-          type="button"
-        >
-          <Icons.Feedback />
-          <span>Feedback</span>
         </button>
       </div>
+
+      {helpOpen && helpPos && createPortal(
+        <>
+          <div className="fixed inset-0 z-[9998]" onClick={() => setHelpOpen(false)} />
+          <div
+            className="fixed z-[9999] w-[160px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[11px] p-[5px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)] animate-in fade-in slide-in-from-bottom-2 duration-100 flex flex-col gap-[2px]"
+            style={{ top: helpPos.top, left: helpPos.left }}
+          >
+            <button
+              className="flex items-center gap-[9px] py-[7px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] bg-transparent border-none cursor-pointer"
+              onClick={() => setHelpOpen(false)}
+            >
+              <Icons.Help />
+              Help & docs
+            </button>
+            <button
+              className="flex items-center gap-[9px] py-[7px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] bg-transparent border-none cursor-pointer"
+              onClick={() => setHelpOpen(false)}
+            >
+              <Icons.Feedback />
+              Feedback
+            </button>
+          </div>
+        </>,
+        document.body
+      )}
     </aside>
   )
 }
@@ -242,30 +309,39 @@ function SidebarHeader({ collapsed, onToggleCollapsed }: { collapsed: boolean; o
   return (
     <div className="shrink-0 px-[12px] pt-[14px] pb-[10px] flex flex-col gap-[10px] border-b border-[var(--border-faint)] group-data-[collapsed=true]/shell:px-[8px] group-data-[collapsed=true]/shell:py-[14px] group-data-[collapsed=true]/shell:gap-[10px]">
       {/* Logo row */}
-      <div className="flex items-center justify-between group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:flex-col group-data-[collapsed=true]/shell:gap-[10px]">
-        <span className="inline-flex items-center gap-[8px] text-[14px] font-semibold tracking-tight text-[var(--text)] group-data-[collapsed=true]/shell:gap-0">
+      <div className="flex items-center justify-between group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:w-full">
+        <span className="inline-flex items-center gap-[8px] text-[14px] font-semibold tracking-tight text-[var(--text)] group-data-[collapsed=true]/shell:hidden">
           <span className="w-[22px] h-[22px] inline-flex items-center justify-center rounded-[6px] bg-[var(--text)] text-[var(--bg)] shrink-0">
             <Icons.FuseMark style={{ width: 13, height: 13 }} />
           </span>
-          <span className="group-data-[collapsed=true]/shell:hidden">fuse</span>
-          <span className="font-mono text-[9px] tracking-[0.16em] uppercase text-[var(--text-faint)] border border-[var(--border-soft)] py-[2px] px-[5px] rounded-[4px] group-data-[collapsed=true]/shell:hidden">
-            BETA
-          </span>
+          <span>fuse</span>
         </span>
         <button
-          className="w-[24px] h-[24px] rounded-[6px] text-[var(--text-faint)] inline-flex items-center justify-center hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px] transition-colors duration-100"
+          className="rounded-[6px] text-[var(--text-faint)] inline-flex items-center justify-center transition-all duration-200 shrink-0 w-[24px] h-[24px] hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px] group-data-[collapsed=true]/shell:w-[32px] group-data-[collapsed=true]/shell:h-[32px] group-data-[collapsed=true]/shell:relative group-data-[collapsed=true]/shell:mx-auto group-data-[collapsed=true]/shell:bg-transparent group-data-[collapsed=true]/shell:hover:bg-[var(--surface)] group-data-[collapsed=true]/shell:hover:text-[var(--text)] group-data-[collapsed=true]/shell:p-0"
           onClick={onToggleCollapsed}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? <Icons.PanelOpen /> : <Icons.PanelClose />}
+          <span className="group-data-[collapsed=true]/shell:hidden flex items-center justify-center">
+            {collapsed ? <Icons.PanelOpen /> : <Icons.PanelClose />}
+          </span>
+          <span className="hidden group-data-[collapsed=true]/shell:flex items-center justify-center w-full h-full relative group/btn">
+            <span className="w-[22px] h-[22px] inline-flex items-center justify-center rounded-[6px] bg-[var(--text)] text-[var(--bg)] absolute transition-all duration-150 group-hover/btn:opacity-0 group-hover/btn:scale-75">
+              <Icons.FuseMark style={{ width: 13, height: 13 }} />
+            </span>
+            <span className="absolute opacity-0 scale-75 transition-all duration-150 group-hover/btn:opacity-100 group-hover/btn:scale-100 text-[var(--text-faint)] group-hover/btn:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px]">
+              {collapsed ? <Icons.PanelOpen /> : <Icons.PanelClose />}
+            </span>
+          </span>
         </button>
       </div>
 
-      {/* Workspace selector */}
-      <WorkspaceSelector />
+      {/* Workspace selector with separating gap */}
+      <div className="mt-[4px] group-data-[collapsed=true]/shell:mt-0">
+        <WorkspaceSelector />
+      </div>
 
       {/* Search bar */}
-      <div className="flex items-center gap-[8px] px-[10px] h-[32px] rounded-[8px] bg-[var(--bg)] border border-[var(--border-faint)] transition-colors duration-120 w-full min-w-0 hover:border-[var(--border-soft)] focus-within:border-[var(--border)] focus-within:bg-[var(--surface)] [&>svg]:w-[13px] [&>svg]:h-[13px] [&>svg]:text-[var(--text-faint)] [&>svg]:shrink-0 group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0 group-data-[collapsed=true]/shell:gap-0">
+      <div className="flex items-center gap-[8px] px-[10px] h-[32px] rounded-[8px] bg-[var(--bg)] border border-[var(--border-faint)] transition-all duration-120 w-full min-w-0 hover:border-[var(--border-soft)] focus-within:border-[var(--border)] focus-within:bg-[var(--surface)] [&>svg]:w-[13px] [&>svg]:h-[13px] [&>svg]:text-[var(--text-faint)] [&>svg]:shrink-0 group-data-[collapsed=true]/shell:hidden">
         <Icons.Search />
         <input
           placeholder="Search"
