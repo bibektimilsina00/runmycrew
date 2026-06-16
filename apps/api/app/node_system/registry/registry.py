@@ -36,6 +36,8 @@ from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNod
 from apps.api.app.node_system.nodes.gdocs.gdocs_node import GoogleDocsNode
 from apps.api.app.node_system.nodes.gdrive.gdrive_node import GDriveNode
 from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNode
+from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
+from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
@@ -131,6 +133,8 @@ node_registry.register(GoogleSheetsTriggerNode)
 node_registry.register(GoogleDocsNode)
 node_registry.register(GoogleTasksNode)
 node_registry.register(GoogleTasksTriggerNode)
+node_registry.register(GoogleFormsNode)
+node_registry.register(GoogleFormsTriggerNode)
 node_registry.register(LinearNode)
 # Meta surfaces — one consolidated trigger + action per surface
 # (Instagram, Facebook/Messenger, WhatsApp, Lead Ads) carrying

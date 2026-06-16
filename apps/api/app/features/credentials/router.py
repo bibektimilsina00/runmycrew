@@ -318,6 +318,10 @@ _GOOGLE_CREATE_DISPATCH: dict[str, tuple[str, dict]] = {
         "https://slides.googleapis.com/v1/presentations",
         {"id_key": "presentationId", "url_key": None},
     ),
+    "application/vnd.google-apps.form": (
+        "https://forms.googleapis.com/v1/forms",
+        {"id_key": "formId", "url_key": "responderUri"},
+    ),
 }
 
 
@@ -423,6 +427,10 @@ async def create_google_file(
         "application/vnd.google-apps.presentation",
     ):
         body = {"title": title}
+    elif mime == "application/vnd.google-apps.form":
+        # Forms wraps the title under `info`; the API rejects the bare
+        # `{title}` shape with a 400.
+        body = {"info": {"title": title, "documentTitle": title}}
     else:  # pragma: no cover - guarded above
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="unreachable")
 
@@ -445,7 +453,12 @@ async def create_google_file(
 
     data = resp.json()
     file_id = data.get(response_shape["id_key"])
-    name = ((data.get("properties") or {}).get("title")) or data.get("title") or title
+    name = (
+        ((data.get("properties") or {}).get("title"))
+        or ((data.get("info") or {}).get("title"))
+        or data.get("title")
+        or title
+    )
     return {
         "id": file_id,
         "name": name,

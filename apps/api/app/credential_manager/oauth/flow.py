@@ -267,6 +267,8 @@ class GoogleOAuthProvider:
         "Read and write Google Sheets",
         "Read and write Google Docs",
         "Manage Google Tasks",
+        "Read and write Google Forms (questions and settings)",
+        "Read Google Forms responses",
         "Read your Google profile",
     ]
 
@@ -298,6 +300,8 @@ class GoogleOAuthProvider:
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/documents",
             "https://www.googleapis.com/auth/tasks",
+            "https://www.googleapis.com/auth/forms.body",
+            "https://www.googleapis.com/auth/forms.responses.readonly",
             "openid",
             "email",
             "profile",
