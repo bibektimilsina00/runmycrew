@@ -34,7 +34,7 @@ export type KnownNodePropertyType =
   | 'credential' | 'key-value' | 'list' | 'messages' | 'schema' | 'file-list'
   | 'tool-selector' | 'skill-selector' | 'meta-resource' | 'wa-template'
   | 'code' | 'collection' | 'fixed-collection' | 'media' | 'gmail-query' | 'gdrive-folder'
-  | 'google-file' | 'gsheet-tab' | 'gtasks-tasklist'
+  | 'google-file' | 'gsheet-tab' | 'gtasks-tasklist' | 'datetime'
 
 export type NodePropertyType = KnownNodePropertyType | (string & {})
 

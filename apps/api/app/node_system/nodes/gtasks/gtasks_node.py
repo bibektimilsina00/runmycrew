@@ -214,12 +214,11 @@ class GoogleTasksNode(BaseNode[GoogleTasksProperties]):
                 {
                     "name": "task_due",
                     "label": "Due date",
-                    "type": "string",
-                    "placeholder": "2025-01-15  or  2025-01-15T00:00:00Z",
+                    "type": "datetime",
+                    "typeOptions": {"granularity": "date"},
                     "description": (
-                        "Date (YYYY-MM-DD) or full RFC3339 timestamp. Google "
-                        "Tasks ignores the time portion but rejects bare dates "
-                        "in the request — we pad to midnight UTC for you."
+                        "Pick a date or type one. Google Tasks ignores the "
+                        "time of day, so we send midnight UTC."
                     ),
                     "condition": _cond_any("create_task", "update_task"),
                 },
@@ -266,25 +265,25 @@ class GoogleTasksNode(BaseNode[GoogleTasksProperties]):
                 },
                 {
                     "name": "due_min",
-                    "label": "Due after (RFC3339)",
-                    "type": "string",
-                    "placeholder": "2025-01-01T00:00:00Z",
+                    "label": "Due after",
+                    "type": "datetime",
+                    "typeOptions": {"granularity": "datetime"},
                     "condition": _cond("list_tasks"),
                     "mode": "advanced",
                 },
                 {
                     "name": "due_max",
-                    "label": "Due before (RFC3339)",
-                    "type": "string",
-                    "placeholder": "2025-02-01T00:00:00Z",
+                    "label": "Due before",
+                    "type": "datetime",
+                    "typeOptions": {"granularity": "datetime"},
                     "condition": _cond("list_tasks"),
                     "mode": "advanced",
                 },
                 {
                     "name": "completed_max",
-                    "label": "Completed before (RFC3339)",
-                    "type": "string",
-                    "placeholder": "2025-01-15T00:00:00Z",
+                    "label": "Completed before",
+                    "type": "datetime",
+                    "typeOptions": {"granularity": "datetime"},
                     "description": "Only meaningful with Include completed on.",
                     "condition": _cond("list_tasks"),
                     "mode": "advanced",
