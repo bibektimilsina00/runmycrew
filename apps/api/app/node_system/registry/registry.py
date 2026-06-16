@@ -31,6 +31,7 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
@@ -115,6 +116,7 @@ node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)
 node_registry.register(GmailNode)
 node_registry.register(GmailTriggerNode)
+node_registry.register(GCalTriggerNode)
 node_registry.register(GoogleSheetsNode)
 node_registry.register(GoogleSheetsTriggerNode)
 node_registry.register(LinearNode)
