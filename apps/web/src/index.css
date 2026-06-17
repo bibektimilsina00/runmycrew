@@ -24,7 +24,8 @@
   --border-faint: rgba(255, 255, 255, 0.04);
 
   /* Text ramp — neutral whites tilted slightly cool */
-  --text:       #edeef0;  /* body */
+  --text:       #edeef0;  /* primary body, headings */
+  --text-body:  #c7c9ce;  /* assistant-message body, secondary copy */
   --text-mute:  #8a8f98;  /* meta, captions */
   --text-faint: #62666d;  /* faint hints */
   --text-dim:   #52565d;  /* dim labels */
@@ -84,6 +85,7 @@
   --border-faint: oklch(0.915 0.004 250);
 
   --text:       oklch(0.180 0.006 250);
+  --text-body:  oklch(0.270 0.008 250);
   --text-mute:  oklch(0.380 0.008 250);
   --text-faint: oklch(0.530 0.008 250);
   --text-dim:   oklch(0.660 0.007 250);
