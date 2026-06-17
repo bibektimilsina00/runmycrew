@@ -1,17 +1,26 @@
-# ─── Build + publish Fuse images to ghcr.io ────────────────────────────
+# ─── Build · scan · publish Fuse images to ghcr.io ─────────────────────
 #
-# Builds the three production images in parallel on push to `main` and
-# pushes them to GitHub Container Registry. Tags:
-#   - latest              → tracks main
-#   - sha-<short>         → pin in deploy/.env to roll back
-#   - main                → same as latest, kept for debugging
+# Triggered on push to main and on any PR that touches a Dockerfile,
+# lockfile, or this workflow itself.
 #
-# Pull requests build but do NOT push — catches Dockerfile breakage
-# before merge.
+# Stages
+#   1. Build the 3 images in parallel (api / worker / web) via buildx +
+#      Actions layer cache. Push only on main; PRs build-only as a
+#      breakage gate.
+#   2. Generate SBOM + provenance attestations on each pushed image,
+#      Sigstore-signed via the OIDC token Actions hands the runner.
+#   3. Scan every pushed image with Trivy. Fails the workflow on
+#      CRITICAL CVEs; uploads SARIF report to the GitHub Security tab.
 #
-# After the first run, mark each package public:
-#   GitHub → repo → Packages → fuse-api  → Package settings → "Change visibility" → Public
-#   ditto for fuse-worker, fuse-web
+# Tags
+#   :latest        tracks main HEAD
+#   :sha-<short>   immutable pin per commit (use for rollbacks)
+#   :main          alias of :latest
+#
+# After the first successful push:
+#   - GitHub → your profile → Packages → fuse-{api,worker,web}
+#     → Package settings → Change visibility → Public
+#     (or keep private + set GHCR_PAT in the deploy workflow secrets).
 # ───────────────────────────────────────────────────────────────────────
 
 name: build-publish
@@ -35,11 +44,19 @@ on:
 permissions:
   contents: read
   packages: write
+  # Required by docker/build-push-action's attestation mode + by
+  # actions/attest-build-provenance.
+  id-token: write
+  attestations: write
+  # Trivy uploads SARIF; needs `security-events: write` for the GitHub
+  # Security tab.
+  security-events: write
 
 concurrency:
-  # One run per ref. New pushes cancel in-flight builds.
   group: build-publish-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancel superseded runs on PRs. DON'T cancel on main — every commit's
+  # image should land in ghcr for rollback granularity.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -55,6 +72,13 @@ jobs:
             dockerfile: apps/worker/Dockerfile
           - service: web
             dockerfile: apps/web/Dockerfile
+
+    # Exposes per-service digests so the scan job can pin the EXACT
+    # image we pushed instead of racing against `:latest` re-tags.
+    outputs:
+      digest-api: ${{ steps.expose.outputs.digest-api }}
+      digest-worker: ${{ steps.expose.outputs.digest-worker }}
+      digest-web: ${{ steps.expose.outputs.digest-web }}
 
     steps:
       - name: Checkout
@@ -81,19 +105,75 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha,prefix=sha-,format=short
+          labels: |
+            org.opencontainers.image.title=fuse-${{ matrix.service }}
+            org.opencontainers.image.description=Fuse ${{ matrix.service }} container
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.vendor=Bibek Timilsina
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ matrix.dockerfile }}
-          # Push only on main + manual runs. PRs build to validate.
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # buildx layer cache via Actions cache. First run cold, subsequent
-          # runs ~70% faster.
+          # buildx layer cache via Actions cache.
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,scope=${{ matrix.service }},mode=max
           platforms: linux/amd64
-          provenance: false
+          # SBOM + provenance baked into the image manifest. Sigstore-
+          # signed via the OIDC token Actions hands the runner. Both
+          # ride along with `docker pull` so consumers see them.
+          provenance: mode=max
+          sbom: true
+
+      - name: Expose digest for scan job
+        id: expose
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "digest-${{ matrix.service }}=${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/fuse-${{ matrix.service }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+  scan:
+    name: trivy scan ${{ matrix.service }}
+    needs: [build]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [api, worker, web]
+
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/fuse-${{ matrix.service }}@${{ needs.build.outputs[format('digest-{0}', matrix.service)] }}
+          format: sarif
+          output: trivy-${{ matrix.service }}.sarif
+          # CRITICAL only — HIGH would flood the gate until we tune.
+          # Bump to 'CRITICAL,HIGH' once the noise is curated.
+          severity: CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+
+      - name: Upload SARIF to GitHub Security tab
+        # `always()` so the report lands even on scan failure — security
+        # teams need to see what tripped the gate.
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-${{ matrix.service }}.sarif
+          category: trivy-${{ matrix.service }}

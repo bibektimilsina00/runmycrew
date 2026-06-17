@@ -33,3 +33,29 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+
+  # Docker base images (one entry per Dockerfile we publish)
+  - package-ecosystem: "docker"
+    directory: "/apps/api"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels: ["dependencies", "docker"]
+    commit-message:
+      prefix: "chore(deps-docker)"
+  - package-ecosystem: "docker"
+    directory: "/apps/worker"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels: ["dependencies", "docker"]
+    commit-message:
+      prefix: "chore(deps-docker)"
+  - package-ecosystem: "docker"
+    directory: "/apps/web"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels: ["dependencies", "docker"]
+    commit-message:
+      prefix: "chore(deps-docker)"
