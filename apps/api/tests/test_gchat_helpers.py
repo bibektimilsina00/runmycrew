@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
+from apps.api.app.node_system.base.errors import STRUCTURED_ERROR_SENTINEL
 from apps.api.app.node_system.nodes.gchat.gchat_node import (
     GoogleChatProperties,
     _coerce_cards,
@@ -12,6 +15,14 @@ from apps.api.app.node_system.nodes.gchat.gchat_node import (
     _to_space_name,
     format_chat_error,
 )
+
+
+def _decode_structured(error_string: str) -> dict:
+    """Pop the sentinel + parse the JSON tail. Asserts on the prefix
+    so callers don't have to repeat it."""
+    assert error_string.startswith(STRUCTURED_ERROR_SENTINEL), error_string
+    return json.loads(error_string[len(STRUCTURED_ERROR_SENTINEL) :])
+
 
 # ── _to_space_name ─────────────────────────────────────────────────────
 
@@ -144,73 +155,80 @@ def test_props_strip_message_name():
 # ── format_chat_error ──────────────────────────────────────────────────
 
 
-def test_format_chat_error_product_off_400():
+def test_format_chat_error_product_off_400_structured():
     body = (
         '{"error":{"code":400,"message":"Google Chat is turned off. '
         'To use Chat API, turn on Google Chat.","status":"FAILED_PRECONDITION"}}'
     )
-    msg = format_chat_error(400, body)
-    assert "Google Chat API error 400" in msg
-    assert "Google Chat is disabled" in msg
-    assert "Admin Console" in msg
-    assert "Gmail" in msg
+    payload = _decode_structured(format_chat_error(400, body))
+    assert "turned off" in payload["title"].lower()
+    assert "per-account" in payload["summary"].lower()
+    actions = " ".join(payload["actions"]).lower()
+    assert "admin console" in actions
+    assert "gmail" in actions
+    assert body[:100] in payload["raw"]
 
 
-def test_format_chat_error_permission_denied_403():
+def test_format_chat_error_permission_denied_403_structured():
     body = '{"error":{"code":403,"status":"PERMISSION_DENIED"}}'
-    msg = format_chat_error(403, body)
-    assert "Google Chat API error 403" in msg
-    assert "Chat API isn't enabled" in msg
-    assert "disconnect + reconnect" in msg
+    payload = _decode_structured(format_chat_error(403, body))
+    assert "rejected" in payload["title"].lower()
+    actions = " ".join(payload["actions"]).lower()
+    assert "chat.googleapis.com" in actions
+    assert "reconnect" in actions
 
 
-def test_format_chat_error_404_membership_hint():
-    msg = format_chat_error(404, '{"error":{"code":404}}')
-    assert "Google Chat API error 404" in msg
-    assert "member of" in msg
-
-
-def test_format_chat_error_404_app_not_configured_hint():
+def test_format_chat_error_404_app_not_configured_structured():
     body = (
         '{"error":{"code":404,"message":"Google Chat app not found. '
         "To create a Chat app, you must turn on the Chat API and "
         'configure the app in the Google Cloud console.","status":"NOT_FOUND"}}'
     )
-    msg = format_chat_error(404, body)
-    assert "Google Chat API error 404" in msg
-    assert "Chat app configured in this GCP" in msg
-    assert "Configuration" in msg
-    # The membership branch must NOT fire — different fix.
-    assert "member of" not in msg
+    payload = _decode_structured(format_chat_error(404, body))
+    assert "not configured" in payload["title"].lower()
+    actions = " ".join(payload["actions"]).lower()
+    assert "configuration tab" in actions
+    assert "app name" in actions
 
 
-def test_format_chat_error_401_token_hint():
-    msg = format_chat_error(401, "")
-    assert "Google Chat API error 401" in msg
-    assert "Reconnect" in msg
+def test_format_chat_error_404_membership_structured():
+    payload = _decode_structured(format_chat_error(404, '{"error":{"code":404}}'))
+    assert "not found" in payload["title"].lower()
+    actions = " ".join(payload["actions"]).lower()
+    assert "space picker" in actions
+    # Must not collide with the chat-app-not-configured branch
+    assert "configuration tab" not in actions
 
 
-def test_format_chat_error_429_quota_hint():
-    msg = format_chat_error(429, "")
-    assert "Google Chat API error 429" in msg
-    assert "quota" in msg
+def test_format_chat_error_401_token_structured():
+    payload = _decode_structured(format_chat_error(401, ""))
+    assert "no longer valid" in payload["title"].lower()
+    assert "reconnect" in " ".join(payload["actions"]).lower()
 
 
-def test_format_chat_error_unknown_status_no_hint():
+def test_format_chat_error_429_quota_structured():
+    payload = _decode_structured(format_chat_error(429, ""))
+    assert "quota" in payload["title"].lower()
+
+
+def test_format_chat_error_unknown_status_falls_through():
     msg = format_chat_error(418, "I'm a teapot")
-    assert "Google Chat API error 418" in msg
+    # Sentinel must NOT be present — unhandled statuses keep the
+    # plain-string contract so legacy renderers still work.
+    assert not msg.startswith(STRUCTURED_ERROR_SENTINEL)
     assert "I'm a teapot" in msg
-    # No specialised hint for unhandled statuses — we just surface body.
-    assert "—" not in msg
+    assert "Google Chat API error 418" in msg
 
 
-def test_format_chat_error_empty_body_uses_placeholder():
+def test_format_chat_error_empty_body_falls_through():
     msg = format_chat_error(500, "")
+    assert not msg.startswith(STRUCTURED_ERROR_SENTINEL)
     assert "(no body)" in msg
 
 
-def test_format_chat_error_truncates_long_body():
-    body = "x" * 1000
-    msg = format_chat_error(500, body)
-    # 300-char cap on snippet; status prefix + body fits well under 400.
-    assert len(msg) < 400
+def test_format_chat_error_truncates_raw_body_when_structured():
+    body = "x" * 5000
+    payload = _decode_structured(format_chat_error(403, "PERMISSION_DENIED " + body))
+    # 600-char cap on the snippet so we don't ship megabyte error
+    # payloads through the websocket frame.
+    assert len(payload["raw"]) <= 600

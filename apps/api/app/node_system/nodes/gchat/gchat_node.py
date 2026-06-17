@@ -45,6 +45,7 @@ from pydantic import BaseModel, field_validator
 
 from apps.api.app.core.logger import get_logger
 from apps.api.app.node_system.base.base_node import BaseNode
+from apps.api.app.node_system.base.errors import make_structured_error
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
@@ -55,68 +56,123 @@ CHAT_API = "https://chat.googleapis.com/v1"
 
 
 def format_chat_error(status_code: int, body: str) -> str:
-    """Turn a Chat API HTTP error into a one-line message with a
-    fix hint when the underlying cause is a known setup gap.
+    """Turn a Chat API HTTP error into a structured error payload.
 
-    Three common gaps the user has to fix outside the workflow:
+    Known setup-gap statuses (product off, app not configured, scope
+    missing, quota, etc) return a sentinel-prefixed JSON payload via
+    :func:`make_structured_error` so the inspector renders a polished
+    card: title + plain-English summary + bulleted actions + raw body
+    in a collapsible section.
 
-    1. **Google Chat is turned off** — the *product* is disabled on
-       the connected account (Workspace admin → Apps → Chat, or for
-       personal accounts Gmail → Settings → Chat and Meet).
-    2. **Chat API not enabled in GCP** — the *project* hasn't
-       enabled `chat.googleapis.com` in Console → APIs & Services.
-    3. **Scope not granted** — the Chat scopes were added after the
-       user last connected the account; they need to re-OAuth.
+    Unhandled statuses fall through to a plain string — the default
+    error renderer keeps working with no information loss.
 
-    The Chat API differentiates 1 and 2 with FAILED_PRECONDITION vs
-    PERMISSION_DENIED, so we can give a targeted hint for each. Other
-    statuses fall through to the raw body so the user gets the same
-    diagnostic info as before.
+    Setup gaps users most often hit:
+      1. **Google Chat is turned off** on the connected account
+         (Workspace admin → Apps → Chat, or for personal accounts
+         Gmail → Settings → Chat and Meet).
+      2. **Chat API library not enabled** in the GCP project
+         (Console → APIs & Services → Library → enable
+         ``chat.googleapis.com``).
+      3. **Chat app not configured** — separate from #2; Console →
+         APIs & Services → Google Chat API → Configuration tab.
     """
-    snippet = (body or "").strip()[:300]
+    snippet = (body or "").strip()[:600]
     lower = snippet.lower()
-    hint = ""
 
     if status_code == 400 and "google chat is turned off" in lower:
-        hint = (
-            " — Google Chat is disabled on the connected account. "
-            "Workspace: Admin Console → Apps → Google Workspace → "
-            "Google Chat → ON. Personal account: Gmail → ⚙️ Settings → "
-            "Chat and Meet → Chat = Google Chat."
+        return make_structured_error(
+            "Google Chat is turned off on the connected account",
+            summary=(
+                "The Chat API works only when Google Chat is enabled as "
+                "a product on the user's Google account. Per-account "
+                "setting, separate from the API in GCP."
+            ),
+            actions=[
+                "Workspace: Admin Console → Apps → Google Workspace → Google Chat → ON.",
+                "Personal account: Gmail → ⚙ Settings → Chat and Meet → Chat = Google Chat.",
+                "Wait ~1 minute for propagation, then retry.",
+            ],
+            raw=snippet,
         )
-    elif status_code == 403 and "permission_denied" in lower:
-        hint = (
-            " — likely the Chat API isn't enabled for this GCP project "
-            "(Console → APIs & Services → Library → enable "
-            "`chat.googleapis.com`) or the chat.* scopes weren't "
-            "granted (disconnect + reconnect the Google credential)."
-        )
-    elif status_code == 404 and "chat app not found" in lower:
-        # The Chat API rejects calls — even user-OAuth ones — until
-        # the *project* has a Chat app configuration row, which is
-        # separate from enabling `chat.googleapis.com` in the API
-        # library. Easy gotcha; the docs treat it as a one-line aside.
-        hint = (
-            " — the Chat API needs a Chat app configured in this GCP "
-            "project (separate from 'enable the API'). Open Cloud Console "
-            "→ APIs & Services → Google Chat API → Configuration, fill in "
-            "App name + avatar + description, save, then retry."
-        )
-    elif status_code == 404:
-        hint = (
-            " — the connected Google account may not be a member of "
-            "this space, or the resource name is stale. Re-pick the "
-            "space, or add the account to it in Chat first."
-        )
-    elif status_code == 401:
-        hint = (
-            " — credential expired or the chat.* scopes were revoked. "
-            "Reconnect the Google credential."
-        )
-    elif status_code == 429:
-        hint = " — Chat API quota exceeded; back off and retry."
 
-    return f"Google Chat API error {status_code}: {snippet or '(no body)'}{hint}"
+    if status_code == 403 and "permission_denied" in lower:
+        return make_structured_error(
+            "Google Chat API rejected the request",
+            summary=(
+                "Either the Chat API isn't enabled for this GCP project, "
+                "or the OAuth token doesn't carry the chat.* scopes "
+                "needed for this operation."
+            ),
+            actions=[
+                "GCP Console → APIs & Services → Library → enable `chat.googleapis.com`.",
+                "Fuse → Credentials → disconnect this Google account and reconnect to grant the new chat.* scopes.",
+            ],
+            raw=snippet,
+        )
+
+    if status_code == 404 and "chat app not found" in lower:
+        return make_structured_error(
+            "Chat app not configured in this GCP project",
+            summary=(
+                "The Chat API needs a Chat app configuration row in "
+                "your GCP project — separate from enabling the API "
+                "library. Even user-OAuth calls are rejected without it."
+            ),
+            actions=[
+                "GCP Console → APIs & Services → Google Chat API → Configuration tab.",
+                "Fill in App name, avatar URL, and description.",
+                "Save the configuration, then retry the workflow.",
+            ],
+            raw=snippet,
+        )
+
+    if status_code == 404:
+        return make_structured_error(
+            "Resource not found",
+            summary=(
+                "The connected Google account may not be a member of "
+                "this space, or the resource name is stale."
+            ),
+            actions=[
+                "Re-open the space picker and re-select the space.",
+                "If you typed the resource name, verify it matches `spaces/...` exactly.",
+                "Make sure the connected account is a member of the space in Chat.",
+            ],
+            raw=snippet,
+        )
+
+    if status_code == 401:
+        return make_structured_error(
+            "Google credential is no longer valid",
+            summary=(
+                "The OAuth token has expired or the chat.* scopes were "
+                "revoked from the Google account settings."
+            ),
+            actions=[
+                "Fuse → Credentials → disconnect and reconnect the Google account.",
+            ],
+            raw=snippet,
+        )
+
+    if status_code == 429:
+        return make_structured_error(
+            "Google Chat API quota exceeded",
+            summary=(
+                "The project has run out of Chat API quota for the "
+                "current window. Calls will resume once the quota "
+                "refills (usually within a minute)."
+            ),
+            actions=[
+                "Wait and retry — the quota refills automatically.",
+                "If this keeps happening, raise the quota in GCP Console → IAM & Admin → Quotas.",
+            ],
+            raw=snippet,
+        )
+
+    # Unhandled status — fall through to plain string. Default frontend
+    # error renderer still shows the user the raw body.
+    return f"Google Chat API error {status_code}: {snippet or '(no body)'}"
 
 
 _SPACE_TYPE_FILTER_OPTIONS: list[dict[str, str]] = [

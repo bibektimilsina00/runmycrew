@@ -3,6 +3,8 @@ import type { RunLog } from '@/features/runs/store/runsStore'
 import { useWorkflowEditorStore } from '../../../../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../../../../stores/editorLayoutStore'
 import { JsonInspector } from './JsonInspector'
+import { StructuredErrorCard } from './StructuredErrorCard'
+import { parseStructuredError } from './structuredError'
 import { stringifyJson } from './json-utils'
 import type { NodeInfo, Tab } from './types'
 
@@ -24,7 +26,14 @@ export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
   const rawError = log.payload?.error
   const errorText = stringifyJson(rawError, true)
 
+  // Nodes can opt into a structured error payload (title + summary +
+  // bulleted actions + collapsible raw response) via the sentinel
+  // prefix emitted by `make_structured_error` on the backend. Falls
+  // back to the legacy headline + JSON tree for anything else.
+  const structured = parseStructuredError(rawError)
+
   const headline =
+    structured?.title ||
     (typeof rawError === 'object' && rawError && 'message' in rawError
       ? String((rawError as { message?: unknown }).message ?? '')
       : '') ||
@@ -52,6 +61,11 @@ export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
   }
   const copyError = () => { void navigator.clipboard.writeText(errorText) }
 
+  // Inspector body — structured card when the backend opted in,
+  // raw JSON tree otherwise. The header banner + footer wrap both
+  // paths identically so the toolbar stays put across error styles.
+  const body = structured ? <StructuredErrorCard data={structured} /> : undefined
+
   return (
     <JsonInspector
       payload={rawError ?? {}}
@@ -59,6 +73,7 @@ export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
       tab={tab}
       onTabChange={onTabChange}
       downloadName={`${log.nodeId || 'error'}-error`}
+      bodyOverride={body}
       headerBanner={
         <div className="flex shrink-0 items-start gap-2.5 border-b border-[var(--border-faint)] bg-[rgba(239,68,68,0.06)] px-3 py-2.5">
           <AlertOctagon className="mt-[1px] h-4 w-4 shrink-0 text-[var(--err)]" />

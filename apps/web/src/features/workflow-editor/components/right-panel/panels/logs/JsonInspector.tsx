@@ -34,6 +34,14 @@ interface Props {
   headerBanner?: React.ReactNode
   /** Optional row rendered below the body — e.g. action buttons. */
   footer?: React.ReactNode
+  /**
+   * When set, replaces the default tree/code body. Callers use this to
+   * render a fully bespoke body (e.g. the structured-error card) while
+   * keeping the inspector's toolbar, header banner, and footer. The
+   * toolbar's view-mode toggle and search still affect the underlying
+   * payload, so they're hidden when an override is active.
+   */
+  bodyOverride?: React.ReactNode
 }
 
 /**
@@ -53,6 +61,7 @@ export function JsonInspector({
   title,
   headerBanner,
   footer,
+  bodyOverride,
 }: Props) {
   // Without a known label we don't have a stable reference style — leave the
   // tree non-draggable rather than emit a raw-uuid form the rest of the
@@ -223,18 +232,23 @@ export function JsonInspector({
       {/* Optional banner (e.g. ErrorView headline) */}
       {headerBanner}
 
-      {/* Body */}
-      <div className="min-h-0 flex-1 overflow-auto px-3 py-2 text-left">
-        {empty ? (
-          <div className="text-[var(--text-faint)] italic font-mono text-[11.5px]">
-            No data available.
-          </div>
-        ) : view === 'tree' ? (
-          <JsonTreeView value={payload} reference={treeReference} />
-        ) : (
-          <JsonCodeView source={visibleCode} wrap={wrap} />
-        )}
-      </div>
+      {/* Body — callers can opt out of the default tree/code via
+          `bodyOverride` while keeping the surrounding chrome. */}
+      {bodyOverride !== undefined ? (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{bodyOverride}</div>
+      ) : (
+        <div className="min-h-0 flex-1 overflow-auto px-3 py-2 text-left">
+          {empty ? (
+            <div className="text-[var(--text-faint)] italic font-mono text-[11.5px]">
+              No data available.
+            </div>
+          ) : view === 'tree' ? (
+            <JsonTreeView value={payload} reference={treeReference} />
+          ) : (
+            <JsonCodeView source={visibleCode} wrap={wrap} />
+          )}
+        </div>
+      )}
 
       {/* Optional footer (e.g. ErrorView action buttons) */}
       {footer}
