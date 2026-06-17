@@ -272,6 +272,7 @@ class GoogleOAuthProvider:
         "Read and write Google Contacts",
         "Manage YouTube (videos, comments, playlists, subscriptions)",
         "Upload videos to YouTube",
+        "Read and write Google Slides",
         "Read your Google profile",
     ]
 
@@ -308,6 +309,7 @@ class GoogleOAuthProvider:
             "https://www.googleapis.com/auth/contacts",
             "https://www.googleapis.com/auth/youtube.force-ssl",
             "https://www.googleapis.com/auth/youtube.upload",
+            "https://www.googleapis.com/auth/presentations",
             "openid",
             "email",
             "profile",
