@@ -102,6 +102,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.gtasks import (
         gtasks_trigger as _gtasks_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.gyt import (
+        gyt_trigger as _gyt_trigger,  # noqa: F401
+    )
 
 
 @celery_app.task(name="poll_integration_triggers")

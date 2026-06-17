@@ -270,6 +270,8 @@ class GoogleOAuthProvider:
         "Read and write Google Forms (questions and settings)",
         "Read Google Forms responses",
         "Read and write Google Contacts",
+        "Manage YouTube (videos, comments, playlists, subscriptions)",
+        "Upload videos to YouTube",
         "Read your Google profile",
     ]
 
@@ -304,6 +306,8 @@ class GoogleOAuthProvider:
             "https://www.googleapis.com/auth/forms.body",
             "https://www.googleapis.com/auth/forms.responses.readonly",
             "https://www.googleapis.com/auth/contacts",
+            "https://www.googleapis.com/auth/youtube.force-ssl",
+            "https://www.googleapis.com/auth/youtube.upload",
             "openid",
             "email",
             "profile",

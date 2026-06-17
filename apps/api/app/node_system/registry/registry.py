@@ -49,6 +49,8 @@ from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTriggerNode
+from apps.api.app.node_system.nodes.gyt.gyt_node import GoogleYouTubeNode
+from apps.api.app.node_system.nodes.gyt.gyt_trigger import GoogleYouTubeTriggerNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
@@ -139,6 +141,8 @@ node_registry.register(GoogleFormsNode)
 node_registry.register(GoogleFormsTriggerNode)
 node_registry.register(GooglePeopleNode)
 node_registry.register(GooglePeopleTriggerNode)
+node_registry.register(GoogleYouTubeNode)
+node_registry.register(GoogleYouTubeTriggerNode)
 node_registry.register(LinearNode)
 # Meta surfaces — one consolidated trigger + action per surface
 # (Instagram, Facebook/Messenger, WhatsApp, Lead Ads) carrying

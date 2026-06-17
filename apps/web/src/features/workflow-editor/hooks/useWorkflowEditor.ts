@@ -215,6 +215,7 @@ export function useWorkflowEditor(workflowId: string) {
     'trigger.gtasks_change',
     'trigger.gforms_response',
     'trigger.gpeople_change',
+    'trigger.gyt_change',
   ])
 
   const hasMetaTrigger = useCallback(() => {

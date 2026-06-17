@@ -696,6 +696,276 @@ async def create_gpeople_group(
     }
 
 
+# ── YouTube pickers ────────────────────────────────────────────────────
+
+
+@router.get("/{credential_id}/youtube/videos")
+async def list_youtube_videos(
+    credential_id: uuid.UUID,
+    query: str = "",
+    page_size: int = 50,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List the signed-in account's own uploaded videos. Backs the
+    youtube-video picker on the YouTube action node."""
+    import httpx
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            ch_resp = await client.get(
+                "https://www.googleapis.com/youtube/v3/channels",
+                headers={"Authorization": f"Bearer {token}"},
+                params={"part": "contentDetails", "mine": "true"},
+            )
+            ch_resp.raise_for_status()
+            ch_items = ch_resp.json().get("items") or []
+            if not ch_items:
+                return {"videos": []}
+            uploads = ((ch_items[0].get("contentDetails") or {}).get("relatedPlaylists") or {}).get(
+                "uploads"
+            ) or ""
+            if not uploads:
+                return {"videos": []}
+
+            pl_resp = await client.get(
+                "https://www.googleapis.com/youtube/v3/playlistItems",
+                headers={"Authorization": f"Bearer {token}"},
+                params={
+                    "part": "contentDetails,snippet",
+                    "playlistId": uploads,
+                    "maxResults": max(1, min(int(page_size or 50), 50)),
+                },
+            )
+            pl_resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                f"YouTube videos list failed ({exc.response.status_code}): "
+                f"{exc.response.text[:200]}"
+            ),
+        ) from exc
+
+    q = (query or "").strip().lower()
+    items = pl_resp.json().get("items") or []
+    videos = []
+    for i in items:
+        snippet = i.get("snippet") or {}
+        vid = ((i.get("contentDetails") or {}).get("videoId")) or ""
+        title = snippet.get("title") or ""
+        if q and q not in title.lower():
+            continue
+        thumb = ((snippet.get("thumbnails") or {}).get("default") or {}).get("url") or ""
+        videos.append(
+            {
+                "id": vid,
+                "title": title,
+                "channel_title": snippet.get("channelTitle") or "",
+                "published_at": snippet.get("publishedAt") or "",
+                "thumbnail_url": thumb,
+            }
+        )
+    return {"videos": videos}
+
+
+@router.get("/{credential_id}/youtube/playlists")
+async def list_youtube_playlists(
+    credential_id: uuid.UUID,
+    query: str = "",
+    page_size: int = 50,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List the user's playlists. Backs the youtube-playlist picker."""
+    import httpx
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(
+                "https://www.googleapis.com/youtube/v3/playlists",
+                headers={"Authorization": f"Bearer {token}"},
+                params={
+                    "part": "snippet,contentDetails,status",
+                    "mine": "true",
+                    "maxResults": max(1, min(int(page_size or 50), 50)),
+                },
+            )
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                f"YouTube playlists list failed ({exc.response.status_code}): "
+                f"{exc.response.text[:200]}"
+            ),
+        ) from exc
+
+    q = (query or "").strip().lower()
+    items = resp.json().get("items") or []
+    playlists = []
+    for p in items:
+        snippet = p.get("snippet") or {}
+        title = snippet.get("title") or ""
+        if q and q not in title.lower():
+            continue
+        playlists.append(
+            {
+                "id": p.get("id"),
+                "title": title,
+                "description": snippet.get("description") or "",
+                "item_count": int((p.get("contentDetails") or {}).get("itemCount") or 0),
+                "privacy": (p.get("status") or {}).get("privacyStatus") or "",
+            }
+        )
+    return {"playlists": playlists}
+
+
+@router.post("/{credential_id}/youtube/playlists", status_code=status.HTTP_201_CREATED)
+async def create_youtube_playlist(
+    credential_id: uuid.UUID,
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """Create a new playlist from inside the picker."""
+    import httpx
+
+    title = str((payload or {}).get("title") or "").strip()
+    if not title:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="`title` is required.",
+        )
+    privacy = str((payload or {}).get("privacy") or "private")
+    token = await _resolve_google_token(credential_id, workspace, service)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://www.googleapis.com/youtube/v3/playlists",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                },
+                params={"part": "snippet,status"},
+                json={
+                    "snippet": {"title": title},
+                    "status": {"privacyStatus": privacy},
+                },
+            )
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                f"Create playlist failed ({exc.response.status_code}): {exc.response.text[:200]}"
+            ),
+        ) from exc
+
+    data = resp.json()
+    return {
+        "id": data.get("id"),
+        "title": ((data.get("snippet") or {}).get("title")) or title,
+        "description": (data.get("snippet") or {}).get("description") or "",
+        "item_count": 0,
+        "privacy": (data.get("status") or {}).get("privacyStatus") or privacy,
+    }
+
+
+@router.get("/{credential_id}/youtube/channels")
+async def search_youtube_channels(
+    credential_id: uuid.UUID,
+    query: str,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """Search channels by name or @handle. Backs the youtube-channel
+    picker on the YouTube action node + trigger."""
+    import httpx
+
+    q = (query or "").strip()
+    if not q:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="`query` is required.",
+        )
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    # `@handle` lookups go through the channels endpoint directly;
+    # free-text searches use the search endpoint.
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            if q.startswith("@"):
+                ch_resp = await client.get(
+                    "https://www.googleapis.com/youtube/v3/channels",
+                    headers={"Authorization": f"Bearer {token}"},
+                    params={"part": "snippet,statistics", "forHandle": q},
+                )
+                ch_resp.raise_for_status()
+                items = ch_resp.json().get("items") or []
+                channels = [
+                    {
+                        "id": c.get("id"),
+                        "title": (c.get("snippet") or {}).get("title") or "",
+                        "handle": q,
+                        "subscriber_count": int(
+                            (c.get("statistics") or {}).get("subscriberCount") or 0
+                        ),
+                        "thumbnail_url": (
+                            ((c.get("snippet") or {}).get("thumbnails") or {}).get("default") or {}
+                        ).get("url")
+                        or "",
+                    }
+                    for c in items
+                ]
+                return {"channels": channels}
+
+            r = await client.get(
+                "https://www.googleapis.com/youtube/v3/search",
+                headers={"Authorization": f"Bearer {token}"},
+                params={
+                    "part": "snippet",
+                    "type": "channel",
+                    "q": q,
+                    "maxResults": 25,
+                },
+            )
+            r.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                f"YouTube channel search failed ({exc.response.status_code}): "
+                f"{exc.response.text[:200]}"
+            ),
+        ) from exc
+
+    items = r.json().get("items") or []
+    channels = [
+        {
+            "id": ((item.get("id") or {}).get("channelId") or item.get("id") or ""),
+            "title": (item.get("snippet") or {}).get("title") or "",
+            "description": (item.get("snippet") or {}).get("description") or "",
+            "thumbnail_url": (
+                ((item.get("snippet") or {}).get("thumbnails") or {}).get("default") or {}
+            ).get("url")
+            or "",
+        }
+        for item in items
+    ]
+    return {"channels": channels}
+
+
 @router.post("/{credential_id}/picker-token")
 async def get_picker_token(
     credential_id: uuid.UUID,

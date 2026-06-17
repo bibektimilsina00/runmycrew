@@ -23,6 +23,9 @@ import { GoogleFilePickerRenderer } from './renderers/GoogleFilePickerRenderer'
 import { GSheetsTabPickerRenderer } from './renderers/GSheetsTabPickerRenderer'
 import { GTasksListPickerRenderer } from './renderers/GTasksListPickerRenderer'
 import { GPeopleGroupPickerRenderer } from './renderers/GPeopleGroupPickerRenderer'
+import { GYouTubeVideoPickerRenderer } from './renderers/GYouTubeVideoPickerRenderer'
+import { GYouTubePlaylistPickerRenderer } from './renderers/GYouTubePlaylistPickerRenderer'
+import { GYouTubeChannelPickerRenderer } from './renderers/GYouTubeChannelPickerRenderer'
 import { DateTimeRenderer } from './renderers/DateTimeRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
@@ -54,6 +57,9 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'gsheet-tab':       GSheetsTabPickerRenderer,
   'gtasks-tasklist':  GTasksListPickerRenderer,
   'gpeople-group':    GPeopleGroupPickerRenderer,
+  'youtube-video':    GYouTubeVideoPickerRenderer,
+  'youtube-playlist': GYouTubePlaylistPickerRenderer,
+  'youtube-channel':  GYouTubeChannelPickerRenderer,
   datetime:           DateTimeRenderer,
 }
 
