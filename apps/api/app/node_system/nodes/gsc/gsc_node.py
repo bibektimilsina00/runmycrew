@@ -99,8 +99,7 @@ def format_gsc_error(status_code: int, body: str) -> str:
         return make_structured_error(
             "Search Console resource not found",
             summary=(
-                "The site URL or sitemap path doesn't match anything "
-                "the connected account can see."
+                "The site URL or sitemap path doesn't match anything the connected account can see."
             ),
             actions=[
                 "Re-open the site picker and re-select the property.",

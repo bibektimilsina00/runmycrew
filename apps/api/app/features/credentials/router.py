@@ -1218,6 +1218,78 @@ async def list_gsc_sites(
     return {"sites": sites}
 
 
+# ── Google Cloud Storage bucket picker ─────────────────────────────────
+
+
+@router.get("/{credential_id}/gcs/buckets")
+async def list_gcs_buckets(
+    credential_id: uuid.UUID,
+    project_id: str,
+    q: str | None = None,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List Cloud Storage buckets in a GCP project — backs the
+    ``gcs-bucket`` picker. ``project_id`` is required because the
+    Storage API scopes bucket lists to one project at a time.
+    """
+    import httpx
+
+    from apps.api.app.node_system.nodes.gcs.gcs_node import format_gcs_error
+
+    project = project_id.strip()
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="`project_id` is required.",
+        )
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    needle = (q or "").strip().lower()
+    buckets: list[dict[str, Any]] = []
+    page_token: str | None = None
+
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            while True:
+                params: dict[str, Any] = {"project": project, "maxResults": 200}
+                if page_token:
+                    params["pageToken"] = page_token
+                resp = await client.get(
+                    "https://storage.googleapis.com/storage/v1/b",
+                    headers={"Authorization": f"Bearer {token}"},
+                    params=params,
+                )
+                resp.raise_for_status()
+                data = resp.json() or {}
+                for entry in data.get("items") or []:
+                    name = str(entry.get("name") or "")
+                    if not name:
+                        continue
+                    if needle and needle not in name.lower():
+                        continue
+                    buckets.append(
+                        {
+                            "name": name,
+                            "location": str(entry.get("location") or ""),
+                            "storageClass": str(entry.get("storageClass") or ""),
+                            "created": str(entry.get("timeCreated") or ""),
+                        }
+                    )
+                page_token = data.get("nextPageToken")
+                if not page_token:
+                    break
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=format_gcs_error(exc.response.status_code, exc.response.text),
+        ) from exc
+
+    return {"buckets": buckets}
+
+
 @router.post("/{credential_id}/picker-token")
 async def get_picker_token(
     credential_id: uuid.UUID,

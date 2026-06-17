@@ -29,6 +29,7 @@ import { GYouTubeChannelPickerRenderer } from './renderers/GYouTubeChannelPicker
 import { GChatSpacePickerRenderer } from './renderers/GChatSpacePickerRenderer'
 import { GA4PropertyPickerRenderer } from './renderers/GA4PropertyPickerRenderer'
 import { GSCSitePickerRenderer } from './renderers/GSCSitePickerRenderer'
+import { GCSBucketPickerRenderer } from './renderers/GCSBucketPickerRenderer'
 import { DateTimeRenderer } from './renderers/DateTimeRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
@@ -66,6 +67,7 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'gchat-space':      GChatSpacePickerRenderer,
   'ga4-property':     GA4PropertyPickerRenderer,
   'gsc-site':         GSCSitePickerRenderer,
+  'gcs-bucket':       GCSBucketPickerRenderer,
   datetime:           DateTimeRenderer,
 }
 
