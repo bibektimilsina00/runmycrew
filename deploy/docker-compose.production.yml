@@ -87,12 +87,13 @@ services:
       REDIS_HOST: redis
       ENVIRONMENT: production
       TZ: UTC
+    # Worker MUST NOT depend on api. The api healthcheck uses Celery's
+    # inspect ping, so api-healthy requires the worker alive — a
+    # circular wait that deadlocks the cold-boot ordering.
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      api:
         condition: service_healthy
     # Two workers fit comfortably under the 384M cap; raise concurrency
     # only after observing real load.
@@ -146,6 +147,12 @@ services:
       - "apps.worker.app.jobs.tasks"
       - "beat"
       - "--loglevel=info"
+      # /app is owned by root inside the image; the non-root `app`
+      # user can't write `celerybeat-schedule` there. Pin the schedule
+      # file to /tmp where the user has write access. Schedule state
+      # is ephemeral (Celery beat rebuilds it from the configured
+      # schedule on every boot), so /tmp is fine.
+      - "--schedule=/tmp/celerybeat-schedule"
     healthcheck:
       # Beat has no inspect endpoint — `pgrep` proves the loop is
       # still running.
