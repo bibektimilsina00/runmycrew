@@ -10,7 +10,11 @@
 set -euo pipefail
 
 echo "[entrypoint] Applying database migrations…"
-uv run --no-sync alembic -c apps/api/alembic.ini upgrade head
+# `script_location = alembic` in alembic.ini resolves relative to the
+# CWD, not the alembic.ini path. cd into apps/api so the migration
+# scripts folder is found correctly. PYTHONPATH=/app keeps the
+# `apps.api.app.*` imports inside env.py / migrations resolvable.
+(cd apps/api && uv run --no-sync alembic upgrade head)
 echo "[entrypoint] Migrations done."
 
 echo "[entrypoint] Handing off to: $*"
