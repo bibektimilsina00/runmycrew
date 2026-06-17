@@ -872,8 +872,27 @@ async def _slides_batch_update(
     return r.json()
 
 
-def _color_field(hex_str: str) -> dict[str, Any] | None:
-    """Hex → Slides OpaqueColor shape, or None if invalid."""
+def _opaque_color_field(hex_str: str) -> dict[str, Any] | None:
+    """Hex → Slides `OpaqueColor` shape, or None if invalid.
+
+    Used wherever the API field is typed as `OpaqueColor` directly —
+    e.g. `SolidFill.color` for page backgrounds, shape fills, table cell
+    fills. NO `opaqueColor` wrapper.
+    """
+    rgb = _hex_to_rgb01(hex_str)
+    if rgb is None:
+        return None
+    return {"rgbColor": rgb}
+
+
+def _optional_color_field(hex_str: str) -> dict[str, Any] | None:
+    """Hex → Slides `OptionalColor` shape, or None if invalid.
+
+    Used wherever the API field is typed as `OptionalColor` — e.g.
+    `TextStyle.foregroundColor` and `TextStyle.backgroundColor`. The
+    `opaqueColor` wrapper is what distinguishes a set color from the
+    `OptionalColor` empty / inherit-from-parent state.
+    """
     rgb = _hex_to_rgb01(hex_str)
     if rgb is None:
         return None
@@ -1314,7 +1333,7 @@ def _build_outline_slide_requests(
     # Optional solid background fill.
     bg_color = str(slide_spec.get("background_color") or "").strip()
     if bg_color:
-        cf = _color_field(bg_color)
+        cf = _opaque_color_field(bg_color)
         if cf is not None:
             requests.append(
                 {
@@ -1753,7 +1772,7 @@ async def _set_slide_background(
 
     bg: dict[str, Any] = {}
     if node.props.background_color:
-        cf = _color_field(node.props.background_color)
+        cf = _opaque_color_field(node.props.background_color)
         if cf is None:
             return NodeResult(success=False, error="`background_color` must be `#rrggbb`.")
         bg["solidFill"] = {"color": cf}
@@ -1848,13 +1867,13 @@ async def _format_text(
         }
         fields.append("fontSize")
     if node.props.format_text_color:
-        cf = _color_field(node.props.format_text_color)
+        cf = _optional_color_field(node.props.format_text_color)
         if cf is None:
             return NodeResult(success=False, error="`format_text_color` must be a `#rrggbb` hex.")
         text_style["foregroundColor"] = cf
         fields.append("foregroundColor")
     if node.props.format_background_color:
-        cf = _color_field(node.props.format_background_color)
+        cf = _optional_color_field(node.props.format_background_color)
         if cf is None:
             return NodeResult(
                 success=False, error="`format_background_color` must be a `#rrggbb` hex."

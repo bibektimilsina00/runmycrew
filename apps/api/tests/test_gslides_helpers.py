@@ -9,23 +9,52 @@ from apps.api.app.node_system.nodes.gslides.gslides_node import (
     _build_outline_slide_requests,
     _coerce_outline_string,
     _collect_speaker_notes_inputs,
-    _color_field,
     _element_kind,
     _extract_element_text,
     _extract_slide_text,
     _find_text_placeholder,
     _gen_object_id,
+    _opaque_color_field,
+    _optional_color_field,
     _placement,
     _slide_insertion_index,
     _text_range,
     _validate_outline,
 )
 
-# ── _color_field ───────────────────────────────────────────────────────
+# ── _opaque_color_field ────────────────────────────────────────────────
+#
+# Raw OpaqueColor — what SolidFill.color (page background, shape fill)
+# expects. No `opaqueColor` wrapper.
 
 
-def test_color_field_well_formed_hex():
-    assert _color_field("#336699") == {
+def test_opaque_color_field_well_formed_hex():
+    assert _opaque_color_field("#336699") == {
+        "rgbColor": {
+            "red": 0x33 / 255,
+            "green": 0x66 / 255,
+            "blue": 0x99 / 255,
+        }
+    }
+
+
+def test_opaque_color_field_accepts_missing_hash():
+    assert _opaque_color_field("ff0000") == {"rgbColor": {"red": 1.0, "green": 0.0, "blue": 0.0}}
+
+
+@pytest.mark.parametrize("bad", ["", "abc", "#nothex", "#abc"])
+def test_opaque_color_field_returns_none_on_invalid(bad):
+    assert _opaque_color_field(bad) is None
+
+
+# ── _optional_color_field ──────────────────────────────────────────────
+#
+# OptionalColor wrapper — what TextStyle.foregroundColor /
+# TextStyle.backgroundColor expect.
+
+
+def test_optional_color_field_well_formed_hex():
+    assert _optional_color_field("#336699") == {
         "opaqueColor": {
             "rgbColor": {
                 "red": 0x33 / 255,
@@ -36,15 +65,9 @@ def test_color_field_well_formed_hex():
     }
 
 
-def test_color_field_accepts_missing_hash():
-    assert _color_field("ff0000") == {
-        "opaqueColor": {"rgbColor": {"red": 1.0, "green": 0.0, "blue": 0.0}}
-    }
-
-
 @pytest.mark.parametrize("bad", ["", "abc", "#nothex", "#abc"])
-def test_color_field_returns_none_on_invalid(bad):
-    assert _color_field(bad) is None
+def test_optional_color_field_returns_none_on_invalid(bad):
+    assert _optional_color_field(bad) is None
 
 
 # ── _placement ─────────────────────────────────────────────────────────
