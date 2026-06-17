@@ -4,7 +4,7 @@
 # stack sets a different `command` for each service. One image, two
 # roles. Keeps ghcr storage and CI matrix small.
 
-FROM python:3.13-slim AS build
+FROM python:3.14-slim AS build
 
 ENV UV_LINK_MODE=copy \
     UV_COMPILE_BYTECODE=1 \
@@ -26,7 +26,7 @@ COPY apps/worker ./apps/worker
 RUN uv sync --frozen --no-dev
 
 # ── Runtime ─────────────────────────────────────────────────────────────
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
