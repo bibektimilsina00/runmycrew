@@ -133,7 +133,9 @@ jobs:
             "umask 077 && cat > ${VPS_DIR}/.env && chmod 600 ${VPS_DIR}/.env"
 
       - name: Log in to ghcr.io on VPS (only if PAT provided)
-        if: ${{ secrets.GHCR_PAT != '' }}
+        # GitHub Actions doesn't allow `secrets.X` inside step-level
+        # `if:` expressions, so we branch at runtime against the env
+        # value instead.
         env:
           VPS_USER: ${{ vars.VPS_USER }}
           VPS_HOST: ${{ vars.VPS_HOST }}
@@ -141,6 +143,10 @@ jobs:
           OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
+          if [ -z "${GHCR_PAT}" ]; then
+            echo "GHCR_PAT not set; skipping ghcr login (packages must be public)."
+            exit 0
+          fi
           # printf so the token isn't echoed in plain text.
           printf '%s' "$GHCR_PAT" | ssh -i ~/.ssh/deploy_key \
             "${VPS_USER}@${VPS_HOST}" \
