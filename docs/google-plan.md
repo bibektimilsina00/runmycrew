@@ -11,11 +11,22 @@ matrix scored 🔒 / ⚠️ / ✅ per cell. This doc is the plan + the tracker.
 - **Phase 3 (Tasks + Forms + Contacts + YouTube)** — ✅ shipped
   (originally only Tasks/Forms/Contacts/YouTube; we promoted YouTube
   out of Phase 3 in the original draft and ended up shipping it here)
-- **Phase 4 (Slides + Meet + Chat + Keep)** — Slides ✅ shipped;
-  Meet / Chat / Keep ⏳ pending.
-  Photos dropped — workflow-automation use cases for personal media
-  are too niche to justify the surface area.
-- **Phase 5+** — ⏳ pending
+- **Phase 4 (Slides + Chat)** — Slides ✅ shipped; Chat ⏳ pending.
+  Dropped from Phase 4: **Photos** (niche personal-media),
+  **Meet** (API barely exists — Calendar already auto-creates Meet
+  links, and post-call transcripts are too niche to carry the surface),
+  **Keep** (read-only stub API).
+- **Phase 5 (Marketing / Analytics / Cloud)** — Business Profile,
+  Analytics 4, Search Console, BigQuery, Cloud Storage ⏳ pending.
+  **AdSense** dropped (too niche). **Ads** deferred (heavyweight,
+  developer-token flow). **Pub/Sub** kept only as an internal
+  transport, not user-facing.
+- **Phase 6 (AI / Maps)** — Translate, Vision, Speech, Maps/Places
+  ⏳ pending. **Document AI** deferred (Vision OCR covers common
+  cases). **Dialogflow CX** dropped (the LLM node already handles
+  intent detection). **Admin SDK** deferred (B2B-only, narrow).
+  **reCAPTCHA**, **Identity Toolkit**, **Vault** dropped (auth /
+  eDiscovery — off-mission for workflow automation).
 
 Cross-cutting infrastructure (also shipped this cycle):
 
@@ -91,14 +102,17 @@ Actions ✅
   AI-driven deck generation, batch slide ops, text/shape/image insert,
   speaker notes, background fills)
 
-Still **missing**
+Still **missing** (after the prune — see status snapshot for what
+was dropped or deferred)
 
-- Phase 4: Meet, Chat, Keep (Slides shipped; Photos dropped — see
-  status snapshot above)
-- Phase 5+: Business Profile, Analytics 4, Search Console, Ads, AdSense,
-  BigQuery, Cloud Storage, Pub/Sub
-- Phase 6+: Translate, Vision, Speech, Document AI, Dialogflow, Maps,
-  reCAPTCHA, Identity, Admin SDK, Vault
+- Phase 4: **Chat**
+- Phase 5: Business Profile, Analytics 4, Search Console, BigQuery,
+  Cloud Storage
+- Phase 6: Translate, Vision, Speech, Maps/Places
+
+**Deferred** (kept in roadmap, low priority): Ads, Document AI,
+Admin SDK. **Pub/Sub** only as an internal transport (not a user-facing
+node).
 
 ## Auth model
 
@@ -108,7 +122,7 @@ each pattern to its own credential type:
 
 | Cred type           | Surfaces                                                                 |
 |---------------------|--------------------------------------------------------------------------|
-| `google_oauth`      | Gmail, Calendar, Drive, Sheets, Docs, Slides, Tasks, Forms, YouTube, Contacts, Chat, Business Profile, Analytics, Search Console, AdSense, BigQuery, Cloud Storage, Pub/Sub, Translate, Vision, Speech, Document AI, Dialogflow |
+| `google_oauth`      | Gmail, Calendar, Drive, Sheets, Docs, Slides, Tasks, Forms, YouTube, Contacts, Chat, Business Profile, Analytics, Search Console, BigQuery, Cloud Storage, Pub/Sub, Translate, Vision, Speech, Document AI |
 | `google_api_key`    | Maps / Places / Geocoding (no per-user context — workspace-shared key)   |
 | `google_ads_oauth`  | Google Ads (OAuth + an extra `developer-token` header — sibling provider for clarity) |
 | `google_service_account` | BigQuery / Cloud APIs when the user wants a service-account workflow (Phase 6) |
@@ -146,27 +160,28 @@ APIs we call. Each Fuse surface gates on one or more APIs:
 | Contacts             | People API                                 | ✅ |
 | YouTube              | YouTube Data API v3                        | ✅ |
 | Slides               | Google Slides API                          | ✅ |
-| Meet                 | Google Meet API (limited program)          | ⏳ |
 | Chat                 | Google Chat API                            | ⏳ |
-| Photos               | Photos Library API                         | ❌ dropped |
 | Business Profile     | Google Business Profile API                | ⏳ |
 | Analytics 4          | Google Analytics Data API                  | ⏳ |
 | Search Console       | Search Console API                         | ⏳ |
-| Ads                  | Google Ads API                             | ⏳ |
-| AdSense              | AdSense Management API                     | ⏳ |
 | BigQuery             | BigQuery API                               | ⏳ |
 | Cloud Storage        | Cloud Storage JSON API                     | ⏳ |
-| Pub/Sub              | Pub/Sub API                                | ⏳ |
 | Translate            | Cloud Translation API                      | ⏳ |
 | Vision               | Cloud Vision API                           | ⏳ |
 | Speech               | Cloud Speech-to-Text + Text-to-Speech      | ⏳ |
-| Document AI          | Document AI API                            | ⏳ |
-| Dialogflow           | Dialogflow CX API                          | ⏳ |
 | Maps / Places        | Maps JavaScript / Places API / Geocoding   | ⏳ |
-| reCAPTCHA            | reCAPTCHA Enterprise API                   | ⏳ |
-| Firebase / Identity  | Identity Toolkit + Firebase Admin          | ⏳ |
-| Admin SDK            | Admin SDK API                              | ⏳ |
-| Vault                | Vault API                                  | ⏳ |
+| Pub/Sub              | Pub/Sub API                                | 🛠 internal transport only |
+| Ads                  | Google Ads API                             | 🕓 deferred |
+| Document AI          | Document AI API                            | 🕓 deferred |
+| Admin SDK            | Admin SDK API                              | 🕓 deferred |
+| Meet                 | Google Meet API (limited program)          | ❌ dropped |
+| Keep                 | Google Keep API                            | ❌ dropped |
+| Photos               | Photos Library API                         | ❌ dropped |
+| AdSense              | AdSense Management API                     | ❌ dropped |
+| Dialogflow           | Dialogflow CX API                          | ❌ dropped |
+| reCAPTCHA            | reCAPTCHA Enterprise API                   | ❌ dropped |
+| Firebase / Identity  | Identity Toolkit + Firebase Admin          | ❌ dropped |
+| Vault                | Vault API                                  | ❌ dropped |
 
 Per-API scopes table is below.
 
@@ -281,14 +296,18 @@ YouTube — 28 action ops + 5 trigger events:
   export PDF, set speaker notes, duplicate slide, delete slide,
   **create_from_outline** for AI-driven decks, batch updates,
   text/shape/image insert, background fills)
-- ⏳ Meet (create meeting, list participants, end meeting) — limited API
 - ⏳ Chat (send message to space/DM, threaded reply, list spaces, list
   members, reactions) — needs `chat.bot` scope / app install flow
-- ⏳ Keep (list notes, create note) — limited API
+- ❌ **Meet — dropped.** API barely exists — Calendar already
+  auto-creates Meet links on event create, and the rest of the API
+  (post-call conference records / transcripts) is too niche to carry
+  the surface. Revisit if transcript-driven workflows surface real
+  demand.
+- ❌ **Keep — dropped.** API is a read-only stub; no automation hook
+  worth the OAuth scope.
 - ❌ **Photos — dropped.** Workflow-automation use cases for personal
   media (auto-backup, social-sync) are niche; quota + scope overhead
-  doesn't pay back for a B2B automation surface. Revisit only if
-  user demand emerges.
+  doesn't pay back for a B2B automation surface.
 
 ### ⏳ Phase 5 — Marketing / Analytics / Cloud
 
@@ -298,33 +317,48 @@ YouTube — 28 action ops + 5 trigger events:
   dimension), list properties
 - **Search Console** — fetch search analytics, submit sitemap, list
   URL inspection
-- **Ads** — list campaigns, pause/enable, fetch metrics, create
-  campaign (heavyweight API)
-- **AdSense / AdMob** — earnings reports
 - **BigQuery** — run SQL, list datasets, insert rows
 - **Cloud Storage** — upload/download object, list bucket
-- **Pub/Sub** — publish message (also internally as a trigger transport)
+- 🛠 **Pub/Sub** — kept only as the internal trigger-transport
+  substrate; not exposed as a user-facing publish/subscribe node.
+- 🕓 **Ads — deferred.** High marketing value but big OAuth lift
+  (separate `developer-token` header, sibling provider). Revisit
+  after the rest of Phase 5 ships.
+- ❌ **AdSense / AdMob — dropped.** Earnings reports for ad
+  publishers — tiny audience for a horizontal automation platform.
 
-### ⏳ Phase 6 — AI / Maps / Auth
+### ⏳ Phase 6 — AI / Maps
 
 - **Translate** — translate text, detect language
 - **Vision** — OCR, label detection, safe-search, face detect
 - **Speech** — speech-to-text, text-to-speech
-- **Document AI** — extract structured fields from invoices, forms, IDs
-- **Dialogflow CX** — agent intent detection
 - **Maps / Places** — geocoding, place lookup, distance matrix,
   directions
-- **reCAPTCHA Enterprise** — verify token
-- **Identity Platform / Firebase Auth** — user mgmt for embedded
-  auth flows
+- 🕓 **Document AI — deferred.** Heavyweight processor-based setup;
+  Vision OCR covers the common "extract text from receipt" case.
+- ❌ **Dialogflow CX — dropped.** The LLM node already handles intent
+  detection / conversational routing with far less Google-specific
+  setup.
+- ❌ **reCAPTCHA Enterprise — dropped.** Token verification is an
+  auth concern, not workflow material.
+- ❌ **Identity Platform / Firebase Auth — dropped.** User
+  management for embedded auth flows is off-mission for workflow
+  automation.
 
-### ⏳ Phase 7 — Workspace Admin (B2B)
+### 🕓 Phase 7 — Workspace Admin (B2B, deferred)
 
-- **Admin SDK Directory** — create/suspend user, list groups, add
-  member, reset password
-- **Admin SDK Reports** — audit logs, usage reports
-- **Vault** — eDiscovery (legal hold), exports
-- **Cloud Identity** — group/membership mgmt across orgs
+Whole phase deferred until B2B-onboarding demand surfaces. When it
+does, the only kept surface is:
+
+- 🕓 **Admin SDK Directory / Reports** — create/suspend user, list
+  groups, audit logs.
+
+Dropped from this phase:
+
+- ❌ **Vault — dropped.** eDiscovery / legal hold is a regulated
+  niche, separate buyer, separate trust requirements.
+- ❌ **Cloud Identity — dropped.** Group / membership mgmt across orgs
+  is a Workspace admin concern, not workflow automation.
 
 ### Out of scope
 
@@ -349,20 +383,25 @@ YouTube — 28 action ops + 5 trigger events:
 | Profile | `openid` + `email` + `profile` | ✅ |
 | Slides | `presentations` | ✅ |
 | Chat | `chat.messages` + `chat.spaces` | ⏳ |
-| Photos | `photoslibrary.readonly` / `photoslibrary.appendonly` | ❌ dropped |
 | Business Profile | `business.manage` | ⏳ |
 | Analytics 4 | `analytics.readonly` | ⏳ |
 | Search Console | `webmasters.readonly` (or `webmasters` for sitemap submit) | ⏳ |
-| Ads | `adwords` (separate developer token required) | ⏳ |
-| AdSense | `adsense.readonly` | ⏳ |
 | BigQuery | `bigquery` (or `bigquery.readonly`) | ⏳ |
 | Cloud Storage | `devstorage.read_write` (or `devstorage.read_only`) | ⏳ |
-| Pub/Sub | `pubsub` | ⏳ |
-| Cloud APIs (Translate / Vision / Speech / Doc AI / Dialogflow) | `cloud-platform` (single broad scope; per-API enable governs access) | ⏳ |
+| Pub/Sub | `pubsub` | 🛠 internal transport only |
+| Cloud APIs (Translate / Vision / Speech) | `cloud-platform` (single broad scope; per-API enable governs access) | ⏳ |
 | Maps / Places / Geocoding | API key (no OAuth) — separate `GOOGLE_MAPS_API_KEY` env | ⏳ |
-| reCAPTCHA Enterprise | `cloud-platform` | ⏳ |
-| Admin SDK | `admin.directory.user` + `admin.directory.group` (+ `.member` for membership) | ⏳ |
-| Vault | `ediscovery` | ⏳ |
+| Ads | `adwords` (separate developer token required) | 🕓 deferred |
+| Document AI | `cloud-platform` | 🕓 deferred |
+| Admin SDK | `admin.directory.user` + `admin.directory.group` (+ `.member` for membership) | 🕓 deferred |
+| Meet | `meetings.space.created` | ❌ dropped |
+| Keep | `keep` | ❌ dropped |
+| Photos | `photoslibrary.readonly` / `photoslibrary.appendonly` | ❌ dropped |
+| AdSense | `adsense.readonly` | ❌ dropped |
+| Dialogflow | `cloud-platform` | ❌ dropped |
+| reCAPTCHA Enterprise | `cloud-platform` | ❌ dropped |
+| Identity Platform / Firebase Auth | `cloud-platform` | ❌ dropped |
+| Vault | `ediscovery` | ❌ dropped |
 
 Restricted scopes (Drive full, Gmail modify) trigger Google's
 **Restricted Scope Verification** (CASA / security review). We ship
@@ -470,16 +509,23 @@ Pattern that all shipped Google surfaces follow:
 | 56 | slides | action: create_from_outline | ✅ | AI-driven deck gen |
 | 57 | slides | action: set_speaker_notes | ✅ | empty-shape deleteText guarded |
 | 58 | slides | action: update_background | ✅ | OpaqueColor vs OptionalColor split |
-| 59 | meet | action: create_meeting | ⏳ | limited API |
-| 60 | chat | action: send_message | ⏳ | needs chat.bot scope |
-| 61 | chat | trigger: new_message_in_space | ⏳ | |
-| 62 | analytics4 | action: run_report | ⏳ | |
-| 63 | search_console | action: get_search_analytics | ⏳ | |
-| 64 | business_profile | trigger: new_review | ⏳ | |
+| 59 | chat | action: send_message | ⏳ | needs chat.bot scope |
+| 60 | chat | trigger: new_message_in_space | ⏳ | |
+| 61 | business_profile | action: list_locations / reply_review | ⏳ | |
+| 62 | business_profile | trigger: new_review | ⏳ | |
+| 63 | analytics4 | action: run_report | ⏳ | |
+| 64 | search_console | action: get_search_analytics | ⏳ | |
+| 65 | bigquery | action: run_sql | ⏳ | |
+| 66 | cloud_storage | action: upload / download object | ⏳ | |
+| 67 | translate | action: translate_text | ⏳ | |
+| 68 | vision | action: ocr / labels | ⏳ | |
+| 69 | speech | action: stt / tts | ⏳ | |
+| 70 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
 
 Statuses: ⏳ not started · 🔄 in progress · ✅ proven end-to-end ·
 🔒 blocked by external (verification, API enable, scope review) · ⚠️
-partial / works with caveats
+partial / works with caveats · 🛠 internal substrate (not user-facing)
+· 🕓 deferred · ❌ dropped
 
 ## External setup checklist
 
