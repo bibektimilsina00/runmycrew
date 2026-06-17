@@ -91,6 +91,17 @@ def format_chat_error(status_code: int, body: str) -> str:
             "`chat.googleapis.com`) or the chat.* scopes weren't "
             "granted (disconnect + reconnect the Google credential)."
         )
+    elif status_code == 404 and "chat app not found" in lower:
+        # The Chat API rejects calls — even user-OAuth ones — until
+        # the *project* has a Chat app configuration row, which is
+        # separate from enabling `chat.googleapis.com` in the API
+        # library. Easy gotcha; the docs treat it as a one-line aside.
+        hint = (
+            " — the Chat API needs a Chat app configured in this GCP "
+            "project (separate from 'enable the API'). Open Cloud Console "
+            "→ APIs & Services → Google Chat API → Configuration, fill in "
+            "App name + avatar + description, save, then retry."
+        )
     elif status_code == 404:
         hint = (
             " — the connected Google account may not be a member of "

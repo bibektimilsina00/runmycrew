@@ -170,6 +170,20 @@ def test_format_chat_error_404_membership_hint():
     assert "member of" in msg
 
 
+def test_format_chat_error_404_app_not_configured_hint():
+    body = (
+        '{"error":{"code":404,"message":"Google Chat app not found. '
+        "To create a Chat app, you must turn on the Chat API and "
+        'configure the app in the Google Cloud console.","status":"NOT_FOUND"}}'
+    )
+    msg = format_chat_error(404, body)
+    assert "Google Chat API error 404" in msg
+    assert "Chat app configured in this GCP" in msg
+    assert "Configuration" in msg
+    # The membership branch must NOT fire — different fix.
+    assert "member of" not in msg
+
+
 def test_format_chat_error_401_token_hint():
     msg = format_chat_error(401, "")
     assert "Google Chat API error 401" in msg
