@@ -198,6 +198,12 @@ class GoogleSlidesProperties(BaseModel):
     # get_thumbnail
     thumbnail_size: str = "MEDIUM"  # SMALL / MEDIUM / LARGE
 
+    # create_from_outline / build_deck — array of slide specs. Each
+    # entry is a dict; see `_build_outline_slide_requests` for the
+    # accepted shape. We accept `Any` so LLM-generated JSON passes
+    # through unchanged.
+    outline: Any = None
+
     @field_validator(
         "presentation_id",
         "slide_id",
@@ -229,6 +235,7 @@ _PRES_OPS = (
     "copy",
     "delete",
     "share",
+    "build_deck",
     "export",
     "get_thumbnail",
     "add_slide",
@@ -303,6 +310,11 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                         {"label": "Get Presentation", "value": "get"},
                         {"label": "Get All Text", "value": "get_text"},
                         {"label": "Create Presentation", "value": "create"},
+                        {
+                            "label": "Create from Outline (AI-friendly)",
+                            "value": "create_from_outline",
+                        },
+                        {"label": "Build Deck from Outline (append)", "value": "build_deck"},
                         {"label": "Rename Presentation", "value": "rename"},
                         {"label": "Copy Presentation", "value": "copy"},
                         {"label": "Delete Presentation", "value": "delete"},
@@ -347,7 +359,7 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                     "type": "string",
                     "required": True,
                     "placeholder": "Q1 launch deck",
-                    "condition": _cond("create"),
+                    "condition": _cond_any("create", "create_from_outline"),
                 },
                 {
                     "name": "initial_content",
@@ -357,6 +369,35 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                     "placeholder": "Optional — text inserted into the title slide's subtitle.",
                     "condition": _cond("create"),
                     "mode": "advanced",
+                },
+                # create_from_outline / build_deck — outline JSON
+                {
+                    "name": "outline",
+                    "label": "Outline (JSON array of slides)",
+                    "type": "json",
+                    "required": True,
+                    "typeOptions": {"multiline": True, "rows": 8},
+                    "placeholder": (
+                        "[\n"
+                        '  {"layout": "TITLE", "title": "Q1 review", "subtitle": "March 2026"},\n'
+                        '  {"layout": "TITLE_AND_BODY", "title": "Highlights",\n'
+                        '   "body": "Revenue up 30%\\n• 500 new customers\\n• 3 launches",\n'
+                        '   "notes": "Talking points: emphasise enterprise tier."},\n'
+                        '  {"layout": "TITLE_AND_BODY", "title": "Roadmap",\n'
+                        '   "body": "Q2 plans…",\n'
+                        '   "image_url": "https://…/chart.png",\n'
+                        '   "background_color": "#f4f4f4"}\n'
+                        "]"
+                    ),
+                    "description": (
+                        "Array of slide dicts. Per-slide keys: `layout` "
+                        "(BLANK / TITLE / TITLE_AND_BODY / SECTION_HEADER / "
+                        "TITLE_AND_TWO_COLUMNS / TITLE_ONLY / BIG_NUMBER / "
+                        "CAPTION_ONLY), `title`, `subtitle` (TITLE layout), "
+                        "`body`, `notes`, `image_url`, `background_color`. "
+                        "Wire an LLM upstream and have it emit this shape."
+                    ),
+                    "condition": _cond_any("create_from_outline", "build_deck"),
                 },
                 # rename / copy
                 {
@@ -1123,6 +1164,320 @@ async def _get_thumbnail(
     return NodeResult(success=True, output_data=r.json())
 
 
+# ── handlers — outline-driven deck building ─────────────────────────────
+
+
+# Maps each layout to (title-placeholder-type, body-placeholder-type).
+# We use these to assign deterministic objectIds via
+# `placeholderIdMappings` so we can insertText without an extra fetch.
+_LAYOUT_PLACEHOLDERS: dict[str, tuple[str | None, str | None]] = {
+    "BLANK": (None, None),
+    "TITLE": ("CENTERED_TITLE", "SUBTITLE"),
+    "TITLE_AND_BODY": ("TITLE", "BODY"),
+    "SECTION_HEADER": ("TITLE", None),
+    "TITLE_AND_TWO_COLUMNS": ("TITLE", "BODY"),
+    "TITLE_ONLY": ("TITLE", None),
+    "BIG_NUMBER": ("TITLE", "BODY"),
+    "CAPTION_ONLY": (None, "BODY"),
+}
+
+
+def _build_outline_slide_requests(
+    slide_spec: dict[str, Any], *, insertion_index: int | None
+) -> tuple[list[dict[str, Any]], str, dict[str, str | None]]:
+    """Compose the batchUpdate requests for one outline slide.
+
+    Returns `(requests, slide_id, placeholder_ids)` so the caller can
+    chain extra ops (image insert, background, speaker notes) against
+    the same slide id. `placeholder_ids` keys are `title` / `body`.
+    Unknown layouts default to TITLE_AND_BODY so an LLM that
+    hallucinates a layout name still produces a usable slide."""
+    layout = str(slide_spec.get("layout") or "TITLE_AND_BODY").upper()
+    if layout not in _LAYOUT_PLACEHOLDERS:
+        layout = "TITLE_AND_BODY"
+
+    title_type, body_type = _LAYOUT_PLACEHOLDERS[layout]
+    slide_id = _gen_object_id("sld")
+    title_id = _gen_object_id("ttl") if title_type else None
+    body_id = _gen_object_id("bdy") if body_type else None
+
+    mappings: list[dict[str, Any]] = []
+    if title_type and title_id:
+        mappings.append(
+            {
+                "layoutPlaceholder": {"type": title_type},
+                "objectId": title_id,
+            }
+        )
+    if body_type and body_id:
+        mappings.append(
+            {
+                "layoutPlaceholder": {"type": body_type},
+                "objectId": body_id,
+            }
+        )
+
+    create_request: dict[str, Any] = {
+        "createSlide": {
+            "objectId": slide_id,
+            "slideLayoutReference": {"predefinedLayout": layout},
+        }
+    }
+    if insertion_index is not None:
+        create_request["createSlide"]["insertionIndex"] = int(insertion_index)
+    if mappings:
+        create_request["createSlide"]["placeholderIdMappings"] = mappings
+
+    requests: list[dict[str, Any]] = [create_request]
+
+    # Title — falls back to `name` if the LLM emitted that key.
+    title_text = str(slide_spec.get("title") or slide_spec.get("name") or "").strip()
+    if title_text and title_id:
+        requests.append({"insertText": {"objectId": title_id, "text": title_text}})
+
+    # Body text — for the TITLE layout we accept `subtitle` as an
+    # alias; for other layouts we pull from `body` first, then
+    # `subtitle`, then `content` (LLM-friendly alternatives).
+    body_text = ""
+    if layout == "TITLE":
+        body_text = str(slide_spec.get("subtitle") or slide_spec.get("body") or "")
+    else:
+        body_text = str(
+            slide_spec.get("body") or slide_spec.get("subtitle") or slide_spec.get("content") or ""
+        )
+    body_text = body_text.strip()
+    if body_text and body_id:
+        requests.append({"insertText": {"objectId": body_id, "text": body_text}})
+
+    # Optional inline image — anchored to the slide page. We park it
+    # at a sensible right-hand spot (300pt wide, 200pt tall). Users
+    # who need custom geometry can use `insert_image` after the fact.
+    image_url = str(slide_spec.get("image_url") or "").strip()
+    if image_url:
+        image_id = _gen_object_id("img")
+        requests.append(
+            {
+                "createImage": {
+                    "objectId": image_id,
+                    "url": image_url,
+                    "elementProperties": {
+                        "pageObjectId": slide_id,
+                        "size": {
+                            "width": {"magnitude": 300, "unit": "PT"},
+                            "height": {"magnitude": 200, "unit": "PT"},
+                        },
+                        "transform": {
+                            "scaleX": 1,
+                            "scaleY": 1,
+                            "translateX": 360,
+                            "translateY": 80,
+                            "unit": "PT",
+                        },
+                    },
+                }
+            }
+        )
+
+    # Optional solid background fill.
+    bg_color = str(slide_spec.get("background_color") or "").strip()
+    if bg_color:
+        cf = _color_field(bg_color)
+        if cf is not None:
+            requests.append(
+                {
+                    "updatePageProperties": {
+                        "objectId": slide_id,
+                        "pageProperties": {"pageBackgroundFill": {"solidFill": {"color": cf}}},
+                        "fields": "pageBackgroundFill",
+                    }
+                }
+            )
+
+    placeholder_ids = {"title": title_id, "body": body_id}
+    return requests, slide_id, placeholder_ids
+
+
+def _collect_speaker_notes_inputs(
+    slide_specs: list[dict[str, Any]], slide_ids: list[str]
+) -> list[tuple[str, str]]:
+    """Pair `(slide_id, notes_text)` for every slide with notes. The
+    notes shape lives under `slideProperties.notesPage.notesProperties.
+    speakerNotesObjectId`, which requires a re-fetch — kept separate
+    so the bulk path stays a single API call when notes aren't used."""
+    out: list[tuple[str, str]] = []
+    for spec, sid in zip(slide_specs, slide_ids, strict=False):
+        notes = str(spec.get("notes") or spec.get("speaker_notes") or "").strip()
+        if notes:
+            out.append((sid, notes))
+    return out
+
+
+async def _apply_speaker_notes(
+    client: httpx.AsyncClient,
+    headers: dict[str, str],
+    presentation_id: str,
+    pairs: list[tuple[str, str]],
+) -> None:
+    """Walk the presentation to locate each slide's notes shape, then
+    issue a single batchUpdate that replaces the text on every notes
+    page that needs one."""
+    if not pairs:
+        return
+    pres = await client.get(f"{SLIDES_API}/{presentation_id}", headers=headers)
+    pres.raise_for_status()
+    slide_to_notes: dict[str, str] = {}
+    for slide in pres.json().get("slides") or []:
+        sid = slide.get("objectId")
+        if not sid:
+            continue
+        notes_props = ((slide.get("slideProperties") or {}).get("notesPage") or {}).get(
+            "notesProperties", {}
+        )
+        notes_id = notes_props.get("speakerNotesObjectId")
+        if notes_id:
+            slide_to_notes[str(sid)] = str(notes_id)
+        else:
+            notes_page = (slide.get("slideProperties") or {}).get("notesPage") or {}
+            for element in notes_page.get("pageElements") or []:
+                shape = element.get("shape") or {}
+                if shape.get("placeholder", {}).get("type") == "BODY":
+                    notes_obj_id = element.get("objectId")
+                    if notes_obj_id:
+                        slide_to_notes[str(sid)] = str(notes_obj_id)
+                    break
+
+    requests: list[dict[str, Any]] = []
+    for slide_id, notes_text in pairs:
+        notes_obj_id = slide_to_notes.get(slide_id)
+        if not notes_obj_id:
+            continue
+        requests.append(
+            {
+                "deleteText": {
+                    "objectId": notes_obj_id,
+                    "textRange": {"type": "ALL"},
+                }
+            }
+        )
+        requests.append({"insertText": {"objectId": notes_obj_id, "text": notes_text}})
+    if requests:
+        await _slides_batch_update(client, headers, presentation_id, requests)
+
+
+def _validate_outline(raw: Any) -> list[dict[str, Any]] | NodeResult:
+    """Outline must be a non-empty list of dicts. We don't enforce
+    individual fields — `_build_outline_slide_requests` has its own
+    fallbacks for missing keys so an imperfect LLM output still
+    produces SOMETHING usable."""
+    if not isinstance(raw, list) or not raw:
+        return NodeResult(
+            success=False,
+            error="`outline` must be a non-empty JSON array of slide objects.",
+        )
+    out: list[dict[str, Any]] = []
+    for entry in raw:
+        if isinstance(entry, dict):
+            out.append(entry)
+    if not out:
+        return NodeResult(
+            success=False,
+            error="`outline` had no slide objects (every entry was non-dict).",
+        )
+    return out
+
+
+async def _create_from_outline(
+    node: GoogleSlidesNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    title = (node.props.title or "").strip()
+    if not title:
+        return NodeResult(success=False, error="Title is required.")
+    slides = _validate_outline(node.props.outline)
+    if isinstance(slides, NodeResult):
+        return slides
+
+    # Create the empty presentation first; Slides auto-seeds a single
+    # title slide we drop right after so the outline starts at 0.
+    create_resp = await client.post(SLIDES_API, headers=headers, json={"title": title})
+    create_resp.raise_for_status()
+    pres = create_resp.json()
+    pres_id = pres.get("presentationId")
+    auto_slide_id = ((pres.get("slides") or [{}])[0]).get("objectId")
+
+    # Build the whole deck in one batchUpdate: delete the placeholder
+    # slide + create every outline slide.
+    requests: list[dict[str, Any]] = []
+    if auto_slide_id:
+        requests.append({"deleteObject": {"objectId": auto_slide_id}})
+
+    slide_ids: list[str] = []
+    for idx, spec in enumerate(slides):
+        reqs, sid, _ = _build_outline_slide_requests(spec, insertion_index=idx)
+        requests.extend(reqs)
+        slide_ids.append(sid)
+
+    result = await _slides_batch_update(client, headers, pres_id, requests)
+
+    # Speaker notes need the notes-shape objectIds, which only come
+    # back after the slides exist — do it in a follow-up.
+    await _apply_speaker_notes(
+        client, headers, pres_id, _collect_speaker_notes_inputs(slides, slide_ids)
+    )
+    return NodeResult(
+        success=True,
+        output_data={
+            "presentation_id": pres_id,
+            "title": title,
+            "slide_count": len(slide_ids),
+            "slide_ids": slide_ids,
+            "url": (f"https://docs.google.com/presentation/d/{pres_id}/edit" if pres_id else None),
+            "result": result,
+        },
+    )
+
+
+async def _build_deck(
+    node: GoogleSlidesNode, client: httpx.AsyncClient, headers: dict[str, str]
+) -> NodeResult:
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    slides = _validate_outline(node.props.outline)
+    if isinstance(slides, NodeResult):
+        return slides
+
+    # Append to the existing deck — pull the current slide count and
+    # start the insertionIndex past it so the outline lands at the end.
+    pres_resp = await client.get(
+        f"{SLIDES_API}/{pid}",
+        headers=headers,
+        params={"fields": "slides.objectId"},
+    )
+    pres_resp.raise_for_status()
+    existing_count = len(pres_resp.json().get("slides") or [])
+
+    requests: list[dict[str, Any]] = []
+    slide_ids: list[str] = []
+    for offset, spec in enumerate(slides):
+        reqs, sid, _ = _build_outline_slide_requests(spec, insertion_index=existing_count + offset)
+        requests.extend(reqs)
+        slide_ids.append(sid)
+
+    result = await _slides_batch_update(client, headers, pid, requests)
+    await _apply_speaker_notes(
+        client, headers, pid, _collect_speaker_notes_inputs(slides, slide_ids)
+    )
+    return NodeResult(
+        success=True,
+        output_data={
+            "presentation_id": pid,
+            "slide_count": len(slide_ids),
+            "slide_ids": slide_ids,
+            "result": result,
+        },
+    )
+
+
 # ── handlers — slide ops ────────────────────────────────────────────────
 
 
@@ -1625,6 +1980,8 @@ def _gen_object_id(prefix: str) -> str:
 
 _HANDLERS: dict[str, Any] = {
     "create": _create,
+    "create_from_outline": _create_from_outline,
+    "build_deck": _build_deck,
     "get": _get,
     "get_text": _get_text,
     "rename": _rename,

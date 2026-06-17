@@ -6,6 +6,8 @@ import pytest
 
 from apps.api.app.node_system.nodes.gslides.gslides_node import (
     GoogleSlidesProperties,
+    _build_outline_slide_requests,
+    _collect_speaker_notes_inputs,
     _color_field,
     _element_kind,
     _extract_element_text,
@@ -15,6 +17,7 @@ from apps.api.app.node_system.nodes.gslides.gslides_node import (
     _placement,
     _slide_insertion_index,
     _text_range,
+    _validate_outline,
 )
 
 # ── _color_field ───────────────────────────────────────────────────────
@@ -256,6 +259,147 @@ def test_find_text_placeholder_ignores_unrelated_placeholders():
         _find_text_placeholder(slide, preferred=("SUBTITLE", "BODY", "CENTERED_TITLE", "TITLE"))
         is None
     )
+
+
+# ── outline builder ───────────────────────────────────────────────────
+
+
+def _types_of_mappings(create_request):
+    return [
+        m["layoutPlaceholder"]["type"]
+        for m in create_request["createSlide"].get("placeholderIdMappings") or []
+    ]
+
+
+def test_outline_title_layout_maps_centered_title_and_subtitle():
+    spec = {"layout": "TITLE", "title": "Q1 review", "subtitle": "March 2026"}
+    requests, sid, ph = _build_outline_slide_requests(spec, insertion_index=0)
+    assert _types_of_mappings(requests[0]) == ["CENTERED_TITLE", "SUBTITLE"]
+    assert ph["title"] and ph["body"]
+    # The insertText requests use the same objectIds we assigned via
+    # placeholderIdMappings so there's no follow-up fetch needed.
+    insert_targets = [r["insertText"]["objectId"] for r in requests if "insertText" in r]
+    assert set(insert_targets) == {ph["title"], ph["body"]}
+
+
+def test_outline_title_and_body_layout_maps_title_and_body():
+    spec = {"layout": "TITLE_AND_BODY", "title": "Highlights", "body": "x\ny"}
+    requests, _, ph = _build_outline_slide_requests(spec, insertion_index=2)
+    assert _types_of_mappings(requests[0]) == ["TITLE", "BODY"]
+    assert requests[0]["createSlide"]["insertionIndex"] == 2
+    insert_targets = [r["insertText"]["objectId"] for r in requests if "insertText" in r]
+    assert ph["title"] in insert_targets
+    assert ph["body"] in insert_targets
+
+
+def test_outline_falls_back_to_title_and_body_on_unknown_layout():
+    """An LLM might emit a layout name we don't know. We should still
+    produce a usable slide instead of erroring."""
+    spec = {"layout": "FANCY_NEW_LAYOUT", "title": "x", "body": "y"}
+    requests, _, _ = _build_outline_slide_requests(spec, insertion_index=0)
+    assert (
+        requests[0]["createSlide"]["slideLayoutReference"]["predefinedLayout"] == "TITLE_AND_BODY"
+    )
+
+
+def test_outline_accepts_subtitle_as_body_alias_for_non_title_layouts():
+    spec = {"layout": "TITLE_AND_BODY", "title": "x", "subtitle": "from subtitle key"}
+    requests, _, ph = _build_outline_slide_requests(spec, insertion_index=0)
+    body_inserts = [
+        r["insertText"]["text"]
+        for r in requests
+        if "insertText" in r and r["insertText"]["objectId"] == ph["body"]
+    ]
+    assert body_inserts == ["from subtitle key"]
+
+
+def test_outline_accepts_content_as_third_alias():
+    spec = {"layout": "TITLE_AND_BODY", "title": "x", "content": "from content key"}
+    requests, _, ph = _build_outline_slide_requests(spec, insertion_index=0)
+    body_inserts = [
+        r["insertText"]["text"]
+        for r in requests
+        if "insertText" in r and r["insertText"]["objectId"] == ph["body"]
+    ]
+    assert body_inserts == ["from content key"]
+
+
+def test_outline_emits_image_request_when_image_url_present():
+    spec = {"layout": "BLANK", "image_url": "https://thumb.example/x.png"}
+    requests, sid, _ = _build_outline_slide_requests(spec, insertion_index=0)
+    images = [r for r in requests if "createImage" in r]
+    assert len(images) == 1
+    assert images[0]["createImage"]["url"] == "https://thumb.example/x.png"
+    assert images[0]["createImage"]["elementProperties"]["pageObjectId"] == sid
+
+
+def test_outline_emits_background_request_when_color_present():
+    spec = {"layout": "BLANK", "background_color": "#1a73e8"}
+    requests, sid, _ = _build_outline_slide_requests(spec, insertion_index=0)
+    bg = [r for r in requests if "updatePageProperties" in r]
+    assert len(bg) == 1
+    assert bg[0]["updatePageProperties"]["objectId"] == sid
+
+
+def test_outline_skips_background_on_invalid_hex():
+    """Bad hex shouldn't blow up the whole slide — drop it silently
+    and emit a valid slide otherwise."""
+    spec = {"layout": "BLANK", "background_color": "not-a-hex"}
+    requests, _, _ = _build_outline_slide_requests(spec, insertion_index=0)
+    assert not any("updatePageProperties" in r for r in requests)
+
+
+def test_outline_blank_layout_does_not_emit_text_inserts():
+    """BLANK layout has no placeholders. Title/body text should be
+    silently dropped instead of throwing — caller can re-issue a
+    text_box insert if they need to."""
+    spec = {"layout": "BLANK", "title": "ignored", "body": "ignored"}
+    requests, _, ph = _build_outline_slide_requests(spec, insertion_index=0)
+    assert ph["title"] is None
+    assert ph["body"] is None
+    assert not any("insertText" in r for r in requests)
+
+
+def test_collect_speaker_notes_inputs_pairs_specs_with_ids():
+    specs = [
+        {"title": "a", "notes": "n1"},
+        {"title": "b"},
+        {"title": "c", "speaker_notes": "n3"},
+    ]
+    ids = ["s1", "s2", "s3"]
+    assert _collect_speaker_notes_inputs(specs, ids) == [("s1", "n1"), ("s3", "n3")]
+
+
+def test_collect_speaker_notes_handles_short_id_list():
+    specs = [{"title": "a", "notes": "n"}]
+    assert _collect_speaker_notes_inputs(specs, []) == []
+
+
+# ── _validate_outline ─────────────────────────────────────────────────
+
+
+def test_validate_outline_accepts_well_formed_list():
+    raw = [{"title": "A"}, {"title": "B"}]
+    out = _validate_outline(raw)
+    assert out == raw
+
+
+def test_validate_outline_rejects_empty_list():
+    result = _validate_outline([])
+    assert not getattr(result, "success", True)
+
+
+def test_validate_outline_rejects_non_list_inputs():
+    for bad in [None, "string", 42, {"slides": []}]:
+        result = _validate_outline(bad)
+        assert not getattr(result, "success", True)
+
+
+def test_validate_outline_drops_non_dict_entries():
+    """If the LLM mixed in a stray string, drop it and keep the rest."""
+    raw = [{"title": "A"}, "garbage", 7, {"title": "B"}]
+    out = _validate_outline(raw)
+    assert out == [{"title": "A"}, {"title": "B"}]
 
 
 # ── resource_id coercion ───────────────────────────────────────────────
