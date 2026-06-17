@@ -7,6 +7,7 @@ import pytest
 from apps.api.app.node_system.nodes.gslides.gslides_node import (
     GoogleSlidesProperties,
     _build_outline_slide_requests,
+    _coerce_outline_string,
     _collect_speaker_notes_inputs,
     _color_field,
     _element_kind,
@@ -453,3 +454,68 @@ def test_outline_passes_dict_through_for_validator_to_reject():
 def test_presentation_id_coercion(raw, expected):
     props = GoogleSlidesProperties(presentation_id=raw)
     assert props.presentation_id == expected
+
+
+# ── _coerce_outline_string (LLM-output edge cases) ────────────────────
+
+
+def test_coerce_outline_parses_clean_json_array():
+    raw = '[{"layout": "TITLE", "title": "x"}]'
+    assert _coerce_outline_string(raw) == [{"layout": "TITLE", "title": "x"}]
+
+
+def test_coerce_outline_strips_markdown_fences():
+    raw = '```json\n[{"layout": "TITLE", "title": "x"}]\n```'
+    assert _coerce_outline_string(raw) == [{"layout": "TITLE", "title": "x"}]
+
+
+def test_coerce_outline_strips_bare_code_fences():
+    raw = '```\n[{"layout": "TITLE"}]\n```'
+    assert _coerce_outline_string(raw) == [{"layout": "TITLE"}]
+
+
+def test_coerce_outline_handles_prose_wrapper():
+    """LLMs love prefixing with 'Here is the JSON:'."""
+    raw = 'Here is your outline: [{"layout": "TITLE", "title": "x"}]. Enjoy!'
+    assert _coerce_outline_string(raw) == [{"layout": "TITLE", "title": "x"}]
+
+
+def test_coerce_outline_normalises_smart_quotes():
+    """Word / Notion paste mangles `"` into curly quotes."""
+    raw = "[{“layout”:“TITLE”,“title”:“x”}]"
+    assert _coerce_outline_string(raw) == [{"layout": "TITLE", "title": "x"}]
+
+
+def test_coerce_outline_tolerates_trailing_commas():
+    raw = '[{"layout": "TITLE", "title": "x",}, {"layout": "BLANK",},]'
+    assert _coerce_outline_string(raw) == [
+        {"layout": "TITLE", "title": "x"},
+        {"layout": "BLANK"},
+    ]
+
+
+def test_coerce_outline_returns_none_on_garbage():
+    assert _coerce_outline_string("nope nothing valid here") is None
+
+
+# ── _validate_outline diagnostic errors ───────────────────────────────
+
+
+def test_validate_outline_string_input_includes_sample():
+    result = _validate_outline("not parseable")
+    assert not result.success
+    assert "First 200 chars" in result.error
+    assert "not parseable" in result.error
+
+
+def test_validate_outline_dict_input_lists_keys():
+    """Common LLM mistake: returning `{slides: [...]}` instead of bare array."""
+    result = _validate_outline({"slides": [], "meta": {}})
+    assert not result.success
+    assert "JSON ARRAY" in result.error
+    assert "slides" in result.error
+
+
+def test_validate_outline_passes_through_well_formed_list():
+    raw = [{"title": "A"}, {"title": "B"}]
+    assert _validate_outline(raw) == raw

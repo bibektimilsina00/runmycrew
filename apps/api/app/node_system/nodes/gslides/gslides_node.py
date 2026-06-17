@@ -38,6 +38,7 @@ configured.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import httpx
@@ -222,29 +223,25 @@ class GoogleSlidesProperties(BaseModel):
     @field_validator("outline", mode="before")
     @classmethod
     def _parse_outline(cls, value: Any) -> Any:
-        """Outline accepts THREE shapes:
-        - a literal list (already a Python list — typical when bound
-          to an upstream `{{ $agent.output }}` that returns an array)
-        - a string that's a JSON-encoded array (typical when the user
-          pastes JSON directly into the multiline text field, OR when
-          the upstream node emits the array as a string)
+        """Outline accepts every shape an upstream LLM might emit:
+
+        - a literal Python list (an upstream node returned an array)
+        - a JSON-encoded array string (user paste OR an LLM that emits
+          stringified JSON)
+        - markdown-fenced JSON (```json\n[...]\n```)
+        - a JSON array embedded in prose ("Here is your deck: [...]")
+        - smart-quoted JSON (Word / Notion paste mangles `"` into `"`)
         - anything else → passes through, `_validate_outline` rejects.
         """
-        import json
-
-        if isinstance(value, str):
-            stripped = value.strip()
-            if not stripped:
-                return None
-            try:
-                parsed = json.loads(stripped)
-            except json.JSONDecodeError:
-                # Likely an unresolved expression (`{{ … }}`) or
-                # malformed JSON. Leave it as-is so
-                # `_validate_outline` can surface a clear error.
-                return value
-            return parsed
-        return value
+        if not isinstance(value, str):
+            return value
+        stripped = value.strip()
+        if not stripped:
+            return None
+        cleaned = _coerce_outline_string(stripped)
+        if cleaned is None:
+            return value
+        return cleaned
 
 
 def _cond(op: str) -> dict[str, Any]:
@@ -1400,11 +1397,78 @@ async def _apply_speaker_notes(
         await _slides_batch_update(client, headers, presentation_id, requests)
 
 
+_MARKDOWN_FENCE_RE = re.compile(
+    r"^```(?:json|JSON|javascript|js)?\s*\n?(.*?)\n?```\s*$",
+    re.DOTALL,
+)
+
+
+def _coerce_outline_string(stripped: str) -> Any:
+    """Parse the multi-shape input the LLM might emit into a Python
+    object. Returns the parsed value on success, `None` on failure (so
+    the caller can fall back to the raw string for a diagnostic
+    error)."""
+    import json
+
+    # 1. Markdown code fences — strip ```json … ``` wrappers.
+    fence_match = _MARKDOWN_FENCE_RE.match(stripped)
+    if fence_match:
+        stripped = fence_match.group(1).strip()
+
+    # 2. Some LLMs prefix with "Here is the JSON:" — pluck the first
+    #    array out of the prose.
+    if not stripped.startswith(("[", "{")):
+        first = stripped.find("[")
+        last = stripped.rfind("]")
+        if first != -1 and last > first:
+            stripped = stripped[first : last + 1]
+
+    # 3. Smart quotes (Word / Notion / browser auto-replace) confuse
+    #    json.loads — normalise back to ASCII quotes.
+    stripped = stripped.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+
+    try:
+        return json.loads(stripped)
+    except json.JSONDecodeError:
+        pass
+
+    # 4. Last-ditch: tolerate trailing commas (LLMs love them).
+    no_trailing = re.sub(r",(\s*[}\]])", r"\1", stripped)
+    try:
+        return json.loads(no_trailing)
+    except json.JSONDecodeError:
+        return None
+
+
 def _validate_outline(raw: Any) -> list[dict[str, Any]] | NodeResult:
     """Outline must be a non-empty list of dicts. We don't enforce
     individual fields — `_build_outline_slide_requests` has its own
     fallbacks for missing keys so an imperfect LLM output still
-    produces SOMETHING usable."""
+    produces SOMETHING usable.
+
+    Errors are diagnostic — they tell the user what type they passed
+    plus a sample so they can see whether the LLM emitted prose,
+    markdown, or some other non-array shape."""
+    if isinstance(raw, str):
+        sample = (raw[:200] + "…") if len(raw) > 200 else raw
+        return NodeResult(
+            success=False,
+            error=(
+                "`outline` arrived as a string we couldn't parse as JSON. "
+                "Most likely the upstream node returned prose around the "
+                "JSON, an unresolved expression, or stray markdown. "
+                f"First 200 chars: {sample!r}"
+            ),
+        )
+    if isinstance(raw, dict):
+        return NodeResult(
+            success=False,
+            error=(
+                "`outline` is a JSON object, but it must be a JSON ARRAY of "
+                'slide dicts (e.g. `[{"layout": "TITLE", "title": "…"}]`). '
+                f"Got keys: {list(raw.keys())[:6]}"
+            ),
+        )
     if not isinstance(raw, list) or not raw:
         return NodeResult(
             success=False,
