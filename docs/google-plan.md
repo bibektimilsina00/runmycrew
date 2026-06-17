@@ -17,8 +17,8 @@ matrix scored 🔒 / ⚠️ / ✅ per cell. This doc is the plan + the tracker.
   **Meet** (API barely exists — Calendar already auto-creates Meet
   links, and post-call transcripts are too niche to carry the surface),
   **Keep** (read-only stub API).
-- **Phase 5 (Marketing / Analytics / Cloud)** — Business Profile,
-  Analytics 4, Search Console, BigQuery, Cloud Storage ⏳ pending.
+- **Phase 5 (Marketing / Analytics / Cloud)** — **Analytics 4 ✅ shipped.**
+  Business Profile, Search Console, BigQuery, Cloud Storage ⏳ pending.
   **AdSense** dropped (too niche). **Ads** deferred (heavyweight,
   developer-token flow). **Pub/Sub** kept only as an internal
   transport, not user-facing.
@@ -64,6 +64,7 @@ forms.body, forms.responses.readonly, contacts,
 youtube.force-ssl, youtube.upload, presentations,
 chat.messages, chat.messages.reactions,
 chat.spaces.readonly, chat.memberships.readonly,
+analytics.readonly,
 openid, email, profile
 ```
 
@@ -109,13 +110,18 @@ Actions ✅
 - `action.gchat` (Chat — 12 ops: send / update / delete / list / get
   messages, list spaces + members, find DM, add / list / delete
   reactions; full Card v2 forwarding, thread-key replies)
+- `action.ga4` (Analytics 4 — 13 ops: run_report / run_realtime_report /
+  run_pivot_report / batch_run_reports / check_compatibility /
+  get_metadata + Admin reads: list_accounts / list_properties /
+  get_property / list_data_streams / list_key_events /
+  list_custom_dimensions / list_custom_metrics. Property picker
+  groups by account. Read-only — `analytics.readonly` scope)
 
 Still **missing** (after the prune — see status snapshot for what
 was dropped or deferred)
 
 - Phase 4: ✅ fully shipped
-- Phase 5: Business Profile, Analytics 4, Search Console, BigQuery,
-  Cloud Storage
+- Phase 5: Business Profile, Search Console, BigQuery, Cloud Storage
 - Phase 6: Translate, Vision, Speech, Maps/Places
 
 **Deferred** (kept in roadmap, low priority): Ads, Document AI,
@@ -170,7 +176,7 @@ APIs we call. Each Fuse surface gates on one or more APIs:
 | Slides               | Google Slides API                          | ✅ |
 | Chat                 | Google Chat API                            | ✅ |
 | Business Profile     | Google Business Profile API                | ⏳ |
-| Analytics 4          | Google Analytics Data API                  | ⏳ |
+| Analytics 4          | Google Analytics Data API + Admin API      | ✅ |
 | Search Console       | Search Console API                         | ⏳ |
 | BigQuery             | BigQuery API                               | ⏳ |
 | Cloud Storage        | Cloud Storage JSON API                     | ⏳ |
@@ -398,7 +404,7 @@ Dropped from this phase:
 | Slides | `presentations` | ✅ |
 | Chat | `chat.messages` + `chat.messages.reactions` + `chat.spaces.readonly` + `chat.memberships.readonly` | ✅ |
 | Business Profile | `business.manage` | ⏳ |
-| Analytics 4 | `analytics.readonly` | ⏳ |
+| Analytics 4 | `analytics.readonly` | ✅ |
 | Search Console | `webmasters.readonly` (or `webmasters` for sitemap submit) | ⏳ |
 | BigQuery | `bigquery` (or `bigquery.readonly`) | ⏳ |
 | Cloud Storage | `devstorage.read_write` (or `devstorage.read_only`) | ⏳ |
@@ -533,14 +539,20 @@ Pattern that all shipped Google surfaces follow:
 | 66 | chat | trigger: new_message_in_space | ✅ | createTime-cursor polling |
 | 67 | business_profile | action: list_locations / reply_review | ⏳ | |
 | 68 | business_profile | trigger: new_review | ⏳ | |
-| 69 | analytics4 | action: run_report | ⏳ | |
-| 70 | search_console | action: get_search_analytics | ⏳ | |
-| 71 | bigquery | action: run_sql | ⏳ | |
-| 72 | cloud_storage | action: upload / download object | ⏳ | |
-| 73 | translate | action: translate_text | ⏳ | |
-| 74 | vision | action: ocr / labels | ⏳ | |
-| 75 | speech | action: stt / tts | ⏳ | |
-| 76 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
+| 69 | analytics4 | action: run_report (dimensions + metrics + date range) | ✅ | accepts comma list or JSON array |
+| 70 | analytics4 | action: run_realtime_report | ✅ | last-30-minute slice |
+| 71 | analytics4 | action: run_pivot_report / batch_run_reports | ✅ | pivots forwarded verbatim |
+| 72 | analytics4 | action: check_compatibility / get_metadata | ✅ | self-service dimension discovery |
+| 73 | analytics4 | admin: list_accounts / list_properties / get_property | ✅ | account-scoped filter |
+| 74 | analytics4 | admin: list_data_streams / list_key_events | ✅ | web + iOS + Android streams |
+| 75 | analytics4 | admin: list_custom_dimensions / list_custom_metrics | ✅ | user-defined fields |
+| 76 | search_console | action: get_search_analytics | ⏳ | |
+| 77 | bigquery | action: run_sql | ⏳ | |
+| 78 | cloud_storage | action: upload / download object | ⏳ | |
+| 79 | translate | action: translate_text | ⏳ | |
+| 80 | vision | action: ocr / labels | ⏳ | |
+| 81 | speech | action: stt / tts | ⏳ | |
+| 82 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
 
 Statuses: ⏳ not started · 🔄 in progress · ✅ proven end-to-end ·
 🔒 blocked by external (verification, API enable, scope review) · ⚠️
