@@ -125,6 +125,68 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
+   COLOR SCHEMES (dark) — Linear-style picker
+   ─────────────────────────────────────────────────────────────────────────────
+   Class scoped on <html data-theme="...">. Each block redefines ONLY the
+   surface + accent tokens; text, semantic, radii, fonts cascade from :root.
+   Tokens are direct ports of the `schemes()` map in Fuse.dc.html.
+══════════════════════════════════════════════════════════════════════════════ */
+:root[data-theme='slate'] {
+  --bg:        #0e0f12;
+  --bg-2:      #121316;
+  --surface:   #16181c;
+  --surface-2: #1d2024;
+  --surface-3: #232629;
+  --accent:       #6b76e0;
+  --accent-soft:  rgba(107, 118, 224, 0.14);
+  --accent-line:  rgba(107, 118, 224, 0.45);
+}
+
+:root[data-theme='indigo'] {
+  --bg:        #08090c;
+  --bg-2:      #0c0d12;
+  --surface:   #0f1118;
+  --surface-2: #161820;
+  --surface-3: #1c1e28;
+  --accent:       #7c83ff;
+  --accent-soft:  rgba(124, 131, 255, 0.14);
+  --accent-line:  rgba(124, 131, 255, 0.45);
+}
+
+:root[data-theme='emerald'] {
+  --bg:        #070908;
+  --bg-2:      #0a0d0b;
+  --surface:   #0d100e;
+  --surface-2: #141a16;
+  --surface-3: #19211c;
+  --accent:       #3fb98a;
+  --accent-soft:  rgba(63, 185, 138, 0.14);
+  --accent-line:  rgba(63, 185, 138, 0.45);
+}
+
+:root[data-theme='ember'] {
+  --bg:        #0a0807;
+  --bg-2:      #0d0a09;
+  --surface:   #100c0b;
+  --surface-2: #1a1411;
+  --surface-3: #221915;
+  --accent:       #e0673f;
+  --accent-soft:  rgba(224, 103, 63, 0.14);
+  --accent-line:  rgba(224, 103, 63, 0.45);
+}
+
+:root[data-theme='plum'] {
+  --bg:        #09080a;
+  --bg-2:      #0c0a0e;
+  --surface:   #0f0d12;
+  --surface-2: #181420;
+  --surface-3: #1f1929;
+  --accent:       #a06cf0;
+  --accent-soft:  rgba(160, 108, 240, 0.14);
+  --accent-line:  rgba(160, 108, 240, 0.45);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
    KEYFRAMES
 ══════════════════════════════════════════════════════════════════════════════ */
 @keyframes status-pulse {
@@ -142,6 +204,13 @@
 @keyframes dropdown-in {
   from { opacity: 0; transform: translateY(-4px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fusePulse {
+  0%, 100% { opacity: 1;    transform: scale(1);   }
+  50%      { opacity: 0.45; transform: scale(0.82); }
+}
+@keyframes fuseDash {
+  to { stroke-dashoffset: -28; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════

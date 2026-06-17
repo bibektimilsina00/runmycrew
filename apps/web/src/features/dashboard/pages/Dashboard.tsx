@@ -44,11 +44,12 @@ export function Dashboard() {
   }
 
   return (
-    <div className="p-[24px_28px_28px] flex flex-col gap-[24px] max-w-[1240px] w-full mx-auto flex-1">
-      <GreetingRow />
-      <StatsGrid items={stats} />
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-[1160px] mx-auto px-[28px] sm:px-[48px] pt-[40px] sm:pt-[56px] pb-[80px] flex flex-col gap-[40px]">
+        <GreetingRow />
 
-      <div className="flex flex-col gap-3">
+        <StatsGrid items={stats} />
+
         <PromptCard
           prompt={prompt}
           onPromptChange={setPrompt}
@@ -56,28 +57,29 @@ export function Dashboard() {
           busy={ai.creating}
           statusMessage={ai.statusMessage}
         />
+
         <SuggestionChips
           suggestions={SUGGESTIONS}
           onPick={setPrompt}
           disabled={ai.creating}
         />
-      </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_320px] gap-[24px]">
-        <RecentRuns
-          items={recentRuns}
-          totalToday={totalToday}
-          onViewAll={() => navigate(APP_ROUTES.RUNS)}
-        />
-        <div className="flex flex-col gap-[16px]">
-          <SchedulePanel
-            items={schedules}
-            onViewAll={() => navigate(APP_ROUTES.SCHEDULES)}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.55fr_1fr] gap-[18px] items-start">
+          <RecentRuns
+            items={recentRuns}
+            totalToday={totalToday}
+            onViewAll={() => navigate(APP_ROUTES.RUNS)}
           />
-          <ConnectionsPanel
-            items={connections}
-            totalActive={connections.filter(c => c.state === 'ok').length}
-          />
+          <div className="flex flex-col gap-[14px]">
+            <SchedulePanel
+              items={schedules}
+              onViewAll={() => navigate(APP_ROUTES.SCHEDULES)}
+            />
+            <ConnectionsPanel
+              items={connections}
+              totalActive={connections.filter(c => c.state === 'ok').length}
+            />
+          </div>
         </div>
       </div>
     </div>

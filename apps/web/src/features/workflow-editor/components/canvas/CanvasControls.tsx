@@ -90,51 +90,54 @@ export const CanvasControls = React.forwardRef<HTMLDivElement, CanvasControlsPro
         </div>
       )}
 
-      {/* Button controls strip */}
-      <div className="flex gap-2 pointer-events-auto">
+      {/* Button controls strip — Linear-style capsule */}
+      <div className="flex items-center gap-[2px] p-[4px] rounded-[10px] border border-[var(--border-soft)] bg-[rgba(18,20,23,0.85)] backdrop-blur-md pointer-events-auto shadow-[0_4px_14px_rgba(0,0,0,0.35)]">
         <button
           onClick={onFitView}
           className={cn(
-            'flex h-[34px] w-[34px] items-center justify-center rounded-[8px]',
-            'border border-[var(--border-faint)] bg-[var(--bg-2)]/90 backdrop-blur-sm text-[var(--text-mute)] shadow-md',
-            'transition-all hover:bg-[var(--surface)] hover:text-[var(--text)] active:scale-95 cursor-pointer'
+            'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
+            'text-[var(--text-mute)] transition-colors cursor-pointer',
+            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
           )}
           title="Fit view"
         >
-          <Maximize2 className="h-4 w-4" />
+          <Maximize2 className="h-[14px] w-[14px]" strokeWidth={1.8} />
         </button>
         <button
           onClick={onZoomIn}
           className={cn(
-            'flex h-[34px] w-[34px] items-center justify-center rounded-[8px]',
-            'border border-[var(--border-faint)] bg-[var(--bg-2)]/90 backdrop-blur-sm text-[var(--text-mute)] shadow-md',
-            'transition-all hover:bg-[var(--surface)] hover:text-[var(--text)] active:scale-95 cursor-pointer'
+            'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
+            'text-[var(--text-mute)] transition-colors cursor-pointer',
+            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
           )}
           title="Zoom in"
         >
-          <ZoomIn className="h-4 w-4" />
+          <ZoomIn className="h-[14px] w-[14px]" strokeWidth={2} />
         </button>
+        <span className="font-mono text-[11.5px] text-[var(--text-mute)] px-[6px] tabular-nums">
+          {Math.round(zoom * 100)}%
+        </span>
         <button
           onClick={onZoomOut}
           className={cn(
-            'flex h-[34px] w-[34px] items-center justify-center rounded-[8px]',
-            'border border-[var(--border-faint)] bg-[var(--bg-2)]/90 backdrop-blur-sm text-[var(--text-mute)] shadow-md',
-            'transition-all hover:bg-[var(--surface)] hover:text-[var(--text)] active:scale-95 cursor-pointer'
+            'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
+            'text-[var(--text-mute)] transition-colors cursor-pointer',
+            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
           )}
           title="Zoom out"
         >
-          <ZoomOut className="h-4 w-4" />
+          <ZoomOut className="h-[14px] w-[14px]" strokeWidth={2} />
         </button>
         <button
           onClick={onCleanLayout}
           className={cn(
-            'flex h-[34px] w-[34px] items-center justify-center rounded-[8px]',
-            'border border-[var(--border-faint)] bg-[var(--bg-2)]/90 backdrop-blur-sm text-[var(--text-mute)] shadow-md',
-            'transition-all hover:bg-[var(--surface)] hover:text-[var(--text)] active:scale-95 cursor-pointer'
+            'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
+            'text-[var(--text-mute)] transition-colors cursor-pointer',
+            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
           )}
           title="Clean canvas view"
         >
-          <Brush className="h-4 w-4" />
+          <Brush className="h-[14px] w-[14px]" strokeWidth={1.8} />
         </button>
       </div>
     </div>

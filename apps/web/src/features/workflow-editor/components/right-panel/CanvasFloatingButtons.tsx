@@ -23,11 +23,11 @@ export function CanvasFloatingButtons({
   const setZoneOpen    = useEditorLayoutStore((s) => s.setZoneOpen)
 
   const btnBase = cn(
-    'w-[38px] h-[38px] rounded-[10px]',
-    'bg-[var(--bg-2)] border border-[var(--border-faint)]',
+    'w-[34px] h-[34px] rounded-[6px]',
+    'bg-[rgba(18,20,23,0.85)] backdrop-blur-md border border-[var(--border-soft)]',
     'flex items-center justify-center',
-    'text-[var(--text-mute)] hover:text-[var(--text)] hover:border-[var(--border-soft)]',
-    'transition-all duration-150 cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.25)]',
+    'text-[var(--text-mute)] hover:bg-[rgba(35,38,43,0.95)] hover:text-[var(--text)] hover:border-[var(--border)]',
+    'transition-all duration-150 cursor-pointer shadow-[0_4px_14px_rgba(0,0,0,0.35)]',
   )
 
   return (
@@ -40,8 +40,8 @@ export function CanvasFloatingButtons({
         onClick={onAddNodeClick}
         className={cn(
           btnBase,
-          'pointer-events-auto',
-          isAddNodeOpen && 'bg-[var(--surface)] text-[var(--text)] border-[var(--border-soft)]'
+          'pointer-events-auto text-[var(--text)]',
+          isAddNodeOpen && 'bg-[var(--surface-2)] border-[var(--border)]'
         )}
         title="Add node"
       >
