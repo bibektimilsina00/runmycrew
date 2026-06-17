@@ -219,6 +219,33 @@ class GoogleSlidesProperties(BaseModel):
             return None
         return str(value)
 
+    @field_validator("outline", mode="before")
+    @classmethod
+    def _parse_outline(cls, value: Any) -> Any:
+        """Outline accepts THREE shapes:
+        - a literal list (already a Python list — typical when bound
+          to an upstream `{{ $agent.output }}` that returns an array)
+        - a string that's a JSON-encoded array (typical when the user
+          pastes JSON directly into the multiline text field, OR when
+          the upstream node emits the array as a string)
+        - anything else → passes through, `_validate_outline` rejects.
+        """
+        import json
+
+        if isinstance(value, str):
+            stripped = value.strip()
+            if not stripped:
+                return None
+            try:
+                parsed = json.loads(stripped)
+            except json.JSONDecodeError:
+                # Likely an unresolved expression (`{{ … }}`) or
+                # malformed JSON. Leave it as-is so
+                # `_validate_outline` can surface a clear error.
+                return value
+            return parsed
+        return value
+
 
 def _cond(op: str) -> dict[str, Any]:
     return {"field": "operation", "value": op}
@@ -370,19 +397,28 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                     "condition": _cond("create"),
                     "mode": "advanced",
                 },
-                # create_from_outline / build_deck — outline JSON
+                # create_from_outline / build_deck — outline accepts
+                # either a JSON literal pasted in by the user OR an
+                # `{{ $agent.output }}` expression that resolves to an
+                # array at runtime. Field type is `string` (not `json`)
+                # so the editor doesn't slap an "Invalid JSON" warning
+                # onto a perfectly valid expression reference; the
+                # Pydantic validator below parses string → list when
+                # the value is literal JSON.
                 {
                     "name": "outline",
-                    "label": "Outline (JSON array of slides)",
-                    "type": "json",
+                    "label": "Outline",
+                    "type": "string",
                     "required": True,
                     "typeOptions": {"multiline": True, "rows": 8},
                     "placeholder": (
+                        "{{ $node.Agent.output }}     ← bind an LLM output\n"
+                        "OR paste a JSON array:\n"
                         "[\n"
                         '  {"layout": "TITLE", "title": "Q1 review", "subtitle": "March 2026"},\n'
                         '  {"layout": "TITLE_AND_BODY", "title": "Highlights",\n'
                         '   "body": "Revenue up 30%\\n• 500 new customers\\n• 3 launches",\n'
-                        '   "notes": "Talking points: emphasise enterprise tier."},\n'
+                        '   "notes": "Emphasise enterprise tier"},\n'
                         '  {"layout": "TITLE_AND_BODY", "title": "Roadmap",\n'
                         '   "body": "Q2 plans…",\n'
                         '   "image_url": "https://…/chart.png",\n'
@@ -390,12 +426,12 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                         "]"
                     ),
                     "description": (
-                        "Array of slide dicts. Per-slide keys: `layout` "
-                        "(BLANK / TITLE / TITLE_AND_BODY / SECTION_HEADER / "
+                        "Bind an Agent/LLM node output OR paste a JSON "
+                        "array directly. Per-slide keys: `layout` (BLANK / "
+                        "TITLE / TITLE_AND_BODY / SECTION_HEADER / "
                         "TITLE_AND_TWO_COLUMNS / TITLE_ONLY / BIG_NUMBER / "
                         "CAPTION_ONLY), `title`, `subtitle` (TITLE layout), "
-                        "`body`, `notes`, `image_url`, `background_color`. "
-                        "Wire an LLM upstream and have it emit this shape."
+                        "`body`, `notes`, `image_url`, `background_color`."
                     ),
                     "condition": _cond_any("create_from_outline", "build_deck"),
                 },

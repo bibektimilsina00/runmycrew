@@ -402,6 +402,40 @@ def test_validate_outline_drops_non_dict_entries():
     assert out == [{"title": "A"}, {"title": "B"}]
 
 
+# ── outline parser (string vs list inputs) ────────────────────────────
+
+
+def test_outline_accepts_python_list_unchanged():
+    props = GoogleSlidesProperties(outline=[{"title": "A"}, {"title": "B"}])
+    assert props.outline == [{"title": "A"}, {"title": "B"}]
+
+
+def test_outline_parses_json_string_into_list():
+    """Pasting JSON into the multiline string field still works — we
+    parse it before Pydantic sees it."""
+    raw = '[{"title": "A"}, {"title": "B"}]'
+    props = GoogleSlidesProperties(outline=raw)
+    assert props.outline == [{"title": "A"}, {"title": "B"}]
+
+
+def test_outline_passes_through_unresolved_expression_string():
+    """An unresolved `{{ … }}` should round-trip as the raw string —
+    `_validate_outline` will surface the error."""
+    raw = "{{ $agent.output }}"
+    props = GoogleSlidesProperties(outline=raw)
+    assert props.outline == raw
+
+
+def test_outline_returns_none_for_blank_input():
+    assert GoogleSlidesProperties(outline=" ").outline is None
+    assert GoogleSlidesProperties(outline="").outline is None
+
+
+def test_outline_passes_dict_through_for_validator_to_reject():
+    raw = {"slides": []}
+    assert GoogleSlidesProperties(outline=raw).outline == raw
+
+
 # ── resource_id coercion ───────────────────────────────────────────────
 
 
