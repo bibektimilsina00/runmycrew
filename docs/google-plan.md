@@ -11,7 +11,10 @@ matrix scored 🔒 / ⚠️ / ✅ per cell. This doc is the plan + the tracker.
 - **Phase 3 (Tasks + Forms + Contacts + YouTube)** — ✅ shipped
   (originally only Tasks/Forms/Contacts/YouTube; we promoted YouTube
   out of Phase 3 in the original draft and ended up shipping it here)
-- **Phase 4 (Slides / Meet / Chat / Photos / Keep)** — ⏳ pending
+- **Phase 4 (Slides + Meet + Chat + Keep)** — Slides ✅ shipped;
+  Meet / Chat / Keep ⏳ pending.
+  Photos dropped — workflow-automation use cases for personal media
+  are too niche to justify the surface area.
 - **Phase 5+** — ⏳ pending
 
 Cross-cutting infrastructure (also shipped this cycle):
@@ -84,10 +87,14 @@ Actions ✅
   bare-string OR `{value, type}` dict shapes)
 - `action.gyt` (YouTube — 28 ops incl. multipart **video upload**,
   thumbnail upload, comment moderation)
+- `action.gslides` (Slides — 24 ops incl. create-from-outline for
+  AI-driven deck generation, batch slide ops, text/shape/image insert,
+  speaker notes, background fills)
 
 Still **missing**
 
-- Phase 4: Slides, Meet, Chat, Photos, Keep
+- Phase 4: Meet, Chat, Keep (Slides shipped; Photos dropped — see
+  status snapshot above)
 - Phase 5+: Business Profile, Analytics 4, Search Console, Ads, AdSense,
   BigQuery, Cloud Storage, Pub/Sub
 - Phase 6+: Translate, Vision, Speech, Document AI, Dialogflow, Maps,
@@ -101,7 +108,7 @@ each pattern to its own credential type:
 
 | Cred type           | Surfaces                                                                 |
 |---------------------|--------------------------------------------------------------------------|
-| `google_oauth`      | Gmail, Calendar, Drive, Sheets, Docs, Slides, Tasks, Forms, YouTube, Contacts, Chat, Photos, Business Profile, Analytics, Search Console, AdSense, BigQuery, Cloud Storage, Pub/Sub, Translate, Vision, Speech, Document AI, Dialogflow |
+| `google_oauth`      | Gmail, Calendar, Drive, Sheets, Docs, Slides, Tasks, Forms, YouTube, Contacts, Chat, Business Profile, Analytics, Search Console, AdSense, BigQuery, Cloud Storage, Pub/Sub, Translate, Vision, Speech, Document AI, Dialogflow |
 | `google_api_key`    | Maps / Places / Geocoding (no per-user context — workspace-shared key)   |
 | `google_ads_oauth`  | Google Ads (OAuth + an extra `developer-token` header — sibling provider for clarity) |
 | `google_service_account` | BigQuery / Cloud APIs when the user wants a service-account workflow (Phase 6) |
@@ -138,10 +145,10 @@ APIs we call. Each Fuse surface gates on one or more APIs:
 | Forms                | Google Forms API                           | ✅ |
 | Contacts             | People API                                 | ✅ |
 | YouTube              | YouTube Data API v3                        | ✅ |
-| Slides               | Google Slides API                          | ⏳ |
+| Slides               | Google Slides API                          | ✅ |
 | Meet                 | Google Meet API (limited program)          | ⏳ |
 | Chat                 | Google Chat API                            | ⏳ |
-| Photos               | Photos Library API                         | ⏳ |
+| Photos               | Photos Library API                         | ❌ dropped |
 | Business Profile     | Google Business Profile API                | ⏳ |
 | Analytics 4          | Google Analytics Data API                  | ⏳ |
 | Search Console       | Search Console API                         | ⏳ |
@@ -268,16 +275,20 @@ YouTube — 28 action ops + 5 trigger events:
   - Channels (2): get_my_channel, get_channel_by_id
   - Subscriptions (3): list / subscribe / unsubscribe
 
-### ⏳ Phase 4 — Specialised / SaaS-ops (next)
+### Phase 4 — Specialised / SaaS-ops
 
-- Slides (create deck, append slide, find/replace text, export pdf,
-  set speaker notes, duplicate slide, delete slide)
-- Meet (create meeting, list participants, end meeting) — limited API
-- Chat (send message to space/DM, threaded reply, list spaces, list
+- ✅ **Slides** (24 ops: create deck, append slide, find/replace text,
+  export PDF, set speaker notes, duplicate slide, delete slide,
+  **create_from_outline** for AI-driven decks, batch updates,
+  text/shape/image insert, background fills)
+- ⏳ Meet (create meeting, list participants, end meeting) — limited API
+- ⏳ Chat (send message to space/DM, threaded reply, list spaces, list
   members, reactions) — needs `chat.bot` scope / app install flow
-- Photos (list album, upload photo, search by date, create album,
-  list_in_album)
-- Keep (list notes, create note) — limited API
+- ⏳ Keep (list notes, create note) — limited API
+- ❌ **Photos — dropped.** Workflow-automation use cases for personal
+  media (auto-backup, social-sync) are niche; quota + scope overhead
+  doesn't pay back for a B2B automation surface. Revisit only if
+  user demand emerges.
 
 ### ⏳ Phase 5 — Marketing / Analytics / Cloud
 
@@ -336,9 +347,9 @@ YouTube — 28 action ops + 5 trigger events:
 | Contacts | `contacts` | ✅ |
 | YouTube | `youtube.force-ssl` + `youtube.upload` | ✅ |
 | Profile | `openid` + `email` + `profile` | ✅ |
-| Slides | `presentations` | ⏳ |
+| Slides | `presentations` | ✅ |
 | Chat | `chat.messages` + `chat.spaces` | ⏳ |
-| Photos | `photoslibrary.readonly` / `photoslibrary.appendonly` | ⏳ |
+| Photos | `photoslibrary.readonly` / `photoslibrary.appendonly` | ❌ dropped |
 | Business Profile | `business.manage` | ⏳ |
 | Analytics 4 | `analytics.readonly` | ⏳ |
 | Search Console | `webmasters.readonly` (or `webmasters` for sitemap submit) | ⏳ |
@@ -453,17 +464,18 @@ Pattern that all shipped Google surfaces follow:
 | 50 | youtube | trigger: new_video (Data API + RSS) | ✅ | RSS = zero quota |
 | 51 | youtube | trigger: new_video_search_match | ✅ | quota-aware |
 | 52 | youtube | trigger: new_reply_to_my_comment | ✅ | |
-| 53 | slides | action: create + append slide | ⏳ | |
-| 54 | slides | action: find_replace_text | ⏳ | |
-| 55 | slides | action: export PDF | ⏳ | |
-| 56 | meet | action: create_meeting | ⏳ | limited API |
-| 57 | chat | action: send_message | ⏳ | needs chat.bot scope |
-| 58 | chat | trigger: new_message_in_space | ⏳ | |
-| 59 | photos | action: upload_photo | ⏳ | |
-| 60 | photos | trigger: new_photo | ⏳ | |
-| 61 | analytics4 | action: run_report | ⏳ | |
-| 62 | search_console | action: get_search_analytics | ⏳ | |
-| 63 | business_profile | trigger: new_review | ⏳ | |
+| 53 | slides | action: create + append slide | ✅ | 24 ops total |
+| 54 | slides | action: find_replace_text | ✅ | |
+| 55 | slides | action: export PDF | ✅ | |
+| 56 | slides | action: create_from_outline | ✅ | AI-driven deck gen |
+| 57 | slides | action: set_speaker_notes | ✅ | empty-shape deleteText guarded |
+| 58 | slides | action: update_background | ✅ | OpaqueColor vs OptionalColor split |
+| 59 | meet | action: create_meeting | ⏳ | limited API |
+| 60 | chat | action: send_message | ⏳ | needs chat.bot scope |
+| 61 | chat | trigger: new_message_in_space | ⏳ | |
+| 62 | analytics4 | action: run_report | ⏳ | |
+| 63 | search_console | action: get_search_analytics | ⏳ | |
+| 64 | business_profile | trigger: new_review | ⏳ | |
 
 Statuses: ⏳ not started · 🔄 in progress · ✅ proven end-to-end ·
 🔒 blocked by external (verification, API enable, scope review) · ⚠️
