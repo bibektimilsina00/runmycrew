@@ -1157,6 +1157,67 @@ async def list_ga4_properties(
     return {"properties": properties}
 
 
+# ── Google Search Console site picker ──────────────────────────────────
+
+
+@router.get("/{credential_id}/gsc/sites")
+async def list_gsc_sites(
+    credential_id: uuid.UUID,
+    q: str | None = None,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List Search Console properties the connected account has access
+    to — backs the ``gsc-site`` picker.
+
+    ``q`` does a case-insensitive substring match on the site URL so
+    users with dozens of verified properties can find one fast.
+    Returns rows like ``{siteUrl, permissionLevel, kind}`` — siteUrl
+    is the literal URL the API uses as an identifier (no transformation).
+    """
+    import httpx
+
+    from apps.api.app.node_system.nodes.gsc.gsc_node import format_gsc_error
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(
+                "https://www.googleapis.com/webmasters/v3/sites",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=format_gsc_error(exc.response.status_code, exc.response.text),
+        ) from exc
+
+    data = resp.json() or {}
+    needle = (q or "").strip().lower()
+    sites: list[dict[str, Any]] = []
+    for entry in data.get("siteEntry") or []:
+        site_url = str(entry.get("siteUrl") or "")
+        if not site_url:
+            continue
+        if needle and needle not in site_url.lower():
+            continue
+        sites.append(
+            {
+                "siteUrl": site_url,
+                "permissionLevel": str(entry.get("permissionLevel") or ""),
+                # `sc-domain:` rows are domain properties; URL-prefix
+                # rows look like a real URL. Surface a hint so the
+                # frontend can icon them differently.
+                "isDomainProperty": site_url.startswith("sc-domain:"),
+            }
+        )
+
+    return {"sites": sites}
+
+
 @router.post("/{credential_id}/picker-token")
 async def get_picker_token(
     credential_id: uuid.UUID,

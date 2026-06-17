@@ -276,6 +276,7 @@ class GoogleOAuthProvider:
         "Send and manage messages in Google Chat spaces",
         "Read Google Chat space metadata and memberships",
         "Read Google Analytics reports and configuration",
+        "Manage Search Console sites, sitemaps, and queries",
         "Read your Google profile",
     ]
 
@@ -318,6 +319,7 @@ class GoogleOAuthProvider:
             "https://www.googleapis.com/auth/chat.spaces.readonly",
             "https://www.googleapis.com/auth/chat.memberships.readonly",
             "https://www.googleapis.com/auth/analytics.readonly",
+            "https://www.googleapis.com/auth/webmasters",
             "openid",
             "email",
             "profile",
