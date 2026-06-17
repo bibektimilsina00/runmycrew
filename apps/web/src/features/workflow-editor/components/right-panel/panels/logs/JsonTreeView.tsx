@@ -116,12 +116,19 @@ function buildPath(parentPath: string, keyName: string | number | null): string 
   return parentPath ? `${parentPath}.${keyName}` : keyName
 }
 
-/** Build the final expression string written to the drag payload. */
+/** Build the final expression string written to the drag payload.
+ *
+ * Emits the canonical `{{ $… }}` shape the expression engine consumes.
+ * The legacy `=$…` form still parses (the ExpressionEditor's drop
+ * handler strips a leading `=` and wraps the body), but new drags
+ * should produce the modern syntax so users see it in the field
+ * immediately rather than relying on a one-shot rewrite.
+ */
 function buildExpression(reference: Reference | null, path: string): string | null {
   if (!reference || !path) return null
-  if (reference.kind === 'step') return `=$step.${path}`
+  if (reference.kind === 'step') return `{{ $step.${path} }}`
   const safeLabel = reference.label.replace(/'/g, "\\'")
-  return `=$node('${safeLabel}').${path}`
+  return `{{ $node('${safeLabel}').${path} }}`
 }
 
 function TreeNode({ keyName, value, depth, initialDepth, reference, parentPath }: NodeProps) {

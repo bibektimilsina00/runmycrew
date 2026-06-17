@@ -163,8 +163,27 @@ class LLMNode(BaseNode[LLMProperties]):
             return NodeResult(success=True, output_data={"text": text, "tokens": tokens})
 
         except httpx.HTTPStatusError as e:
+            # Surface the URL + a hint for the common 404 case so the
+            # user isn't left with "API error 404:" and no body to
+            # diagnose against. Most provider 404s mean the model id
+            # is retired or unknown to the account.
+            body = (e.response.text or "").strip()[:300]
+            hint = ""
+            if e.response.status_code == 404:
+                hint = (
+                    f" — likely the model id ({model!r}) is unknown "
+                    "to this provider account or has been retired. "
+                    "Check the model dropdown on the LLM node."
+                )
+            elif e.response.status_code in (401, 403):
+                hint = " — credential / API key is invalid or missing permission for this model."
             return NodeResult(
-                success=False, error=f"API error {e.response.status_code}: {e.response.text[:300]}"
+                success=False,
+                error=(
+                    f"API error {e.response.status_code} on "
+                    f"{e.request.url}: {body or '(no response body)'}"
+                    f"{hint}"
+                ),
             )
         except Exception as e:
             logger.error(f"LLMNode failed: {e}", exc_info=True)
