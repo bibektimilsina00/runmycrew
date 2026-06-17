@@ -1377,40 +1377,57 @@ async def _apply_speaker_notes(
         return
     pres = await client.get(f"{SLIDES_API}/{presentation_id}", headers=headers)
     pres.raise_for_status()
-    slide_to_notes: dict[str, str] = {}
+    # slide_id → (notes_object_id, has_existing_text). The flag drives whether
+    # we issue a deleteText: the Slides API rejects deleteText with
+    # `textRange.type=ALL` on an empty shape ("startIndex 0 must be less than
+    # endIndex 0"), so fresh slides (e.g. from create_from_outline) can never
+    # use the delete-then-insert pattern blindly.
+    slide_to_notes: dict[str, tuple[str, bool]] = {}
     for slide in pres.json().get("slides") or []:
         sid = slide.get("objectId")
         if not sid:
             continue
-        notes_props = ((slide.get("slideProperties") or {}).get("notesPage") or {}).get(
-            "notesProperties", {}
-        )
-        notes_id = notes_props.get("speakerNotesObjectId")
-        if notes_id:
-            slide_to_notes[str(sid)] = str(notes_id)
-        else:
-            notes_page = (slide.get("slideProperties") or {}).get("notesPage") or {}
-            for element in notes_page.get("pageElements") or []:
-                shape = element.get("shape") or {}
-                if shape.get("placeholder", {}).get("type") == "BODY":
-                    notes_obj_id = element.get("objectId")
-                    if notes_obj_id:
-                        slide_to_notes[str(sid)] = str(notes_obj_id)
-                    break
+        notes_page = (slide.get("slideProperties") or {}).get("notesPage") or {}
+        notes_props = notes_page.get("notesProperties") or {}
+        preferred_id = notes_props.get("speakerNotesObjectId")
+        notes_obj_id: str | None = None
+        has_text = False
+        for element in notes_page.get("pageElements") or []:
+            shape = element.get("shape") or {}
+            if not shape:
+                continue
+            element_id = element.get("objectId")
+            placeholder_type = shape.get("placeholder", {}).get("type")
+            matches = (preferred_id and element_id == preferred_id) or (
+                not preferred_id and placeholder_type == "BODY"
+            )
+            if matches:
+                notes_obj_id = str(element_id)
+                has_text = bool(_extract_element_text(element))
+                break
+        if notes_obj_id is None and preferred_id:
+            # We didn't see the placeholder in pageElements (rare — older
+            # presentations sometimes hide it from the API), but the
+            # speakerNotesObjectId pointer is still authoritative.
+            notes_obj_id = str(preferred_id)
+        if notes_obj_id:
+            slide_to_notes[str(sid)] = (notes_obj_id, has_text)
 
     requests: list[dict[str, Any]] = []
     for slide_id, notes_text in pairs:
-        notes_obj_id = slide_to_notes.get(slide_id)
-        if not notes_obj_id:
+        slot = slide_to_notes.get(slide_id)
+        if not slot:
             continue
-        requests.append(
-            {
-                "deleteText": {
-                    "objectId": notes_obj_id,
-                    "textRange": {"type": "ALL"},
+        notes_obj_id, has_text = slot
+        if has_text:
+            requests.append(
+                {
+                    "deleteText": {
+                        "objectId": notes_obj_id,
+                        "textRange": {"type": "ALL"},
+                    }
                 }
-            }
-        )
+            )
         requests.append({"insertText": {"objectId": notes_obj_id, "text": notes_text}})
     if requests:
         await _slides_batch_update(client, headers, presentation_id, requests)
@@ -1719,41 +1736,51 @@ async def _set_speaker_notes(
     pres = await client.get(f"{SLIDES_API}/{pid}", headers=headers)
     pres.raise_for_status()
     notes_object_id: str | None = None
+    # Track whether the notes shape already has text — the Slides API
+    # rejects deleteText on an empty shape ("startIndex 0 must be less
+    # than endIndex 0"), so we only delete-then-insert when there's
+    # something to delete.
+    has_text = False
     for slide in pres.json().get("slides") or []:
         if slide.get("objectId") != sid:
             continue
-        notes_object_id = (
-            ((slide.get("slideProperties") or {}).get("notesPage") or {})
-            .get("notesProperties", {})
-            .get("speakerNotesObjectId")
-        )
-        if not notes_object_id:
-            # The speaker notes shape lives under the notes page elements.
-            notes_page = (slide.get("slideProperties") or {}).get("notesPage") or {}
-            for element in notes_page.get("pageElements") or []:
-                shape = element.get("shape") or {}
-                if shape.get("placeholder", {}).get("type") == "BODY":
-                    notes_object_id = element.get("objectId")
-                    break
+        notes_page = (slide.get("slideProperties") or {}).get("notesPage") or {}
+        preferred_id = (notes_page.get("notesProperties") or {}).get("speakerNotesObjectId")
+        for element in notes_page.get("pageElements") or []:
+            shape = element.get("shape") or {}
+            if not shape:
+                continue
+            element_id = element.get("objectId")
+            placeholder_type = shape.get("placeholder", {}).get("type")
+            matches = (preferred_id and element_id == preferred_id) or (
+                not preferred_id and placeholder_type == "BODY"
+            )
+            if matches:
+                notes_object_id = element_id
+                has_text = bool(_extract_element_text(element))
+                break
+        if notes_object_id is None and preferred_id:
+            notes_object_id = preferred_id
         break
     if not notes_object_id:
         return NodeResult(
             success=False, error=f"Could not locate the speaker notes shape on slide {sid}."
         )
-    requests: list[dict[str, Any]] = [
-        {
-            "deleteText": {
-                "objectId": notes_object_id,
-                "textRange": {"type": "ALL"},
+    requests: list[dict[str, Any]] = []
+    if has_text:
+        requests.append(
+            {
+                "deleteText": {
+                    "objectId": notes_object_id,
+                    "textRange": {"type": "ALL"},
+                }
             }
-        },
-        {
-            "insertText": {
-                "objectId": notes_object_id,
-                "text": notes,
-            }
-        },
-    ]
+        )
+    if notes:
+        requests.append({"insertText": {"objectId": notes_object_id, "text": notes}})
+    if not requests:
+        # User asked to clear notes that were already empty — no-op.
+        return NodeResult(success=True, output_data={"replies": []})
     result = await _slides_batch_update(client, headers, pid, requests)
     return NodeResult(success=True, output_data=result)
 
