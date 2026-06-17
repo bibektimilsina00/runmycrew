@@ -486,7 +486,7 @@ requires-dist = [
     { name = "sqlalchemy", extras = ["asyncio"] },
     { name = "sqlmodel", specifier = ">=0.0.38" },
     { name = "uvicorn", extras = ["standard"] },
-    { name = "websockets", specifier = "<16" },
+    { name = "websockets", specifier = "<17" },
 ]
 
 [package.metadata.requires-dev]
