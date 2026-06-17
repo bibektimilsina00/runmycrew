@@ -10,6 +10,7 @@ from apps.api.app.node_system.nodes.gslides.gslides_node import (
     _element_kind,
     _extract_element_text,
     _extract_slide_text,
+    _find_text_placeholder,
     _gen_object_id,
     _placement,
     _slide_insertion_index,
@@ -201,6 +202,60 @@ def test_extract_slide_text_flattens_full_presentation():
             "elements": [{"id": "el_3", "kind": "image", "text": ""}],
         },
     ]
+
+
+# ── _find_text_placeholder ─────────────────────────────────────────────
+
+
+def _placeholder_element(object_id: str, ptype: str) -> dict:
+    return {
+        "objectId": object_id,
+        "shape": {"placeholder": {"type": ptype}},
+    }
+
+
+def test_find_text_placeholder_returns_subtitle_when_preferred_first():
+    slide = {
+        "pageElements": [
+            _placeholder_element("title_obj", "CENTERED_TITLE"),
+            _placeholder_element("subtitle_obj", "SUBTITLE"),
+        ]
+    }
+    assert (
+        _find_text_placeholder(slide, preferred=("SUBTITLE", "BODY", "CENTERED_TITLE", "TITLE"))
+        == "subtitle_obj"
+    )
+
+
+def test_find_text_placeholder_falls_back_to_title_when_no_subtitle():
+    slide = {"pageElements": [_placeholder_element("title_obj", "CENTERED_TITLE")]}
+    assert (
+        _find_text_placeholder(slide, preferred=("SUBTITLE", "BODY", "CENTERED_TITLE", "TITLE"))
+        == "title_obj"
+    )
+
+
+def test_find_text_placeholder_returns_none_on_blank_slide():
+    """A BLANK layout has no placeholders — the caller should skip the
+    seed step silently."""
+    slide = {"pageElements": [{"objectId": "non_placeholder_shape", "shape": {}}]}
+    assert (
+        _find_text_placeholder(slide, preferred=("SUBTITLE", "BODY", "CENTERED_TITLE", "TITLE"))
+        is None
+    )
+
+
+def test_find_text_placeholder_ignores_unrelated_placeholders():
+    slide = {
+        "pageElements": [
+            _placeholder_element("img_ph", "PICTURE"),
+            _placeholder_element("chart_ph", "OBJECT"),
+        ]
+    }
+    assert (
+        _find_text_placeholder(slide, preferred=("SUBTITLE", "BODY", "CENTERED_TITLE", "TITLE"))
+        is None
+    )
 
 
 # ── resource_id coercion ───────────────────────────────────────────────

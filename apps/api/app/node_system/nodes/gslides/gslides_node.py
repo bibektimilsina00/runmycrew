@@ -827,6 +827,32 @@ def _placement(node: GoogleSlidesNode, slide_id: str) -> dict[str, Any]:
     }
 
 
+def _find_text_placeholder(slide: dict[str, Any], *, preferred: tuple[str, ...]) -> str | None:
+    """Walk a slide's pageElements → first placeholder shape whose
+    `placeholder.type` matches one of the preferred kinds. Used after
+    `create` to seed text into the title-slide subtitle without
+    knowing the layout-generated object id ahead of time.
+
+    Returns None when the slide has no placeholders (e.g. BLANK layout)
+    so the caller can skip the seed step silently."""
+    preferred_set = {p.upper() for p in preferred}
+    matched: dict[str, str] = {}
+    for element in slide.get("pageElements") or []:
+        eid = element.get("objectId")
+        if not isinstance(eid, str):
+            continue
+        ptype = ((element.get("shape") or {}).get("placeholder") or {}).get("type") or ""
+        if not ptype:
+            continue
+        ptype_upper = ptype.upper()
+        if ptype_upper in preferred_set and ptype_upper not in matched:
+            matched[ptype_upper] = eid
+    for kind in preferred:
+        if kind.upper() in matched:
+            return matched[kind.upper()]
+    return None
+
+
 def _extract_slide_text(presentation: dict[str, Any]) -> list[dict[str, Any]]:
     """Walk slides → per-slide flattened text + element list. Used by
     `get_text` (returns the structure downstream nodes need to drive
@@ -891,25 +917,30 @@ async def _create(
     data = r.json()
     pres_id = data.get("presentationId")
     # If the user wanted a subtitle seeded on the title slide, drop the
-    # text into the first slide's title placeholder via a follow-up
-    # batchUpdate.
+    # text into the first slide's subtitle placeholder via a follow-up
+    # batchUpdate. The slide page itself (objectId "p") does NOT accept
+    # text — we have to target a placeholder shape inside it.
     if node.props.initial_content and pres_id:
         slides = data.get("slides") or []
         if slides:
-            first_slide_id = slides[0].get("objectId")
-            await _slides_batch_update(
-                client,
-                headers,
-                pres_id,
-                [
-                    {
-                        "insertText": {
-                            "objectId": first_slide_id,
-                            "text": node.props.initial_content,
-                        }
-                    }
-                ],
+            placeholder_id = _find_text_placeholder(
+                slides[0],
+                preferred=("SUBTITLE", "BODY", "CENTERED_TITLE", "TITLE"),
             )
+            if placeholder_id:
+                await _slides_batch_update(
+                    client,
+                    headers,
+                    pres_id,
+                    [
+                        {
+                            "insertText": {
+                                "objectId": placeholder_id,
+                                "text": node.props.initial_content,
+                            }
+                        }
+                    ],
+                )
     return NodeResult(
         success=True,
         output_data={
