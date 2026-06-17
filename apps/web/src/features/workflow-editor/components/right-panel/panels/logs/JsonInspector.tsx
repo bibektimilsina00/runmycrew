@@ -12,6 +12,8 @@ import { OverflowMenu, type OverflowItem } from './OverflowMenu'
 import { JsonCodeView } from './JsonCodeView'
 import { JsonTreeView, type Reference } from './JsonTreeView'
 import { stringifyJson } from './json-utils'
+import { StructuredErrorCard } from './StructuredErrorCard'
+import { parseStructuredError } from './structuredError'
 import type { Tab, ViewMode } from './types'
 
 interface Props {
@@ -79,6 +81,23 @@ export function JsonInspector({
   const menuBtnRef = useRef<HTMLButtonElement>(null)
 
   const empty = payload === null || payload === undefined
+
+  // Auto-detect a structured error payload anywhere in the inspector
+  // chain — the backend emits these as sentinel-prefixed strings, and
+  // we want the polished card to show up wherever the inspector ends
+  // up rendering one (LogsPanel's output tab, listen-mode preview,
+  // sub-workflow error pass-through, etc) without each call site
+  // having to remember the override.
+  const autoStructured = useMemo(() => {
+    const direct = parseStructuredError(payload)
+    if (direct) return direct
+    // Also handle the common case where the caller passes the whole
+    // payload object and the sentinel lives under `.error`.
+    if (payload && typeof payload === 'object' && 'error' in payload) {
+      return parseStructuredError((payload as Record<string, unknown>).error)
+    }
+    return null
+  }, [payload])
 
   const codeSource = useMemo(() => stringifyJson(payload, pretty), [payload, pretty])
 
@@ -232,10 +251,19 @@ export function JsonInspector({
       {/* Optional banner (e.g. ErrorView headline) */}
       {headerBanner}
 
-      {/* Body — callers can opt out of the default tree/code via
-          `bodyOverride` while keeping the surrounding chrome. */}
+      {/* Body — three render paths in priority order:
+          1. Caller-supplied `bodyOverride` (e.g. ErrorView for a known
+             failed log; lets the caller customise the headline too).
+          2. Auto-detected structured-error payload — anywhere in the
+             app that hands a sentinel-prefixed string to the inspector,
+             we surface the polished card automatically.
+          3. Default tree / code view. */}
       {bodyOverride !== undefined ? (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{bodyOverride}</div>
+      ) : autoStructured ? (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <StructuredErrorCard data={autoStructured} />
+        </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-auto px-3 py-2 text-left">
           {empty ? (
