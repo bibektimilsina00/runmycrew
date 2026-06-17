@@ -295,9 +295,12 @@ class LLMNode(BaseNode[LLMProperties]):
         if system:
             payload["systemInstruction"] = {"parts": [{"text": system}]}
 
-        # Normalise model path (models/gemini-... or just gemini-...)
-        model_path = model if model.startswith("models/") else f"models/{model}"
-        url = url_template.format(model=model_path)
+        # Normalise model name — the URL template already contains the
+        # `/models/` segment, so the placeholder is just the bare model
+        # id (`gemini-1.5-flash`). Strip an accidental `models/` prefix
+        # so a user who pasted the full path still works.
+        bare_model = model[len("models/") :] if model.startswith("models/") else model
+        url = url_template.format(model=bare_model)
 
         resp = await client.post(
             url, params={"key": api_key}, headers={"Content-Type": "application/json"}, json=payload
