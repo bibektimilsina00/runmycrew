@@ -22,6 +22,7 @@ import { GDrivePickerRenderer } from './renderers/GDrivePickerRenderer'
 import { GoogleFilePickerRenderer } from './renderers/GoogleFilePickerRenderer'
 import { GSheetsTabPickerRenderer } from './renderers/GSheetsTabPickerRenderer'
 import { GTasksListPickerRenderer } from './renderers/GTasksListPickerRenderer'
+import { GPeopleGroupPickerRenderer } from './renderers/GPeopleGroupPickerRenderer'
 import { DateTimeRenderer } from './renderers/DateTimeRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
@@ -52,6 +53,7 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'google-file':      GoogleFilePickerRenderer,
   'gsheet-tab':       GSheetsTabPickerRenderer,
   'gtasks-tasklist':  GTasksListPickerRenderer,
+  'gpeople-group':    GPeopleGroupPickerRenderer,
   datetime:           DateTimeRenderer,
 }
 

@@ -96,6 +96,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.google_sheets import (
         google_sheets_trigger as _google_sheets_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.gpeople import (
+        gpeople_trigger as _gpeople_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gtasks import (
         gtasks_trigger as _gtasks_trigger,  # noqa: F401
     )

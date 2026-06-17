@@ -45,6 +45,8 @@ from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleShe
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
 )
+from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
+from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTriggerNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
@@ -135,6 +137,8 @@ node_registry.register(GoogleTasksNode)
 node_registry.register(GoogleTasksTriggerNode)
 node_registry.register(GoogleFormsNode)
 node_registry.register(GoogleFormsTriggerNode)
+node_registry.register(GooglePeopleNode)
+node_registry.register(GooglePeopleTriggerNode)
 node_registry.register(LinearNode)
 # Meta surfaces — one consolidated trigger + action per surface
 # (Instagram, Facebook/Messenger, WhatsApp, Lead Ads) carrying

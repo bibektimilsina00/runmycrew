@@ -602,6 +602,100 @@ async def create_gtasks_tasklist(
     }
 
 
+# ── Google Contacts (People) group picker ──────────────────────────────
+
+
+@router.get("/{credential_id}/gpeople/groups")
+async def list_gpeople_groups(
+    credential_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List the user's contact groups (labels). Backs the group picker
+    on the Contacts action node."""
+    import httpx
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(
+                "https://people.googleapis.com/v1/contactGroups",
+                headers={"Authorization": f"Bearer {token}"},
+                params={
+                    "pageSize": 200,
+                    "groupFields": "name,memberCount,groupType",
+                },
+            )
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                f"Contact groups list failed ({exc.response.status_code}): "
+                f"{exc.response.text[:200]}"
+            ),
+        ) from exc
+
+    groups = [
+        {
+            "resource_name": g.get("resourceName"),
+            "name": g.get("formattedName") or g.get("name") or "",
+            "member_count": int(g.get("memberCount") or 0),
+            "type": g.get("groupType") or "",
+        }
+        for g in (resp.json().get("contactGroups") or [])
+        if g.get("resourceName")
+    ]
+    return {"groups": groups}
+
+
+@router.post("/{credential_id}/gpeople/groups", status_code=status.HTTP_201_CREATED)
+async def create_gpeople_group(
+    credential_id: uuid.UUID,
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """Create a new contact group from inside the picker."""
+    import httpx
+
+    name = str((payload or {}).get("name") or "").strip()
+    if not name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="`name` is required.",
+        )
+    token = await _resolve_google_token(credential_id, workspace, service)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://people.googleapis.com/v1/contactGroups",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                },
+                json={"contactGroup": {"name": name}},
+            )
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(f"Create group failed ({exc.response.status_code}): {exc.response.text[:200]}"),
+        ) from exc
+
+    data = resp.json()
+    return {
+        "resource_name": data.get("resourceName"),
+        "name": data.get("formattedName") or data.get("name") or name,
+        "member_count": int(data.get("memberCount") or 0),
+        "type": data.get("groupType") or "",
+    }
+
+
 @router.post("/{credential_id}/picker-token")
 async def get_picker_token(
     credential_id: uuid.UUID,

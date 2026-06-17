@@ -269,6 +269,7 @@ class GoogleOAuthProvider:
         "Manage Google Tasks",
         "Read and write Google Forms (questions and settings)",
         "Read Google Forms responses",
+        "Read and write Google Contacts",
         "Read your Google profile",
     ]
 
@@ -302,6 +303,7 @@ class GoogleOAuthProvider:
             "https://www.googleapis.com/auth/tasks",
             "https://www.googleapis.com/auth/forms.body",
             "https://www.googleapis.com/auth/forms.responses.readonly",
+            "https://www.googleapis.com/auth/contacts",
             "openid",
             "email",
             "profile",
