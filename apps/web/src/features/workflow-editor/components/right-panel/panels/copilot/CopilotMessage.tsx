@@ -38,12 +38,12 @@ export function CopilotMessage({ content }: Props) {
           ol: ({ children }) => <ol className="mb-4 ml-5 list-decimal space-y-2 marker:text-[var(--text-faint)] last:mb-0">{children}</ol>,
           li: ({ children }) => <li className="pl-1 leading-[1.6]">{children}</li>,
           a:  ({ href, children }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#7aa2f7] underline-offset-2 hover:underline">
+            <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] underline-offset-2 hover:underline">
               {children}
             </a>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="mb-3 border-l-2 border-[#7aa2f7] bg-[var(--surface-2)]/40 py-1.5 pl-3 pr-2 text-[var(--text-mute)] last:mb-0">
+            <blockquote className="mb-3 border-l-2 border-[var(--accent)] bg-[var(--accent-soft)] py-1.5 pl-3 pr-2 text-[var(--text-mute)] last:mb-0">
               {children}
             </blockquote>
           ),
@@ -83,7 +83,7 @@ function InlineOrBlockCode({ inline, className, children }: CodeProps) {
   const looksInline = inline ?? (!className && !text.includes('\n'))
   if (looksInline) {
     return (
-      <code className="rounded-[4px] border border-[var(--border-faint)] bg-[var(--surface-2)] px-[5px] py-[1px] font-mono text-[11.5px] text-[#7dcfff]">
+      <code className="rounded-[4px] border border-[var(--border-soft)] bg-[var(--surface-2)] px-[5px] py-[1px] font-mono text-[11.5px] text-[var(--accent)]">
         {children}
       </code>
     )
@@ -123,7 +123,7 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
           )}
           title="Copy code"
         >
-          {copied ? <Check className="h-3 w-3 text-[#9ece6a]" /> : <Copy className="h-3 w-3" />}
+          {copied ? <Check className="h-3 w-3 text-[var(--ok)]" /> : <Copy className="h-3 w-3" />}
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>

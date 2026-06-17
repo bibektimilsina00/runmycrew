@@ -28,10 +28,10 @@ export function CopilotToolChips({ calls }: Props) {
           <span
             key={`${call.tool}-${i}`}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-full border px-2 py-[2px] text-[10.5px] font-medium',
-              call.status === 'running' && 'border-[var(--border-faint)] bg-[var(--surface)] text-[var(--text-mute)]',
-              call.status === 'success' && 'border-[#9ece6a]/40 bg-[#9ece6a]/10 text-[#9ece6a]',
-              call.status === 'failed'  && 'border-[var(--err)]/40 bg-[var(--err)]/10 text-[var(--err)]',
+              'inline-flex items-center gap-[6px] rounded-[5px] border px-[8px] py-[3px] text-[11px] font-medium',
+              call.status === 'running' && 'border-[var(--border-soft)] bg-[rgba(255,255,255,0.04)] text-[var(--text-mute)]',
+              call.status === 'success' && 'border-transparent bg-[var(--badge-ok-bg)] text-[var(--ok)]',
+              call.status === 'failed'  && 'border-transparent bg-[var(--badge-err-bg)] text-[var(--err)]',
             )}
             title={call.tool}
           >

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  Send, Zap, Check, X, Plus, History,
+  ArrowUp, Zap, Check, X, Plus, History, Sparkles,
   Copy, RotateCcw, Square, ArrowDown,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
@@ -20,21 +20,21 @@ function DiffBanner() {
     summary.deleted.length ? `-${summary.deleted.length} removed` : '',
   ].filter(Boolean)
   return (
-    <div className="mx-3 mb-2 flex items-center gap-2 rounded-[10px] border border-[var(--accent-line)] bg-[var(--accent-line)]/10 px-3 py-2">
+    <div className="mx-3 mb-2 flex items-center gap-2 rounded-[9px] border border-[var(--accent-line)] bg-[var(--accent-soft)] px-3 py-2">
       <span className="flex-1 text-[12px] text-[var(--text)]">
         Copilot proposed changes — {parts.join(', ')}
       </span>
       <button
         onClick={reject}
-        className="flex items-center gap-1 rounded-[6px] px-2 py-1 text-[11.5px] text-[var(--text-mute)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+        className="inline-flex items-center gap-1 rounded-[7px] border border-[var(--border-soft)] bg-transparent px-3 py-[5px] text-[11.5px] font-medium text-[var(--text-mute)] transition-colors hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--text)]"
       >
         <X className="h-3 w-3" /> Reject
       </button>
       <button
         onClick={accept}
-        className="flex items-center gap-1 rounded-[6px] bg-[var(--text)] px-2 py-1 text-[11.5px] text-[var(--bg)] transition-colors hover:opacity-90"
+        className="inline-flex items-center gap-[5px] rounded-[7px] bg-[var(--accent)] px-3 py-[5px] text-[11.5px] font-semibold text-white transition-[filter] hover:brightness-110"
       >
-        <Check className="h-3 w-3" /> Accept
+        <Check className="h-3 w-3" strokeWidth={2.4} /> Apply change
       </button>
     </div>
   )
@@ -58,9 +58,18 @@ function StreamingCursor() {
   return (
     <span
       aria-hidden
-      className="ml-[1px] inline-block h-[14px] w-[6px] translate-y-[2px] rounded-[1px] bg-[var(--text-mute)] align-middle"
+      className="ml-[1px] inline-block h-[14px] w-[6px] translate-y-[2px] rounded-[1px] bg-[var(--accent)] align-middle"
       style={{ animation: 'copilot-cursor 0.9s steps(2) infinite' }}
     />
+  )
+}
+
+/** Linear-style assistant avatar — 26px accent-soft tile + sparkle. */
+function AssistantAvatar() {
+  return (
+    <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[var(--accent-soft)] text-[var(--accent)]">
+      <Sparkles className="h-[15px] w-[15px]" strokeWidth={1.7} />
+    </span>
   )
 }
 
@@ -214,40 +223,35 @@ export function CopilotPanel() {
                 }
                 const isLastAssistant = m.role === 'assistant' && i === lastIdx
                 const isStreaming = busy && isLastAssistant
+                if (m.role === 'user') {
+                  return (
+                    <div key={i} className="group flex justify-end max-w-full">
+                      <div className="flex max-w-[80%] flex-col items-end">
+                        <div className="whitespace-pre-wrap break-words rounded-[11px_11px_3px_11px] bg-[var(--accent)] px-3 py-[9px] text-[13px] leading-[1.5] text-white">
+                          {m.content}
+                        </div>
+                        <MessageActions
+                          onCopy={() => void navigator.clipboard.writeText(m.content)}
+                        />
+                      </div>
+                    </div>
+                  )
+                }
                 return (
-                  <div
-                    key={i}
-                    className={cn(
-                      'group flex max-w-full',
-                      m.role === 'user' ? 'justify-end' : 'items-start',
-                    )}
-                  >
-                    <div className={cn(
-                      'flex flex-col',
-                      m.role === 'user' ? 'max-w-[85%] items-end' : 'min-w-0 flex-1',
-                    )}>
-                      <div
-                        className={cn(
-                          'copilot-chat text-[13.5px] leading-[1.6] text-[var(--text)]',
-                          m.role === 'user' && 'rounded-[12px] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] leading-[1.5]',
-                        )}
-                      >
+                  <div key={i} className="group flex items-start gap-[10px] max-w-full">
+                    <AssistantAvatar />
+                    <div className="flex min-w-0 flex-1 flex-col pt-[3px]">
+                      <div className="copilot-chat text-[13.5px] leading-[1.6] text-[var(--text)]">
                         {m.toolCalls && m.toolCalls.length > 0 && (
                           <CopilotToolChips calls={m.toolCalls} />
                         )}
-                        {m.role === 'assistant' ? (
-                          <>
-                            <CopilotMessage content={m.content} />
-                            {isStreaming && m.content.trim() && <StreamingCursor />}
-                          </>
-                        ) : (
-                          <div className="whitespace-pre-wrap break-words">{m.content}</div>
-                        )}
+                        <CopilotMessage content={m.content} />
+                        {isStreaming && m.content.trim() && <StreamingCursor />}
                       </div>
                       {!isStreaming && (
                         <MessageActions
                           onCopy={() => void navigator.clipboard.writeText(m.content)}
-                          onRetry={m.role === 'assistant' ? () => retryFromAssistant(i) : undefined}
+                          onRetry={() => retryFromAssistant(i)}
                         />
                       )}
                     </div>
@@ -262,8 +266,11 @@ export function CopilotPanel() {
                   (msgs[lastIdx].content.trim() ||
                     (msgs[lastIdx].toolCalls && msgs[lastIdx].toolCalls!.length > 0))
                 ) && (
-                  <div className="rounded-[10px] bg-[var(--surface)] px-3 py-2 w-fit">
-                    <TypingDots />
+                  <div className="flex items-center gap-[10px]">
+                    <AssistantAvatar />
+                    <div className="w-fit rounded-[10px] bg-[var(--surface)] px-3 py-2 border border-[var(--border-soft)]">
+                      <TypingDots />
+                    </div>
                   </div>
                 )}
             </div>
@@ -283,19 +290,19 @@ export function CopilotPanel() {
         </div>
 
         {/* Quick action chips */}
-        <div className="flex shrink-0 flex-wrap gap-1.5 px-4 pb-3">
+        <div className="flex shrink-0 flex-wrap gap-[7px] px-4 pb-3">
           {quickActions.map(qa => (
             <button
               key={qa.text}
               disabled={busy}
               onClick={() => void send(qa.text)}
               className={cn(
-                'flex items-center gap-1 rounded-full border border-[var(--border-faint)] px-2.5 py-1 text-[11.5px] text-[var(--text-mute)]',
-                'transition-colors hover:border-[var(--border-soft)] hover:bg-[var(--surface)] hover:text-[var(--text)]',
+                'inline-flex items-center gap-[6px] rounded-[8px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.02)] px-[10px] py-[6px] text-[12px] font-medium text-[var(--text-mute)]',
+                'transition-colors hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--text)]',
                 'disabled:pointer-events-none disabled:opacity-40',
               )}
             >
-              <Zap className="h-3 w-3" />
+              <Zap className="h-[13px] w-[13px] text-[var(--accent)]" strokeWidth={1.9} />
               {qa.label}
             </button>
           ))}
@@ -314,7 +321,7 @@ export function CopilotPanel() {
         <div className="shrink-0 border-t border-[var(--border-faint)] p-3">
           <div className="relative">
             {slashOpen && slashFilter.length > 0 && (
-              <div className="absolute bottom-[calc(100%+6px)] left-0 right-0 overflow-hidden rounded-[10px] border border-[var(--border)] bg-[var(--bg-2)] shadow-lg">
+              <div className="absolute bottom-[calc(100%+6px)] left-0 right-0 overflow-hidden rounded-[10px] border border-[var(--border-soft)] bg-[var(--surface)] shadow-[var(--shadow-dropdown)]">
                 {slashFilter.map((c, i) => (
                   <button
                     key={c.cmd}
@@ -333,17 +340,17 @@ export function CopilotPanel() {
               </div>
             )}
 
-            <div className="flex items-end gap-2 rounded-[10px] border border-[var(--border-faint)] bg-[var(--bg)] px-3 py-2 transition-colors focus-within:border-[var(--border-soft)]">
+            <div className="rounded-[10px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.02)] px-3 py-[10px] transition-colors focus-within:border-[var(--border)]">
               <textarea
                 ref={inputRef}
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Ask anything, or type / for commands…"
+                placeholder="Ask Copilot to edit this workflow…"
                 rows={1}
                 disabled={busy}
                 className={cn(
-                  'min-h-[20px] max-h-[120px] flex-1 resize-none bg-transparent text-[12.5px] leading-relaxed text-[var(--text)] outline-none',
+                  'min-h-[24px] max-h-[120px] w-full resize-none bg-transparent text-[13px] leading-relaxed text-[var(--text)] outline-none',
                   'placeholder:text-[var(--text-dim)] disabled:opacity-50',
                   '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
                 )}
@@ -354,30 +361,35 @@ export function CopilotPanel() {
                   el.style.height = `${el.scrollHeight}px`
                 }}
               />
-              {busy ? (
-                <button
-                  onClick={cancel}
-                  title="Stop generating"
-                  className={cn(
-                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px]',
-                    'bg-[var(--err)] text-[var(--bg)] transition-colors hover:opacity-90',
-                  )}
-                >
-                  <Square className="h-3 w-3 fill-current" />
-                </button>
-              ) : (
-                <button
-                  disabled={!input.trim()}
-                  onClick={() => void send()}
-                  title="Send"
-                  className={cn(
-                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] bg-[var(--text)] text-[var(--bg)] transition-colors',
-                    'hover:opacity-90 disabled:pointer-events-none disabled:opacity-30',
-                  )}
-                >
-                  <Send className="h-3 w-3" />
-                </button>
-              )}
+              <div className="mt-[4px] flex items-center justify-between">
+                <span className="inline-flex items-center gap-[5px] text-[11px] text-[var(--text-dim)]">
+                  <kbd className="kbd">↵</kbd> send
+                </span>
+                {busy ? (
+                  <button
+                    onClick={cancel}
+                    title="Stop generating"
+                    className={cn(
+                      'flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[7px]',
+                      'bg-[var(--err)] text-white transition-[filter] hover:brightness-110',
+                    )}
+                  >
+                    <Square className="h-[14px] w-[14px] fill-current" />
+                  </button>
+                ) : (
+                  <button
+                    disabled={!input.trim()}
+                    onClick={() => void send()}
+                    title="Send"
+                    className={cn(
+                      'flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[7px] bg-[var(--accent)] text-white transition-[filter]',
+                      'hover:brightness-110 disabled:pointer-events-none disabled:opacity-30',
+                    )}
+                  >
+                    <ArrowUp className="h-[14px] w-[14px]" strokeWidth={2.2} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
