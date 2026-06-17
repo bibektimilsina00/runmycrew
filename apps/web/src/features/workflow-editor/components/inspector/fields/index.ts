@@ -26,6 +26,7 @@ import { GPeopleGroupPickerRenderer } from './renderers/GPeopleGroupPickerRender
 import { GYouTubeVideoPickerRenderer } from './renderers/GYouTubeVideoPickerRenderer'
 import { GYouTubePlaylistPickerRenderer } from './renderers/GYouTubePlaylistPickerRenderer'
 import { GYouTubeChannelPickerRenderer } from './renderers/GYouTubeChannelPickerRenderer'
+import { GChatSpacePickerRenderer } from './renderers/GChatSpacePickerRenderer'
 import { DateTimeRenderer } from './renderers/DateTimeRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
@@ -60,6 +61,7 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'youtube-video':    GYouTubeVideoPickerRenderer,
   'youtube-playlist': GYouTubePlaylistPickerRenderer,
   'youtube-channel':  GYouTubeChannelPickerRenderer,
+  'gchat-space':      GChatSpacePickerRenderer,
   datetime:           DateTimeRenderer,
 }
 

@@ -1,5 +1,6 @@
 import secrets
 import uuid
+from typing import Any
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -964,6 +965,81 @@ async def search_youtube_channels(
         for item in items
     ]
     return {"channels": channels}
+
+
+# ── Google Chat space picker ────────────────────────────────────────────
+
+
+@router.get("/{credential_id}/gchat/spaces")
+async def list_gchat_spaces(
+    credential_id: uuid.UUID,
+    q: str | None = None,
+    space_type: str | None = None,
+    page_token: str | None = None,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List the user's Google Chat spaces — backs the gchat-space picker
+    on the Chat action node + trigger.
+
+    ``q`` (optional) does a client-side substring match on display name
+    once the API returns. ``space_type`` (``SPACE`` / ``DIRECT_MESSAGE``
+    / ``GROUP_CHAT``) maps to the Chat API's CEL filter on space type.
+    """
+    import httpx
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+
+    params: dict[str, Any] = {"pageSize": 100}
+    if page_token:
+        params["pageToken"] = page_token
+    if space_type and space_type.upper() in {"SPACE", "DIRECT_MESSAGE", "GROUP_CHAT"}:
+        params["filter"] = f'spaceType = "{space_type.upper()}"'
+
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(
+                "https://chat.googleapis.com/v1/spaces",
+                headers={"Authorization": f"Bearer {token}"},
+                params=params,
+            )
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                f"Chat spaces list failed ({exc.response.status_code}): {exc.response.text[:200]}"
+            ),
+        ) from exc
+
+    data = resp.json() or {}
+    needle = (q or "").strip().lower()
+    spaces = []
+    for item in data.get("spaces") or []:
+        # Resource name is `spaces/AAAA`; expose the bare id so the
+        # frontend can also show the human-readable display name. The
+        # node-side validator accepts both forms.
+        name = str(item.get("name") or "")
+        space_id = name.split("/", 1)[1] if name.startswith("spaces/") else name
+        display = str(item.get("displayName") or "")
+        if needle and needle not in display.lower() and needle not in space_id.lower():
+            continue
+        spaces.append(
+            {
+                "id": space_id,
+                "name": name,
+                "displayName": display,
+                "type": str(item.get("spaceType") or item.get("type") or ""),
+                "singleUserBotDm": bool(item.get("singleUserBotDm") or False),
+            }
+        )
+
+    return {
+        "spaces": spaces,
+        "nextPageToken": data.get("nextPageToken") or "",
+    }
 
 
 @router.post("/{credential_id}/picker-token")

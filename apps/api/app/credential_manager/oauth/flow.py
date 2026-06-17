@@ -273,6 +273,8 @@ class GoogleOAuthProvider:
         "Manage YouTube (videos, comments, playlists, subscriptions)",
         "Upload videos to YouTube",
         "Read and write Google Slides",
+        "Send and manage messages in Google Chat spaces",
+        "Read Google Chat space metadata and memberships",
         "Read your Google profile",
     ]
 
@@ -310,6 +312,10 @@ class GoogleOAuthProvider:
             "https://www.googleapis.com/auth/youtube.force-ssl",
             "https://www.googleapis.com/auth/youtube.upload",
             "https://www.googleapis.com/auth/presentations",
+            "https://www.googleapis.com/auth/chat.messages",
+            "https://www.googleapis.com/auth/chat.messages.reactions",
+            "https://www.googleapis.com/auth/chat.spaces.readonly",
+            "https://www.googleapis.com/auth/chat.memberships.readonly",
             "openid",
             "email",
             "profile",

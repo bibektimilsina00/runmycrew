@@ -86,6 +86,9 @@ def eager_register_polling_providers() -> None:
     Celery task means a worker that only ever runs one of those paths
     still sees the right providers."""
     from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
+    from apps.api.app.node_system.nodes.gchat import (
+        gchat_trigger as _gchat_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gdrive import (
         gdrive_trigger as _gdrive_trigger,  # noqa: F401
     )

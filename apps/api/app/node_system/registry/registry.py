@@ -33,6 +33,8 @@ from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
+from apps.api.app.node_system.nodes.gchat.gchat_node import GoogleChatNode
+from apps.api.app.node_system.nodes.gchat.gchat_trigger import GoogleChatTriggerNode
 from apps.api.app.node_system.nodes.gdocs.gdocs_node import GoogleDocsNode
 from apps.api.app.node_system.nodes.gdrive.gdrive_node import GDriveNode
 from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNode
@@ -145,6 +147,8 @@ node_registry.register(GooglePeopleTriggerNode)
 node_registry.register(GoogleYouTubeNode)
 node_registry.register(GoogleYouTubeTriggerNode)
 node_registry.register(GoogleSlidesNode)
+node_registry.register(GoogleChatNode)
+node_registry.register(GoogleChatTriggerNode)
 node_registry.register(LinearNode)
 # Meta surfaces — one consolidated trigger + action per surface
 # (Instagram, Facebook/Messenger, WhatsApp, Lead Ads) carrying

@@ -11,7 +11,8 @@ matrix scored 🔒 / ⚠️ / ✅ per cell. This doc is the plan + the tracker.
 - **Phase 3 (Tasks + Forms + Contacts + YouTube)** — ✅ shipped
   (originally only Tasks/Forms/Contacts/YouTube; we promoted YouTube
   out of Phase 3 in the original draft and ended up shipping it here)
-- **Phase 4 (Slides + Chat)** — Slides ✅ shipped; Chat ⏳ pending.
+- **Phase 4 (Slides + Chat)** — Slides ✅ shipped; Chat ✅ shipped.
+  Phase 4 is fully closed out.
   Dropped from Phase 4: **Photos** (niche personal-media),
   **Meet** (API barely exists — Calendar already auto-creates Meet
   links, and post-call transcripts are too niche to carry the surface),
@@ -60,7 +61,9 @@ incremental consent):
 ```
 gmail.modify, calendar, drive.file, spreadsheets, documents, tasks,
 forms.body, forms.responses.readonly, contacts,
-youtube.force-ssl, youtube.upload,
+youtube.force-ssl, youtube.upload, presentations,
+chat.messages, chat.messages.reactions,
+chat.spaces.readonly, chat.memberships.readonly,
 openid, email, profile
 ```
 
@@ -82,6 +85,8 @@ Triggers ✅
 - `trigger.gyt_change` (google_youtube) — `new_comment`, `new_subscriber`,
   `new_video` (Data API **or RSS**), `new_video_search_match`,
   `new_reply_to_my_comment`
+- `trigger.gchat_change` (google_chat) — `new_message_in_space`
+  (createTime-cursor polling, optional CEL extra-filter)
 
 Actions ✅
 
@@ -101,11 +106,14 @@ Actions ✅
 - `action.gslides` (Slides — 24 ops incl. create-from-outline for
   AI-driven deck generation, batch slide ops, text/shape/image insert,
   speaker notes, background fills)
+- `action.gchat` (Chat — 12 ops: send / update / delete / list / get
+  messages, list spaces + members, find DM, add / list / delete
+  reactions; full Card v2 forwarding, thread-key replies)
 
 Still **missing** (after the prune — see status snapshot for what
 was dropped or deferred)
 
-- Phase 4: **Chat**
+- Phase 4: ✅ fully shipped
 - Phase 5: Business Profile, Analytics 4, Search Console, BigQuery,
   Cloud Storage
 - Phase 6: Translate, Vision, Speech, Maps/Places
@@ -160,7 +168,7 @@ APIs we call. Each Fuse surface gates on one or more APIs:
 | Contacts             | People API                                 | ✅ |
 | YouTube              | YouTube Data API v3                        | ✅ |
 | Slides               | Google Slides API                          | ✅ |
-| Chat                 | Google Chat API                            | ⏳ |
+| Chat                 | Google Chat API                            | ✅ |
 | Business Profile     | Google Business Profile API                | ⏳ |
 | Analytics 4          | Google Analytics Data API                  | ⏳ |
 | Search Console       | Search Console API                         | ⏳ |
@@ -296,8 +304,14 @@ YouTube — 28 action ops + 5 trigger events:
   export PDF, set speaker notes, duplicate slide, delete slide,
   **create_from_outline** for AI-driven decks, batch updates,
   text/shape/image insert, background fills)
-- ⏳ Chat (send message to space/DM, threaded reply, list spaces, list
-  members, reactions) — needs `chat.bot` scope / app install flow
+- ✅ **Chat** (12 ops: send_message — text + Card v2 + thread key,
+  update_message, delete_message, list_messages, get_message,
+  list_spaces, get_space, list_members, find_direct_message,
+  add_reaction, list_reactions, delete_reaction). Trigger
+  `trigger.gchat_change` with `new_message_in_space` over
+  `createTime > cursor` polling, optional CEL extra-filter for
+  sender-based scoping. Shipped under user OAuth — no bot-app install
+  required.
 - ❌ **Meet — dropped.** API barely exists — Calendar already
   auto-creates Meet links on event create, and the rest of the API
   (post-call conference records / transcripts) is too niche to carry
@@ -382,7 +396,7 @@ Dropped from this phase:
 | YouTube | `youtube.force-ssl` + `youtube.upload` | ✅ |
 | Profile | `openid` + `email` + `profile` | ✅ |
 | Slides | `presentations` | ✅ |
-| Chat | `chat.messages` + `chat.spaces` | ⏳ |
+| Chat | `chat.messages` + `chat.messages.reactions` + `chat.spaces.readonly` + `chat.memberships.readonly` | ✅ |
 | Business Profile | `business.manage` | ⏳ |
 | Analytics 4 | `analytics.readonly` | ⏳ |
 | Search Console | `webmasters.readonly` (or `webmasters` for sitemap submit) | ⏳ |
@@ -509,18 +523,24 @@ Pattern that all shipped Google surfaces follow:
 | 56 | slides | action: create_from_outline | ✅ | AI-driven deck gen |
 | 57 | slides | action: set_speaker_notes | ✅ | empty-shape deleteText guarded |
 | 58 | slides | action: update_background | ✅ | OpaqueColor vs OptionalColor split |
-| 59 | chat | action: send_message | ⏳ | needs chat.bot scope |
-| 60 | chat | trigger: new_message_in_space | ⏳ | |
-| 61 | business_profile | action: list_locations / reply_review | ⏳ | |
-| 62 | business_profile | trigger: new_review | ⏳ | |
-| 63 | analytics4 | action: run_report | ⏳ | |
-| 64 | search_console | action: get_search_analytics | ⏳ | |
-| 65 | bigquery | action: run_sql | ⏳ | |
-| 66 | cloud_storage | action: upload / download object | ⏳ | |
-| 67 | translate | action: translate_text | ⏳ | |
-| 68 | vision | action: ocr / labels | ⏳ | |
-| 69 | speech | action: stt / tts | ⏳ | |
-| 70 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
+| 59 | chat | action: send_message (text + thread_key) | ✅ | user OAuth, no bot install |
+| 60 | chat | action: send_message with cardsV2 | ✅ | dict / list / JSON string accepted |
+| 61 | chat | action: update_message / delete_message | ✅ | updateMask=text |
+| 62 | chat | action: list_messages / get_message | ✅ | createTime filter, orderBy |
+| 63 | chat | action: list_spaces / get_space / list_members | ✅ | space-type CEL filter |
+| 64 | chat | action: find_direct_message | ✅ | users/{id} lookup |
+| 65 | chat | action: add_reaction / list_reactions / delete_reaction | ✅ | unicode emoji |
+| 66 | chat | trigger: new_message_in_space | ✅ | createTime-cursor polling |
+| 67 | business_profile | action: list_locations / reply_review | ⏳ | |
+| 68 | business_profile | trigger: new_review | ⏳ | |
+| 69 | analytics4 | action: run_report | ⏳ | |
+| 70 | search_console | action: get_search_analytics | ⏳ | |
+| 71 | bigquery | action: run_sql | ⏳ | |
+| 72 | cloud_storage | action: upload / download object | ⏳ | |
+| 73 | translate | action: translate_text | ⏳ | |
+| 74 | vision | action: ocr / labels | ⏳ | |
+| 75 | speech | action: stt / tts | ⏳ | |
+| 76 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
 
 Statuses: ⏳ not started · 🔄 in progress · ✅ proven end-to-end ·
 🔒 blocked by external (verification, API enable, scope review) · ⚠️
