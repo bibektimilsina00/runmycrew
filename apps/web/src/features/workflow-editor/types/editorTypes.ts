@@ -36,7 +36,7 @@ export type KnownNodePropertyType =
   | 'code' | 'collection' | 'fixed-collection' | 'media' | 'gmail-query' | 'gdrive-folder'
   | 'google-file' | 'gsheet-tab' | 'gtasks-tasklist' | 'gpeople-group'
   | 'youtube-video' | 'youtube-playlist' | 'youtube-channel'
-  | 'gchat-space' | 'ga4-property' | 'datetime'
+  | 'gchat-space' | 'ga4-property' | 'gcs-bucket' | 'datetime'
 
 export type NodePropertyType = KnownNodePropertyType | (string & {})
 

@@ -17,8 +17,9 @@ matrix scored 🔒 / ⚠️ / ✅ per cell. This doc is the plan + the tracker.
   **Meet** (API barely exists — Calendar already auto-creates Meet
   links, and post-call transcripts are too niche to carry the surface),
   **Keep** (read-only stub API).
-- **Phase 5 (Marketing / Analytics / Cloud)** — **Analytics 4 ✅ shipped.**
-  Business Profile, Search Console, BigQuery, Cloud Storage ⏳ pending.
+- **Phase 5 (Marketing / Analytics / Cloud)** — **Analytics 4 ✅ shipped.
+  Cloud Storage ✅ shipped.** (Search Console PR #161 in flight.)
+  Business Profile, BigQuery ⏳ pending.
   **AdSense** dropped (too niche). **Ads** deferred (heavyweight,
   developer-token flow). **Pub/Sub** kept only as an internal
   transport, not user-facing.
@@ -64,7 +65,7 @@ forms.body, forms.responses.readonly, contacts,
 youtube.force-ssl, youtube.upload, presentations,
 chat.messages, chat.messages.reactions,
 chat.spaces.readonly, chat.memberships.readonly,
-analytics.readonly,
+analytics.readonly, devstorage.read_write,
 openid, email, profile
 ```
 
@@ -116,12 +117,18 @@ Actions ✅
   get_property / list_data_streams / list_key_events /
   list_custom_dimensions / list_custom_metrics. Property picker
   groups by account. Read-only — `analytics.readonly` scope)
+- `action.gcs` (Cloud Storage — 10 ops: list_buckets / get_bucket /
+  create_bucket / delete_bucket + list_objects / get_object_metadata /
+  download_object (utf-8 decode w/ binary fallback) / upload_object
+  (URL / Library / inline via Media field, with custom MIME + metadata
+  + cache-control) / delete_object / copy_object. `devstorage.read_write`
+  scope. Bucket picker scoped by `project_id` sibling field)
 
 Still **missing** (after the prune — see status snapshot for what
 was dropped or deferred)
 
 - Phase 4: ✅ fully shipped
-- Phase 5: Business Profile, Search Console, BigQuery, Cloud Storage
+- Phase 5: Business Profile, BigQuery (Search Console PR #161 in flight; Cloud Storage shipped)
 - Phase 6: Translate, Vision, Speech, Maps/Places
 
 **Deferred** (kept in roadmap, low priority): Ads, Document AI,
@@ -179,7 +186,7 @@ APIs we call. Each Fuse surface gates on one or more APIs:
 | Analytics 4          | Google Analytics Data API + Admin API      | ✅ |
 | Search Console       | Search Console API                         | ⏳ |
 | BigQuery             | BigQuery API                               | ⏳ |
-| Cloud Storage        | Cloud Storage JSON API                     | ⏳ |
+| Cloud Storage        | Cloud Storage JSON API                     | ✅ |
 | Translate            | Cloud Translation API                      | ⏳ |
 | Vision               | Cloud Vision API                           | ⏳ |
 | Speech               | Cloud Speech-to-Text + Text-to-Speech      | ⏳ |
@@ -407,7 +414,7 @@ Dropped from this phase:
 | Analytics 4 | `analytics.readonly` | ✅ |
 | Search Console | `webmasters.readonly` (or `webmasters` for sitemap submit) | ⏳ |
 | BigQuery | `bigquery` (or `bigquery.readonly`) | ⏳ |
-| Cloud Storage | `devstorage.read_write` (or `devstorage.read_only`) | ⏳ |
+| Cloud Storage | `devstorage.read_write` (covers list / read / write / delete) | ✅ |
 | Pub/Sub | `pubsub` | 🛠 internal transport only |
 | Cloud APIs (Translate / Vision / Speech) | `cloud-platform` (single broad scope; per-API enable governs access) | ⏳ |
 | Maps / Places / Geocoding | API key (no OAuth) — separate `GOOGLE_MAPS_API_KEY` env | ⏳ |
@@ -548,11 +555,17 @@ Pattern that all shipped Google surfaces follow:
 | 75 | analytics4 | admin: list_custom_dimensions / list_custom_metrics | ✅ | user-defined fields |
 | 76 | search_console | action: get_search_analytics | ⏳ | |
 | 77 | bigquery | action: run_sql | ⏳ | |
-| 78 | cloud_storage | action: upload / download object | ⏳ | |
-| 79 | translate | action: translate_text | ⏳ | |
-| 80 | vision | action: ocr / labels | ⏳ | |
-| 81 | speech | action: stt / tts | ⏳ | |
-| 82 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
+| 78 | cloud_storage | action: list_buckets / get_bucket | ✅ | project-scoped list |
+| 79 | cloud_storage | action: create_bucket / delete_bucket | ✅ | location + storage class |
+| 80 | cloud_storage | action: list_objects (prefix + delimiter) | ✅ | virtual-folder grouping |
+| 81 | cloud_storage | action: get_object_metadata | ✅ | |
+| 82 | cloud_storage | action: download_object | ✅ | utf-8 decode w/ binary base64 fallback |
+| 83 | cloud_storage | action: upload_object (URL / Library / inline) | ✅ | media-field reuse, multipart |
+| 84 | cloud_storage | action: delete_object / copy_object | ✅ | cross-bucket copy |
+| 85 | translate | action: translate_text | ⏳ | |
+| 86 | vision | action: ocr / labels | ⏳ | |
+| 87 | speech | action: stt / tts | ⏳ | |
+| 88 | maps | action: geocode / distance_matrix | ⏳ | API-key cred |
 
 Statuses: ⏳ not started · 🔄 in progress · ✅ proven end-to-end ·
 🔒 blocked by external (verification, API enable, scope review) · ⚠️
