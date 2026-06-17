@@ -1046,6 +1046,117 @@ async def list_gchat_spaces(
     }
 
 
+# ── Google Analytics 4 property picker ──────────────────────────────────
+
+
+@router.get("/{credential_id}/ga4/properties")
+async def list_ga4_properties(
+    credential_id: uuid.UUID,
+    q: str | None = None,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    service: CredentialService = Depends(get_credential_service),
+):
+    """List GA4 properties the connected account can see — backs the
+    ``ga4-property`` picker on the Analytics action node.
+
+    The Admin API lists properties one account at a time, so we first
+    fetch every visible account (paginating), then issue one parallel
+    ``properties.list`` per account. The result is flattened into
+    ``{id, name, displayName, account, accountDisplayName}`` so the
+    frontend can show a grouped, searchable list. ``q`` does a
+    client-side substring match across display name + property id.
+    """
+    import asyncio
+
+    import httpx
+
+    from apps.api.app.node_system.nodes.ga4.ga4_node import format_ga4_error
+
+    token = await _resolve_google_token(credential_id, workspace, service)
+    admin = "https://analyticsadmin.googleapis.com/v1beta"
+    auth_headers = {"Authorization": f"Bearer {token}"}
+
+    async def _all_accounts(client: httpx.AsyncClient) -> list[dict[str, Any]]:
+        accounts: list[dict[str, Any]] = []
+        page_token: str | None = None
+        while True:
+            params: dict[str, Any] = {"pageSize": 200}
+            if page_token:
+                params["pageToken"] = page_token
+            resp = await client.get(f"{admin}/accounts", headers=auth_headers, params=params)
+            resp.raise_for_status()
+            data = resp.json() or {}
+            for acc in data.get("accounts") or []:
+                accounts.append(acc)
+            page_token = data.get("nextPageToken")
+            if not page_token:
+                break
+        return accounts
+
+    async def _props_for(client: httpx.AsyncClient, account_name: str) -> list[dict[str, Any]]:
+        out: list[dict[str, Any]] = []
+        page_token: str | None = None
+        while True:
+            params: dict[str, Any] = {
+                "pageSize": 200,
+                "filter": f"parent:{account_name}",
+            }
+            if page_token:
+                params["pageToken"] = page_token
+            resp = await client.get(f"{admin}/properties", headers=auth_headers, params=params)
+            resp.raise_for_status()
+            data = resp.json() or {}
+            for p in data.get("properties") or []:
+                out.append(p)
+            page_token = data.get("nextPageToken")
+            if not page_token:
+                break
+        return out
+
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            accounts = await _all_accounts(client)
+            # Map account-name → displayName so we can label rows.
+            account_label = {
+                str(a.get("name") or ""): str(a.get("displayName") or "") for a in accounts
+            }
+            if not accounts:
+                return {"properties": []}
+            tasks = [_props_for(client, str(a.get("name") or "")) for a in accounts]
+            per_account = await asyncio.gather(*tasks)
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=format_ga4_error(exc.response.status_code, exc.response.text),
+        ) from exc
+
+    needle = (q or "").strip().lower()
+    properties: list[dict[str, Any]] = []
+    for batch in per_account:
+        for p in batch:
+            name = str(p.get("name") or "")  # e.g. "properties/123456789"
+            pid = name.split("/", 1)[1] if name.startswith("properties/") else name
+            display = str(p.get("displayName") or "")
+            parent = str(p.get("parent") or "")  # "accounts/..."
+            if needle and needle not in display.lower() and needle not in pid.lower():
+                continue
+            properties.append(
+                {
+                    "id": pid,
+                    "name": name,
+                    "displayName": display,
+                    "account": parent,
+                    "accountDisplayName": account_label.get(parent, ""),
+                    "currencyCode": str(p.get("currencyCode") or ""),
+                    "timeZone": str(p.get("timeZone") or ""),
+                }
+            )
+
+    return {"properties": properties}
+
+
 @router.post("/{credential_id}/picker-token")
 async def get_picker_token(
     credential_id: uuid.UUID,
