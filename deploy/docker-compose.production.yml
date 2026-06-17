@@ -1,0 +1,250 @@
+# ─── Fuse production stack ─────────────────────────────────────────────
+#
+# 7 services on a single host. Pulls pre-built images from ghcr.io —
+# no `build:` lines, so a VPS deploy never needs Node / uv / gcc /
+# anything beyond Docker.
+#
+# Run from the `deploy/` directory:
+#   docker compose -f docker-compose.production.yml up -d
+#
+# Tag pinning: set FUSE_IMAGE_TAG=sha-abc1234 in .env to roll back
+# without changing this file. Default `latest` tracks main.
+#
+# Resource caps assume a 2 GB VPS. Bump if you upgrade the droplet
+# (see docs/devops-plan.md §3).
+# ───────────────────────────────────────────────────────────────────────
+
+# YAML anchor reused on every service so logs rotate uniformly. With
+# the default unbounded driver, a single chatty service fills the
+# disk overnight.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # ── Reverse proxy + static frontend ──────────────────────────────
+  # Single image: Caddy + the React dist baked in. No volume hand-off
+  # between a builder container and Caddy — release atomicity is just
+  # "pull web image, restart container".
+  web:
+    image: ghcr.io/${GITHUB_OWNER}/fuse-web:${FUSE_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Persistent Let's Encrypt certs + Caddy state so renewals
+      # survive container restarts.
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    mem_limit: 128m
+    logging: *default-logging
+
+  # ── FastAPI ──────────────────────────────────────────────────────
+  api:
+    image: ghcr.io/${GITHUB_OWNER}/fuse-api:${FUSE_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_SERVER: db
+      REDIS_HOST: redis
+      ENVIRONMENT: production
+      BASE_URL: ${BASE_URL:-https://fuse.bibektimilsina.tech}
+      FRONTEND_URL: ${FRONTEND_URL:-https://fuse.bibektimilsina.tech}
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+    mem_limit: 512m
+    logging: *default-logging
+
+  # ── Celery worker ────────────────────────────────────────────────
+  worker:
+    image: ghcr.io/${GITHUB_OWNER}/fuse-worker:${FUSE_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_SERVER: db
+      REDIS_HOST: redis
+      ENVIRONMENT: production
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    # Two workers fit comfortably under the 384M cap; raise concurrency
+    # only after observing real load.
+    command:
+      - "uv"
+      - "run"
+      - "--no-sync"
+      - "celery"
+      - "-A"
+      - "apps.worker.app.jobs.tasks"
+      - "worker"
+      - "--loglevel=info"
+      - "--concurrency=2"
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - |
+          uv run --no-sync celery -A apps.worker.app.jobs.tasks inspect ping \
+            -d celery@$$HOSTNAME --timeout=5 >/dev/null 2>&1 || exit 1
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    mem_limit: 384m
+    logging: *default-logging
+
+  # ── Celery beat scheduler ────────────────────────────────────────
+  # Runs the polling triggers (Gmail / Drive / GA4 / Search Console /
+  # YouTube / Cloud Storage / People / Tasks / Forms / Chat). Single
+  # replica is mandatory — multiple beats would double-fire schedules.
+  beat:
+    image: ghcr.io/${GITHUB_OWNER}/fuse-worker:${FUSE_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_SERVER: db
+      REDIS_HOST: redis
+      ENVIRONMENT: production
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command:
+      - "uv"
+      - "run"
+      - "--no-sync"
+      - "celery"
+      - "-A"
+      - "apps.worker.app.jobs.tasks"
+      - "beat"
+      - "--loglevel=info"
+    healthcheck:
+      # Beat has no inspect endpoint — `pgrep` proves the loop is
+      # still running.
+      test: ["CMD-SHELL", "pgrep -f 'celery .* beat' >/dev/null || exit 1"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    mem_limit: 128m
+    logging: *default-logging
+
+  # ── Postgres + pgvector ──────────────────────────────────────────
+  db:
+    image: pgvector/pgvector:pg15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # Stronger password hashing than the legacy md5 default.
+      POSTGRES_INITDB_ARGS: "--auth=scram-sha-256"
+      TZ: UTC
+    # Tuned for a 512 MB cap — defaults assume 1 GB+ of shared buffers
+    # which would just get OOM-killed here.
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=128MB"
+      - "-c"
+      - "effective_cache_size=384MB"
+      - "-c"
+      - "work_mem=8MB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+      - "-c"
+      - "max_connections=50"
+      - "-c"
+      - "wal_compression=on"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Idempotent init scripts (`CREATE EXTENSION vector;`). Only
+      # runs on first boot when the data volume is empty.
+      - ./pg-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 512m
+    logging: *default-logging
+
+  # ── Redis (Celery broker + result backend + cache) ───────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # AOF on so a hard crash doesn't lose in-flight Celery state.
+    # maxmemory caps prevent runaway eviction → OOM kill.
+    command:
+      - "redis-server"
+      - "--appendonly"
+      - "yes"
+      - "--maxmemory"
+      - "96mb"
+      - "--maxmemory-policy"
+      - "allkeys-lru"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 128m
+    logging: *default-logging
+
+  # ── Nightly Postgres dump with 14-day retention ──────────────────
+  # Bind-mounts the host backup script so we can iterate without a
+  # rebuild. Image is just stock `postgres:15-alpine` for the matching
+  # `pg_dump` client.
+  backup:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pg_backups:/backups
+      - ./backup.sh:/usr/local/bin/backup.sh:ro
+    entrypoint: ["/bin/sh", "-c", "while true; do /usr/local/bin/backup.sh || true; sleep 86400; done"]
+    mem_limit: 64m
+    logging: *default-logging
+
+# ── Persistent volumes ─────────────────────────────────────────────
+volumes:
+  postgres_data:  # Postgres data dir — DO NOT delete.
+  redis_data:     # Redis AOF — Celery state survives restarts.
+  caddy_data:     # Let's Encrypt certs + Caddy ACME state.
+  caddy_config:   # Caddy adapted config.
+  pg_backups:     # Nightly dump output (also rsync off-box later).

@@ -46,6 +46,9 @@ apps/web/.vite/
 .env
 .env.local
 .env.*.local
+# Production env lives on the VPS only — `deploy/.env.production.example`
+# is the committed template.
+deploy/.env
 *.pem
 *.key
 *.cert
