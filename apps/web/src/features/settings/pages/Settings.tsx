@@ -5,6 +5,7 @@ import { Icons } from '@/shared/components/icons'
 import { useSettings, useUpdateProfile } from '../hooks/useSettings'
 import { ProfileCard } from '../components/ProfileCard'
 import { ApiKeysCard } from '../components/ApiKeysCard'
+import { AppearanceCard } from '../components/AppearanceCard'
 import type { UserProfile } from '../types/settingsTypes'
 
 export function Settings() {
@@ -74,6 +75,8 @@ export function Settings() {
         onSave={handleSaveProfile}
         isSaving={updateProfileMutation.isPending}
       />
+
+      <AppearanceCard />
 
       <ApiKeysCard
         apiKeys={apiKeys}

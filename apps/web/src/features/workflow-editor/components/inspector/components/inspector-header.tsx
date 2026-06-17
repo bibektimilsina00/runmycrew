@@ -47,17 +47,22 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
     setError(null)
   }
 
+  const category = definition.category
+    ? definition.category.charAt(0).toUpperCase() + definition.category.slice(1)
+    : 'Node'
+  const subtitle = `${category} · ${definition.name}`
+
   return (
-    <header className="shrink-0 border-b border-[var(--border-faint)] px-4 py-3">
-      <div className="flex items-center gap-2.5">
+    <header className="shrink-0 border-b border-[var(--border-soft)] px-4 py-4">
+      <div className="flex items-center gap-[11px]">
         <div
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] text-white [&_svg]:h-3.5 [&_svg]:w-3.5"
+          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[8px] text-white [&_svg]:h-[18px] [&_svg]:w-[18px]"
           style={{ background: definition.color ?? 'var(--surface-3)' }}
         >
           {Icon}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 leading-[1.3]">
           {editing ? (
             <input
               ref={inputRef}
@@ -74,23 +79,26 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
                   setError(null)
                 }
               }}
-              className="w-full bg-transparent text-[13px] font-medium text-[var(--text)] outline-none"
+              className="w-full bg-transparent text-[14px] font-semibold text-[var(--text)] outline-none"
               aria-label="Node name"
               aria-invalid={!!error}
             />
           ) : (
-            <span className="block truncate text-[13px] font-medium text-[var(--text)]">
+            <span className="block truncate text-[14px] font-semibold text-[var(--text)]">
               {label}
             </span>
           )}
+          <span className="block truncate text-[11.5px] text-[var(--text-faint)] font-medium">
+            {subtitle}
+          </span>
         </div>
 
         <button
           onClick={startEdit}
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text-mute)]"
+          className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[6px] text-[var(--text-faint)] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]"
           title="Rename node"
         >
-          <Pencil className="h-3 w-3" />
+          <Pencil className="h-[14px] w-[14px]" strokeWidth={1.8} />
         </button>
       </div>
 

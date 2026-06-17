@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Icons } from '@/shared/components'
+import { cn } from '@/lib/cn'
 import { PanelHead } from './PanelHead'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import type { DashboardRun } from '../services/dashboardAPI'
@@ -10,22 +11,29 @@ interface Props {
   onViewAll: () => void
 }
 
+const STATUS_DOT: Record<DashboardRun['status'], { dot: string; glow: string }> = {
+  ok:   { dot: 'var(--ok)',   glow: 'rgba(76,195,138,0.18)' },
+  run:  { dot: 'var(--accent)', glow: 'var(--accent-soft)' },
+  err:  { dot: 'var(--err)',  glow: 'rgba(229,103,95,0.20)' },
+  warn: { dot: 'var(--warn)', glow: 'rgba(231,183,102,0.20)' },
+}
+
 export function RecentRuns({ items, totalToday, onViewAll }: Props) {
   const navigate = useNavigate()
 
   return (
-    <div className="bg-[var(--bg)] border border-[var(--border-faint)] rounded-[12px] overflow-hidden flex flex-col">
+    <div className="border border-[var(--border-soft)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
       <PanelHead
-        icon={<Icons.Activity className="w-3.5 h-3.5" />}
+        icon={<Icons.Activity />}
         title="Recent runs"
         count={`${totalToday.toLocaleString()} today`}
         action={
           <button
-            className="text-[12px] text-[var(--text-mute)] py-[4px] px-[8px] rounded-[6px] transition-colors inline-flex items-center gap-[4px] hover:text-[var(--text)] hover:bg-[var(--surface)]"
+            className="text-[12px] font-medium text-[var(--text-faint)] py-[4px] px-[8px] rounded-[6px] transition-colors inline-flex items-center gap-[4px] hover:text-[var(--text)] hover:bg-[rgba(255,255,255,0.05)]"
             onClick={onViewAll}
           >
-            <span>View all</span>
-            <Icons.CaretRight className="w-3 h-3" />
+            View all
+            <Icons.CaretRight className="w-[13px] h-[13px]" />
           </button>
         }
       />
@@ -35,26 +43,32 @@ export function RecentRuns({ items, totalToday, onViewAll }: Props) {
           <span className="text-[13px]">No runs yet. Trigger an automation to see results here.</span>
         </div>
       ) : (
-        <div className="flex flex-col">
-          {items.map(r => (
-            <div
-              key={r.id}
-              className="grid grid-cols-[22px_1fr_180px_80px_80px_22px] gap-[12px] items-center py-[10px] px-[16px] border-b border-[var(--border-faint)] text-[13px] cursor-pointer transition-colors last:border-b-0 hover:bg-[var(--surface)]"
-              onClick={() => navigate(APP_ROUTES.RUNS)}
-            >
-              <span className={`status-dot ${r.status}`} />
-              <span className="font-medium whitespace-nowrap overflow-hidden text-ellipsis">{r.name}</span>
-              <span className="inline-flex items-center gap-[6px] font-mono text-[11px] text-[var(--text-mute)]">
-                <Icons.Bolt className="w-2.5 h-2.5" />
-                <span className="truncate">{r.trigger}</span>
-              </span>
-              <span className="font-mono text-[11px] text-[var(--text-faint)]">{r.duration}</span>
-              <span className="font-mono text-[11px] text-[var(--text-faint)]">{r.ago}</span>
-              <span className="text-[var(--text-dim)] inline-flex">
-                <Icons.CaretRight className="w-3.5 h-3.5" />
-              </span>
-            </div>
-          ))}
+        <div>
+          {items.map(r => {
+            const tone = STATUS_DOT[r.status] ?? STATUS_DOT.ok
+            return (
+              <button
+                key={r.id}
+                onClick={() => navigate(APP_ROUTES.RUNS)}
+                className={cn(
+                  'w-full flex items-center gap-[12px] py-[11px] px-[15px] border-b border-[var(--border-faint)] last:border-b-0 bg-transparent text-left transition-colors cursor-pointer',
+                  'hover:bg-[rgba(255,255,255,0.03)]',
+                )}
+              >
+                <span
+                  className="w-[8px] h-[8px] rounded-full shrink-0"
+                  style={{ background: tone.dot, boxShadow: `0 0 0 3px ${tone.glow}` }}
+                />
+                <span className="text-[13px] text-[var(--text)] font-medium flex-1 min-w-0 truncate">{r.name}</span>
+                <span className="font-mono text-[11.5px] text-[var(--text-mute)] bg-[rgba(255,255,255,0.04)] border border-[var(--border-soft)] rounded-[5px] py-[2px] px-[7px]">
+                  {r.trigger}
+                </span>
+                <span className="font-mono text-[11.5px] text-[var(--text-faint)] w-[54px] text-right">{r.duration}</span>
+                <span className="text-[11.5px] text-[var(--text-dim)] w-[48px] text-right">{r.ago}</span>
+                <Icons.CaretRight className="w-[14px] h-[14px] text-[var(--text-dim)] shrink-0" />
+              </button>
+            )
+          })}
         </div>
       )}
     </div>

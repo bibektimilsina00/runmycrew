@@ -9,9 +9,9 @@ export function GreetingRow() {
   const navigate = useNavigate()
   const requestCreateWorkflow = useWorkflowModalStore(s => s.requestOpen)
 
-  const formattedDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'short', month: 'short', day: 'numeric',
-  })
+  const formattedDate = new Date()
+    .toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    .toUpperCase()
 
   const hour = new Date().getHours()
   const greeting =
@@ -22,32 +22,36 @@ export function GreetingRow() {
   const firstName = user?.full_name ? user.full_name.split(' ')[0] : (user?.email?.split('@')[0] ?? '')
 
   return (
-    <div className="flex items-end justify-between gap-[24px]">
-      <div className="flex flex-col">
-        <span className="inline-flex items-center gap-[8px] font-mono text-[10.5px] tracking-widest uppercase text-[var(--text-faint)] font-medium">
-          <span className="w-[6px] h-[6px] rounded-full bg-[var(--ok)] shadow-[0_0_6px_oklch(0.78_0.14_145/0.6)]" />
-          All systems operational · {formattedDate}
-        </span>
-        <h1 className="text-[26px] mt-[6px] font-medium tracking-tight">
-          {greeting}, {firstName}
-          <span style={{ color: 'var(--accent)' }}>.</span>
-        </h1>
-      </div>
+    <div className="flex flex-col gap-[18px]">
       <div className="flex items-center gap-[8px]">
-        <button
-          className="inline-flex items-center gap-[7px] py-[8px] px-[14px] rounded-[9px] text-[13px] font-medium bg-[var(--surface)] border border-[var(--border-faint)] text-[var(--text)] hover:bg-[var(--surface-2)] transition-colors"
-          onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
-        >
-          <Icons.Plug className="w-3.5 h-3.5" />
-          Connect app
-        </button>
-        <button
-          className="inline-flex items-center gap-[7px] py-[8px] px-[14px] rounded-[9px] text-[13px] font-medium bg-[var(--text)] text-[var(--bg)] border border-[var(--text)] hover:bg-[oklch(0.90_0.003_250)] transition-colors"
-          onClick={requestCreateWorkflow}
-        >
-          <Icons.Plus className="w-3.5 h-3.5" />
-          New automation
-        </button>
+        <span className="relative inline-flex w-[8px] h-[8px]">
+          <span className="absolute inset-0 rounded-full bg-[var(--ok)] animate-[fusePulse_2.4s_ease-in-out_infinite]" />
+        </span>
+        <span className="text-[11px] font-semibold tracking-[0.08em] text-[var(--text-faint)]">ALL SYSTEMS OPERATIONAL</span>
+        <span className="text-[var(--text-dim)]">·</span>
+        <span className="text-[11px] font-semibold tracking-[0.08em] text-[var(--text-dim)]">{formattedDate}</span>
+      </div>
+
+      <div className="flex items-end justify-between gap-[16px] flex-wrap">
+        <h1 className="m-0 text-[27px] font-semibold tracking-[-0.022em] text-[var(--text)] flex-1 min-w-[280px]">
+          {greeting}, {firstName}
+        </h1>
+        <div className="flex items-center gap-[9px] shrink-0">
+          <button
+            onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
+            className="inline-flex items-center gap-[7px] py-[8px] px-[14px] rounded-[6px] text-[13px] font-medium text-[var(--text)] bg-[rgba(255,255,255,0.02)] border border-[var(--border-soft)] transition-colors hover:bg-[rgba(255,255,255,0.05)] hover:border-[var(--border)] [&_svg]:w-[15px] [&_svg]:h-[15px]"
+          >
+            <Icons.Plug />
+            Connect app
+          </button>
+          <button
+            onClick={requestCreateWorkflow}
+            className="inline-flex items-center gap-[7px] py-[8px] px-[14px] rounded-[6px] text-[13px] font-semibold text-white bg-[var(--accent)] border border-transparent transition-[filter] hover:brightness-110 [&_svg]:w-[15px] [&_svg]:h-[15px]"
+          >
+            <Icons.Plus />
+            New automation
+          </button>
+        </div>
       </div>
     </div>
   )

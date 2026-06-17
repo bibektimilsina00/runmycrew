@@ -4,18 +4,29 @@ interface PanelHeadProps {
   icon: React.ReactNode
   title: string
   count?: string
+  countTone?: 'neutral' | 'ok'
   action?: React.ReactNode
 }
 
-export function PanelHead({ icon, title, count, action }: PanelHeadProps) {
+export function PanelHead({ icon, title, count, countTone = 'neutral', action }: PanelHeadProps) {
   return (
-    <div className="flex items-center justify-between py-[12px] px-[16px] border-b border-[var(--border-faint)]">
-      <div className="flex items-center gap-[8px] text-[13px] font-medium">
+    <div className="flex items-center gap-[9px] py-[13px] px-[15px] border-b border-[var(--border-soft)]">
+      <span className="inline-flex items-center justify-center text-[var(--text-mute)] [&_svg]:w-[15px] [&_svg]:h-[15px]">
         {icon}
-        <span>{title}</span>
-        {count && <span className="font-mono text-[11px] text-[var(--text-faint)] bg-[var(--surface)] py-[2px] px-[6px] pb-[1px] rounded-[4px] border border-[var(--border-faint)]">{count}</span>}
-      </div>
-      {action && <div className="flex items-center gap-[4px]">{action}</div>}
+      </span>
+      <span className="text-[13.5px] font-semibold text-[var(--text)]">{title}</span>
+      {count && (
+        <span
+          className={
+            countTone === 'ok'
+              ? 'text-[11px] font-semibold text-[var(--ok)] bg-[var(--badge-ok-bg)] rounded-[5px] py-[2px] px-[7px]'
+              : 'text-[11px] font-medium text-[var(--text-mute)] bg-[rgba(255,255,255,0.05)] rounded-[5px] py-[2px] px-[7px] font-mono'
+          }
+        >
+          {count}
+        </span>
+      )}
+      {action && <div className="ml-auto flex items-center gap-[4px]">{action}</div>}
     </div>
   )
 }

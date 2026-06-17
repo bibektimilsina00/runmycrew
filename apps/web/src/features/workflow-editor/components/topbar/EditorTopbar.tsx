@@ -200,8 +200,8 @@ export function EditorTopbar({
             <Button
               variant="outline"
               size="sm"
-              leftIcon={<Send className="text-[var(--accent)]" />}
-              className="h-8 px-3 border-[var(--border-soft)] text-[var(--text)] bg-[var(--surface)] hover:bg-[var(--surface-2)] hover:border-[var(--border)]"
+              leftIcon={<Send />}
+              className="h-8 px-3 rounded-[8px] border-[var(--border-soft)] text-[var(--text)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.06)] hover:border-[var(--border)]"
             >
               Deploy
             </Button>
@@ -211,7 +211,7 @@ export function EditorTopbar({
               onClick={onRun}
               disabled={isRunning}
               leftIcon={isRunning ? <Loader2 className="animate-spin" /> : <Play className="fill-current" />}
-              className="h-8 px-4 bg-[var(--text)] text-[var(--bg)] border-none hover:opacity-90 active:scale-[0.97]"
+              className="h-8 px-4 rounded-[8px] bg-[var(--accent)] text-white border-none hover:brightness-110 active:scale-[0.97]"
             >
               {isRunning ? 'Running' : 'Run'}
             </Button>

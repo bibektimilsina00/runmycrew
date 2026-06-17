@@ -104,9 +104,9 @@ function SimpleSelect({ options, value, onChange, placeholder, isLoading, disabl
         onClick={() => setOpen(v => !v)}
         disabled={disabled}
         className={cn(
-          'flex h-8 w-full items-center gap-2 rounded-[5px] border border-border-faint bg-bg px-3 text-[12px] text-left',
-          'transition-colors hover:border-border-soft',
-          open && 'border-border bg-surface',
+          'flex h-[34px] w-full items-center gap-2 rounded-[7px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.025)] px-[11px] text-[13px] text-left',
+          'transition-colors hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.04)]',
+          open && 'border-[var(--border)] bg-[var(--surface-2)]',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
       >
@@ -205,9 +205,9 @@ function ComboBox({ options, value, displayValue, onChange, placeholder, isLoadi
         onClick={() => setOpen(v => !v)}
         disabled={disabled}
         className={cn(
-          'flex h-8 w-full items-center gap-2 rounded-[5px] border border-border-faint bg-bg px-3 text-[12px] text-left',
-          'transition-colors hover:border-border-soft',
-          open && 'border-border bg-surface',
+          'flex h-[34px] w-full items-center gap-2 rounded-[7px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.025)] px-[11px] text-[13px] text-left',
+          'transition-colors hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.04)]',
+          open && 'border-[var(--border)] bg-[var(--surface-2)]',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
       >
@@ -330,9 +330,9 @@ function MultiSelect({ options, value, onChange, placeholder, isLoading, disable
         onClick={() => setOpen(v => !v)}
         disabled={disabled}
         className={cn(
-          'flex min-h-8 w-full items-center gap-1.5 rounded-[5px] border border-border-faint bg-bg p-1 pl-2 text-[12px] text-left',
-          'transition-colors hover:border-border-soft',
-          open && 'border-border bg-surface',
+          'flex min-h-[34px] w-full items-center gap-1.5 rounded-[7px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.025)] p-[5px] pl-[9px] text-[13px] text-left',
+          'transition-colors hover:border-[var(--border)]',
+          open && 'border-[var(--border)] bg-[var(--surface-2)]',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
       >
@@ -343,7 +343,7 @@ function MultiSelect({ options, value, onChange, placeholder, isLoading, disable
             selectedOptions.map((opt, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-[5px] bg-surface-2 px-1.5 py-0.5 text-[11px] text-text"
+                className="inline-flex items-center gap-[6px] rounded-[5px] bg-[rgba(255,255,255,0.07)] px-[8px] py-[3px] text-[12px] text-[var(--text)]"
               >
                 {opt.label}
                 <button

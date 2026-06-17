@@ -27,11 +27,11 @@ export function PropertyGroupList({
       {groups.map(group => (
         <section key={group.name} className="flex flex-col gap-3">
           {showHeaders && (
-            <div className="flex items-center gap-2">
-              <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-faint">
+            <div className="flex items-center gap-[10px]">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.07em] text-[var(--text-dim)]">
                 {group.name}
               </span>
-              <div className="h-px flex-1 bg-border-faint" />
+              <div className="h-px flex-1 bg-[var(--border-faint)]" />
             </div>
           )}
           {group.properties.map(prop => (

@@ -11,6 +11,13 @@ interface Props {
   totalActive: number
 }
 
+const STATE_LABEL: Record<DashboardConnection['state'], string> = { ok: 'OK', warn: 'Warn', err: 'Error' }
+const STATE_TONE: Record<DashboardConnection['state'], { bg: string; text: string; dot: string }> = {
+  ok:   { bg: 'var(--badge-ok-bg)',   text: 'var(--ok)',   dot: 'var(--ok)' },
+  warn: { bg: 'var(--badge-warn-bg)', text: 'var(--warn)', dot: 'var(--warn)' },
+  err:  { bg: 'var(--badge-err-bg)',  text: 'var(--err)',  dot: 'var(--err)' },
+}
+
 function providerInitial(type: string): string {
   return type.replace('_oauth', '').replace('_api_key', '').slice(0, 2).toUpperCase()
 }
@@ -21,18 +28,19 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
   const providerMap = Object.fromEntries(providers.map(p => [p.id, p]))
 
   return (
-    <div className="bg-[var(--bg)] border border-[var(--border-faint)] rounded-[12px] overflow-hidden flex flex-col">
+    <div className="border border-[var(--border-soft)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
       <PanelHead
-        icon={<Icons.Plug className="w-3.5 h-3.5" />}
+        icon={<Icons.Plug />}
         title="Connections"
         count={`${totalActive} active`}
+        countTone="ok"
         action={
           <button
-            className="text-[12px] text-[var(--text-mute)] py-[4px] px-[8px] rounded-[6px] transition-colors inline-flex items-center gap-[4px] hover:text-[var(--text)] hover:bg-[var(--surface)]"
+            className="text-[12px] font-medium text-[var(--text-faint)] py-[4px] px-[8px] rounded-[6px] transition-colors inline-flex items-center gap-[4px] hover:text-[var(--text)] hover:bg-[rgba(255,255,255,0.05)]"
             onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
           >
-            <span>Manage</span>
-            <Icons.CaretRight className="w-3 h-3" />
+            Manage
+            <Icons.CaretRight className="w-[13px] h-[13px]" />
           </button>
         }
       />
@@ -48,36 +56,37 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
             const provider = providerMap[c.type]
             const iconUrl  = provider?.icon_url
             const initial  = provider?.name?.slice(0, 2).toUpperCase() ?? providerInitial(c.type)
-
+            const tone     = STATE_TONE[c.state]
             return (
-              <div
+              <button
                 key={c.id}
-                className="flex items-center gap-[12px] py-[10px] px-[16px] border-b border-[var(--border-faint)] last:border-b-0 cursor-pointer hover:bg-[var(--surface)] transition-colors"
                 onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
+                className="w-full flex items-center gap-[11px] py-[11px] px-[15px] border-b border-[var(--border-faint)] last:border-b-0 bg-transparent text-left transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.03)]"
               >
                 {iconUrl ? (
                   <img
                     src={iconUrl}
                     alt={provider?.name ?? c.type}
-                    className="w-[28px] h-[28px] rounded-[7px] object-contain bg-[var(--surface)] p-1 shrink-0"
+                    className="w-[30px] h-[30px] rounded-[8px] object-contain bg-[var(--surface-2)] p-1 shrink-0"
                     onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
                 ) : (
-                  <span className="w-[28px] h-[28px] rounded-[7px] inline-flex items-center justify-center text-[11px] font-semibold shrink-0 bg-[var(--surface-3)] text-[var(--text)]">
+                  <span className="w-[30px] h-[30px] rounded-[8px] inline-flex items-center justify-center text-[13px] font-bold text-white shrink-0 bg-[linear-gradient(135deg,var(--surface-3),var(--surface-2))]">
                     {initial}
                   </span>
                 )}
-                <span className="flex flex-col gap-[2px] min-w-0 flex-1">
-                  <span className="text-[12.5px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">{c.name}</span>
-                  <span className="text-[11px] text-[var(--text-faint)] font-mono">{provider?.name ?? c.type}</span>
+                <span className="flex flex-col gap-[2px] min-w-0 flex-1 leading-[1.3]">
+                  <span className="text-[13px] font-medium text-[var(--text)] truncate">{c.name}</span>
+                  <span className="text-[11px] text-[var(--text-faint)] truncate">{provider?.name ?? c.type}</span>
                 </span>
-                <span className={cn(
-                  "font-mono text-[10px] tracking-widest uppercase py-[3px] px-[7px] pb-[2px] rounded-[4px] font-medium",
-                  c.state === 'ok'   && 'bg-emerald-500/15 text-emerald-500',
-                  c.state === 'warn' && 'bg-amber-500/15 text-amber-500',
-                  c.state === 'err'  && 'bg-red-500/15 text-red-500',
-                )}>{c.state}</span>
-              </div>
+                <span
+                  className={cn('inline-flex items-center gap-[5px] text-[11px] font-semibold rounded-[6px] py-[3px] px-[8px]')}
+                  style={{ background: tone.bg, color: tone.text }}
+                >
+                  <span className="w-[5px] h-[5px] rounded-full" style={{ background: tone.dot }} />
+                  {STATE_LABEL[c.state]}
+                </span>
+              </button>
             )
           })}
         </div>
