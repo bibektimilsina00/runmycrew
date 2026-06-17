@@ -241,7 +241,7 @@ export function CopilotPanel() {
                   <div key={i} className="group flex items-start gap-[10px] max-w-full">
                     <AssistantAvatar />
                     <div className="flex min-w-0 flex-1 flex-col pt-[3px]">
-                      <div className="copilot-chat text-[13.5px] leading-[1.6] text-[var(--text)]">
+                      <div className="copilot-chat text-[13px] leading-[1.55] text-[var(--text-body)]">
                         {m.toolCalls && m.toolCalls.length > 0 && (
                           <CopilotToolChips calls={m.toolCalls} />
                         )}
