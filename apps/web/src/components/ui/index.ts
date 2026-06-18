@@ -1,9 +1,11 @@
 // shadcn/ui primitives — Fuse-styled
-export { Button, buttonVariants, type ButtonProps } from './button'
+export { Button, type ButtonProps } from './button'
+export { buttonVariants } from './button.variants'
 export { Input, type InputProps } from './input'
 export { Textarea, type TextareaProps } from './textarea'
 export { Label } from './label'
-export { Badge, badgeVariants, type BadgeProps } from './badge'
+export { Badge, type BadgeProps } from './badge'
+export { badgeVariants } from './badge.variants'
 export { Checkbox } from './checkbox'
 export { Switch } from './switch'
 export { Separator } from './separator'
