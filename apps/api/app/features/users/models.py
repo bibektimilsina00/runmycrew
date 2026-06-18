@@ -18,7 +18,15 @@ if TYPE_CHECKING:
 class User(SQLModelBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     email: str = Field(unique=True, index=True)
-    hashed_password: str = Field()
+    # Null for OAuth-only accounts (Google sign-in) — they never set
+    # a Fuse password, so we let the column be empty rather than store
+    # an unguessable filler that would always fail password verify.
+    hashed_password: str | None = Field(default=None, nullable=True)
+    # Identity origin. "password" = registered with email+password,
+    # "google"   = first signed in with Google OAuth.
+    # Used by authenticate() to bail out fast on OAuth-only accounts
+    # and by the UI to show "Continue with Google" vs the password form.
+    auth_provider: str = Field(default="password", max_length=32)
     full_name: str | None = Field(default=None, max_length=200)
     avatar_url: str | None = Field(default=None, max_length=500)
     is_active: bool = Field(default=True)
