@@ -1,6 +1,7 @@
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, HelpCircle } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { NodeProperty } from '../../../types/editorTypes'
+import { Tooltip } from '@/shared/components'
 
 interface FieldWrapperProps {
   prop: NodeProperty
@@ -30,6 +31,11 @@ export function FieldWrapper({
               title="Required"
             />
           )}
+          {prop.description && (
+            <Tooltip content={<span className="max-w-[220px] block text-[11px] leading-normal">{prop.description}</span>} delayDuration={150}>
+              <HelpCircle className="h-[12.5px] w-[12.5px] text-[var(--text-faint)] hover:text-[var(--text-mute)] cursor-help transition-colors" />
+            </Tooltip>
+          )}
         </label>
         {canReset && onReset && (
           <button
@@ -44,10 +50,6 @@ export function FieldWrapper({
       </div>
 
       {children}
-
-      {prop.description && (
-        <p className="text-[11.5px] leading-relaxed text-[var(--text-faint)]">{prop.description}</p>
-      )}
     </div>
   )
 }

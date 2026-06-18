@@ -138,8 +138,8 @@ export function GmailQueryRenderer({ prop, value, onChange, disabled }: Renderer
   // autocomplete + `{{ }}` interpolation when they need full control.
   if (mode === 'raw') {
     return (
-      <div className="space-y-2">
-        <div className="flex justify-end">
+      <div className="relative">
+        <div className="absolute -top-[20px] right-0 z-10 flex items-center">
           <ModeToggle mode={mode} setMode={setMode} disabled={disabled} />
         </div>
         <ExpressionEditor
@@ -153,15 +153,15 @@ export function GmailQueryRenderer({ prop, value, onChange, disabled }: Renderer
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex justify-end">
+    <div className="relative">
+      <div className="absolute -top-[20px] right-0 z-10 flex items-center">
         <ModeToggle mode={mode} setMode={setMode} disabled={disabled} />
       </div>
       <div className={cn(
         'flex flex-wrap items-center gap-1.5',
         'min-h-[38px] px-3 py-1.5 rounded-[8px]',
-        'bg-bg2 border border-border-soft transition-colors duration-[120ms]',
-        'hover:border-border hover:bg-surface focus-within:border-accent focus-within:bg-surface-2',
+        'bg-surface border border-solid border-border-soft transition-colors duration-[120ms]',
+        'hover:border-border hover:bg-surface-2 focus-within:border-accent focus-within:bg-surface-2',
       )}>
         {parsed.chips.map((chip, i) => (
           <ChipEditor
@@ -181,9 +181,6 @@ export function GmailQueryRenderer({ prop, value, onChange, disabled }: Renderer
         />
         <AddFilterButton disabled={disabled} onPick={addChip} />
       </div>
-      {prop.description && (
-        <p className="text-[11px] text-text-muted">{prop.description}</p>
-      )}
     </div>
   )
 }
