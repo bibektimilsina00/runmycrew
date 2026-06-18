@@ -27,7 +27,9 @@ fuse.bibektimilsina.tech {
 	# Container-local health probe so the compose healthcheck never
 	# depends on the marketing site being up.
 	@healthz path /healthz
-	handle @healthz { respond "ok" 200 }
+	handle @healthz {
+		respond "ok" 200
+	}
 
 	# Everything else → Next.js standalone server.
 	reverse_proxy site:3100 {
@@ -58,7 +60,9 @@ app.fuse.bibektimilsina.tech {
 	}
 
 	@healthz path /healthz
-	handle @healthz { respond "ok" 200 }
+	handle @healthz {
+		respond "ok" 200
+	}
 
 	# ── Backend routes (terminal) ───────────────────────────────────
 	@api path /api/* /ws/* /openapi.json /docs /docs/* /redoc /redoc/* /health
