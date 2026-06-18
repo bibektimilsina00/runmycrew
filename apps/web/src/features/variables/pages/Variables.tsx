@@ -151,7 +151,7 @@ export function Variables() {
               Cancel
             </button>
             <button type="submit" disabled={createVar.isPending}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-50">
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors disabled:opacity-50">
               <Icons.Plus style={{ width: 13, height: 13 }} />
               {createVar.isPending ? 'Creating…' : 'Create variable'}
             </button>

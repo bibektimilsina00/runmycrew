@@ -150,7 +150,7 @@ export function ProfileCard({ profile, onSave, isSaving = false }: Props) {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer transition-colors hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer transition-colors hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
           >
             <Icons.Check className="w-[13px] h-[13px]" />
             {isSaving ? 'Saving…' : 'Save changes'}

@@ -107,7 +107,7 @@ function FeedbackModal({ open, text, sent, onTextChange, onSend, onClose }: Feed
             </div>
             <h3 className="text-[15px] font-semibold text-[var(--text)]">Thanks for your feedback!</h3>
             <p className="text-[13px] text-[var(--text-faint)]">We read every submission and use it to improve fuse.</p>
-            <button onClick={onClose} className="mt-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors">
+            <button onClick={onClose} className="mt-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors">
               Close
             </button>
           </div>
@@ -132,7 +132,7 @@ function FeedbackModal({ open, text, sent, onTextChange, onSend, onClose }: Feed
               <button
                 onClick={onSend}
                 disabled={!text.trim()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-default"
               >
                 <Icons.Feedback className="w-[13px] h-[13px]" />
                 Send feedback

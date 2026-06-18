@@ -133,7 +133,7 @@ export function WorkspaceSelector() {
                   <button
                     type="submit"
                     disabled={!newName.trim() || createWorkspace.isPending}
-                    className="h-[30px] px-2.5 rounded-[7px] bg-[var(--text)] text-[var(--bg)] text-[12px] font-medium border-none cursor-pointer disabled:opacity-40"
+                    className="h-[30px] px-2.5 rounded-[7px] bg-[var(--accent)] text-white text-[12px] font-medium border-none cursor-pointer hover:brightness-110 disabled:opacity-40"
                   >
                     {createWorkspace.isPending ? '…' : 'Create'}
                   </button>

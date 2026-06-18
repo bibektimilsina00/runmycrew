@@ -45,7 +45,7 @@ export function InviteAccept() {
             This invite link is no longer valid. Ask the workspace admin to send a new one.
           </p>
           <button
-            className="w-full p-[11px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] text-[14px] font-medium border-none cursor-pointer transition-colors duration-120 hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+            className="w-full p-[11px] rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold border-none cursor-pointer transition-colors duration-120 hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
             onClick={() => navigate(APP_ROUTES.DASHBOARD)}
           >
             Go to dashboard
@@ -89,7 +89,7 @@ export function InviteAccept() {
               Already accepted
             </div>
             <button
-              className="w-full p-[11px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] text-[14px] font-medium border-none cursor-pointer transition-colors duration-120 hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+              className="w-full p-[11px] rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold border-none cursor-pointer transition-colors duration-120 hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
               onClick={() => navigate(APP_ROUTES.DASHBOARD)}
             >
               Go to workspace
@@ -103,7 +103,7 @@ export function InviteAccept() {
               </p>
             )}
             <button
-              className="w-full p-[11px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] text-[14px] font-medium border-none cursor-pointer transition-colors duration-120 hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+              className="w-full p-[11px] rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold border-none cursor-pointer transition-colors duration-120 hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
               onClick={handleAccept}
               disabled={accept.isPending}
             >

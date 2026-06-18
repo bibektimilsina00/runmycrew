@@ -136,7 +136,7 @@ export function Settings() {
             <div className="flex justify-end pt-1 border-t border-[var(--border-faint)]">
               <button
                 onClick={() => setNewlyCreatedKey(null)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors"
               >
                 I've saved this key
               </button>

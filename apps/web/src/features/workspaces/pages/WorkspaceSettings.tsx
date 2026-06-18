@@ -293,7 +293,7 @@ export function WorkspaceSettings() {
                 <button
                   onClick={handleRename}
                   disabled={updateWorkspace.isPending || renameName.trim() === currentWorkspace?.name}
-                  className="inline-flex items-center gap-2 px-4 h-[38px] rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer shrink-0 hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+                  className="inline-flex items-center gap-2 px-4 h-[38px] rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer shrink-0 hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-default"
                 >
                   {updateWorkspace.isPending ? 'Saving…' : 'Save'}
                 </button>
