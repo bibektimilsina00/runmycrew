@@ -14,24 +14,6 @@ import { DashboardMockup } from './DashboardMockup'
 export function Hero() {
   return (
     <section className="relative pt-[170px] sm:pt-[240px]">
-      {/* Ambient grid + accent wash behind the headline */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[820px] overflow-hidden"
-      >
-        <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_70%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
-            maskImage: 'radial-gradient(ellipse_at_top, black 35%, transparent 75%)',
-            WebkitMaskImage: 'radial-gradient(ellipse_at_top, black 35%, transparent 75%)',
-          }}
-        />
-      </div>
-
       <Container className="max-w-[1280px] px-7">
         <Reveal y={24}>
           <h1 className="m-0 max-w-[1024px] text-[clamp(38px,5vw,64px)] font-[590] leading-[1.06] tracking-[-0.022em] text-foreground text-balance">

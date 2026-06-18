@@ -11,11 +11,6 @@ import { EXTERNAL_LINKS } from '@/shared/constants/routes'
 export function FinalCTA() {
   return (
     <section className="relative px-7 pb-[140px] pt-[160px] text-center">
-      {/* Accent halo behind the closing headline */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[40px] -z-10 h-[480px] bg-[radial-gradient(ellipse_50%_60%_at_50%_50%,color-mix(in_oklab,var(--primary)_18%,transparent),transparent_70%)]"
-      />
       <Container className="max-w-[1280px] px-0">
         <Reveal y={28}>
           <h2 className="m-0 text-[clamp(36px,4.2vw,56px)] font-[590] leading-[1.1] tracking-[-0.022em] text-foreground text-balance">

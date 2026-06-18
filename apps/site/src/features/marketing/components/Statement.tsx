@@ -23,12 +23,6 @@ export function Statement() {
         </Reveal>
 
         <div className="relative mt-16 border-t border-border/80 pt-[26px]">
-          {/* Faint accent wash behind the strip */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-[-1px] -z-10 h-[230px] bg-[radial-gradient(ellipse_at_top,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_70%)]"
-          />
-
           <div className="grid grid-cols-1 gap-[18px] md:grid-cols-3">
             {STATEMENT_FIGS.map((f, i) => {
               const Glyph = GLYPHS[i] ?? TriggerGlyph
