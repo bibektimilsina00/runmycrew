@@ -13,29 +13,13 @@ import { DashboardMockup } from './DashboardMockup'
  */
 export function Hero() {
   return (
-    <section className="relative pt-[170px] sm:pt-[240px]">
-      {/* Ambient grid + accent wash behind the headline */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[820px] overflow-hidden"
-      >
-        <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_70%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
-            maskImage: 'radial-gradient(ellipse_at_top, black 35%, transparent 75%)',
-            WebkitMaskImage: 'radial-gradient(ellipse_at_top, black 35%, transparent 75%)',
-          }}
-        />
-      </div>
-
-      <Container className="max-w-[1280px] px-7">
+    <section className="relative pt-[120px] sm:pt-[170px]">
+      <Container className="max-w-[1330px] px-7">
         <Reveal y={24}>
-          <h1 className="m-0 max-w-[1024px] text-[clamp(38px,5vw,64px)] font-[590] leading-[1.06] tracking-[-0.022em] text-foreground text-balance">
-            {HERO.title}
+          <h1 className="m-0 max-w-[1024px] text-[clamp(34px,4.4vw,56px)] font-[560] leading-[1.08] tracking-[-0.022em] text-foreground">
+            The automation
+            <br />
+            system for teams and agents
           </h1>
         </Reveal>
         <Reveal delay={0.1}>
@@ -59,16 +43,16 @@ export function Hero() {
         </Reveal>
 
         <Reveal delay={0.15}>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-2.5">
             <Link
               href={EXTERNAL_LINKS.REGISTER}
-              className="inline-flex items-center rounded-md bg-foreground px-[18px] py-[10px] text-[14px] font-medium text-background transition-[filter] hover:brightness-110"
+              className="inline-flex h-[34px] items-center gap-[7px] rounded-[8px] bg-primary px-[16px] text-[13px] font-semibold text-primary-foreground transition-[filter] hover:brightness-110"
             >
               Get started
             </Link>
             <Link
               href="#contact"
-              className="inline-flex items-center rounded-md border border-border bg-white/[0.02] px-[18px] py-[10px] text-[14px] font-medium text-foreground/90 transition-colors hover:bg-white/[0.06]"
+              className="inline-flex h-[34px] items-center gap-[7px] rounded-[8px] border border-border bg-white/[0.02] px-[16px] text-[13px] font-medium text-foreground/90 transition-colors hover:bg-white/[0.06]"
             >
               Get demo
             </Link>

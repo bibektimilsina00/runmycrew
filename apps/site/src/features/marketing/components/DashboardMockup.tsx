@@ -37,12 +37,6 @@ export function DashboardMockup() {
 
   return (
     <div className="relative mt-12 sm:mt-16">
-      {/* Soft accent glow behind the card */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-160px] h-[420px] w-[1080px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--primary)_18%,transparent),transparent_68%)] blur-2xl"
-      />
-
       <div className="relative flex h-[620px] overflow-hidden rounded-[14px] border border-white/10 bg-[#0c0d0f] shadow-[0_60px_160px_-40px_rgba(0,0,0,0.92),0_0_0_1px_rgba(255,255,255,0.02)]">
         <Sidebar />
 

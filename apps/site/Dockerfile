@@ -24,11 +24,10 @@ RUN corepack enable && corepack prepare pnpm@11.4.0 --activate
 # Copy ONLY what's needed to resolve the workspace graph so the Docker
 # layer cache survives source-code changes.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Node workspace members only — `apps/api` and `apps/worker` are Python
+# (no package.json) so pnpm-workspace ignores them at resolve time.
 COPY apps/site/package.json apps/site/package.json
-# Other apps' package.json so pnpm-workspace resolves cleanly.
-COPY apps/api/package.json apps/api/package.json 2>/dev/null || true
-COPY apps/worker/package.json apps/worker/package.json 2>/dev/null || true
-COPY apps/web/package.json apps/web/package.json
+COPY apps/web/package.json  apps/web/package.json
 
 RUN pnpm install --frozen-lockfile --filter fuse-site...
 
