@@ -25,7 +25,7 @@ export function InviteAccept() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] p-6">
-        <div className="w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[20px] pt-[36px] px-[32px] pb-[32px] flex flex-col items-center gap-[14px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.5)] text-center">
+        <div className="w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[12px] pt-[36px] px-[32px] pb-[32px] flex flex-col items-center gap-[14px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.5)] text-center">
           <div className="w-[28px] h-[28px] border-2 border-[var(--border)] border-t-[var(--text)] rounded-full animate-spin" />
           <p className="text-[13px] text-[var(--text-faint)] m-0">Loading invite…</p>
         </div>
@@ -36,7 +36,7 @@ export function InviteAccept() {
   if (isError || !preview) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] p-6">
-        <div className="w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[20px] pt-[36px] px-[32px] pb-[32px] flex flex-col items-center gap-[14px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.5)] text-center">
+        <div className="w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[12px] pt-[36px] px-[32px] pb-[32px] flex flex-col items-center gap-[14px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.5)] text-center">
           <div className="w-[48px] h-[48px] rounded-[12px] bg-[oklch(0.70_0.18_22/0.12)] flex items-center justify-center text-[var(--err)]">
             <Icons.Activity style={{ width: 24, height: 24 }} />
           </div>
@@ -45,7 +45,7 @@ export function InviteAccept() {
             This invite link is no longer valid. Ask the workspace admin to send a new one.
           </p>
           <button
-            className="w-full p-[11px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] text-[14px] font-medium border-none cursor-pointer transition-colors duration-120 hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+            className="w-full p-[11px] rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold border-none cursor-pointer transition-colors duration-120 hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
             onClick={() => navigate(APP_ROUTES.DASHBOARD)}
           >
             Go to dashboard
@@ -59,8 +59,8 @@ export function InviteAccept() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] p-6">
-      <div className="w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[20px] pt-[36px] px-[32px] pb-[32px] flex flex-col items-center gap-[14px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.5)] text-center">
-        <div className="w-[56px] h-[56px] rounded-[14px] bg-[var(--text)] text-[var(--bg)] flex items-center justify-center text-[22px] font-bold tracking-tight">
+      <div className="w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[12px] pt-[36px] px-[32px] pb-[32px] flex flex-col items-center gap-[14px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.5)] text-center">
+        <div className="w-[56px] h-[56px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] flex items-center justify-center text-[22px] font-bold tracking-tight">
           {preview.workspace_name[0]?.toUpperCase()}
         </div>
         <h2 className="text-[20px] font-medium tracking-tight text-[var(--text)] m-0">
@@ -89,7 +89,7 @@ export function InviteAccept() {
               Already accepted
             </div>
             <button
-              className="w-full p-[11px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] text-[14px] font-medium border-none cursor-pointer transition-colors duration-120 hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+              className="w-full p-[11px] rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold border-none cursor-pointer transition-colors duration-120 hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
               onClick={() => navigate(APP_ROUTES.DASHBOARD)}
             >
               Go to workspace
@@ -103,7 +103,7 @@ export function InviteAccept() {
               </p>
             )}
             <button
-              className="w-full p-[11px] rounded-[10px] bg-[var(--text)] text-[var(--bg)] text-[14px] font-medium border-none cursor-pointer transition-colors duration-120 hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+              className="w-full p-[11px] rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold border-none cursor-pointer transition-colors duration-120 hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
               onClick={handleAccept}
               disabled={accept.isPending}
             >

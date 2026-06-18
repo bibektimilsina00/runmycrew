@@ -1,4 +1,4 @@
-import { AlertOctagon, Sparkles, SlidersHorizontal, Copy } from 'lucide-react'
+import { AlertOctagon, Bot, SlidersHorizontal, Copy } from 'lucide-react'
 import type { RunLog } from '@/features/runs/store/runsStore'
 import { useWorkflowEditorStore } from '../../../../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../../../../stores/editorLayoutStore'
@@ -94,7 +94,7 @@ export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
             disabled={!log.nodeId}
             className="inline-flex items-center gap-1.5 rounded-[7px] bg-[var(--text)] px-2.5 py-1.5 text-[11.5px] font-medium text-[var(--bg)] transition-colors hover:opacity-90 disabled:opacity-40"
           >
-            <Sparkles className="h-3.5 w-3.5" /> Fix with Copilot
+            <Bot className="h-3.5 w-3.5" /> Fix with Copilot
           </button>
           <button
             onClick={inspectNode}

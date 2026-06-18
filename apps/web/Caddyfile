@@ -7,13 +7,14 @@
 	# before expiry. No certbot required.
 }
 
-# ── Production domain ──────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────
+# Marketing site — fuse.bibektimilsina.tech
+# Reverse-proxies to the Next.js standalone server in the `site`
+# container. The product app lives on the `app.` subdomain.
+# ─────────────────────────────────────────────────────────────────────
 fuse.bibektimilsina.tech {
-	# Compress everything Caddy serves and proxies.
 	encode zstd gzip
 
-	# Common response headers — global so api proxy responses get
-	# them too.
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
@@ -23,24 +24,47 @@ fuse.bibektimilsina.tech {
 		-Server
 	}
 
-	# ── Container-local healthcheck ─────────────────────────────────
-	# Does NOT touch the API — the web container reports healthy
-	# independently of upstream state.
+	# Container-local health probe so the compose healthcheck never
+	# depends on the marketing site being up.
 	@healthz path /healthz
-	handle @healthz {
-		respond "ok" 200
+	handle @healthz { respond "ok" 200 }
+
+	# Everything else → Next.js standalone server.
+	reverse_proxy site:3100 {
+		header_up X-Real-IP {remote_host}
+		transport http {
+			dial_timeout 10s
+			response_header_timeout 30s
+		}
+	}
+}
+
+# ─────────────────────────────────────────────────────────────────────
+# Product app — app.fuse.bibektimilsina.tech
+# Caddy serves the static React build + reverse-proxies `/api/*`,
+# `/ws/*`, `/health`, etc. to the FastAPI container. This block is
+# what used to live on the apex.
+# ─────────────────────────────────────────────────────────────────────
+app.fuse.bibektimilsina.tech {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		-Server
 	}
 
+	@healthz path /healthz
+	handle @healthz { respond "ok" 200 }
+
 	# ── Backend routes (terminal) ───────────────────────────────────
-	# `/health` is the FastAPI root-level liveness probe — also rolled
-	# in so the smoke test can hit it via this hostname.
 	@api path /api/* /ws/* /openapi.json /docs /docs/* /redoc /redoc/* /health
 	handle @api {
 		reverse_proxy api:8000 {
-			# Caddy auto-passes X-Forwarded-{For,Proto,Host} — only set
-			# headers it doesn't fill itself.
 			header_up X-Real-IP {remote_host}
-			# Long timeout for SSE / streaming workflow logs.
 			transport http {
 				read_buffer 64KB
 				write_buffer 64KB
@@ -51,27 +75,19 @@ fuse.bibektimilsina.tech {
 	}
 
 	# ── Static frontend (everything else, terminal) ─────────────────
-	# Wrapped in `handle` so `try_files` doesn't rewrite api paths
-	# back to /index.html before the @api matcher fires.
 	handle {
 		root * /srv
 
-		# Long-cache for content-hashed Vite assets — safe to cache
-		# forever; the hash changes on rebuild.
 		@assets path /assets/*
 		header @assets Cache-Control "public, max-age=31536000, immutable"
 
-		# Never cache index.html so users see the latest build the
-		# moment we ship.
 		@index path / /index.html
 		header @index Cache-Control "no-cache, no-store, must-revalidate"
 
-		# SPA fallback — any path that isn't a real file serves
-		# index.html so React Router owns the URL space.
 		try_files {path} /index.html
 		file_server
 	}
 }
 
-# Caddy automatically issues a 308 redirect from :80 to :443 for the
-# managed site above, so no explicit `http://` block is needed.
+# Caddy auto-issues 308 redirects from :80 to :443 for both managed
+# sites above — no explicit `http://` blocks needed.

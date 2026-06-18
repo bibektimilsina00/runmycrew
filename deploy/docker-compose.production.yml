@@ -28,6 +28,10 @@ services:
   # Single image: Caddy + the React dist baked in. No volume hand-off
   # between a builder container and Caddy — release atomicity is just
   # "pull web image, restart container".
+  #
+  # Caddy fronts BOTH hostnames from this one container:
+  #   - fuse.bibektimilsina.tech       → marketing site (`site:3100`)
+  #   - app.fuse.bibektimilsina.tech   → React product (static + api)
   web:
     image: ghcr.io/${GITHUB_OWNER}/fuse-web:${FUSE_IMAGE_TAG:-latest}
     restart: unless-stopped
@@ -42,6 +46,8 @@ services:
     depends_on:
       api:
         condition: service_healthy
+      site:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost/healthz || exit 1"]
       interval: 30s
@@ -49,6 +55,26 @@ services:
       retries: 3
       start_period: 10s
     mem_limit: 128m
+    logging: *default-logging
+
+  # ── Marketing site (Next.js standalone) ──────────────────────────
+  # Pure HTML/CSS/JS app — no DB, no Redis, no env vars beyond port.
+  # Reverse-proxied by `web` on the apex hostname.
+  site:
+    image: ghcr.io/${GITHUB_OWNER}/fuse-site:${FUSE_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3100"
+      HOSTNAME: 0.0.0.0
+      TZ: UTC
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    mem_limit: 192m
     logging: *default-logging
 
   # ── FastAPI ──────────────────────────────────────────────────────
@@ -60,8 +86,8 @@ services:
       POSTGRES_SERVER: db
       REDIS_HOST: redis
       ENVIRONMENT: production
-      BASE_URL: ${BASE_URL:-https://fuse.bibektimilsina.tech}
-      FRONTEND_URL: ${FRONTEND_URL:-https://fuse.bibektimilsina.tech}
+      BASE_URL: ${BASE_URL:-https://app.fuse.bibektimilsina.tech}
+      FRONTEND_URL: ${FRONTEND_URL:-https://app.fuse.bibektimilsina.tech}
       TZ: UTC
     depends_on:
       db:

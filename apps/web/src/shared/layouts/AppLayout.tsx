@@ -19,7 +19,7 @@ export function AppLayout() {
     >
       <AppSidebar controller={controller} variant="floating" />
 
-      <div className="relative flex h-[calc(100vh-28px)] my-[14px] mr-[14px] ml-0 min-h-0 flex-col overflow-hidden bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[16px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]">
+      <div className="relative flex h-[calc(100vh-28px)] my-[14px] mr-[14px] ml-0 min-h-0 flex-col overflow-hidden bg-[var(--bg-2)] border border-[var(--border-faint)] rounded-[10px] shadow-[inset_0_1px_0_oklch(0.30_0.004_250/0.4),0_24px_48px_-28px_oklch(0_0_0/0.6)]">
         <AppTopBar controller={controller} />
         <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-[var(--bg)]" style={{ height: '100%' }}>
           <Outlet />

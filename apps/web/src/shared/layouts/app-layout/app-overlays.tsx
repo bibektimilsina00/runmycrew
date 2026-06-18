@@ -58,7 +58,7 @@ function KeyboardShortcutsModal({ open, onClose }: { open: boolean; onClose: () 
   return createPortal(
     <>
       <div className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[520px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[16px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)] overflow-hidden">
+      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[520px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)] overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-faint)]">
           <h3 className="text-[15px] font-semibold text-[var(--text)] tracking-tight">Keyboard shortcuts</h3>
           <button onClick={onClose} className="w-[28px] h-[28px] rounded-[7px] flex items-center justify-center text-[var(--text-faint)] hover:bg-[var(--surface)] hover:text-[var(--text)] transition-colors text-[13px]">✕</button>
@@ -99,7 +99,7 @@ function FeedbackModal({ open, text, sent, onTextChange, onSend, onClose }: Feed
   return createPortal(
     <>
       <div className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[16px] p-6 flex flex-col gap-5 shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]">
+      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[420px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] p-6 flex flex-col gap-5 shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]">
         {sent ? (
           <div className="flex flex-col items-center gap-3 py-4 text-center">
             <div className="w-[44px] h-[44px] rounded-full bg-[oklch(0.78_0.14_145/0.14)] flex items-center justify-center">
@@ -107,7 +107,7 @@ function FeedbackModal({ open, text, sent, onTextChange, onSend, onClose }: Feed
             </div>
             <h3 className="text-[15px] font-semibold text-[var(--text)]">Thanks for your feedback!</h3>
             <p className="text-[13px] text-[var(--text-faint)]">We read every submission and use it to improve fuse.</p>
-            <button onClick={onClose} className="mt-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors">
+            <button onClick={onClose} className="mt-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors">
               Close
             </button>
           </div>
@@ -132,7 +132,7 @@ function FeedbackModal({ open, text, sent, onTextChange, onSend, onClose }: Feed
               <button
                 onClick={onSend}
                 disabled={!text.trim()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-default"
               >
                 <Icons.Feedback className="w-[13px] h-[13px]" />
                 Send feedback

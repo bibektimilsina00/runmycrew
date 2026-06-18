@@ -47,7 +47,7 @@ export function ApiKeysCard({ apiKeys, isGenerating, onCreateKey, onRevokeKey }:
           <button
             onClick={handleCreate}
             disabled={isGenerating || !newKeyName.trim()}
-            className="inline-flex items-center gap-2 px-4 h-[38px] rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer shrink-0 transition-colors hover:bg-[oklch(0.90_0.003_250)] disabled:opacity-50 disabled:cursor-default"
+            className="inline-flex items-center gap-2 px-4 h-[38px] rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer shrink-0 transition-colors hover:brightness-110 disabled:opacity-50 disabled:cursor-default"
           >
             <Icons.Plus className="w-[13px] h-[13px]" />
             {isGenerating ? 'Generating…' : 'Generate'}

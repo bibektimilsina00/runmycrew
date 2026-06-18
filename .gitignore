@@ -93,3 +93,5 @@ temp/
 *_doc/
 # ── Uploaded user assets (per-workspace media) ───────────────────────────────
 apps/api/uploads/
+sample.zip
+sample-handoff.zip

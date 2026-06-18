@@ -1,5 +1,5 @@
 import {
-  Sparkles, Workflow, Bell, Calendar, Repeat,
+  Bot, Workflow, Bell, Calendar, Repeat,
   Lightbulb, ShieldAlert, Search as SearchIcon, BookOpen,
 } from 'lucide-react'
 import { useWorkflowEditorStore } from '../../../../stores/workflowEditorStore'
@@ -85,8 +85,8 @@ export function CopilotEmptyState({ onSend, disabled }: Props) {
 
   return (
     <div className="flex h-full flex-col items-center justify-center px-4 py-6">
-      <div className="mb-4 flex h-[40px] w-[40px] items-center justify-center rounded-[10px] bg-[var(--accent-soft)] text-[var(--accent)]">
-        <Sparkles className="h-[20px] w-[20px]" strokeWidth={1.7} />
+      <div className="mb-4 flex h-[40px] w-[40px] items-center justify-center rounded-[10px] bg-[var(--accent)] text-white">
+        <Bot className="h-[20px] w-[20px]" strokeWidth={1.8} />
       </div>
       <h2 className="text-[14px] font-semibold text-[var(--text)]">
         {hasNodes ? `What's next for ${workflowName ?? 'this workflow'}?` : 'Build something with Copilot'}
@@ -106,7 +106,7 @@ export function CopilotEmptyState({ onSend, disabled }: Props) {
             className="group flex flex-col items-start gap-[6px] rounded-[10px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.02)] p-[12px] text-left transition-colors hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.05)] disabled:cursor-default disabled:opacity-40"
           >
             <div className="flex items-center gap-[8px]">
-              <span className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] bg-[var(--accent-soft)] text-[var(--accent)]">
+              <span className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] bg-[var(--accent)] text-white">
                 <s.Icon className="h-[13px] w-[13px]" />
               </span>
               <span className="text-[12.5px] font-semibold text-[var(--text)]">{s.title}</span>

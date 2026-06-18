@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  ArrowUp, Zap, Check, X, Plus, History, Sparkles,
+  ArrowUp, Zap, Check, X, Plus, History, Bot,
   Copy, RotateCcw, Square, ArrowDown,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
@@ -67,8 +67,8 @@ function StreamingCursor() {
 /** Linear-style assistant avatar — 26px accent-soft tile + sparkle. */
 function AssistantAvatar() {
   return (
-    <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[var(--accent-soft)] text-[var(--accent)]">
-      <Sparkles className="h-[15px] w-[15px]" strokeWidth={1.7} />
+    <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[var(--accent)] text-white">
+      <Bot className="h-[15px] w-[15px]" strokeWidth={1.8} />
     </span>
   )
 }

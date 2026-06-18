@@ -260,7 +260,7 @@ export function KBSettingsPanel({ kb, onClose, onSaved }: Props) {
           <button
             onClick={handleSave}
             disabled={saving || !effectiveModel || (!isDefault && !credId)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-default"
           >
             {saving ? 'Saving…' : 'Save settings'}
           </button>

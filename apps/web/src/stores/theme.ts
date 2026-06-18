@@ -29,7 +29,9 @@ function getStoredScheme(): ColorScheme {
   } catch {
     // Ignore
   }
-  return 'linear'
+  // Slate is the default scheme — slightly lifted backgrounds vs the
+  // near-black Linear preset; reads cleaner on most monitors.
+  return 'slate'
 }
 
 function applyTheme(theme: Theme) {

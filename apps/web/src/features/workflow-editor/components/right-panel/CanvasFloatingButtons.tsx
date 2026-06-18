@@ -24,10 +24,10 @@ export function CanvasFloatingButtons({
 
   const btnBase = cn(
     'w-[34px] h-[34px] rounded-[6px]',
-    'bg-[rgba(18,20,23,0.85)] backdrop-blur-md border border-[var(--border-soft)]',
+    'bg-[var(--bg-2)] backdrop-blur-md border border-[var(--border-soft)]',
     'flex items-center justify-center',
-    'text-[var(--text-mute)] hover:bg-[rgba(35,38,43,0.95)] hover:text-[var(--text)] hover:border-[var(--border)]',
-    'transition-all duration-150 cursor-pointer shadow-[0_4px_14px_rgba(0,0,0,0.35)]',
+    'text-[var(--text-mute)] hover:bg-[var(--surface)] hover:text-[var(--text)] hover:border-[var(--border)]',
+    'transition-all duration-150 cursor-pointer shadow-[var(--shadow-float)]',
   )
 
   return (

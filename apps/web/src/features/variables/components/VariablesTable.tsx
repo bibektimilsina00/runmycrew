@@ -142,7 +142,7 @@ export function VariablesTable({ items, totalCount = 0 }: Props) {
                     <button
                       onClick={() => saveEdit(v)}
                       disabled={update.isPending}
-                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-[5px] text-[11.5px] font-medium bg-[var(--text)] text-[var(--bg)] hover:opacity-80 transition-opacity"
+                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-[5px] text-[11.5px] font-medium bg-[var(--accent)] text-white hover:brightness-110 transition-opacity"
                     >
                       {update.isPending ? '…' : 'Save'}
                     </button>

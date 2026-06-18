@@ -55,7 +55,7 @@ export function ConnectorModal({ kbId, onClose, onConnected }: Props) {
   return createPortal(
     <>
       <div className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[540px] max-h-[80vh] bg-[var(--bg-2)] border border-[var(--border)] rounded-[16px] flex flex-col shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]">
+      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[540px] max-h-[80vh] bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] flex flex-col shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]">
 
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-faint)] shrink-0">
           <div>
@@ -111,7 +111,7 @@ export function ConnectorModal({ kbId, onClose, onConnected }: Props) {
           <button
             onClick={handleConnect}
             disabled={!selected || connecting || (selected === 'website' && !urlInput.trim())}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--text)] text-[var(--bg)] text-[13px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-[var(--accent)] text-white text-[13px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-default"
           >
             <Icons.Plug style={{ width: 13, height: 13 }} />
             {connecting ? 'Connecting…' : 'Connect'}

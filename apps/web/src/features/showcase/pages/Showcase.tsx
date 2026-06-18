@@ -13,7 +13,7 @@ import {
   useToast,
   type SelectOption,
 } from '@/shared/components'
-import { LoginForm, RegisterForm } from '@/features/auth'
+import { AuthForm } from '@/features/auth/components/AuthForm'
 
 function CardHeader({ title, description }: { title: string; description?: string }) {
   return (
@@ -58,9 +58,9 @@ export function Showcase() {
 
       {/* Main Container */}
       <div className="relative max-w-6xl mx-auto px-6 py-8 md:px-10 md:py-12 flex flex-col gap-8 z-10">
-        
+
         {/* Top Navbar Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-bg2/50 backdrop-blur-md border border-border-faint rounded-[14px] p-4 shadow-panel">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-bg2/50 backdrop-blur-md border border-border-faint rounded-[10px] p-4 shadow-panel">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-[8px] bg-text text-bg flex items-center justify-center shadow-sm">
               <Zap size={15} />
@@ -89,35 +89,35 @@ export function Showcase() {
             </div>
 
             <Divider vertical className="h-6 hidden sm:block" />
-            
+
             <ThemeToggle />
           </div>
         </header>
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          
+
           {/* LEFT/MAIN COLUMN (SPAN 2) */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            
+
             {/* Card 1: Interactive Forms & Inputs */}
             <Card padding="lg" className="flex flex-col gap-4">
-              <CardHeader 
-                title="Form Controls & Inputs" 
-                description="Flexible schema-driven field elements with integrated validation states." 
+              <CardHeader
+                title="Form Controls & Inputs"
+                description="Flexible schema-driven field elements with integrated validation states."
               />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Workflow name" required hint="Give your workflow a unique name">
                   <Input placeholder="Stripe Refund Approvals" />
                 </FormField>
-                
+
                 <FormField label="Trigger Source" hint="Select the initial ingestion point">
-                  <Select 
-                    options={triggerOptions} 
-                    value={trigger} 
-                    onChange={setTrigger} 
-                    placeholder="Select starting point…" 
+                  <Select
+                    options={triggerOptions}
+                    value={trigger}
+                    onChange={setTrigger}
+                    placeholder="Select starting point…"
                   />
                 </FormField>
 
@@ -137,15 +137,15 @@ export function Showcase() {
               <div className="flex flex-col gap-3.5 pt-2">
                 <p className="mono-label text-text-faint">Interactive Checkboxes</p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <Checkbox 
-                    checked={checked1} 
-                    onChange={e => setChecked1(e.target.checked)} 
-                    label="Enable email notifications" 
+                  <Checkbox
+                    checked={checked1}
+                    onChange={e => setChecked1(e.target.checked)}
+                    label="Enable email notifications"
                   />
-                  <Checkbox 
-                    checked={checked2} 
-                    onChange={e => setChecked2(e.target.checked)} 
-                    label="Auto-retry tasks on failure" 
+                  <Checkbox
+                    checked={checked2}
+                    onChange={e => setChecked2(e.target.checked)}
+                    label="Auto-retry tasks on failure"
                   />
                 </div>
               </div>
@@ -172,21 +172,21 @@ export function Showcase() {
             {/* Card: Authentication Module Showcase */}
             <Card padding="lg" className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-                <CardHeader 
-                  title="Authentication Module Showcase" 
-                  description="Stateful Login and Registration forms utilizing our custom-styled shared UI elements." 
+                <CardHeader
+                  title="Authentication Module Showcase"
+                  description="Stateful Login and Registration forms utilizing our custom-styled shared UI elements."
                 />
                 <div className="flex gap-2 self-start sm:self-center bg-bg p-1 border border-border-faint rounded-[8px]">
-                  <Button 
-                    variant={authTab === 'login' ? 'primary' : 'secondary'} 
+                  <Button
+                    variant={authTab === 'login' ? 'primary' : 'secondary'}
                     size="sm"
                     className="h-8 py-1 text-xs"
                     onClick={() => setAuthTab('login')}
                   >
                     Login Form
                   </Button>
-                  <Button 
-                    variant={authTab === 'register' ? 'primary' : 'secondary'} 
+                  <Button
+                    variant={authTab === 'register' ? 'primary' : 'secondary'}
                     size="sm"
                     className="h-8 py-1 text-xs"
                     onClick={() => setAuthTab('register')}
@@ -195,15 +195,11 @@ export function Showcase() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="flex justify-center items-center py-8 px-4 bg-bg border border-border-faint rounded-[12px] min-h-[460px] relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-tr from-bg/10 via-surface/5 to-text/2 opacity-20 pointer-events-none" />
                 <div className="w-full max-w-[400px] z-10">
-                  {authTab === 'login' ? (
-                    <LoginForm />
-                  ) : (
-                    <RegisterForm />
-                  )}
+                  <AuthForm mode={authTab === 'login' ? 'login' : 'signup'} />
                 </div>
               </div>
             </Card>
@@ -211,11 +207,11 @@ export function Showcase() {
 
             {/* Card 2: Interactive Tabs & Panel State */}
             <Card padding="lg">
-              <CardHeader 
-                title="Navigation & Server State Tabs" 
-                description="Zustand-powered state transitions with fade-in animations and status sub-panels." 
+              <CardHeader
+                title="Navigation & Server State Tabs"
+                description="Zustand-powered state transitions with fade-in animations and status sub-panels."
               />
-              
+
               <Tabs defaultValue="overview">
                 <TabsList>
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -227,7 +223,7 @@ export function Showcase() {
                   <TabsTrigger value="logs">Logs</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="overview" className="pt-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 rounded-[8px] bg-bg border border-border-faint flex flex-col gap-1">
@@ -240,7 +236,7 @@ export function Showcase() {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="runs" className="pt-4">
                   <div className="border border-border-faint rounded-[8px] overflow-hidden bg-bg">
                     {[
@@ -259,7 +255,7 @@ export function Showcase() {
                     ))}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="logs" className="pt-4">
                   <div className="p-4 rounded-[8px] bg-bg border border-border-faint font-mono text-xs text-text-mute leading-relaxed">
                     <div className="flex items-center gap-1 text-text-faint">
@@ -275,16 +271,16 @@ export function Showcase() {
                     </p>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="settings" className="pt-4">
                   <div className="p-4 rounded-[8px] bg-bg border border-border-faint flex flex-col gap-3">
                     <FormField label="Concurrency Limit">
-                      <Select 
+                      <Select
                         options={[
                           { value: '1', label: '1 concurrent execution' },
                           { value: '5', label: '5 concurrent executions' },
                           { value: '10', label: '10 concurrent executions' },
-                        ]} 
+                        ]}
                         value="5"
                         onChange={() => {}}
                       />
@@ -296,11 +292,11 @@ export function Showcase() {
 
             {/* Card 3: Dashboard Layout Templates */}
             <Card padding="lg" className="flex flex-col gap-4">
-              <CardHeader 
-                title="Dashboard Card Templates" 
-                description="Premium composite card designs implementing standard headers, avatars, status tags, and details." 
+              <CardHeader
+                title="Dashboard Card Templates"
+                description="Premium composite card designs implementing standard headers, avatars, status tags, and details."
               />
-              
+
               <div className="flex flex-col gap-3">
                 {/* slack digest card */}
                 <Card padding="md" className="flex flex-col sm:flex-row sm:items-center gap-4 bg-bg/60">
@@ -337,19 +333,19 @@ export function Showcase() {
                 {/* empty templates */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-bg/40 border border-border-faint rounded-[12px] p-6 text-center flex flex-col items-center justify-center">
-                    <Empty 
-                      icon={<Workflow size={16} />} 
-                      title="No Connected Tables" 
-                      description="Create data tables to query." 
-                      action={<Button variant="secondary" size="sm" leftIcon={<Plus />}>Add Table</Button>} 
+                    <Empty
+                      icon={<Workflow size={16} />}
+                      title="No Connected Tables"
+                      description="Create data tables to query."
+                      action={<Button variant="secondary" size="sm" leftIcon={<Plus />}>Add Table</Button>}
                     />
                   </div>
-                  
+
                   <div className="bg-bg/40 border border-border-faint rounded-[12px] p-6 text-center flex flex-col items-center justify-center">
-                    <Empty 
-                      icon={<Filter size={16} />} 
-                      title="No Executed Runs" 
-                      description="Triggers will appear here." 
+                    <Empty
+                      icon={<Filter size={16} />}
+                      title="No Executed Runs"
+                      description="Triggers will appear here."
                     />
                   </div>
                 </div>
@@ -359,14 +355,14 @@ export function Showcase() {
 
           {/* RIGHT COLUMN (SPAN 1) */}
           <div className="lg:col-span-1 flex flex-col gap-6">
-            
+
             {/* Card 4: Buttons Playground */}
             <Card padding="lg" className="flex flex-col gap-4">
-              <CardHeader 
-                title="Buttons Playground" 
-                description="Theme-aware button variants and sizing options matching the mockup style." 
+              <CardHeader
+                title="Buttons Playground"
+                description="Theme-aware button variants and sizing options matching the mockup style."
               />
-              
+
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <span className="mono-label text-text-faint">Variants</span>
@@ -416,11 +412,11 @@ export function Showcase() {
 
             {/* Card 5: Indicators & Badges */}
             <Card padding="lg" className="flex flex-col gap-4">
-              <CardHeader 
-                title="Indicators & Badges" 
-                description="Status elements indicating run loop states, task logs, and categorization." 
+              <CardHeader
+                title="Indicators & Badges"
+                description="Status elements indicating run loop states, task logs, and categorization."
               />
-              
+
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <span className="mono-label text-text-faint">Badges</span>
@@ -454,9 +450,9 @@ export function Showcase() {
                   <span className="mono-label text-text-faint">Segmented Chips</span>
                   <div className="flex flex-wrap gap-1.5">
                     {['All', 'Active', 'Draft', 'Failed'].map(v => (
-                      <Chip 
-                        key={v} 
-                        active={chip === v.toLowerCase()} 
+                      <Chip
+                        key={v}
+                        active={chip === v.toLowerCase()}
                         onClick={() => setChip(v.toLowerCase())}
                       >
                         {v}
@@ -484,11 +480,11 @@ export function Showcase() {
 
             {/* Card 6: Interactive Modals, Dropdowns & Toasts */}
             <Card padding="lg" className="flex flex-col gap-4">
-              <CardHeader 
-                title="Overlays & Triggers" 
-                description="Triggers for dropdown selections, toast notifications, modals, and tooltips." 
+              <CardHeader
+                title="Overlays & Triggers"
+                description="Triggers for dropdown selections, toast notifications, modals, and tooltips."
               />
-              
+
               <div className="flex flex-col gap-3">
                 <span className="mono-label text-text-faint">Dropdown Options</span>
                 <div className="flex flex-wrap gap-2.5">
@@ -542,11 +538,11 @@ export function Showcase() {
 
             {/* Card 7: Loaders & Skeletons */}
             <Card padding="lg" className="flex flex-col gap-4">
-              <CardHeader 
-                title="Loading Skeletons" 
-                description="Skeleton components used for initial load states." 
+              <CardHeader
+                title="Loading Skeletons"
+                description="Skeleton components used for initial load states."
               />
-              
+
               <div className="flex flex-col gap-4">
                 <SkeletonCard />
                 <div className="flex flex-col gap-2">
@@ -565,9 +561,9 @@ export function Showcase() {
       </div>
 
       {/* Edit Modal */}
-      <Modal 
-        open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
         title="Edit Workflow Configuration"
         footer={
           <>
@@ -591,9 +587,9 @@ export function Showcase() {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal 
-        open={confirmOpen} 
-        onClose={() => setConfirmOpen(false)} 
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
         title="Confirm Deletion"
         footer={
           <>

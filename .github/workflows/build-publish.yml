@@ -34,6 +34,7 @@ on:
       - "apps/api/**"
       - "apps/worker/**"
       - "apps/web/**"
+      - "apps/site/**"
       - "pyproject.toml"
       - "uv.lock"
       - "pnpm-lock.yaml"
@@ -72,6 +73,8 @@ jobs:
             dockerfile: apps/worker/Dockerfile
           - service: web
             dockerfile: apps/web/Dockerfile
+          - service: site
+            dockerfile: apps/site/Dockerfile
 
     # Exposes per-service digests so the scan job can pin the EXACT
     # image we pushed instead of racing against `:latest` re-tags.
@@ -79,6 +82,7 @@ jobs:
       digest-api: ${{ steps.expose.outputs.digest-api }}
       digest-worker: ${{ steps.expose.outputs.digest-worker }}
       digest-web: ${{ steps.expose.outputs.digest-web }}
+      digest-site: ${{ steps.expose.outputs.digest-site }}
 
     steps:
       - name: Checkout
@@ -154,9 +158,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [api, worker, web]
+        service: [api, worker, web, site]
 
     steps:
+      # GitHub Actions doesn't support dynamic indexing on `needs.*.outputs`,
+      # so we resolve the per-service digest in a shell step and feed it
+      # into Trivy via `steps.<id>.outputs.digest`.
+      - name: Resolve image digest
+        id: digest
+        run: |
+          case "${{ matrix.service }}" in
+            api)    echo "digest=${{ needs.build.outputs.digest-api }}"    >> "$GITHUB_OUTPUT" ;;
+            worker) echo "digest=${{ needs.build.outputs.digest-worker }}" >> "$GITHUB_OUTPUT" ;;
+            web)    echo "digest=${{ needs.build.outputs.digest-web }}"    >> "$GITHUB_OUTPUT" ;;
+            site)   echo "digest=${{ needs.build.outputs.digest-site }}"   >> "$GITHUB_OUTPUT" ;;
+          esac
+
       - name: Run Trivy vulnerability scanner
         # `@master` floats with upstream — fine for a scanning tool we
         # treat as best-effort. Pin to a SHA if you want immutable CI.
@@ -168,7 +185,7 @@ jobs:
         # what's outstanding.
         continue-on-error: true
         with:
-          image-ref: ghcr.io/${{ github.repository_owner }}/fuse-${{ matrix.service }}@${{ needs.build.outputs[format('digest-{0}', matrix.service)] }}
+          image-ref: ghcr.io/${{ github.repository_owner }}/fuse-${{ matrix.service }}@${{ steps.digest.outputs.digest }}
           format: sarif
           output: trivy-${{ matrix.service }}.sarif
           severity: CRITICAL,HIGH

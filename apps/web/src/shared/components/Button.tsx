@@ -4,7 +4,7 @@ import { Spinner } from './Spinner'
 
 /**
  * Variants:
- * primary     — filled emerald CTA
+ * primary     — accent indigo CTA (the brand primary across the app)
  * secondary   — surface + border, default action
  * outline     — transparent + border, secondary action
  * ghost       — no border, hover only, nav/tertiary
@@ -48,7 +48,7 @@ const destructiveCls = [
 ].join(' ')
 
 const variants: Record<Variant, string> = {
-  primary:     'bg-text border border-text text-bg hover:opacity-90 [&_svg]:text-bg',
+  primary:     'bg-[var(--accent)] border border-[var(--accent)] text-white hover:brightness-110 [&_svg]:text-white',
   secondary:   secondaryCls,
   subtle:      secondaryCls,
   danger:      destructiveCls,

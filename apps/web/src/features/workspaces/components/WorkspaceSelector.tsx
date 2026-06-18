@@ -72,7 +72,7 @@ export function WorkspaceSelector() {
 
           {/* Dropdown */}
           <div
-            className="fixed z-[9999] bg-[var(--bg-2)] border border-[var(--border)] rounded-[13px] p-[6px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]"
+            className="fixed z-[9999] bg-[var(--bg-2)] border border-[var(--border)] rounded-[11px] p-[6px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]"
             style={{ top: pos.top, left: pos.left, width: Math.max(pos.width, 260) }}
           >
             {/* Current workspace header */}
@@ -133,7 +133,7 @@ export function WorkspaceSelector() {
                   <button
                     type="submit"
                     disabled={!newName.trim() || createWorkspace.isPending}
-                    className="h-[30px] px-2.5 rounded-[7px] bg-[var(--text)] text-[var(--bg)] text-[12px] font-medium border-none cursor-pointer disabled:opacity-40"
+                    className="h-[30px] px-2.5 rounded-[7px] bg-[var(--accent)] text-white text-[12px] font-medium border-none cursor-pointer hover:brightness-110 disabled:opacity-40"
                   >
                     {createWorkspace.isPending ? '…' : 'Create'}
                   </button>

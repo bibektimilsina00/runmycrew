@@ -46,7 +46,7 @@ export function Modal({ open, onClose, title, children, footer, width, descripti
         aria-describedby={description ? descId : undefined}
         data-state="open"
         className={cn(
-          'relative bg-bg2 border border-border-faint rounded-[16px]',
+          'relative bg-bg2 border border-border-faint rounded-[10px]',
           'shadow-modal w-full max-w-md flex flex-col',
           'animate-slide-up',
         )}

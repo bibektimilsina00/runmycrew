@@ -91,13 +91,13 @@ export const CanvasControls = React.forwardRef<HTMLDivElement, CanvasControlsPro
       )}
 
       {/* Button controls strip — Linear-style capsule */}
-      <div className="flex items-center gap-[2px] p-[4px] rounded-[10px] border border-[var(--border-soft)] bg-[rgba(18,20,23,0.85)] backdrop-blur-md pointer-events-auto shadow-[0_4px_14px_rgba(0,0,0,0.35)]">
+      <div className="flex items-center gap-[2px] p-[4px] rounded-[10px] border border-[var(--border-soft)] bg-[var(--bg-2)] backdrop-blur-md pointer-events-auto shadow-[var(--shadow-float)]">
         <button
           onClick={onFitView}
           className={cn(
             'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
             'text-[var(--text-mute)] transition-colors cursor-pointer',
-            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
+            'hover:bg-[var(--surface-2)] hover:text-[var(--text)]',
           )}
           title="Fit view"
         >
@@ -108,7 +108,7 @@ export const CanvasControls = React.forwardRef<HTMLDivElement, CanvasControlsPro
           className={cn(
             'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
             'text-[var(--text-mute)] transition-colors cursor-pointer',
-            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
+            'hover:bg-[var(--surface-2)] hover:text-[var(--text)]',
           )}
           title="Zoom in"
         >
@@ -122,7 +122,7 @@ export const CanvasControls = React.forwardRef<HTMLDivElement, CanvasControlsPro
           className={cn(
             'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
             'text-[var(--text-mute)] transition-colors cursor-pointer',
-            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
+            'hover:bg-[var(--surface-2)] hover:text-[var(--text)]',
           )}
           title="Zoom out"
         >
@@ -133,7 +133,7 @@ export const CanvasControls = React.forwardRef<HTMLDivElement, CanvasControlsPro
           className={cn(
             'flex w-[28px] h-[28px] items-center justify-center rounded-[6px]',
             'text-[var(--text-mute)] transition-colors cursor-pointer',
-            'hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--text)]',
+            'hover:bg-[var(--surface-2)] hover:text-[var(--text)]',
           )}
           title="Clean canvas view"
         >

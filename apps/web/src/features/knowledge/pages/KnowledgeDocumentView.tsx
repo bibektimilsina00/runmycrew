@@ -203,7 +203,7 @@ export function KnowledgeDocumentView() {
                       <button
                         onClick={e => { e.stopPropagation(); void handleSave() }}
                         disabled={updateChunk.isPending || editContent === chunk.content}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] bg-[var(--text)] text-[var(--bg)] text-[12.5px] font-medium border-none cursor-pointer hover:bg-[oklch(0.90_0.003_250)] transition-colors disabled:opacity-40 disabled:cursor-default"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] bg-[var(--accent)] text-white text-[12.5px] font-medium border-none cursor-pointer hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         {updateChunk.isPending ? 'Saving…' : 'Save & re-index'}
                       </button>
