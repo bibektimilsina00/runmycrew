@@ -5,14 +5,61 @@
  * comparable section-by-section.
  */
 
-export type NavLink = { label: string; href: string; hasMenu?: boolean }
+export type NavMenuKey = 'docs' | 'blog'
+export type NavLink = { label: string; href: string; menu?: NavMenuKey }
 export const NAV_LINKS: NavLink[] = [
-  { label: 'Docs',         href: '#', hasMenu: true },
-  { label: 'Blog',         href: '#', hasMenu: true },
-  { label: 'Integrations', href: '#' },
-  { label: 'Templates',    href: '#' },
-  { label: 'Pricing',      href: '#' },
+  { label: 'Docs',         href: '/docs', menu: 'docs' },
+  { label: 'Blog',         href: '/blog', menu: 'blog' },
+  { label: 'Integrations', href: '/integrations' },
+  { label: 'Templates',    href: '/templates' },
+  { label: 'Pricing',      href: '/pricing' },
 ]
+
+/* ─── Nav-menu popups (Docs + Blog) ───────────────────────────────── */
+
+export type NavHeroCard = {
+  title: string
+  href: string
+  /** SVG node rendered inside the dark preview area at the top of the card. */
+  visual: 'workflow' | 'chart' | 'logs' | 'enterprise'
+}
+
+export type NavMiniCard = {
+  icon: 'sparkles' | 'plug' | 'server' | 'shield' | 'bot' | 'cog'
+  title: string
+  sub: string
+  href: string
+}
+
+export type NavThumbCard = {
+  title: string
+  visual: 'city' | 'graph' | 'collab' | 'series' | 'features'
+  href: string
+}
+
+/** Docs popup — 2 hero cards on top, 3 mini-cards underneath. */
+export const NAV_MENU_DOCS = {
+  hero: [
+    { title: 'Introduction', href: '/docs',            visual: 'workflow' },
+    { title: 'Quickstart',   href: '/docs/quickstart', visual: 'chart'    },
+  ] as NavHeroCard[],
+  mini: [
+    { icon: 'sparkles', title: 'Fuse AI',     sub: 'Prompt → workflow',  href: '/docs/fuse-ai'   },
+    { icon: 'plug',     title: 'Connections', sub: 'OAuth & webhooks',    href: '/docs/oauth'     },
+    { icon: 'server',   title: 'Self-hosting', sub: 'Run on your infra',  href: '/docs/self-host' },
+  ] as NavMiniCard[],
+}
+
+/** Blog popup — 1 large featured + 1 enterprise card + 3 thumb cards. */
+export const NAV_MENU_BLOG = {
+  featured:   { title: 'Introducing Fuse AI',   href: '/blog/introducing-fuse-ai', visual: 'city' as const },
+  enterprise: { title: 'Fuse for Enterprise',    href: '/blog/enterprise',          visual: 'enterprise' as const },
+  thumbs: [
+    { title: 'Series Seed announcement',  visual: 'series', href: '/blog/seed-announcement'     },
+    { title: 'Realtime collaboration',    visual: 'collab', href: '/blog/realtime-collaboration' },
+    { title: 'Inside the Fuse executor',  visual: 'graph',  href: '/blog/inside-the-executor'   },
+  ] as NavThumbCard[],
+}
 
 /* ─── HERO ─────────────────────────────────────────────────────────── */
 

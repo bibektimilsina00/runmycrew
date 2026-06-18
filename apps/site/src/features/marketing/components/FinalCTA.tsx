@@ -20,16 +20,16 @@ export function FinalCTA() {
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
-          <div className="mt-11 flex items-center justify-center gap-3">
+          <div className="mt-11 flex items-center justify-center gap-2.5">
             <Link
               href={EXTERNAL_LINKS.REGISTER}
-              className="inline-flex items-center rounded-md bg-foreground px-[18px] py-[10px] text-[14px] font-medium text-background transition-[filter] hover:brightness-110"
+              className="inline-flex h-[34px] items-center gap-[7px] rounded-[8px] bg-primary px-[16px] text-[13px] font-semibold text-primary-foreground transition-[filter] hover:brightness-110"
             >
               Get started
             </Link>
             <Link
               href="#contact"
-              className="inline-flex items-center rounded-md border border-border bg-white/[0.02] px-[18px] py-[10px] text-[14px] font-medium text-foreground/90 transition-colors hover:bg-white/[0.06]"
+              className="inline-flex h-[34px] items-center gap-[7px] rounded-[8px] border border-border bg-white/[0.02] px-[16px] text-[13px] font-medium text-foreground/90 transition-colors hover:bg-white/[0.06]"
             >
               Contact sales
             </Link>

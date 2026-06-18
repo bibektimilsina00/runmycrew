@@ -146,6 +146,12 @@
     font-variation-settings: 'opsz' auto;
     text-rendering: optimizeLegibility;
   }
+  /* Kill the macOS / iOS rubber-band overscroll bounce. Without this
+     dragging past the top or bottom edge keeps pulling the page on
+     trackpads, which reads as a bug when you're already at the limit. */
+  html, body {
+    overscroll-behavior-y: none;
+  }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
   }
@@ -159,4 +165,79 @@
 @keyframes fuseBlink {
   0%, 49%   { opacity: 1; }
   50%, 100% { opacity: 0; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Docs prose — minimal, Linear-style typography. Picks up tokens from
+   :root so it retints with dark/light + accent scheme automatically.
+   ────────────────────────────────────────────────────────────────────── */
+.prose-docs {
+  color: var(--muted-foreground);
+  font-size: 15.5px;
+  line-height: 1.7;
+  max-width: 720px;
+}
+.prose-docs h1 {
+  color: var(--foreground);
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 590;
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+  margin: 0 0 12px;
+}
+.prose-docs h2 {
+  color: var(--foreground);
+  font-size: 22px;
+  font-weight: 590;
+  letter-spacing: -0.018em;
+  margin: 40px 0 12px;
+  scroll-margin-top: 88px;
+}
+.prose-docs h3 {
+  color: var(--foreground);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin: 28px 0 8px;
+  scroll-margin-top: 88px;
+}
+.prose-docs p   { margin: 0 0 16px; }
+.prose-docs a   { color: var(--primary); text-decoration: none; }
+.prose-docs a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.prose-docs strong { color: var(--foreground); font-weight: 600; }
+.prose-docs ul, .prose-docs ol { padding-left: 22px; margin: 0 0 16px; }
+.prose-docs li { margin: 6px 0; }
+.prose-docs code {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.05);
+  color: var(--foreground);
+}
+.prose-docs pre {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  margin: 18px 0;
+}
+.prose-docs pre code { padding: 0; background: transparent; }
+.prose-docs blockquote {
+  margin: 18px 0;
+  padding: 4px 14px;
+  border-left: 2px solid var(--primary);
+  color: var(--muted-foreground);
+  background: color-mix(in oklab, var(--primary) 6%, transparent);
+  border-radius: 0 8px 8px 0;
+}
+.prose-docs hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+.prose-docs .lead {
+  font-size: 17px;
+  color: var(--muted-foreground);
+  margin: 0 0 24px;
 }
