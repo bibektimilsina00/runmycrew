@@ -311,9 +311,7 @@ function SidebarHeader({ collapsed, onToggleCollapsed }: { collapsed: boolean; o
       {/* Logo row */}
       <div className="flex items-center justify-between group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:w-full">
         <span className="inline-flex items-center gap-[9px] text-[15px] font-semibold tracking-[-0.02em] text-[var(--text)] group-data-[collapsed=true]/shell:hidden">
-          <span className="w-[26px] h-[26px] inline-flex items-center justify-center rounded-[7px] bg-[var(--accent)] text-white shrink-0 shadow-[0_2px_8px_var(--accent-soft)]">
-            <Icons.FuseMark style={{ width: 14, height: 14 }} />
-          </span>
+          <Icons.FuseMark style={{ width: 28, height: 28, color: 'var(--accent)' }} />
           <span>fuse</span>
         </span>
         <button
@@ -325,8 +323,8 @@ function SidebarHeader({ collapsed, onToggleCollapsed }: { collapsed: boolean; o
             {collapsed ? <Icons.PanelOpen /> : <Icons.PanelClose />}
           </span>
           <span className="hidden group-data-[collapsed=true]/shell:flex items-center justify-center w-full h-full relative group/btn">
-            <span className="w-[26px] h-[26px] inline-flex items-center justify-center rounded-[7px] bg-[var(--accent)] text-white absolute transition-all duration-150 group-hover/btn:opacity-0 group-hover/btn:scale-75 shadow-[0_2px_8px_var(--accent-soft)]">
-              <Icons.FuseMark style={{ width: 14, height: 14 }} />
+            <span className="absolute inline-flex items-center justify-center transition-all duration-150 group-hover/btn:opacity-0 group-hover/btn:scale-75">
+              <Icons.FuseMark style={{ width: 28, height: 28, color: 'var(--accent)' }} />
             </span>
             <span className="absolute opacity-0 scale-75 transition-all duration-150 group-hover/btn:opacity-100 group-hover/btn:scale-100 text-[var(--text-faint)] group-hover/btn:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px]">
               {collapsed ? <Icons.PanelOpen /> : <Icons.PanelClose />}

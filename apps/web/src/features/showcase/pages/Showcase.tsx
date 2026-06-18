@@ -13,7 +13,7 @@ import {
   useToast,
   type SelectOption,
 } from '@/shared/components'
-import { LoginForm, RegisterForm } from '@/features/auth'
+import { AuthForm } from '@/features/auth/components/AuthForm'
 
 function CardHeader({ title, description }: { title: string; description?: string }) {
   return (
@@ -199,11 +199,7 @@ export function Showcase() {
               <div className="flex justify-center items-center py-8 px-4 bg-bg border border-border-faint rounded-[12px] min-h-[460px] relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-tr from-bg/10 via-surface/5 to-text/2 opacity-20 pointer-events-none" />
                 <div className="w-full max-w-[400px] z-10">
-                  {authTab === 'login' ? (
-                    <LoginForm />
-                  ) : (
-                    <RegisterForm />
-                  )}
+                  <AuthForm mode={authTab === 'login' ? 'login' : 'signup'} />
                 </div>
               </div>
             </Card>

@@ -250,8 +250,9 @@ export const Icons = {
     </svg>
   ),
   FuseMark: (props: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <path d="M13 3 4 14h7l-1 7 9-11h-7z" fill="currentColor" />
+    <svg viewBox="0 0 32 32" fill="none" {...props}>
+      <rect x="4"  y="4"  width="17" height="17" rx="6" fill="currentColor" opacity="0.42" />
+      <rect x="11" y="11" width="17" height="17" rx="6" fill="currentColor" />
     </svg>
   ),
   Globe: (props: IconProps) => (
@@ -300,4 +301,3 @@ export const Icons = {
     </svg>
   ),
 }
-

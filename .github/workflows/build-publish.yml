@@ -34,6 +34,7 @@ on:
       - "apps/api/**"
       - "apps/worker/**"
       - "apps/web/**"
+      - "apps/site/**"
       - "pyproject.toml"
       - "uv.lock"
       - "pnpm-lock.yaml"
@@ -72,6 +73,8 @@ jobs:
             dockerfile: apps/worker/Dockerfile
           - service: web
             dockerfile: apps/web/Dockerfile
+          - service: site
+            dockerfile: apps/site/Dockerfile
 
     # Exposes per-service digests so the scan job can pin the EXACT
     # image we pushed instead of racing against `:latest` re-tags.
@@ -79,6 +82,7 @@ jobs:
       digest-api: ${{ steps.expose.outputs.digest-api }}
       digest-worker: ${{ steps.expose.outputs.digest-worker }}
       digest-web: ${{ steps.expose.outputs.digest-web }}
+      digest-site: ${{ steps.expose.outputs.digest-site }}
 
     steps:
       - name: Checkout
@@ -154,7 +158,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [api, worker, web]
+        service: [api, worker, web, site]
 
     steps:
       - name: Run Trivy vulnerability scanner

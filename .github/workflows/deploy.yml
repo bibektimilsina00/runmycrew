@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://fuse.bibektimilsina.tech
+      url: https://app.fuse.bibektimilsina.tech
 
     # Skip when the build job that triggered us actually failed.
     if: >
@@ -184,17 +184,23 @@ jobs:
           # it explicitly. JSON response with per-component status.
           for i in 1 2 3 4 5 6 7 8; do
             if curl -fsS --max-time 8 \
-                https://fuse.bibektimilsina.tech/health > /tmp/health.json; then
-              echo "✓ /health responding."
+                https://app.fuse.bibektimilsina.tech/health > /tmp/health.json; then
+              echo "✓ app /health responding."
               cat /tmp/health.json
-              exit 0
+              # Also verify the marketing site returns 200 on root.
+              if curl -fsS --max-time 8 -o /dev/null https://fuse.bibektimilsina.tech/; then
+                echo "✓ marketing site responding."
+                exit 0
+              fi
+              echo "⚠ marketing site not responding yet; retrying."
+            else
+              echo "Health check attempt ${i} failed; retrying in 8s…"
             fi
-            echo "Health check attempt ${i} failed; retrying in 8s…"
             sleep 8
           done
           echo "✗ Health check never passed."
           ssh -i ~/.ssh/deploy_key "${{ vars.VPS_USER }}@${{ vars.VPS_HOST }}" \
             "cd ${{ vars.VPS_DEPLOY_DIR }} && \
              docker compose -f docker-compose.production.yml ps && \
-             docker compose -f docker-compose.production.yml logs --tail=80 api web"
+             docker compose -f docker-compose.production.yml logs --tail=80 api web site"
           exit 1
