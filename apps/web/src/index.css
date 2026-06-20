@@ -27,8 +27,8 @@
   --text:       #f3f4f6;  /* primary body, headings */
   --text-body:  #d1d5db;  /* assistant-message body, secondary copy */
   --text-mute:  #9ca3af;  /* meta, captions */
-  --text-faint: #62666d;  /* faint hints */
-  --text-dim:   #52565d;  /* dim labels */
+  --text-faint: #7a7f8a;  /* faint hints — lifted for small-text readability */
+  --text-dim:   #656973;  /* dim labels — lifted for small-text readability */
 
   /* Accent — muted indigo (the real Linear blue, NOT bright) */
   --accent:       #5e6ad2;
@@ -54,7 +54,7 @@
   --dot-color: rgba(255, 255, 255, 0.05);
 
   /* Typography */
-  --font-ui:   "Inter", "Inter Tight", "Geist", "Helvetica Neue", system-ui, sans-serif;
+  --font-ui:   "Plus Jakarta Sans", "Geist", "Inter", "Helvetica Neue", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Radii — Linear-tight (was 8/12/16, now 6/8/10) */
@@ -304,8 +304,8 @@ body {
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 14px;
-  line-height: 1.5;
-  letter-spacing: -0.005em;
+  line-height: 1.6;
+  letter-spacing: -0.004em;
   font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

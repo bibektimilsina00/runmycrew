@@ -28,7 +28,7 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
   const providerMap = Object.fromEntries(providers.map(p => [p.id, p]))
 
   return (
-    <div className="border border-[var(--border-soft)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
+    <div className="border border-[var(--border-faint)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
       <PanelHead
         icon={<Icons.Plug />}
         title="Connections"
@@ -51,7 +51,7 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
           <button className="underline" onClick={() => navigate(APP_ROUTES.CONNECTIONS)}>Add one</button>
         </div>
       ) : (
-        <div>
+        <div className="flex flex-col gap-[2px] pb-[8px] px-[8px]">
           {items.map(c => {
             const provider = providerMap[c.type]
             const iconUrl  = provider?.icon_url
@@ -61,7 +61,7 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
               <button
                 key={c.id}
                 onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
-                className="w-full flex items-center gap-[11px] py-[11px] px-[15px] border-b border-[var(--border-faint)] last:border-b-0 bg-transparent text-left transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.03)]"
+                className="w-full flex items-center gap-[11px] py-[8px] px-[12px] rounded-[6px] bg-transparent text-left transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.04)]"
               >
                 {iconUrl ? (
                   <img

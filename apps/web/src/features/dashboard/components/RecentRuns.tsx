@@ -22,7 +22,7 @@ export function RecentRuns({ items, totalToday, onViewAll }: Props) {
   const navigate = useNavigate()
 
   return (
-    <div className="border border-[var(--border-soft)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
+    <div className="border border-[var(--border-faint)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
       <PanelHead
         icon={<Icons.Activity />}
         title="Recent runs"
@@ -43,7 +43,7 @@ export function RecentRuns({ items, totalToday, onViewAll }: Props) {
           <span className="text-[13px]">No runs yet. Trigger an automation to see results here.</span>
         </div>
       ) : (
-        <div>
+        <div className="flex flex-col gap-[2px] pb-[8px] px-[8px]">
           {items.map(r => {
             const tone = STATUS_DOT[r.status] ?? STATUS_DOT.ok
             return (
@@ -51,8 +51,8 @@ export function RecentRuns({ items, totalToday, onViewAll }: Props) {
                 key={r.id}
                 onClick={() => navigate(APP_ROUTES.RUNS)}
                 className={cn(
-                  'w-full flex items-center gap-[12px] py-[11px] px-[15px] border-b border-[var(--border-faint)] last:border-b-0 bg-transparent text-left transition-colors cursor-pointer',
-                  'hover:bg-[rgba(255,255,255,0.03)]',
+                  'w-full flex items-center gap-[12px] py-[8px] px-[12px] rounded-[6px] bg-transparent text-left transition-colors cursor-pointer',
+                  'hover:bg-[rgba(255,255,255,0.04)]',
                 )}
               >
                 <span

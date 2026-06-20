@@ -10,7 +10,7 @@ interface PanelHeadProps {
 
 export function PanelHead({ icon, title, count, countTone = 'neutral', action }: PanelHeadProps) {
   return (
-    <div className="flex items-center gap-[9px] py-[13px] px-[15px] border-b border-[var(--border-soft)]">
+    <div className="flex items-center gap-[9px] pb-[10px] pt-[14px] px-[15px]">
       <span className="inline-flex items-center justify-center text-[var(--text-mute)] [&_svg]:w-[15px] [&_svg]:h-[15px]">
         {icon}
       </span>

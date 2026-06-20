@@ -45,7 +45,7 @@ export function PromptCard({
       )}
     >
       {/* Header */}
-      <div className="flex items-center gap-[9px] px-[20px] py-[14px] border-b border-[var(--border-faint)]">
+      <div className="flex items-center gap-[9px] px-[20px] py-[14px]">
         <span className="w-[24px] h-[24px] rounded-[7px] bg-[var(--accent-soft)] text-[var(--accent)] inline-flex items-center justify-center shrink-0">
           <Sparkles className="w-[14px] h-[14px]" />
         </span>

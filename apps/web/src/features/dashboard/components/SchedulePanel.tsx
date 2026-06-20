@@ -13,7 +13,7 @@ export function SchedulePanel({ items, onViewAll }: Props) {
   const navigate = useNavigate()
 
   return (
-    <div className="border border-[var(--border-soft)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
+    <div className="border border-[var(--border-faint)] rounded-[8px] bg-[var(--surface)] overflow-hidden flex flex-col">
       <PanelHead
         icon={<Icons.Clock />}
         title="Next 12 hours"
@@ -35,12 +35,12 @@ export function SchedulePanel({ items, onViewAll }: Props) {
           <span className="text-[12.5px] text-[var(--text-faint)]">No scheduled workflows in the next 12 hours.</span>
         </div>
       ) : (
-        <div>
+        <div className="flex flex-col gap-[2px] pb-[8px] px-[8px]">
           {items.map((s, i) => (
             <button
               key={i}
               onClick={() => navigate(APP_ROUTES.WORKFLOW(s.workflow_id))}
-              className="w-full flex items-center gap-[12px] py-[11px] px-[15px] border-b border-[var(--border-faint)] last:border-b-0 bg-transparent text-left transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.03)]"
+              className="w-full flex items-center gap-[12px] py-[8px] px-[12px] rounded-[6px] bg-transparent text-left transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.04)]"
             >
               <span className="font-mono text-[11.5px] text-[var(--text)] w-[54px] shrink-0">{s.time}</span>
               <span className="flex flex-col gap-[2px] min-w-0 flex-1">
