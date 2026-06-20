@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal, ChevronDown } from 'lucide-react'
 import type { Node } from 'reactflow'
 import { Empty } from '@/shared/components'
 import { cn } from '@/lib/cn'
@@ -68,52 +68,44 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
                   <div className="text-[10.5px] font-bold tracking-[0.08em] text-[var(--text-dim)] uppercase">
                     Configuration
                   </div>
-                  {advancedGroups.length > 0 && (
-                    <div className="flex p-0.5 rounded-[7px] bg-[var(--bg)] border border-[var(--border-soft)]">
-                      <button
-                        type="button"
-                        onClick={() => { if (showAdvanced) toggleAdvanced() }}
-                        className={cn(
-                          "px-3 py-1 text-[11px] font-semibold rounded-[5px] transition-all duration-[120ms]",
-                          !showAdvanced
-                            ? "bg-[var(--surface)] text-[var(--text)] border border-[var(--border-soft)] shadow-[var(--shadow-float)]"
-                            : "text-[var(--text-mute)] hover:text-[var(--text)] border border-transparent"
-                        )}
-                      >
-                        Basic
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { if (!showAdvanced) toggleAdvanced() }}
-                        className={cn(
-                          "px-3 py-1 text-[11px] font-semibold rounded-[5px] transition-all duration-[120ms]",
-                          showAdvanced
-                            ? "bg-[var(--surface)] text-[var(--text)] border border-[var(--border-soft)] shadow-[var(--shadow-float)]"
-                            : "text-[var(--text-mute)] hover:text-[var(--text)] border border-transparent"
-                        )}
-                      >
-                        Advanced
-                      </button>
-                    </div>
-                  )}
                 </div>
 
-                {!showAdvanced ? (
-                  <PropertyGroupList
-                    groups={basicGroups}
-                    definition={definition}
-                    properties={properties}
-                    onPropertyChange={updateProperty}
-                    onPropertiesChange={updateProperties}
-                  />
-                ) : (
-                  <PropertyGroupList
-                    groups={advancedGroups}
-                    definition={definition}
-                    properties={properties}
-                    onPropertyChange={updateProperty}
-                    onPropertiesChange={updateProperties}
-                  />
+                <PropertyGroupList
+                  groups={basicGroups}
+                  definition={definition}
+                  properties={properties}
+                  onPropertyChange={updateProperty}
+                  onPropertiesChange={updateProperties}
+                />
+
+                {advancedGroups.length > 0 && (
+                  <div className="flex flex-col gap-3 mt-1 border-t border-[var(--border-faint)] pt-3">
+                    <button
+                      type="button"
+                      onClick={toggleAdvanced}
+                      className="flex items-center justify-between w-full py-1 text-[10.5px] font-bold uppercase tracking-[0.08em] text-[var(--text-dim)] hover:text-[var(--text)] transition-colors"
+                    >
+                      <span>Advanced Settings</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-3.5 w-3.5 text-[var(--text-faint)] transition-transform duration-150",
+                          showAdvanced && "rotate-180"
+                        )}
+                      />
+                    </button>
+
+                    {showAdvanced && (
+                      <div className="animate-in fade-in slide-in-from-top-1 duration-150">
+                        <PropertyGroupList
+                          groups={advancedGroups}
+                          definition={definition}
+                          properties={properties}
+                          onPropertyChange={updateProperty}
+                          onPropertiesChange={updateProperties}
+                        />
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}

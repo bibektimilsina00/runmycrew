@@ -225,40 +225,39 @@ function ChipEditor({
 
   return (
     <div className={cn(
-      'inline-flex items-center gap-1 h-7 rounded-full text-xs',
+      'inline-flex items-center h-7 rounded-full text-xs px-2.5 gap-0.5',
       'border transition-colors',
       chip.negated
         ? 'border-[var(--danger,#dc2626)]/40 bg-[var(--danger,#dc2626)]/10'
         : 'border-border bg-surface-2',
     )}>
-      <Button
-        type="button"
-        variant="ghost"
-        onClick={toggleNegate}
-        disabled={disabled}
-        title={chip.negated ? 'Match messages with this (remove −)' : 'Exclude messages with this (add −)'}
-        className={cn(
-          'pl-2 pr-0.5 font-mono h-auto p-0 hover:bg-transparent leading-none text-xs',
-          chip.negated ? 'text-[var(--danger,#dc2626)]' : 'text-text-muted hover:text-text',
-        )}
-      >
-        {chip.negated ? '−' : ''}
-      </Button>
-      <span className="text-text-muted">{def.label}:</span>
+      {chip.negated && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={toggleNegate}
+          disabled={disabled}
+          title="Remove negation"
+          className="font-mono h-auto p-0 hover:bg-transparent leading-none text-xs text-[var(--danger,#dc2626)] mr-0.5"
+        >
+          −
+        </Button>
+      )}
+      <span className="text-text-muted font-mono">{chip.op}:</span>
       {def.kind === 'preset' ? (
         <Dropdown>
           <DropdownTrigger asChild disabled={disabled}>
             <Button
               type="button"
               variant="link"
-              className="text-text px-1 h-auto p-0 hover:underline outline-none cursor-pointer text-xs"
+              className="text-text h-auto p-0 hover:underline outline-none cursor-pointer text-xs font-mono font-normal"
             >
               {chip.value || '—'}
             </Button>
           </DropdownTrigger>
           <DropdownContent>
             {def.options!.map(o => (
-              <DropdownItem key={o} onClick={() => onChange({ value: o })}>
+              <DropdownItem key={o} onClick={() => onChange({ value: o })} className="capitalize">
                 {o}
               </DropdownItem>
             ))}
@@ -274,7 +273,7 @@ function ChipEditor({
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); commit() } }}
           placeholder={def.placeholder}
           disabled={disabled}
-          className="bg-transparent text-text text-xs outline-none border-0 py-0 px-1 min-w-[60px] w-[var(--w,auto)] hover:bg-transparent focus-visible:bg-transparent focus-visible:border-transparent"
+          className="bg-transparent text-text text-xs outline-none border-0 py-0 px-0.5 min-w-[60px] w-[var(--w,auto)] hover:bg-transparent focus-visible:bg-transparent focus-visible:border-transparent font-mono"
           style={{ width: `${Math.max((chip.value?.length ?? 0) + 1, def.placeholder?.length ?? 8)}ch` }}
         />
       ) : (
@@ -283,7 +282,7 @@ function ChipEditor({
           variant="link"
           onClick={() => setEditing(true)}
           disabled={disabled}
-          className="text-text px-1 h-auto p-0 hover:underline text-xs font-normal"
+          className="text-text h-auto p-0 hover:underline text-xs font-mono font-normal"
         >
           {valueLabel}
         </Button>
@@ -294,7 +293,7 @@ function ChipEditor({
         onClick={onRemove}
         disabled={disabled}
         title="Remove filter"
-        className="px-1.5 h-auto p-0 text-text-muted hover:text-text hover:bg-transparent leading-none text-xs"
+        className="ml-1 px-1 h-auto p-0 text-text-muted hover:text-text hover:bg-transparent leading-none text-xs"
       >
         ×
       </Button>
