@@ -73,16 +73,22 @@ function schemaToStub(outputs: { label: string; type: string }[]): Record<string
  * its outputsSchema so drag-drop still inserts `{{nodeId.path}}` even before
  * the node has been run.
  */
-import { useEditorLayoutStore } from '../../../stores/editorLayoutStore'
+// Inspector "Inputs" section header height + the body height we
+// reveal when the user expands. Independent of the bottom (logs)
+// panel — the section was previously height-locked to `bottomOpen` /
+// `bottomHeight`, which meant collapsing the logs panel also
+// collapsed this section even when the user wanted the inspector
+// inputs visible.
+const COLLAPSED_HEIGHT = 36
+const EXPANDED_HEIGHT = 320
 
 export function UpstreamConnectionsSection({ nodeId }: UpstreamConnectionsSectionProps) {
   const nodes = useWorkflowEditorStore(s => s.nodes)
   const edges = useWorkflowEditorStore(s => s.edges)
   const nodeDefinitions = useWorkflowEditorStore(s => s.nodeDefinitions)
 
-  const bottomOpen = useEditorLayoutStore(s => s.bottomOpen)
-  const bottomHeight = useEditorLayoutStore(s => s.bottomHeight)
-  const totalHeight = bottomOpen ? bottomHeight : 36
+  const [expanded, setExpanded] = useState(false)
+  const totalHeight = expanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT
 
   const ancestors = useMemo<Ancestor[]>(() => {
     const distance = collectAncestors(nodeId, edges)
@@ -114,14 +120,26 @@ export function UpstreamConnectionsSection({ nodeId }: UpstreamConnectionsSectio
       className="shrink-0 border-t border-[var(--border-faint)] px-3 py-3 flex flex-col overflow-hidden transition-[height] duration-300 ease-in-out"
       style={{ height: totalHeight }}
     >
-      <div className="mb-1.5 flex items-center justify-between px-1 shrink-0">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-mute)]">
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        className="mb-1.5 flex w-full items-center justify-between px-1 shrink-0 text-left transition-colors hover:text-[var(--text)]"
+        aria-expanded={expanded}
+        title={expanded ? 'Collapse inputs' : 'Expand inputs'}
+      >
+        <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-mute)]">
+          <ChevronDown
+            className={cn(
+              'h-3 w-3 transition-transform duration-200',
+              expanded ? 'rotate-0' : '-rotate-90',
+            )}
+          />
           Inputs
         </span>
         {ancestors.length > 0 && (
           <span className="font-mono text-[10px] text-[var(--text-dim)]">{ancestors.length}</span>
         )}
-      </div>
+      </button>
       <div className="flex-1 min-h-0 overflow-y-auto">
         {ancestors.length === 0 ? (
           <p className="px-1 text-[11.5px] italic text-[var(--text-faint)]">
