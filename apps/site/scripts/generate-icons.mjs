@@ -29,13 +29,30 @@ const BRAND_PURPLE = '#5e6ad2'
 const TEXT_PRIMARY = '#edeef0'
 const TEXT_MUTED = '#8a8f98'
 
-// Transparent brand mark — for favicons, app-store icons, and any
-// surface where the host UI provides the background. No fill behind
-// the rects so the wrapper bleeds through.
+// Three-petal spinner brand mark. Petal source path:
+//   M16 16 C 12.4 13, 12.4 6.4, 16 3 C 19.6 6.4, 19.6 13, 16 16 Z
+// Renders the petal pointing up from the centre, then duplicates at
+// rotations 0/120/240 with descending opacity (1.0 / 0.66 / 0.4) for
+// the "spinning" look. The centre `<circle>` caps the petal bases so
+// the focal point reads as a single dot instead of three overlapping
+// curves.
+const PETAL = 'M16 16 C 12.4 13, 12.4 6.4, 16 3 C 19.6 6.4, 19.6 13, 16 16 Z'
+const MARK_GROUP = ({ centerFill = BG } = {}) => `
+  <g>
+    <path d="${PETAL}" fill="${BRAND_PURPLE}"/>
+    <path d="${PETAL}" fill="${BRAND_PURPLE}" opacity="0.66" transform="rotate(120 16 16)"/>
+    <path d="${PETAL}" fill="${BRAND_PURPLE}" opacity="0.4"  transform="rotate(240 16 16)"/>
+  </g>
+  <circle cx="16" cy="16" r="2.4" fill="${centerFill}"/>`
+
+// Transparent — for favicons, app-store icons, and any surface where
+// the host UI provides the background. The centre cap is the brand-bg
+// colour so the overlap of the three petal bases still reads as a
+// single accent dot on dark surfaces; on light surfaces it presents as
+// a small dark dot, which is consistent with the wordmark.
 const TRANSPARENT_SVG = (size) => `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}">
-  <rect x="4"  y="4"  width="17" height="17" rx="6" fill="${BRAND_PURPLE}" opacity="0.45"/>
-  <rect x="11" y="11" width="17" height="17" rx="6" fill="${BRAND_PURPLE}"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}" fill="none">
+${MARK_GROUP()}
 </svg>`.trim()
 
 // Maskable variant — REQUIRES an opaque background because Android
@@ -46,8 +63,12 @@ const MASKABLE_SVG = (size) => `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}">
   <rect width="32" height="32" fill="${BG}"/>
   <g transform="translate(2 2) scale(0.875)">
-    <rect x="4"  y="4"  width="17" height="17" rx="6" fill="${BRAND_PURPLE}" opacity="0.45"/>
-    <rect x="11" y="11" width="17" height="17" rx="6" fill="${BRAND_PURPLE}"/>
+    <g>
+      <path d="${PETAL}" fill="${BRAND_PURPLE}"/>
+      <path d="${PETAL}" fill="${BRAND_PURPLE}" opacity="0.66" transform="rotate(120 16 16)"/>
+      <path d="${PETAL}" fill="${BRAND_PURPLE}" opacity="0.4"  transform="rotate(240 16 16)"/>
+    </g>
+    <circle cx="16" cy="16" r="2.4" fill="${BG}"/>
   </g>
 </svg>`.trim()
 
@@ -69,10 +90,13 @@ const OG_SVG = `
   <rect width="1200" height="630" fill="url(#bg)"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
 
-  <!-- Brand mark, centered vertically, 140px tall -->
-  <g transform="translate(120 245)">
-    <rect x="0"  y="0"  width="74" height="74" rx="26" fill="${BRAND_PURPLE}" opacity="0.45"/>
-    <rect x="32" y="32" width="74" height="74" rx="26" fill="${BRAND_PURPLE}"/>
+  <!-- Brand mark, 140px tall, vertically centred at y≈315. The mark
+       SVG is 32 units across, so scale 4.375x to land at 140px. -->
+  <g transform="translate(120 245) scale(4.375)">
+    <path d="${PETAL}" fill="${BRAND_PURPLE}"/>
+    <path d="${PETAL}" fill="${BRAND_PURPLE}" opacity="0.66" transform="rotate(120 16 16)"/>
+    <path d="${PETAL}" fill="${BRAND_PURPLE}" opacity="0.4"  transform="rotate(240 16 16)"/>
+    <circle cx="16" cy="16" r="2.4" fill="${BG}"/>
   </g>
 
   <!-- Wordmark + tagline -->

@@ -25,7 +25,7 @@ export function GreetingRow() {
     <div className="flex flex-col gap-[18px]">
       <div className="flex items-center gap-[8px]">
         <span className="relative inline-flex w-[8px] h-[8px]">
-          <span className="absolute inset-0 rounded-full bg-[var(--ok)] animate-[fusePulse_2.4s_ease-in-out_infinite]" />
+          <span className="absolute inset-0 rounded-full bg-[var(--ok)] animate-[rmcPulse_2.4s_ease-in-out_infinite]" />
         </span>
         <span className="text-[11px] font-semibold tracking-[0.08em] text-[var(--text-faint)]">ALL SYSTEMS OPERATIONAL</span>
         <span className="text-[var(--text-dim)]">·</span>

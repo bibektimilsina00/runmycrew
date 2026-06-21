@@ -48,7 +48,7 @@ export function DashboardMockup() {
             <div className="h-full overflow-hidden px-[26px] py-6">
               {/* Greeting + status + actions */}
               <div className="mb-3.5 flex items-center gap-2">
-                <span className="h-[7px] w-[7px] animate-[fusePulse_2.4s_ease-in-out_infinite] rounded-full bg-[#4cc38a]" />
+                <span className="h-[7px] w-[7px] animate-[rmcPulse_2.4s_ease-in-out_infinite] rounded-full bg-[#4cc38a]" />
                 <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/80">
                   All systems operational
                 </span>
@@ -123,7 +123,7 @@ export function DashboardMockup() {
                 <div className="px-4 pb-3.5 pt-4">
                   <div className="min-h-[42px] text-[14.5px] leading-[1.5] text-foreground/85">
                     {active.text}
-                    <span className="ml-[2px] inline-block h-[15px] w-[7px] -translate-y-[2px] animate-[fuseBlink_1.1s_infinite] bg-primary align-middle" />
+                    <span className="ml-[2px] inline-block h-[15px] w-[7px] -translate-y-[2px] animate-[rmcBlink_1.1s_infinite] bg-primary align-middle" />
                   </div>
                   <div className="mt-3.5 flex items-center justify-end">
                     <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-[13px] py-[7px] text-[12.5px] font-semibold text-primary-foreground transition-[filter] hover:brightness-110">

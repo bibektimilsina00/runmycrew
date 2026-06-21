@@ -157,14 +157,18 @@
   }
 }
 
-/* Keyframes used by the dashboard mockup (status pulse + cursor blink). */
-@keyframes fusePulse {
+/* Keyframes used by the dashboard mockup (status pulse + cursor blink)
+ * and the brand mark spinner. */
+@keyframes rmcPulse {
   0%, 100% { opacity: 1;   }
   50%      { opacity: 0.35; }
 }
-@keyframes fuseBlink {
+@keyframes rmcBlink {
   0%, 49%   { opacity: 1; }
   50%, 100% { opacity: 0; }
+}
+@keyframes rmcSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* ──────────────────────────────────────────────────────────────────────
