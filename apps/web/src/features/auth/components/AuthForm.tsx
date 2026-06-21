@@ -78,15 +78,19 @@ export function AuthForm({ mode }: AuthFormProps) {
       description: 'OAuth providers are wired but not enabled yet — use email below.',
     })
 
-  const goGoogle = () => {
-    // Full-page redirect so the backend can set the session in its own
-    // response — we never see Google's consent page inside an AJAX call.
-    // `VITE_API_URL` is `/api/v1` in prod (same-origin via Caddy) and
-    // e.g. `http://localhost:8000/api/v1` in dev.
+  // Full-page redirect so the backend can set the session in its own
+  // response — we never see the provider consent page inside an AJAX call.
+  // `VITE_API_URL` is `/api/v1` in prod (same-origin via Caddy) and
+  // e.g. `http://localhost:8000/api/v1` in dev.
+  const goProvider = (provider: 'google' | 'github' | 'microsoft') => () => {
     const base = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/+$/, '')
     const next = encodeURIComponent('/dashboard')
-    window.location.assign(`${base}/auth/google/start?next=${next}`)
+    window.location.assign(`${base}/auth/${provider}/start?next=${next}`)
   }
+
+  const goGoogle = goProvider('google')
+  const goGithub = goProvider('github')
+  const goMicrosoft = goProvider('microsoft')
 
   return (
     <>
@@ -102,16 +106,15 @@ export function AuthForm({ mode }: AuthFormProps) {
         {copy.sub}
       </p>
 
-      {/* SSO triplet — Google is live; GitHub + Microsoft show a toast
-          until their backend providers ship. */}
+      {/* SSO triplet — all three are live OIDC/OAuth providers. */}
       <div className="mt-[30px] flex flex-col gap-2.5">
         <SsoButton onClick={goGoogle}>
           <GoogleIcon /> {copy.verb} Google
         </SsoButton>
-        <SsoButton onClick={ssoSoon}>
+        <SsoButton onClick={goGithub}>
           <GithubIcon /> {copy.verb} GitHub
         </SsoButton>
-        <SsoButton onClick={ssoSoon}>
+        <SsoButton onClick={goMicrosoft}>
           <MicrosoftIcon /> {copy.verb} Microsoft
         </SsoButton>
       </div>

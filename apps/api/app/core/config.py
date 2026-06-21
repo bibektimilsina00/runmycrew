@@ -41,6 +41,13 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_ID: str = ""
     GITHUB_CLIENT_SECRET: str = ""
 
+    # Microsoft (Azure AD / Entra ID) — sign-in only. `common` tenant
+    # accepts both personal Microsoft accounts and work/school Entra
+    # accounts. Use a tenant id to lock to one org.
+    MICROSOFT_CLIENT_ID: str = ""
+    MICROSOFT_CLIENT_SECRET: str = ""
+    MICROSOFT_TENANT: str = "common"
+
     NOTION_CLIENT_ID: str = ""
     NOTION_CLIENT_SECRET: str = ""
 

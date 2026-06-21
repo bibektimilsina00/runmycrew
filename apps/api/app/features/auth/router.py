@@ -136,3 +136,85 @@ async def google_callback(
         url=_login_redirect_url(token, next_path),
         status_code=status.HTTP_302_FOUND,
     )
+
+
+# ── GitHub sign-in ────────────────────────────────────────────────────
+
+
+@router.get("/github/start")
+@limiter.limit(settings.RATE_LIMIT_AUTH)
+async def github_start(
+    request: Request,
+    next: str = Query(default="/dashboard"),
+    service: AuthService = Depends(get_auth_service),
+):
+    url = service.github_authorize_url(next_path=next)
+    return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/github/callback")
+@limiter.limit(settings.RATE_LIMIT_AUTH)
+async def github_callback(
+    request: Request,
+    code: str | None = Query(default=None),
+    state: str | None = Query(default=None),
+    error: str | None = Query(default=None),
+    service: AuthService = Depends(get_auth_service),
+):
+    if error or not code or not state:
+        return RedirectResponse(
+            url=_login_error_url(error or "github_cancelled"),
+            status_code=status.HTTP_302_FOUND,
+        )
+    try:
+        _user, token, next_path = await service.github_exchange(code=code, state=state)
+    except HTTPException as exc:
+        return RedirectResponse(
+            url=_login_error_url(str(exc.detail) or "github_failed"),
+            status_code=status.HTTP_302_FOUND,
+        )
+    return RedirectResponse(
+        url=_login_redirect_url(token, next_path),
+        status_code=status.HTTP_302_FOUND,
+    )
+
+
+# ── Microsoft sign-in ─────────────────────────────────────────────────
+
+
+@router.get("/microsoft/start")
+@limiter.limit(settings.RATE_LIMIT_AUTH)
+async def microsoft_start(
+    request: Request,
+    next: str = Query(default="/dashboard"),
+    service: AuthService = Depends(get_auth_service),
+):
+    url = service.microsoft_authorize_url(next_path=next)
+    return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/microsoft/callback")
+@limiter.limit(settings.RATE_LIMIT_AUTH)
+async def microsoft_callback(
+    request: Request,
+    code: str | None = Query(default=None),
+    state: str | None = Query(default=None),
+    error: str | None = Query(default=None),
+    service: AuthService = Depends(get_auth_service),
+):
+    if error or not code or not state:
+        return RedirectResponse(
+            url=_login_error_url(error or "microsoft_cancelled"),
+            status_code=status.HTTP_302_FOUND,
+        )
+    try:
+        _user, token, next_path = await service.microsoft_exchange(code=code, state=state)
+    except HTTPException as exc:
+        return RedirectResponse(
+            url=_login_error_url(str(exc.detail) or "microsoft_failed"),
+            status_code=status.HTTP_302_FOUND,
+        )
+    return RedirectResponse(
+        url=_login_redirect_url(token, next_path),
+        status_code=status.HTTP_302_FOUND,
+    )
