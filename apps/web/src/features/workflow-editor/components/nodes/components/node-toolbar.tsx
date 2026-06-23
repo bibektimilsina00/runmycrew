@@ -9,15 +9,23 @@ interface NodeToolbarProps {
   selected: boolean
 }
 
-// Chip uses the accent (theme primary) as its surface so the toolbar
-// stays consistent across colour schemes — the variable retints with
-// the active palette automatically. White-ish foreground for contrast
-// against the saturated bg; alpha overlay on hover for press feedback.
+// Chip base = neutral surface so the toolbar reads as quiet glyphs at
+// rest. Accent (theme primary) only applies when the chip's underlying
+// state is active — Run while running, Lock while locked — surfaced via
+// the BTN_ACTIVE modifier below. Hover stays subtle (surface bump) so
+// it never looks like an "active" state on idle chips.
 const BTN =
   'flex size-[24px] items-center justify-center rounded-[7px] ' +
-  'bg-[var(--accent)] border border-[color-mix(in_oklab,var(--accent)_70%,transparent)] text-white/90 ' +
-  'transition-colors hover:brightness-110 hover:text-white ' +
+  'bg-[var(--surface)]/80 border border-[var(--border-faint)] text-[var(--text-mute)] ' +
+  'backdrop-blur-sm transition-colors ' +
+  'hover:bg-[var(--surface-2)] hover:border-[var(--border-soft)] hover:text-[var(--text)] ' +
   '[&_svg]:size-[12px] disabled:opacity-40 disabled:cursor-not-allowed'
+
+// Applied to a chip whose underlying state is currently "on". Uses the
+// accent token so the highlight retints with the active palette.
+const BTN_ACTIVE =
+  'bg-[var(--accent)] border-[color-mix(in_oklab,var(--accent)_70%,transparent)] text-white ' +
+  'hover:bg-[var(--accent)] hover:text-white hover:brightness-110'
 
 const NODE_HEIGHT_ESTIMATE = 30 // px above the node
 
@@ -63,11 +71,16 @@ export const NodeToolbar = ({ id, selected }: NodeToolbarProps) => {
       onPointerDown={e => e.stopPropagation()}
       onClick={e => e.stopPropagation()}
     >
-      {/* Run / Stop — single slot toggle */}
+      {/* Run / Stop — single slot toggle. While running the chip lights
+          up red (active danger state); idle keeps neutral but tints text
+          on the last terminal status. */}
       {isRunning ? (
         <button
           type="button"
-          className={cn(BTN, 'text-[var(--err)] hover:text-[var(--err)] hover:bg-[var(--err)]/10 hover:border-[var(--err)]/30')}
+          className={cn(
+            BTN,
+            'bg-[var(--err)] border-[var(--err)] text-white hover:bg-[var(--err)] hover:text-white hover:brightness-110',
+          )}
           title="Stop run"
           onClick={() => stopNode(id)}
         >
@@ -103,7 +116,7 @@ export const NodeToolbar = ({ id, selected }: NodeToolbarProps) => {
 
       <button
         type="button"
-        className={cn(BTN, isLocked && 'text-[var(--warn)] hover:text-[var(--warn)]')}
+        className={cn(BTN, isLocked && BTN_ACTIVE)}
         title={isLocked ? 'Unlock node' : 'Lock node'}
         onClick={() => toggleNodeLock(id)}
         aria-pressed={isLocked}
@@ -132,7 +145,13 @@ export const NodeToolbar = ({ id, selected }: NodeToolbarProps) => {
 
       <button
         type="button"
-        className={cn(BTN, 'hover:bg-[var(--err)]/10 hover:border-[var(--err)]/30 hover:text-[var(--err)]')}
+        className={cn(
+          BTN,
+          // Delete is destructive — hover keeps the err tint but never
+          // becomes the accent / "active" state since the action is a
+          // momentary trigger, not a persistent toggle.
+          'hover:bg-[var(--err)]/10 hover:border-[var(--err)]/30 hover:text-[var(--err)]',
+        )}
         title="Delete node (⌫)"
         onClick={() => removeNode(id)}
       >
