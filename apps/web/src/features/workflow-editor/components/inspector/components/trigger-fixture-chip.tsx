@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Clock, AlertCircle } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import apiClient from '@/shared/utils/apiClient'
 import { useWorkflowEditorStore } from '../../../stores/workflowEditorStore'
 
@@ -53,17 +53,10 @@ export function TriggerFixtureChip({ nodeId }: Props) {
     )
   }
 
-  if (!query.data) {
-    return (
-      <div className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-dashed border-[var(--border-soft)] bg-[var(--surface)] px-3 py-2 text-[11px] text-[var(--text-faint)]">
-        <AlertCircle className="h-3.5 w-3.5" />
-        <span>
-          No event captured yet — Run will fail until this trigger
-          receives a real event.
-        </span>
-      </div>
-    )
-  }
+  // Empty state (no captured event yet) is intentionally not rendered —
+  // it cluttered the inspector for nodes that hadn't seen a fire. The
+  // chip only appears when there's something useful to show.
+  if (!query.data) return null
 
   return (
     <div className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-[var(--border-faint)] bg-[var(--surface)] px-3 py-2 text-[11px] text-[var(--text-mute)]">
