@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -13,6 +14,8 @@ from apps.api.app.features.credentials.models import Credential
 from apps.api.app.features.credentials.repository import CredentialRepository
 from apps.api.app.features.users.models import User
 from apps.api.app.features.workspaces.models import Workspace
+
+logger = logging.getLogger(__name__)
 
 REFRESH_SKEW = timedelta(minutes=5)
 
@@ -77,11 +80,53 @@ class CredentialService:
         return await self._decrypt_credentials(credentials)
 
     async def _decrypt_credentials(self, credentials: list[Credential]) -> list[dict[str, Any]]:
+        """Decrypt every credential the caller asked for.
+
+        Per-credential failures (typically a stale OAuth refresh token that
+        the provider has revoked) are isolated: we mark the row with
+        ``needs_reauth`` in its meta so the UI can show a reconnect badge,
+        log a warning, and skip the entry. Returning a partial list keeps
+        unrelated workflows running — one broken Google connection should
+        not take down every agent loop that reads the credential list.
+
+        Callers that need a SPECIFIC credential (`get_decrypted_credential`,
+        `get_decrypted`, `get_decrypted_by_type`) still see the raised
+        error and surface it to the user.
+        """
         decrypted: list[dict[str, Any]] = []
         for credential in credentials:
-            data = await self.get_decrypted_credential(credential)
+            try:
+                data = await self.get_decrypted_credential(credential)
+            except Exception as exc:
+                logger.warning(
+                    "credential %s (%s) skipped during bulk decrypt: %s",
+                    credential.id,
+                    credential.type,
+                    exc,
+                )
+                await self._mark_needs_reauth(credential, str(exc))
+                continue
             decrypted.append({"id": str(credential.id), "type": credential.type, "data": data})
         return decrypted
+
+    async def _mark_needs_reauth(self, credential: Credential, reason: str) -> None:
+        """Flag the credential row so the UI can show a reconnect prompt.
+
+        Idempotent — repeated failures just refresh the reason + timestamp.
+        Best-effort: if the meta update itself raises, we swallow it (the
+        bulk decrypt path that called us is already in a degraded state
+        and re-raising here would defeat the per-credential isolation).
+        """
+        try:
+            credential.meta = {
+                **(credential.meta or {}),
+                "needs_reauth": True,
+                "last_refresh_error": reason[:500],
+                "last_refresh_error_at": datetime.now(UTC).isoformat(),
+            }
+            await self.repo.update(credential)
+        except Exception as exc:
+            logger.warning("failed to mark credential %s as needs_reauth: %s", credential.id, exc)
 
     async def rename_credential(
         self, credential_id: uuid.UUID, name: str, user: User, workspace: Workspace
