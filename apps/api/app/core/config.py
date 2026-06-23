@@ -19,9 +19,18 @@ class Settings(BaseSettings):
     # `http://localhost:8000`, so production deployments MUST set this to
     # the Cloudflare tunnel / public hostname.
     PUBLIC_BASE_URL: str = ""
-    FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "http://localhost:3001"
+    # Default origins match the actual ports each frontend listens on in dev:
+    # - web (apps/web Vite)  → :3001  (see apps/web/vite.config.ts)
+    # - site (apps/site Next) → :3100 (see apps/site/package.json)
+    # :5173 stays for the legacy Vite default port so a customised config
+    # doesn't get blocked.
     BACKEND_CORS_ORIGINS: list[str] = Field(
         default_factory=lambda: [
+            "http://localhost:3001",
+            "http://127.0.0.1:3001",
+            "http://localhost:3100",
+            "http://127.0.0.1:3100",
             "http://localhost:5173",
             "http://127.0.0.1:5173",
         ]

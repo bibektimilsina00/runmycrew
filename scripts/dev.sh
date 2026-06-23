@@ -50,6 +50,17 @@ for _ in {1..30}; do
   sleep 1
 done
 
+# Kill any stragglers from a previous run that didn't trap clean.
+# Uvicorn's --reload spawns a child that survives parent SIGTERM under
+# some bash versions, leaving port 8000 locked. Same idea for vite/next.
+for port in 8000 3001 3100; do
+  pids="$(lsof -ti tcp:$port 2>/dev/null || true)"
+  if [[ -n "$pids" ]]; then
+    log "killing stale process on :$port (pids: $pids)"
+    kill -9 $pids 2>/dev/null || true
+  fi
+done
+
 log "running alembic migrations…"
 (cd apps/api && PYTHONPATH=../.. uv run alembic upgrade head)
 
@@ -101,8 +112,8 @@ launch site   "$C_SITE"   pnpm --filter runmycrew-site dev
 
 log "all services launched. URLs:"
 log "  api    → http://localhost:8000  (docs: /docs, health: /health)"
-log "  web    → http://localhost:5173"
-log "  site   → http://localhost:3000"
+log "  web    → http://localhost:3001  (workflow editor)"
+log "  site   → http://localhost:3100  (marketing site)"
 log ""
 log "press Ctrl-C to stop everything."
 
