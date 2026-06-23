@@ -1,0 +1,82 @@
+{
+  "id": "loop_dependabot_automerge",
+  "name": "Auto-merge Dependabot PRs",
+  "category": "loops",
+  "summary": "On every new pull request, decides whether to merge automatically. If author is Dependabot, version bump is patch/minor, and CI is green → merge. Otherwise post to #dependencies for human review.",
+  "estimated_cost_per_fire": "USD 0.01–0.02",
+  "schedule_human": "webhook · pull_request.opened",
+  "credentials_required": ["github", "slack"],
+  "tags": ["github", "dependabot", "auto-merge", "loop"],
+  "workflow": {
+    "name": "Auto-merge Dependabot PRs",
+    "graph": {
+      "nodes": [
+        {
+          "id": "trigger",
+          "type": "trigger.webhook",
+          "position": { "x": 80, "y": 200 },
+          "data": {
+            "properties": {
+              "path": "/dependabot-automerge",
+              "method": "POST"
+            }
+          }
+        },
+        {
+          "id": "agent",
+          "type": "action.agent",
+          "position": { "x": 400, "y": 200 },
+          "data": {
+            "properties": {
+              "provider": "anthropic",
+              "model": "claude-haiku-4-5",
+              "messages": "Decide whether to merge this pull request. Auto-merge ONLY if all three conditions are true: (1) the PR author login is 'dependabot[bot]', (2) the version bump is 'patch' or 'minor' (NOT 'major'), and (3) every required check is green. Otherwise, post the PR title + link + reason to the #dependencies Slack channel for human review.",
+              "tools": ["github_get_pr", "github_get_checks", "github_merge_pr", "slack_post"],
+              "toolChoice": "auto",
+              "maxIterations": 6,
+              "maxSeconds": 180,
+              "maxInputTokens": 50000,
+              "maxCostUsd": 0.05,
+              "successWhen": "action_taken",
+              "failurePolicy": "escalate",
+              "retryCount": 1
+            }
+          }
+        },
+        {
+          "id": "github_get_pr",
+          "type": "action.github",
+          "position": { "x": 720, "y": 40 },
+          "data": { "properties": { "operation": "get_pr", "credential": "" } }
+        },
+        {
+          "id": "github_get_checks",
+          "type": "action.github",
+          "position": { "x": 720, "y": 180 },
+          "data": { "properties": { "operation": "list_check_runs", "credential": "" } }
+        },
+        {
+          "id": "github_merge_pr",
+          "type": "action.github",
+          "position": { "x": 720, "y": 320 },
+          "data": { "properties": { "operation": "merge_pr", "credential": "" } }
+        },
+        {
+          "id": "slack_post",
+          "type": "action.slack",
+          "position": { "x": 720, "y": 460 },
+          "data": {
+            "properties": {
+              "operation": "send_message",
+              "credential": "",
+              "channel": "#dependencies"
+            }
+          }
+        }
+      ],
+      "edges": [
+        { "id": "e1", "source": "trigger", "target": "agent" }
+      ]
+    }
+  }
+}

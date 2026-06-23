@@ -1,0 +1,83 @@
+{
+  "id": "loop_sentry_to_github",
+  "name": "Sentry → GitHub issue",
+  "category": "loops",
+  "summary": "Every 15 minutes, fetches new Sentry issues. For each, checks if a GitHub issue already references the fingerprint. If not, creates a new GitHub issue with stack trace + frequency.",
+  "estimated_cost_per_fire": "USD 0.01–0.03",
+  "schedule_human": "every 15 minutes",
+  "credentials_required": ["sentry", "github"],
+  "tags": ["sentry", "github", "bug-triage", "loop"],
+  "workflow": {
+    "name": "Sentry → GitHub issue",
+    "graph": {
+      "nodes": [
+        {
+          "id": "trigger",
+          "type": "trigger.cron",
+          "position": { "x": 80, "y": 200 },
+          "data": {
+            "properties": {
+              "cron_expression": "*/15 * * * *"
+            }
+          }
+        },
+        {
+          "id": "agent",
+          "type": "action.agent",
+          "position": { "x": 400, "y": 200 },
+          "data": {
+            "properties": {
+              "provider": "openai",
+              "model": "gpt-5-mini",
+              "messages": "For each new Sentry issue created since memory.last_seen_at, search GitHub issues for one mentioning the Sentry fingerprint. If found, do nothing for that issue. If not found, open a new GitHub issue with: title 'Sentry: {sentry_title}', body containing the stack trace + frequency + link back to Sentry, and label 'sentry'. After processing all issues, update memory.last_seen_at to the newest Sentry issue's timestamp. If no new issues, exit with no_new_issues=true.",
+              "tools": ["sentry_list", "github_search_issues", "github_create_issue", "memory_get", "memory_set"],
+              "toolChoice": "auto",
+              "maxIterations": 12,
+              "maxSeconds": 600,
+              "maxInputTokens": 100000,
+              "maxCostUsd": 0.05,
+              "memoryType": "redis",
+              "memoryKey": "sentry-bridge",
+              "successWhen": "action_taken or no_new_issues",
+              "failurePolicy": "escalate",
+              "retryCount": 1
+            }
+          }
+        },
+        {
+          "id": "sentry_list",
+          "type": "action.sentry",
+          "position": { "x": 720, "y": 40 },
+          "data": { "properties": { "operation": "list_issues", "credential": "" } }
+        },
+        {
+          "id": "github_search_issues",
+          "type": "action.github",
+          "position": { "x": 720, "y": 180 },
+          "data": { "properties": { "operation": "search_issues", "credential": "" } }
+        },
+        {
+          "id": "github_create_issue",
+          "type": "action.github",
+          "position": { "x": 720, "y": 320 },
+          "data": { "properties": { "operation": "create_issue", "credential": "" } }
+        },
+        {
+          "id": "memory_get",
+          "type": "action.memory",
+          "position": { "x": 720, "y": 460 },
+          "data": { "properties": { "operation": "get" } }
+        },
+        {
+          "id": "memory_set",
+          "type": "action.memory",
+          "position": { "x": 720, "y": 600 },
+          "data": { "properties": { "operation": "set" } }
+        }
+      ],
+      "edges": [
+        { "id": "e1", "source": "trigger", "target": "agent" }
+      ]
+    }
+  }
+}
