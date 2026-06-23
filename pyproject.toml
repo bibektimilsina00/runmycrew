@@ -16,5 +16,6 @@ known-first-party = ["apps"]
 
 [dependency-groups]
 dev = [
+    "fakeredis[lua]>=2.36.2",
     "ruff>=0.15.12",
 ]

@@ -86,7 +86,76 @@ class WorkflowRunner:
     # Public entry point
     # ------------------------------------------------------------------
 
+    async def _acquire_concurrency(self) -> tuple[Any, Any]:
+        """Acquire the workflow-level concurrency mutex.
+
+        Returns ``(manager, acquire_result)`` so the caller can
+        release on exit. When the workflow is a sub-runner (depth>0)
+        we skip the mutex entirely — sub-workflows are part of the
+        parent's run by definition. Loads policy from the workflow
+        row; falls back to ``skip`` + 60s queue wait if the row was
+        deleted between trigger and run.
+        """
+        if self._depth > 0 or self.db is None:
+            return None, None
+        try:
+            import uuid as _uuid
+
+            from apps.api.app.execution_engine.concurrency import (
+                ConcurrencyManager,
+                ConcurrencyPolicy,
+            )
+            from apps.api.app.features.workflows.models import Workflow
+
+            try:
+                wf_uuid = _uuid.UUID(str(self.workflow_id))
+            except (ValueError, TypeError):
+                return None, None
+            wf = await self.db.get(Workflow, wf_uuid)
+            if wf is None:
+                return None, None
+            try:
+                policy = ConcurrencyPolicy(wf.concurrency_policy or "skip")
+            except ValueError:
+                policy = ConcurrencyPolicy.SKIP
+            mgr = ConcurrencyManager()
+            result = await mgr.acquire(
+                wf.id,
+                policy=policy,
+                queue_max_wait_seconds=int(wf.concurrency_queue_max_wait_seconds or 60),
+            )
+            return mgr, result
+        except Exception:
+            # Concurrency MUST never break the run path. Log + fall
+            # through to lock-free execution.
+            logger.exception("concurrency: acquire failed; running lock-free")
+            return None, None
+
+    async def _release_concurrency(self, mgr: Any, result: Any) -> None:
+        if mgr is None or result is None or not getattr(result, "token", None):
+            return
+        try:
+            await mgr.release(self.workflow_id, result.token)
+        except Exception:
+            logger.exception("concurrency: release failed")
+
     async def run(self, trigger_data: dict[str, Any]) -> dict[str, Any]:
+        # ── Concurrency mutex (Phase 2 wiring) ─────────────────────
+        # Acquire BEFORE we set any per-run state so that a skipped
+        # fire returns immediately without touching DB / outputs.
+        cc_mgr, cc_result = await self._acquire_concurrency()
+        if cc_result is not None and not cc_result.acquired:
+            logger.info(
+                "workflow=%s execution=%s skipped — concurrency status=%s",
+                self.workflow_id,
+                self.execution_id,
+                cc_result.status,
+            )
+            return {
+                "_concurrency_status": cc_result.status,
+                "_skipped": True,
+            }
+
         self._trigger_data = trigger_data
         logger.info(f"Starting workflow execution {self.execution_id}")
 
@@ -122,24 +191,35 @@ class WorkflowRunner:
                         per_node_input[node_id] = fixture.payload
 
         try:
-            await asyncio.gather(
-                *[self._execute_node(n, per_node_input.get(n, trigger_data)) for n in start_nodes]
-            )
-        except PauseSignal:
-            raise  # propagate to Celery task
-        except CancelledException:
-            raise  # propagate to Celery task
-        except Exception as e:
-            self._failed.set()
-            self._error_message = str(e)
+            try:
+                await asyncio.gather(
+                    *[
+                        self._execute_node(n, per_node_input.get(n, trigger_data))
+                        for n in start_nodes
+                    ]
+                )
+            except PauseSignal:
+                raise  # propagate to Celery task
+            except CancelledException:
+                raise  # propagate to Celery task
+            except Exception as e:
+                self._failed.set()
+                self._error_message = str(e)
 
-        if self._failed.is_set():
-            raise Exception(self._error_message or "Execution failed")
+            if self._failed.is_set():
+                raise Exception(self._error_message or "Execution failed")
 
-        if self._outputs:
-            last_node_id = list(self._outputs.keys())[-1]
-            return self._outputs[last_node_id]
-        return {}
+            if self._outputs:
+                last_node_id = list(self._outputs.keys())[-1]
+                return self._outputs[last_node_id]
+            return {}
+        finally:
+            # Always release the mutex, even on PauseSignal or
+            # CancelledException. PauseSignal is a special case:
+            # technically the run is paused, not finished — but the
+            # mutex is per FIRE, not per RESUME, so releasing here is
+            # correct. Resume reacquires.
+            await self._release_concurrency(cc_mgr, cc_result)
 
     # ------------------------------------------------------------------
     # Internal: run a single node then dispatch its successors

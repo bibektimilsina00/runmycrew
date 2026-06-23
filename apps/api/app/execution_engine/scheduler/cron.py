@@ -54,34 +54,89 @@ async def _check_and_fire():
                     )
                     continue
 
+                # ── Cron drift policy (Phase 5) ────────────────
+                # ``latest`` (default) — fire ONCE for the current
+                #   tick, discarding any older missed fires.
+                # ``catchup`` — fire for every missed tick (capped at
+                #   MAX_CATCHUP_FIRES to stop a long-idle worker from
+                #   stampeding the queue).
+                # ``skip`` — fire nothing if more than one tick was
+                #   missed; useful for "freshest data wins" workloads
+                #   where stale fires are worse than no fire.
+                drift_policy = getattr(workflow, "cron_drift_policy", None) or "latest"
+
                 citer = croniter(cron_expr, now)
                 last_expected: datetime = citer.get_prev(datetime)
 
                 last_run_str = await redis.get(redis_key)
+                last_run: datetime | None = None
                 if last_run_str:
                     last_run = datetime.fromisoformat(last_run_str.decode())
                     if last_run >= last_expected:
                         continue  # already fired for this window
 
-                logger.info(f"Firing cron trigger on workflow {workflow.id} (expr: {cron_expr})")
-
-                async with AsyncSessionLocal() as db:
-                    wf_repo = WorkflowRepository(db)
-                    fresh_workflow = await wf_repo.get_by_id(workflow.id)
-                    if not fresh_workflow:
+                # Build list of ticks to fire based on drift policy.
+                fires: list[datetime] = []
+                if drift_policy == "catchup" and last_run is not None:
+                    # Replay every missed tick between last_run and now,
+                    # bounded so an idle worker doesn't unleash hundreds
+                    # of fires when it wakes up.
+                    MAX_CATCHUP_FIRES = 10
+                    catchup_iter = croniter(cron_expr, last_run)
+                    while True:
+                        nxt = catchup_iter.get_next(datetime)
+                        if nxt > now:
+                            break
+                        fires.append(nxt)
+                        if len(fires) >= MAX_CATCHUP_FIRES:
+                            logger.warning(
+                                "cron: catchup capped at %d fires for workflow %s",
+                                MAX_CATCHUP_FIRES,
+                                workflow.id,
+                            )
+                            break
+                elif drift_policy == "skip" and last_run is not None:
+                    # If we're already more than one tick late, the
+                    # ``skip`` policy says do nothing.
+                    next_after_last = croniter(cron_expr, last_run).get_next(datetime)
+                    next_after_that = croniter(cron_expr, next_after_last).get_next(datetime)
+                    if now >= next_after_that:
+                        logger.info(
+                            "cron: skip-policy dropped late fire for workflow %s",
+                            workflow.id,
+                        )
+                        await redis.set(redis_key, now.isoformat(), ex=120)
                         continue
+                    fires.append(last_expected)
+                else:
+                    # Default: one fire for the current tick.
+                    fires.append(last_expected)
 
-                    await execution_engine.trigger_workflow(
-                        workflow_id=fresh_workflow.id,
-                        graph=fresh_workflow.graph,
-                        trigger_type="trigger.cron",
-                        input_data={
-                            "fired_at": now.isoformat(),
-                            "scheduled_time": last_expected.isoformat(),
-                            "workflow_id": str(fresh_workflow.id),
-                            "cron_expression": cron_expr,
-                        },
+                for scheduled in fires:
+                    logger.info(
+                        "Firing cron trigger on workflow %s (expr=%s, scheduled=%s)",
+                        workflow.id,
+                        cron_expr,
+                        scheduled.isoformat(),
                     )
+                    async with AsyncSessionLocal() as db:
+                        wf_repo = WorkflowRepository(db)
+                        fresh_workflow = await wf_repo.get_by_id(workflow.id)
+                        if not fresh_workflow:
+                            continue
+
+                        await execution_engine.trigger_workflow(
+                            workflow_id=fresh_workflow.id,
+                            graph=fresh_workflow.graph,
+                            trigger_type="trigger.cron",
+                            input_data={
+                                "fired_at": now.isoformat(),
+                                "scheduled_time": scheduled.isoformat(),
+                                "workflow_id": str(fresh_workflow.id),
+                                "cron_expression": cron_expr,
+                                "drift_policy": drift_policy,
+                            },
+                        )
 
                 # Mark as fired — TTL of 2 minutes (safe overlap buffer)
                 await redis.set(redis_key, now.isoformat(), ex=120)

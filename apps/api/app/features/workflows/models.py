@@ -35,6 +35,25 @@ class Workflow(SQLModelBase, table=True):
         default=None, foreign_key="folder.id", ondelete="CASCADE", index=True
     )
 
+    # ── Loop engineering — phases 2 + 5 ───────────────────────────
+    # See docs/loop-engineering-plan.md sections 8.5 + 8.6.
+    #
+    # concurrency_policy controls what happens when a trigger fires
+    # this workflow while a previous run is still in flight:
+    #   - "skip"    — drop the new fire (default; safest for loops)
+    #   - "queue"   — wait up to concurrency_queue_max_wait_seconds
+    #   - "replace" — force-acquire, original holder stays running
+    #                 but its release becomes a no-op
+    concurrency_policy: str = Field(default="skip", max_length=16)
+    concurrency_queue_max_wait_seconds: int = Field(default=60)
+
+    # cron_drift_policy controls what happens when the cron scheduler
+    # is late firing (e.g. the worker was busy + slept past the tick).
+    #   - "latest"  — fire ONCE for the current tick only (default)
+    #   - "catchup" — fire for every missed tick since last run
+    #   - "skip"    — fire nothing if we are more than 1 tick late
+    cron_drift_policy: str = Field(default="latest", max_length=16)
+
     user: "User" = Relationship(back_populates="workflows")
     folder: "Folder" = Relationship(back_populates="workflows")
     executions: list["Execution"] = Relationship(
