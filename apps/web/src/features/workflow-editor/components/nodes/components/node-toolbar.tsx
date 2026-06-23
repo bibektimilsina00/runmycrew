@@ -148,10 +148,13 @@ export const NodeToolbar = ({ id, selected }: NodeToolbarProps) => {
         type="button"
         className={cn(
           BTN,
-          // Delete is destructive — hover keeps the err tint but never
-          // becomes the accent / "active" state since the action is a
-          // momentary trigger, not a persistent toggle.
-          'hover:bg-[var(--err)]/10 hover:border-[var(--err)]/30 hover:text-[var(--err)]',
+          // Delete shares the idle surface-2 fill with the rest of the
+          // toolbar, then flips to a solid err on hover instead of accent
+          // so the destructive intent reads at a glance. Avoiding the
+          // /N alpha modifier here too — Tailwind silently drops alpha
+          // on CSS-var values, which would have left the chip
+          // colour-shift-less on hover.
+          'hover:bg-[var(--err)] hover:border-[var(--err)] hover:text-white',
         )}
         title="Delete node (⌫)"
         onClick={() => removeNode(id)}
