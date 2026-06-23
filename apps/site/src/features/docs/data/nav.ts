@@ -53,6 +53,7 @@ export const DOCS_NAV: DocGroup[] = [
       { slug: 'run-history',   title: 'Run history' },
       { slug: 'alerts',        title: 'Alerts' },
       { slug: 'replay',        title: 'Run replay' },
+      { slug: 'agent-loops',   title: 'Agent loops', intro: 'Schedule autonomous agents that own recurring work — with hard budgets, escalation, and a live trace.' },
     ],
   },
   {

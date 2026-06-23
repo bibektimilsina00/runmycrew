@@ -4,6 +4,9 @@
  */
 export type BlogCategory = 'Product' | 'Engineering' | 'Company' | 'Customer story'
 
+// PostVisual variants the blog cards/visual component support today. Extend
+// PostVisual.tsx in lockstep when adding a new key here.
+
 export type BlogPost = {
   slug: string
   title: string
@@ -11,12 +14,23 @@ export type BlogPost = {
   category: BlogCategory
   date: string         // ISO-ish, used as display string
   read: string         // e.g. '4 min read'
-  visual: 'mothership' | 'series' | 'realtime' | 'executor' | 'enterprise' | 'crew-ai'
+  visual: 'mothership' | 'series' | 'realtime' | 'executor' | 'enterprise' | 'crew-ai' | 'agent-loops'
   featured?: boolean
   body?: string        // optional stub markdown-ish body for the detail page
 }
 
 export const POSTS: BlogPost[] = [
+  {
+    slug: 'loop-engineering',
+    title: 'Loop engineering — autonomous agents that run on their own',
+    excerpt:
+      'Agents that own recurring work — triaging bugs, merging Dependabot PRs, turning Sentry into GitHub issues — with hard budgets, escalation, and a live trace you can audit step by step.',
+    category: 'Engineering',
+    date: 'Jun 20, 2026',
+    read: '9 min read',
+    visual: 'agent-loops',
+    featured: true,
+  },
   {
     slug: 'introducing-crew-ai',
     title: 'Introducing Crew AI',
@@ -25,7 +39,6 @@ export const POSTS: BlogPost[] = [
     date: 'Jun 10, 2026',
     read: '5 min read',
     visual: 'crew-ai',
-    featured: true,
   },
   {
     slug: 'enterprise',

@@ -6,12 +6,58 @@ import type { BlogPost } from '../data/posts'
  * brand tokens so they re-tint with the active scheme.
  */
 export function PostVisual({ which }: { which: BlogPost['visual'] }) {
-  if (which === 'crew-ai')   return <CrewAiVisual />
-  if (which === 'enterprise') return <EnterpriseVisual />
-  if (which === 'series')    return <SeriesVisual />
-  if (which === 'realtime')  return <RealtimeVisual />
-  if (which === 'executor')  return <ExecutorVisual />
+  if (which === 'crew-ai')      return <CrewAiVisual />
+  if (which === 'enterprise')   return <EnterpriseVisual />
+  if (which === 'series')       return <SeriesVisual />
+  if (which === 'realtime')     return <RealtimeVisual />
+  if (which === 'executor')     return <ExecutorVisual />
+  if (which === 'agent-loops')  return <AgentLoopsVisual />
   return <MothershipVisual />
+}
+
+function AgentLoopsVisual() {
+  return (
+    <svg viewBox="0 0 600 320" className="h-full w-full">
+      <defs>
+        <linearGradient id="bg-loops" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%"   stopColor="#202a55" />
+          <stop offset="100%" stopColor="#08090a" />
+        </linearGradient>
+        <linearGradient id="rim-loops" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%"  stopColor="#7aa2f7" />
+          <stop offset="50%" stopColor="#4cc38a" />
+          <stop offset="100%" stopColor="#e5b341" />
+        </linearGradient>
+      </defs>
+      <rect width="600" height="320" fill="url(#bg-loops)" />
+
+      {/* Cron tick markers along the top */}
+      <g stroke="rgba(255,255,255,0.35)" strokeWidth="1.2">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <line key={i} x1={60 + i * 40} y1="40" x2={60 + i * 40} y2="56" />
+        ))}
+      </g>
+
+      {/* The loop ring */}
+      <g transform="translate(300,180)" fill="none">
+        <circle r="86" stroke="url(#rim-loops)" strokeWidth="2.2" />
+        <circle r="62" stroke="rgba(255,255,255,0.18)" strokeWidth="0.6" />
+      </g>
+
+      {/* Three tool-call dots on the ring (one per "iteration") */}
+      <g>
+        <circle cx="386" cy="180" r="6" fill="#7aa2f7" />
+        <circle cx="300" cy="94"  r="6" fill="#4cc38a" />
+        <circle cx="214" cy="180" r="6" fill="#e5b341" />
+      </g>
+
+      {/* Budget meter at bottom */}
+      <g transform="translate(60,278)">
+        <rect width="480" height="6" rx="3" fill="rgba(255,255,255,0.1)" />
+        <rect width="320" height="6" rx="3" fill="url(#rim-loops)" />
+      </g>
+    </svg>
+  )
 }
 
 function CrewAiVisual() {
