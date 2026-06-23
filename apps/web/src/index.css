@@ -583,14 +583,25 @@ select:-webkit-autofill {
 }
 
 /* ============ TEMPLATES GRID ============ */
-.tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+/* grid-auto-rows: 1fr + child height: 100% gives every card the same
+   height regardless of title length. Without these two, intrinsic
+   content sizes leaked through the Aceternity CardContainer wrapper
+   and the cards in a row were uneven. */
+.tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; grid-auto-rows: 1fr; }
+.tpl-grid > * { height: 100%; display: flex; }
+.tpl-grid > * > div,
+.tpl-grid > * > div > div { width: 100%; height: 100%; }
 .inspo-card {
   position: relative; border-radius: 12px; overflow: hidden;
   border: 1px solid var(--border-faint); background: var(--bg); cursor: pointer;
   transition: transform 180ms, border-color 180ms; display: flex; flex-direction: column;
+  height: 100%;
 }
 .inspo-card:hover { transform: translateY(-2px); border-color: var(--border-soft); }
-.inspo-art { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+/* Fixed aspect-ratio art keeps the visual block identical across cards.
+   shrink: 0 stops the art from collapsing when a long title forces meta
+   to grow. */
+.inspo-art { position: relative; aspect-ratio: 4/3; overflow: hidden; flex-shrink: 0; }
 .inspo-card .label {
   position: absolute; left: 12px; bottom: 10px; font-family: var(--font-mono);
   font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text);
@@ -608,9 +619,13 @@ select:-webkit-autofill {
 .inspo-bg-1 { background: radial-gradient(ellipse at 70% 30%, oklch(0.34 0.04 240), oklch(0.16 0.02 240) 60%), oklch(0.14 0.01 240); }
 .inspo-bg-2 { background: radial-gradient(ellipse at 30% 60%, oklch(0.36 0.05 280), oklch(0.18 0.03 270) 65%), oklch(0.14 0.02 270); }
 .inspo-bg-3 { background: radial-gradient(ellipse at 50% 70%, oklch(0.38 0.05 200), oklch(0.20 0.03 220) 65%), oklch(0.16 0.02 220); }
-.inspo-meta { padding: 12px 14px 14px; border-top: 1px solid var(--border-faint); display: flex; flex-direction: column; gap: 7px; background: var(--bg-2); }
-.inspo-meta-title { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; }
-.inspo-meta-row { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); }
+.inspo-meta { padding: 12px 14px 14px; border-top: 1px solid var(--border-faint); display: flex; flex-direction: column; gap: 7px; background: var(--bg-2); flex: 1; min-height: 0; }
+/* line-clamp keeps long titles from pushing the meta-row to varying
+   positions across cards — every title gets at most 2 lines. */
+.inspo-meta-title { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+/* margin-top: auto pins the kind / steps row to the card bottom so the
+   bottom edge of every card aligns regardless of title height. */
+.inspo-meta-row { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin-top: auto; }
 .inspo-meta-row span { display: inline-flex; align-items: center; gap: 5px; }
 .inspo-meta-row svg { width: 11px; height: 11px; }
 
