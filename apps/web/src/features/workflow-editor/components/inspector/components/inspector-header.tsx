@@ -47,22 +47,17 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
     setError(null)
   }
 
-  const category = definition.category
-    ? definition.category.charAt(0).toUpperCase() + definition.category.slice(1)
-    : 'Node'
-  const subtitle = `${category} · ${definition.name}`
-
   return (
-    <header className="shrink-0 border-b border-[var(--border-soft)] px-4 py-4">
-      <div className="flex items-center gap-[11px]">
+    <header className="shrink-0 border-b border-[var(--border-soft)] px-4 py-3">
+      <div className="flex items-center gap-[10px]">
         <div
-          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[8px] text-white [&_svg]:h-[18px] [&_svg]:w-[18px]"
+          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-[14px] [&_svg]:w-[14px]"
           style={{ background: definition.color ?? 'var(--surface-3)' }}
         >
           {Icon}
         </div>
 
-        <div className="min-w-0 flex-1 leading-[1.3]">
+        <div className="min-w-0 flex-1">
           {editing ? (
             <input
               ref={inputRef}
@@ -88,9 +83,6 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
               {label}
             </span>
           )}
-          <span className="block truncate text-[11.5px] text-[var(--text-faint)] font-medium">
-            {subtitle}
-          </span>
         </div>
 
         <button
