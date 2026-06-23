@@ -9,15 +9,15 @@ interface NodeToolbarProps {
   selected: boolean
 }
 
-// Chip base = subtle surface tint + soft border + muted glyph so the
-// chip reads as a real tappable surface even at rest. Pointer hover
-// paints the accent (theme primary) so the action being pointed at
-// lights up; everything else stays quiet. backdrop-blur keeps the
-// tint readable when the chip floats over a coloured node header.
+// Chip base = solid surface-2 fill + soft border + muted glyph so the
+// chip reads as a real tappable surface at rest. Pointer hover paints
+// the accent (theme primary) so the action being pointed at lights up.
+// Solid bg avoids the alpha-on-CSS-var pitfall where Tailwind's /N
+// opacity modifier silently drops; this guarantees a visible fill.
 const BTN =
   'flex size-[24px] items-center justify-center rounded-[7px] ' +
-  'bg-[var(--surface)]/70 border border-[var(--border-soft)] text-[var(--text-mute)] ' +
-  'backdrop-blur-sm transition-colors ' +
+  'bg-[var(--surface-2)] border border-[var(--border-soft)] text-[var(--text-mute)] ' +
+  'transition-colors ' +
   'hover:bg-[var(--accent)] hover:border-[color-mix(in_oklab,var(--accent)_70%,transparent)] hover:text-white ' +
   '[&_svg]:size-[12px] disabled:opacity-40 disabled:cursor-not-allowed'
 
