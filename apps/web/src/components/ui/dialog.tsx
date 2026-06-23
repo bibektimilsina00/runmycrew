@@ -40,7 +40,9 @@ const DialogContent = forwardRef<
       className={cn(
         'fixed left-1/2 top-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2',
         'w-full max-w-md',
-        'bg-bg-2 border border-border-faint rounded-[10px] shadow-modal',
+        // bg-bg2 (not bg-bg-2) — Tailwind config key is `bg2`, hyphenated
+        // form was a typo and resolved to no class → transparent panel.
+        'bg-bg2 border border-border-faint rounded-[10px] shadow-modal',
         'flex flex-col',
         'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
         'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
@@ -155,7 +157,10 @@ function Modal({
 }) {
   return (
     <DialogRoot open={open} onOpenChange={(o) => { if (!o) onClose() }}>
-      <DialogContent width={width} hideClose={!title}>
+      {/* hideClose=true when we render our own X in the header below —
+          otherwise DialogContent renders its own auto-close X on top of
+          ours and the user sees two X buttons stacked. */}
+      <DialogContent width={width} hideClose={!!title}>
         {title && (
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
