@@ -43,3 +43,6 @@ class ToolDefinition:
     params: dict[str, ToolParam]
     oauth: ToolOAuth | None = None
     retry: ToolRetryConfig | None = None
+    category: str | None = None
+    tags: list[str] = field(default_factory=list)
+    dangerous: bool = False

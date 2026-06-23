@@ -45,6 +45,11 @@ class ToolSchema(SQLModel):
     oauth: ToolOAuthSchema | None = None
     retry: ToolRetrySchema | None = None
     requires_auth: bool  # convenience: oauth.required when oauth is set
+    # Phase 4 (loop hardening): free-form tags + dangerous flag let the
+    # agent inspector surface "this tool can write" without parsing names,
+    # and `tags` powers the search bar across registered tools.
+    tags: list[str] = []
+    dangerous: bool = False
 
 
 class ToolCategorySchema(SQLModel):

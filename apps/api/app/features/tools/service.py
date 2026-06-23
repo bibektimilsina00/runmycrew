@@ -58,7 +58,10 @@ def label_for_category(category: str) -> str:
 
 
 def _serialize_tool(definition: ToolDefinition) -> ToolSchema:
-    category = derive_category(definition.id)
+    # Explicit category on the definition wins; otherwise we fall back to
+    # the historical "first id segment" derivation so older tool entries
+    # still bucket correctly.
+    category = definition.category or derive_category(definition.id)
     return ToolSchema(
         id=definition.id,
         name=definition.name,
@@ -77,6 +80,8 @@ def _serialize_tool(definition: ToolDefinition) -> ToolSchema:
         oauth=ToolOAuthSchema(**asdict(definition.oauth)) if definition.oauth else None,
         retry=ToolRetrySchema(**asdict(definition.retry)) if definition.retry else None,
         requires_auth=bool(definition.oauth and definition.oauth.required),
+        tags=list(definition.tags),
+        dangerous=definition.dangerous,
     )
 
 
@@ -85,10 +90,16 @@ def _matches_filters(
     q: str | None,
     category: str | None,
     requires_auth: bool | None,
+    tag: str | None = None,
+    dangerous: bool | None = None,
 ) -> bool:
     if category and tool.category != category:
         return False
     if requires_auth is not None and tool.requires_auth != requires_auth:
+        return False
+    if tag and tag not in tool.tags:
+        return False
+    if dangerous is not None and tool.dangerous != dangerous:
         return False
     if q:
         needle = q.lower().strip()
@@ -96,6 +107,7 @@ def _matches_filters(
             needle in tool.id.lower()
             or needle in tool.name.lower()
             or needle in tool.description.lower()
+            or any(needle in t.lower() for t in tool.tags)
         ):
             return False
     return True
@@ -113,11 +125,17 @@ class ToolCatalogService:
         q: str | None = None,
         category: str | None = None,
         requires_auth: bool | None = None,
+        tag: str | None = None,
+        dangerous: bool | None = None,
     ) -> ToolListResponse:
         all_serialized = [_serialize_tool(d) for d in tool_registry.list_definitions()]
         all_serialized.sort(key=lambda t: (t.category, t.name.lower()))
 
-        matched = [t for t in all_serialized if _matches_filters(t, q, category, requires_auth)]
+        matched = [
+            t
+            for t in all_serialized
+            if _matches_filters(t, q, category, requires_auth, tag=tag, dangerous=dangerous)
+        ]
 
         # Categories are derived from the **matched** set so the frontend
         # picker can render group headers without round-tripping.

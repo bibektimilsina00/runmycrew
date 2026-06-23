@@ -36,17 +36,27 @@ async def list_tools(
     q: str | None = None,
     category: str | None = None,
     requires_auth: bool | None = None,
+    tag: str | None = None,
+    dangerous: bool | None = None,
     _: User = Depends(get_current_user),
     service: ToolCatalogService = Depends(get_tool_catalog_service),
 ) -> ToolListResponse:
     """List every tool the agent node can pick from.
 
     Query params:
-    - ``q`` — substring match across id / name / description (case-insensitive).
+    - ``q`` — substring match across id / name / description / tags (case-insensitive).
     - ``category`` — filter by derived category bucket (e.g. ``slack``).
     - ``requires_auth`` — narrow to tools that do (or don't) need an OAuth credential.
+    - ``tag`` — exact match on a single tag string (e.g. ``write``, ``read-only``).
+    - ``dangerous`` — narrow to tools the registry has flagged as writes/deletes.
     """
-    return service.list_tools(q=q, category=category, requires_auth=requires_auth)
+    return service.list_tools(
+        q=q,
+        category=category,
+        requires_auth=requires_auth,
+        tag=tag,
+        dangerous=dangerous,
+    )
 
 
 @router.get("/categories", response_model=ToolCategoryListResponse)
