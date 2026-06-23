@@ -25,11 +25,7 @@ beat:
 	cd apps/api && PYTHONPATH=../.. uv run celery -A apps.api.app.core.celery beat --loglevel=info
 
 dev-all:
-	make db-up
-	make migrate
-	@echo "🚀 Infrastructure ready. Starting frontend..."
-	@echo "💡 Note: You still need to run 'make api' and 'make worker' in separate tabs."
-	pnpm dev
+	@./scripts/dev.sh
 
 lint: lint-py lint-js
 
