@@ -67,7 +67,7 @@ class A2ANode(BaseNode[A2AProperties]):
                     "name": "message",
                     "label": "Message",
                     "type": "string",
-                    "placeholder": "{{trigger.output.message}}",
+                    "placeholder": "{{$trigger.output.message}}",
                     "condition": {"field": "operation", "value": "send_message"},
                 },
                 {
@@ -91,7 +91,7 @@ class A2ANode(BaseNode[A2AProperties]):
                     "name": "taskId",
                     "label": "Task / Execution ID",
                     "type": "string",
-                    "placeholder": "{{previous.output.executionId}}",
+                    "placeholder": "{{$previous.output.executionId}}",
                     "condition": {"field": "operation", "value": "get_status"},
                 },
                 {

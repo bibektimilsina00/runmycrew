@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-  ChevronDown, Pencil, Activity, Check, MoreHorizontal, Bot, Loader2, Send, Play,
+  ChevronDown, Pencil, Activity, Check, MoreHorizontal, Bot, Loader2, Rocket, Power, Play,
   LayoutDashboard, Lock, Download, Copy, Trash2, PanelRightClose, Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
@@ -206,13 +206,27 @@ export function EditorTopbar({
           </div>
 
           <div className="flex items-center gap-2 ml-1">
+            {/* Activate / Pause — same control as the right-panel ActionBar.
+                When active, triggers fire; pausing makes the runtime ignore
+                them. Toggles workflow.is_active via the parent's onToggleActive. */}
             <Button
               variant="outline"
               size="sm"
-              leftIcon={<Send className="w-[14px] h-[14px]" strokeWidth={1.8} />}
-              className="h-[30px] gap-[7px] px-[13px] rounded-[8px] text-[13px] font-medium border-[var(--border-soft)] text-[var(--text)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.06)] hover:border-[var(--border)] [&_svg]:text-current"
+              onClick={onToggleActive}
+              leftIcon={
+                isActive
+                  ? <Power className="w-[14px] h-[14px] text-[var(--ok)]" strokeWidth={1.8} />
+                  : <Rocket className="w-[14px] h-[14px] text-[var(--accent)]" strokeWidth={1.8} />
+              }
+              className={cn(
+                'h-[30px] gap-[7px] px-[13px] rounded-[8px] text-[13px] font-medium border-[var(--border-soft)] text-[var(--text)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.06)] hover:border-[var(--border)]',
+                isActive && 'border-[var(--ok)]/40 bg-[var(--ok)]/5',
+              )}
+              title={isActive
+                ? 'Workflow is live. Click to pause and ignore triggers.'
+                : 'Activate the workflow so its triggers start firing.'}
             >
-              Deploy
+              {isActive ? 'Active' : 'Activate'}
             </Button>
             <Button
               variant="primary"

@@ -26,7 +26,7 @@ class LoopProperties(BaseModel):
     start: int = 0
     step: int = 1
     # while / do_while
-    condition: str = "{{variables.shouldContinue}}"
+    condition: str = "{{$variables.shouldContinue}}"
     max_iterations: int = 100
     # shared
     parallel: bool = False
@@ -70,8 +70,8 @@ class LoopNode(BaseNode[LoopProperties]):
                     "label": "Items",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{trigger.output.items}}",
-                    "description": "Array to iterate. Use {{loop.item}}, {{loop.index}}, {{loop.total}} in downstream nodes.",
+                    "placeholder": "{{$trigger.output.items}}",
+                    "description": "Array to iterate. Use {{$loop.item}}, {{$loop.index}}, {{$loop.total}} in downstream nodes.",
                     "condition": {"field": "loop_type", "value": "for_each"},
                 },
                 # For
@@ -81,7 +81,7 @@ class LoopNode(BaseNode[LoopProperties]):
                     "type": "number",
                     "default": 10,
                     "required": True,
-                    "description": "Number of iterations. Use {{loop.value}}, {{loop.index}}, {{loop.total}} in downstream nodes.",
+                    "description": "Number of iterations. Use {{$loop.value}}, {{$loop.index}}, {{$loop.total}} in downstream nodes.",
                     "condition": {"field": "loop_type", "value": "for"},
                 },
                 {
@@ -106,8 +106,8 @@ class LoopNode(BaseNode[LoopProperties]):
                     "label": "Condition",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{variables.hasMore}}",
-                    "description": "Loop continues while this is truthy. Use {{loop.iteration}} in downstream nodes.",
+                    "placeholder": "{{$variables.hasMore}}",
+                    "description": "Loop continues while this is truthy. Use {{$loop.iteration}} in downstream nodes.",
                     "condition": {"field": "loop_type", "value": ["while", "do_while"]},
                 },
                 {

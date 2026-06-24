@@ -13,7 +13,7 @@ _MAX_ITERATIONS = 1000
 
 
 class WhileLoopProperties(BaseModel):
-    condition: str = "{{variables.shouldContinue}}"
+    condition: str = "{{$variables.shouldContinue}}"
     maxIterations: int = 100
 
 
@@ -37,8 +37,8 @@ class WhileLoopNode(BaseNode[WhileLoopProperties]):
                     "label": "Condition",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{variables.hasMore}}",
-                    "description": "Template expression. Loop continues while this resolves to truthy. Supports: {{path}} == value, {{path}} < 10, {{path}} != null",
+                    "placeholder": "{{$variables.hasMore}}",
+                    "description": "Template expression. Loop continues while this resolves to truthy. Supports: {{$path}} == value, {{$path}} < 10, {{$path}} != null",
                 },
                 {
                     "name": "maxIterations",

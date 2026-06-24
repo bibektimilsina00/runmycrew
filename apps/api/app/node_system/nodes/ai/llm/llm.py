@@ -104,7 +104,7 @@ class LLMNode(BaseNode[LLMProperties]):
                     "type": "messages",
                     "required": True,
                     "default": [
-                        {"role": "user", "content": "{{trigger.output}}"},
+                        {"role": "user", "content": "{{$trigger.output}}"},
                     ],
                     "description": "Prompt messages with role and content.",
                 },

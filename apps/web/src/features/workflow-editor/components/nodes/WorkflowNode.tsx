@@ -41,7 +41,7 @@ export function WorkflowNode({ id, type, data, selected }: NodeProps) {
         role="button"
         tabIndex={0}
         className={cn(
-          'workflow-drag-handle relative z-[20] w-[240px] select-none rounded-[8px] border bg-bg2 transition-colors',
+          'workflow-drag-handle relative z-[20] w-[210px] select-none rounded-[8px] border bg-bg2 transition-colors',
           !isLocked ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
           // Copilot diff overlay takes precedence over normal state styling
           diffMark === 'new'     && 'border-[var(--ok)] shadow-[0_0_0_1px_var(--ok)]',

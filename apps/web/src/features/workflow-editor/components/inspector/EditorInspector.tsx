@@ -64,12 +64,6 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
               />
             ) : (
               <div className="flex flex-col gap-[16px] p-4 pb-6">
-                <div className="flex items-center justify-between gap-4 h-8">
-                  <div className="text-[10.5px] font-bold tracking-[0.08em] text-[var(--text-dim)] uppercase">
-                    Configuration
-                  </div>
-                </div>
-
                 <PropertyGroupList
                   groups={basicGroups}
                   definition={definition}

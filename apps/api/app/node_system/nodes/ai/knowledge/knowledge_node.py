@@ -49,7 +49,7 @@ class KnowledgeNode(BaseNode[KnowledgeProperties]):
                     "label": "Search Query",
                     "type": "string",
                     "required": True,
-                    "placeholder": "What is the refund policy? {{trigger.output}}",
+                    "placeholder": "What is the refund policy? {{$trigger.output}}",
                 },
                 {
                     "name": "top_k",

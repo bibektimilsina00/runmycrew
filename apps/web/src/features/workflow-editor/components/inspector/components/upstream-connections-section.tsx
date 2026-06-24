@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import type { Node, Edge } from 'reactflow'
 import { cn } from '@/lib/cn'
@@ -80,9 +80,47 @@ export function UpstreamConnectionsSection({ nodeId }: UpstreamConnectionsSectio
   const edges = useWorkflowEditorStore(s => s.edges)
   const nodeDefinitions = useWorkflowEditorStore(s => s.nodeDefinitions)
 
-  const bottomOpen = useEditorLayoutStore(s => s.bottomOpen)
-  const bottomHeight = useEditorLayoutStore(s => s.bottomHeight)
-  const totalHeight = bottomOpen ? bottomHeight : 36
+  // Own collapse + height — independent of the bottom Logs panel so users
+  // can keep the inputs preview visible while collapsing the logs (and
+  // vice versa). Persisted via the editor layout store.
+  const isOpen = useEditorLayoutStore(s => s.inspectorInputsOpen)
+  const sectionHeight = useEditorLayoutStore(s => s.inspectorInputsHeight)
+  const toggleOpen = useEditorLayoutStore(s => s.toggleInspectorInputs)
+  const setSectionHeight = useEditorLayoutStore(s => s.setInspectorInputsHeight)
+
+  const COLLAPSED_HEIGHT = 36
+  const totalHeight = isOpen ? sectionHeight : COLLAPSED_HEIGHT
+
+  // ── Resize handle (drag the top edge to grow/shrink) ─────────────────
+  const dragState = useRef<{ startY: number; startH: number } | null>(null)
+  const [isResizing, setIsResizing] = useState(false)
+
+  const onResizeMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      dragState.current = { startY: e.clientY, startH: sectionHeight }
+      setIsResizing(true)
+    },
+    [sectionHeight],
+  )
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const s = dragState.current
+      if (!s) return
+      // Dragging up grows the section; matches the bottom panel's idiom.
+      setSectionHeight(s.startH - (e.clientY - s.startY))
+    }
+    const onUp = () => {
+      dragState.current = null
+      setIsResizing(false)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [setSectionHeight])
 
   const ancestors = useMemo<Ancestor[]>(() => {
     const distance = collectAncestors(nodeId, edges)
@@ -111,30 +149,58 @@ export function UpstreamConnectionsSection({ nodeId }: UpstreamConnectionsSectio
 
   return (
     <div
-      className="shrink-0 border-t border-[var(--border-faint)] px-3 py-3 flex flex-col overflow-hidden transition-[height] duration-300 ease-in-out"
+      className={cn(
+        'shrink-0 border-t border-[var(--border-faint)] flex flex-col overflow-hidden',
+        !isResizing && 'transition-[height] duration-300 ease-in-out',
+      )}
       style={{ height: totalHeight }}
     >
-      <div className="mb-1.5 flex items-center justify-between px-1 shrink-0">
+      {/* Resize handle — only when the section is open. Dragging up grows
+          the section like the bottom panel. */}
+      {isOpen && (
+        <div
+          onMouseDown={onResizeMouseDown}
+          className="h-1 shrink-0 cursor-row-resize bg-transparent hover:bg-[var(--accent)]/40"
+          title="Drag to resize"
+        />
+      )}
+
+      {/* Header bar — full row clickable. Label sits flush left; the
+          chevron toggle is pushed to the right. Count was removed at
+          design's request — the ancestor list itself shows the rows. */}
+      <button
+        type="button"
+        onClick={toggleOpen}
+        className="flex h-[36px] shrink-0 items-center justify-between px-4 text-left transition-colors hover:bg-[var(--surface)]"
+      >
         <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-mute)]">
           Inputs
         </span>
-        {ancestors.length > 0 && (
-          <span className="font-mono text-[10px] text-[var(--text-dim)]">{ancestors.length}</span>
-        )}
-      </div>
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        {ancestors.length === 0 ? (
-          <p className="px-1 text-[11.5px] italic text-[var(--text-faint)]">
-            No upstream nodes connected.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-0.5">
-            {ancestors.map(a => (
-              <AncestorRow key={a.node.id} ancestor={a} />
-            ))}
-          </div>
-        )}
-      </div>
+        <ChevronDown
+          className={cn(
+            'h-3.5 w-3.5 text-[var(--text-faint)] transition-transform duration-150',
+            !isOpen && '-rotate-90',
+          )}
+        />
+      </button>
+
+      {/* Body — only mounted when open so collapsed state is genuinely
+          zero-cost. */}
+      {isOpen && (
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+          {ancestors.length === 0 ? (
+            <p className="px-1 text-[11.5px] italic text-[var(--text-faint)]">
+              No upstream nodes connected.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-0.5">
+              {ancestors.map(a => (
+                <AncestorRow key={a.node.id} ancestor={a} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

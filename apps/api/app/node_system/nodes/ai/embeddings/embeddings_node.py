@@ -91,7 +91,7 @@ class EmbeddingsNode(BaseNode[EmbeddingsProperties]):
                     "label": "Text to Embed",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{trigger.text}}",
+                    "placeholder": "{{$trigger.text}}",
                 },
             ],
             inputs=1,

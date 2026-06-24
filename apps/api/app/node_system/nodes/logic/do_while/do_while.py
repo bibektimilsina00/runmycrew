@@ -13,7 +13,7 @@ _MAX_ITERATIONS = 1000
 
 
 class DoWhileProperties(BaseModel):
-    condition: str = "{{variables.shouldContinue}}"
+    condition: str = "{{$variables.shouldContinue}}"
     maxIterations: int = 100
 
 
@@ -37,7 +37,7 @@ class DoWhileNode(BaseNode[DoWhileProperties]):
                     "label": "Condition",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{variables.hasMore}}",
+                    "placeholder": "{{$variables.hasMore}}",
                     "description": "Checked AFTER each iteration. Same syntax as While Loop.",
                 },
                 {

@@ -39,6 +39,11 @@ interface EditorLayoutState {
   bottomOpen: boolean
   bottomHeight: number
 
+  // Inspector's upstream-inputs section: independent collapse + height so
+  // the inputs preview no longer follows the bottom Logs panel's state.
+  inspectorInputsOpen: boolean
+  inspectorInputsHeight: number
+
   // Per-node UI prefs (volatile across workflows; not persisted to graph).
   nodeUI: Record<string, NodeUIState>
 
@@ -51,6 +56,9 @@ interface EditorLayoutState {
   focusTab: (tab: EditorTab) => void
   closeTabPanel: (tab: EditorTab) => void
   tabsInZone: (zone: PanelZone) => EditorTab[]
+
+  toggleInspectorInputs: () => void
+  setInspectorInputsHeight: (px: number) => void
 
   setNodeShowAdvanced: (nodeId: string, value: boolean) => void
   clearNodeUI: (nodeId: string) => void
@@ -65,6 +73,8 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
       rightOpen: true,
       bottomOpen: false,
       bottomHeight: DEFAULT_BOTTOM_HEIGHT,
+      inspectorInputsOpen: false,
+      inspectorInputsHeight: 240,
       nodeUI: {},
 
       setRightActiveTab: (rightActiveTab) => set({ rightActiveTab, rightOpen: true }),
@@ -115,6 +125,19 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
         return (Object.keys(z) as EditorTab[]).filter((t) => z[t] === zone)
       },
 
+      toggleInspectorInputs: () =>
+        set((s) => ({ inspectorInputsOpen: !s.inspectorInputsOpen })),
+
+      setInspectorInputsHeight: (px) =>
+        set({
+          // Same clamp range as the bottom panel for visual rhythm — the
+          // section sits in the inspector pane so its max stays modest.
+          inspectorInputsHeight: Math.min(
+            MAX_BOTTOM_HEIGHT,
+            Math.max(MIN_BOTTOM_HEIGHT, Math.round(px)),
+          ),
+        }),
+
       setNodeShowAdvanced: (nodeId, value) =>
         set((s) => ({
           nodeUI: {
@@ -141,6 +164,8 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
         // bottomOpen intentionally NOT persisted — the logs panel is
         // hidden on every fresh session and only opens when the user
         // explicitly clicks the tab or runs the workflow.
+        inspectorInputsOpen: s.inspectorInputsOpen,
+        inspectorInputsHeight: s.inspectorInputsHeight,
       }),
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<EditorLayoutState>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useParams } from 'react-router-dom'
 import {
-  MoreHorizontal, MessageCircle, Send, Play, Loader2,
+  MoreHorizontal, MessageCircle, Rocket, Power, Play, Loader2,
   LayoutDashboard, Lock, Download, Copy, Trash2, PanelRightClose,
   Sparkles,
 } from 'lucide-react'
@@ -76,6 +76,7 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
     btnRef, anchorRect,
     openMenu, closeMenu, openCopilot,
     exportWorkflow, autoLayout, deleteWorkflow, collapseRightPanel,
+    isActive, isToggling, toggleActive,
   } = useEditorActionBar()
   const { id: workflowId } = useParams<{ id: string }>()
   const workflowName = useWorkflowEditorStore((s) => s.workflow?.name ?? '')
@@ -117,8 +118,27 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="secondary" size="sm" leftIcon={<Send className="text-[var(--accent)]" />}>
-          Deploy
+        {/* Activate / Pause — toggles workflow.is_active. When active the
+            cron / webhook triggers fire; pausing makes the runtime ignore
+            them. Same control as the topbar's Active pill, surfaced here
+            as a primary action next to Run. */}
+        <Button
+          variant={isActive ? 'outline' : 'secondary'}
+          size="sm"
+          onClick={toggleActive}
+          disabled={isToggling}
+          leftIcon={
+            isToggling
+              ? <Loader2 className="animate-spin" />
+              : isActive
+                ? <Power className="text-[var(--ok)]" />
+                : <Rocket className="text-[var(--accent)]" />
+          }
+          title={isActive
+            ? 'Workflow is live. Click to pause and ignore triggers.'
+            : 'Activate the workflow so its triggers start firing.'}
+        >
+          {isToggling ? '…' : isActive ? 'Active' : 'Activate'}
         </Button>
         <Button
           variant="primary"

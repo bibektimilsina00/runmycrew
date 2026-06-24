@@ -48,7 +48,7 @@ class CodeNode(BaseNode[CodeProperties]):
                     "type": "code",
                     "required": True,
                     "default": "# Access previous node data via `input`\n# Set `output` to pass data to the next node\noutput = {'result': input}",
-                    "description": "Python: set `output` dict. Use `{{node.output.field}}` to reference previous nodes.",
+                    "description": "Python: set `output` dict. Use `{{$node.output.field}}` to reference previous nodes.",
                     "condition": {"field": "language", "value": "python"},
                 },
                 {
@@ -57,7 +57,7 @@ class CodeNode(BaseNode[CodeProperties]):
                     "type": "code",
                     "required": True,
                     "default": "// Access previous node data via `input`\n// Set `output` to pass data to the next node\noutput = { result: input };",
-                    "description": "JavaScript: set `output` object. Use {{node.output.field}} to reference previous nodes.",
+                    "description": "JavaScript: set `output` object. Use {{$node.output.field}} to reference previous nodes.",
                     "condition": {"field": "language", "value": "javascript"},
                 },
                 {

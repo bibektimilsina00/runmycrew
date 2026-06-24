@@ -131,7 +131,7 @@ export function Showcase() {
               </div>
 
               <FormField label="Execution Payload Schema" hint="Define variables to forward to the Celery executor.">
-                <Textarea placeholder='{\n  "refund_id": "{{trigger.payload.id}}",\n  "reason": "Customer request"\n}' rows={4} className="font-mono text-xs" />
+                <Textarea placeholder='{\n  "refund_id": "{{$trigger.payload.id}}",\n  "reason": "Customer request"\n}' rows={4} className="font-mono text-xs" />
               </FormField>
 
               <div className="flex flex-col gap-3.5 pt-2">

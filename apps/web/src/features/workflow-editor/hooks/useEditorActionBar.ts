@@ -1,8 +1,11 @@
 import { useRef, useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useReactFlow } from 'reactflow'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../stores/editorLayoutStore'
+import { editorAPI } from '../services/editorAPI'
+import { useToast } from '@/shared/components'
 
 export interface ActionMenuItem {
   label: string
@@ -24,6 +27,24 @@ export function useEditorActionBar() {
   const toggleZone  = useEditorLayoutStore(s => s.toggleZone)
   const nodes       = useWorkflowEditorStore(s => s.nodes)
   const edges       = useWorkflowEditorStore(s => s.edges)
+  const workflow    = useWorkflowEditorStore(s => s.workflow)
+  const setWorkflow = useWorkflowEditorStore(s => s.setWorkflow)
+  const { toast }   = useToast()
+
+  // Toggle the workflow's deployed state. When active, cron + webhook
+  // triggers fire; when paused they're ignored. The editor's Activate
+  // button is a thin wrapper over this mutation so the user can deploy
+  // without leaving the canvas.
+  const activateMutation = useMutation({
+    mutationFn: () => editorAPI.toggleActive(workflowId ?? ''),
+    onSuccess: (res) => {
+      if (workflow) setWorkflow({ ...workflow, is_active: res.is_active })
+      toast(res.is_active ? 'Workflow activated — triggers are live' : 'Workflow paused', {
+        variant: 'ok',
+      })
+    },
+    onError: () => toast('Failed to update workflow state', { variant: 'err' }),
+  })
 
   const openMenu = () => setAnchorRect(btnRef.current?.getBoundingClientRect() ?? null)
   const closeMenu = () => setAnchorRect(null)
@@ -59,5 +80,8 @@ export function useEditorActionBar() {
     autoLayout,
     deleteWorkflow,
     collapseRightPanel,
+    isActive: !!workflow?.is_active,
+    isToggling: activateMutation.isPending,
+    toggleActive: () => activateMutation.mutate(),
   }
 }

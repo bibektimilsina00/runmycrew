@@ -64,7 +64,7 @@ class MemoryNode(BaseNode[MemoryProperties]):
                     "label": "Memory Key",
                     "type": "string",
                     "required": True,
-                    "placeholder": "user-{{trigger.user_id}}",
+                    "placeholder": "user-{{$trigger.user_id}}",
                     "description": "Same key used by the Agent node to share memory.",
                 },
                 {
@@ -84,7 +84,7 @@ class MemoryNode(BaseNode[MemoryProperties]):
                     "label": "Message Content",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{trigger.message}}",
+                    "placeholder": "{{$trigger.message}}",
                     "condition": {"field": "operation", "value": "append"},
                 },
                 {

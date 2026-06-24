@@ -146,7 +146,7 @@ function MessageRow({
     message.role === 'system'
       ? 'System instructions…'
       : message.role === 'user'
-        ? 'Hello {{trigger.output}} or =$trigger.message'
+        ? 'Hello {{$trigger.output}} or =$trigger.message'
         : 'Assistant response…'
 
   return (

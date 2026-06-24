@@ -62,7 +62,7 @@ class ImageGenNode(BaseNode[ImageGenProperties]):
                     "label": "Prompt",
                     "type": "string",
                     "required": True,
-                    "placeholder": "A photorealistic image of {{trigger.subject}}",
+                    "placeholder": "A photorealistic image of {{$trigger.subject}}",
                 },
                 {
                     "name": "size",
