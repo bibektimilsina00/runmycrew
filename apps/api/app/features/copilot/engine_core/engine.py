@@ -20,76 +20,137 @@ logger = get_logger(__name__)
 MAX_ITERATIONS = 10
 
 # ── Tool schemas sent to the LLM ─────────────────────────────────────────────
+#
+# Atomic per-operation tools. Each tool emits a single graph_op SSE event so
+# the client can render the workflow building progressively as the model
+# emits ops. Replaces the legacy batched `edit_workflow(operations=[...])`
+# tool — model-paced streaming is the natural cadence, no artificial sleep.
 
-_EDIT_WORKFLOW_TOOL: dict[str, Any] = {
+_ADD_NODE_TOOL: dict[str, Any] = {
     "type": "function",
     "function": {
-        "name": "edit_workflow",
+        "name": "add_node",
         "description": (
-            "Create or modify the workflow by applying a list of operations atomically. "
-            "Always batch all operations for a single logical change into one call."
+            "Add ONE node to the workflow. Always call this for every node BEFORE any "
+            "`add_edge` that references it. Always fetch the type's schema via "
+            "`get_node_metadata` first so `properties` field names are correct."
         ),
         "parameters": {
             "type": "object",
             "properties": {
-                "operations": {
-                    "type": "array",
-                    "description": "Ordered list of edit operations",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "type": {
-                                "type": "string",
-                                "enum": [
-                                    "add_node",
-                                    "edit_node",
-                                    "delete_node",
-                                    "add_edge",
-                                    "delete_edge",
-                                ],
-                                "description": "Operation type",
-                            },
-                            "node_id": {
-                                "type": "string",
-                                "description": "Node ID. For add_node: desired ID. For edit/delete_node: existing ID.",
-                            },
-                            "source_id": {
-                                "type": "string",
-                                "description": "Source node ID (add_edge / delete_edge)",
-                            },
-                            "target_id": {
-                                "type": "string",
-                                "description": "Target node ID (add_edge / delete_edge)",
-                            },
-                            "source_handle": {
-                                "type": "string",
-                                "description": "Source handle (optional)",
-                            },
-                            "target_handle": {
-                                "type": "string",
-                                "description": "Target handle (optional)",
-                            },
-                            "params": {
-                                "type": "object",
-                                "description": (
-                                    "add_node: {type, name, properties}. "
-                                    "edit_node: {name?, properties?}."
-                                ),
-                            },
-                        },
-                        "required": ["type"],
-                    },
-                },
-                "workflow_name": {
+                "node_id": {
                     "type": "string",
+                    "description": "Short stable id like 'trigger_1', 'agent_1', 'slack_1'.",
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Node type from the index, e.g. 'action.agent', 'trigger.cron'.",
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Human-readable label shown on the node card.",
+                },
+                "properties": {
+                    "type": "object",
                     "description": (
-                        "Short Title Case name for the workflow (e.g. 'Notion Welcome Email'). "
-                        "Set ONLY on first build of a new/empty workflow, or when the user "
-                        "explicitly asks to rename. Omit on follow-up edits."
+                        "Flat {fieldName: value} map matching get_node_metadata. "
+                        "Operation-gated fields belong under the chosen operation."
                     ),
                 },
             },
-            "required": ["operations"],
+            "required": ["node_id", "type"],
+        },
+    },
+}
+
+_UPDATE_NODE_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": "update_node",
+        "description": (
+            "Modify an existing node's name and/or properties. Use to fix a property "
+            "after the user reports an error, or to wire a placeholder to a real value. "
+            "Properties are merged into the existing map (not replaced)."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "node_id": {"type": "string", "description": "Existing node id to update."},
+                "name": {"type": "string", "description": "New label (optional)."},
+                "properties": {
+                    "type": "object",
+                    "description": "Field updates merged into the node's properties.",
+                },
+            },
+            "required": ["node_id"],
+        },
+    },
+}
+
+_REMOVE_NODE_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": "remove_node",
+        "description": "Delete a node by id. Edges touching it are removed automatically.",
+        "parameters": {
+            "type": "object",
+            "properties": {"node_id": {"type": "string"}},
+            "required": ["node_id"],
+        },
+    },
+}
+
+_ADD_EDGE_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": "add_edge",
+        "description": (
+            "Connect two nodes. Both must already exist (call `add_node` first). "
+            "Use `source_handle` for branch nodes (condition true/false, switch cases)."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "source_id": {"type": "string"},
+                "target_id": {"type": "string"},
+                "source_handle": {"type": "string", "description": "Optional. Branch handle name."},
+                "target_handle": {"type": "string", "description": "Optional."},
+            },
+            "required": ["source_id", "target_id"],
+        },
+    },
+}
+
+_REMOVE_EDGE_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": "remove_edge",
+        "description": "Delete an edge between two nodes.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "source_id": {"type": "string"},
+                "target_id": {"type": "string"},
+            },
+            "required": ["source_id", "target_id"],
+        },
+    },
+}
+
+_SET_WORKFLOW_NAME_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": "set_workflow_name",
+        "description": (
+            "Set the workflow's name. Call this ONCE on first-build of an empty workflow, "
+            "or when the user explicitly asks to rename. Skip on follow-up edits."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "description": "Short Title Case name."},
+            },
+            "required": ["name"],
         },
     },
 }
@@ -164,6 +225,118 @@ def _sse(event_type: str, payload: dict[str, Any]) -> str:
     return f"data: {json.dumps({'type': event_type, **payload})}\n\n"
 
 
+# ── Atomic-op helpers ─────────────────────────────────────────────────────────
+
+
+def _tool_call_to_op(tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
+    """Translate one of the atomic tool calls into an `operations.py` op dict.
+
+    Operations.py is the single source of truth for validation, layout and
+    edge dedup — atomic tools wrap it with a one-op list so we don't fork
+    the rules.
+    """
+    if tool_name == "add_node":
+        return {
+            "type": "add_node",
+            "node_id": args.get("node_id"),
+            "params": {
+                "type": args.get("type"),
+                "name": args.get("name"),
+                "properties": args.get("properties") or {},
+            },
+        }
+    if tool_name == "update_node":
+        return {
+            "type": "edit_node",
+            "node_id": args.get("node_id"),
+            "params": {
+                "name": args.get("name"),
+                "properties": args.get("properties") or {},
+            },
+        }
+    if tool_name == "remove_node":
+        return {"type": "delete_node", "node_id": args.get("node_id")}
+    if tool_name == "add_edge":
+        return {
+            "type": "add_edge",
+            "source_id": args.get("source_id"),
+            "target_id": args.get("target_id"),
+            "source_handle": args.get("source_handle"),
+            "target_handle": args.get("target_handle"),
+        }
+    # remove_edge
+    return {
+        "type": "delete_edge",
+        "source_id": args.get("source_id"),
+        "target_id": args.get("target_id"),
+    }
+
+
+def _build_op_result(tool_name: str, res: dict[str, Any], graph: dict[str, Any]) -> dict[str, Any]:
+    """Structured feedback returned to the model after one atomic op."""
+    result: dict[str, Any] = {
+        "success": bool(res["applied"]),
+        "nodes": len(graph.get("nodes", [])),
+        "edges": len(graph.get("edges", [])),
+    }
+    if res["input_errors"]:
+        msgs = [f"{e.get('node_id', '?')}.{e['field']}: {e['error']}" for e in res["input_errors"]]
+        result["input_validation_message"] = (
+            f"{len(msgs)} input(s) rejected (valid inputs were kept): " + "; ".join(msgs)
+        )
+    if res["skipped"]:
+        msgs = [f"{s.get('op')}: {s['reason']}" for s in res["skipped"]]
+        result["skipped_message"] = f"{tool_name} skipped: " + "; ".join(msgs)
+    return result
+
+
+def _tool_result_extras(result: dict[str, Any]) -> dict[str, Any]:
+    """Subset of result fields safe to leak into the SSE tool_result event."""
+    extras: dict[str, Any] = {}
+    if "input_validation_message" in result:
+        extras["input_validation_message"] = result["input_validation_message"]
+    if "skipped_message" in result:
+        extras["skipped_message"] = result["skipped_message"]
+    return extras
+
+
+def _graph_op_payload(
+    tool_name: str,
+    applied: dict[str, Any],
+    graph: dict[str, Any],
+    args: dict[str, Any],
+) -> dict[str, Any]:
+    """Build the SSE payload for a single applied op so the client can paint it
+    without re-reading the whole graph."""
+    op_kind = tool_name  # frontend reducer keys off this
+    nodes = graph.get("nodes", [])
+    edges = graph.get("edges", [])
+
+    if tool_name in ("add_node", "update_node"):
+        node_id = applied.get("node_id")
+        node = next((n for n in nodes if n["id"] == node_id), None)
+        return {"op": op_kind, "node_id": node_id, "node": node}
+
+    if tool_name == "remove_node":
+        return {"op": op_kind, "node_id": applied.get("node_id")}
+
+    if tool_name == "add_edge":
+        src = applied.get("source_id") or args.get("source_id")
+        tgt = applied.get("target_id") or args.get("target_id")
+        edge = next(
+            (e for e in edges if e.get("source") == src and e.get("target") == tgt),
+            None,
+        )
+        return {"op": op_kind, "edge": edge}
+
+    # remove_edge
+    return {
+        "op": op_kind,
+        "source_id": applied.get("source_id"),
+        "target_id": applied.get("target_id"),
+    }
+
+
 # ── Main copilot loop ─────────────────────────────────────────────────────────
 
 
@@ -201,7 +374,12 @@ async def run_copilot(
         *messages,
     ]
     tool_specs = [
-        _EDIT_WORKFLOW_TOOL,
+        _ADD_NODE_TOOL,
+        _UPDATE_NODE_TOOL,
+        _REMOVE_NODE_TOOL,
+        _ADD_EDGE_TOOL,
+        _REMOVE_EDGE_TOOL,
+        _SET_WORKFLOW_NAME_TOOL,
         _GET_NODE_METADATA_TOOL,
         _SEARCH_NODE_TYPES_TOOL,
         _GET_TRIGGER_NODES_TOOL,
@@ -280,61 +458,56 @@ async def run_copilot(
 
                 yield _sse("tool_start", {"tool": tool_name})
 
-                # ── edit_workflow ─────────────────────────────────────────
-                if tool_name == "edit_workflow":
-                    operations: list[dict[str, Any]] = args.get("operations", [])
-                    res = apply_operations(current_graph, operations, meta_by_type)
+                # ── Atomic graph ops (one per tool call → one graph_op SSE) ──
+                if tool_name in (
+                    "add_node",
+                    "update_node",
+                    "remove_node",
+                    "add_edge",
+                    "remove_edge",
+                ):
+                    op = _tool_call_to_op(tool_name, args)
+                    res = apply_operations(current_graph, [op], meta_by_type)
                     current_graph = res["graph"]
-                    graph_dirty = True  # propose at the end; never persists here
-                    name_arg = args.get("workflow_name")
-                    if isinstance(name_arg, str) and name_arg.strip():
-                        proposed_name = name_arg.strip()
+                    graph_dirty = True
+                    applied_now = res["applied"]
+                    succeeded = bool(applied_now)
+                    result = _build_op_result(tool_name, res, current_graph)
 
-                    # Structured feedback so the model self-corrects (save valid parts)
-                    result: dict[str, Any] = {
-                        "success": True,
-                        "applied": len(res["applied"]),
-                        "nodes": len(current_graph.get("nodes", [])),
-                        "edges": len(current_graph.get("edges", [])),
-                    }
-                    if res["input_errors"]:
-                        msgs = [
-                            f"{e.get('node_id', '?')}.{e['field']}: {e['error']}"
-                            for e in res["input_errors"]
-                        ]
-                        result["input_validation_errors"] = msgs
-                        result["input_validation_message"] = (
-                            f"{len(msgs)} input(s) rejected (valid inputs were kept): "
-                            + "; ".join(msgs)
+                    # Emit graph_op so the canvas paints THIS op live, before
+                    # the model emits the next one. node/edge payload is
+                    # post-apply so the client can render without re-reading
+                    # the whole graph.
+                    if succeeded:
+                        yield _sse(
+                            "graph_op",
+                            _graph_op_payload(tool_name, applied_now[0], current_graph, args),
                         )
-                    if res["skipped"]:
-                        msgs = [f"{s.get('op')}: {s['reason']}" for s in res["skipped"]]
-                        result["skipped_items"] = msgs
-                        result["skipped_message"] = (
-                            f"{len(msgs)} operation(s) skipped: " + "; ".join(msgs)
-                        )
-                    if res["lint"]:
-                        result["lint"] = res["lint"]
 
-                    all_tool_calls.append({"name": tool_name, "success": True, "result": result})
+                    all_tool_calls.append(
+                        {"name": tool_name, "success": succeeded, "result": result}
+                    )
                     yield _sse(
                         "tool_result",
-                        {
-                            "tool": tool_name,
-                            "success": True,
-                            "applied": len(res["applied"]),
-                            **(
-                                {"input_validation_message": result["input_validation_message"]}
-                                if res["input_errors"]
-                                else {}
-                            ),
-                            **(
-                                {"skipped_message": result["skipped_message"]}
-                                if res["skipped"]
-                                else {}
-                            ),
-                        },
+                        {"tool": tool_name, "success": succeeded, **_tool_result_extras(result)},
                     )
+
+                elif tool_name == "set_workflow_name":
+                    name_arg = args.get("name")
+                    if isinstance(name_arg, str) and name_arg.strip():
+                        proposed_name = name_arg.strip()
+                        result = {"success": True, "name": proposed_name}
+                        all_tool_calls.append(
+                            {"name": tool_name, "success": True, "result": result}
+                        )
+                        yield _sse("graph_op", {"op": "set_workflow_name", "name": proposed_name})
+                        yield _sse("tool_result", {"tool": tool_name, "success": True})
+                    else:
+                        result = {"success": False, "error": "name is empty"}
+                        all_tool_calls.append(
+                            {"name": tool_name, "success": False, "result": result}
+                        )
+                        yield _sse("tool_result", {"tool": tool_name, "success": False})
 
                 # ── get_node_metadata (batched, compressed projection) ─────
                 elif tool_name == "get_node_metadata":

@@ -9,6 +9,7 @@ export interface CopilotEvent {
     | 'text_delta'
     | 'tool_start'
     | 'tool_result'
+    | 'graph_op'
     | 'workflow_proposed'
     | 'session_saved'
     | 'error'

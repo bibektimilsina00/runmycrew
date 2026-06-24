@@ -3,7 +3,7 @@ import type { Node, Edge } from 'reactflow'
 import { HelpCircle, Code2, Search, Wrench, Sparkles } from 'lucide-react'
 import { streamCopilotChat, copilotAPI, type SessionItem } from '../services/copilotAPI'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
-import { useCopilotDiffStore } from '../stores/copilotDiffStore'
+import { useCopilotDiffStore, type StreamingOp } from '../stores/copilotDiffStore'
 import { useCopilotPendingStore } from '../stores/copilotPendingStore'
 
 export type ToolCallStatus = 'running' | 'success' | 'failed'
@@ -197,10 +197,29 @@ export function useCopilotChat() {
         if (ev.type === 'text_delta') {
           appendToAssistant(String(ev.content ?? ''))
         } else if (ev.type === 'tool_start') {
-          appendToolCall(String(ev.tool ?? 'tool'))
+          const tool = String(ev.tool ?? 'tool')
+          appendToolCall(tool)
+          // First graph-mutating tool of the turn → open an empty diff so the
+          // canvas can paint subsequent graph_op events as they arrive.
+          if (
+            tool === 'add_node' ||
+            tool === 'update_node' ||
+            tool === 'remove_node' ||
+            tool === 'add_edge' ||
+            tool === 'remove_edge' ||
+            tool === 'set_workflow_name'
+          ) {
+            useCopilotDiffStore.getState().startStreaming()
+          }
         } else if (ev.type === 'tool_result') {
           finalizeToolCall(String(ev.tool ?? ''), ev.success === false ? 'failed' : 'success')
+        } else if (ev.type === 'graph_op') {
+          // Atomic op from the engine — apply to the in-progress proposed graph
+          // so the user sees each node/edge appear one at a time.
+          useCopilotDiffStore.getState().applyOp(ev as unknown as StreamingOp)
         } else if (ev.type === 'workflow_proposed') {
+          // Final canonical resolve. Reconciles any drift between the streamed
+          // ops and the server's authoritative graph.
           useCopilotDiffStore.getState().setProposal(
             ev.graph as { nodes: Node[]; edges: Edge[] },
             typeof ev.name === 'string' ? ev.name : null,

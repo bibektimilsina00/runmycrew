@@ -759,6 +759,28 @@ select:-webkit-autofill {
   box-shadow: 0 0 5px rgba(239, 68, 68, 0.18);
 }
 
+/* Copilot streaming — newly-added nodes pop in (scale + opacity, spring easing).
+   Driven by className 'rf-diff-new' applied in WorkflowEditor's canvasNodes
+   builder when a node only exists in the proposed graph. One-shot. */
+@keyframes copilot-node-pop {
+  0%   { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1);    }
+}
+.react-flow__node.rf-diff-new {
+  animation: copilot-node-pop 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+}
+
+/* Newly-added edges draw in via stroke-dashoffset. */
+@keyframes copilot-edge-draw {
+  from { stroke-dashoffset: 200; }
+  to   { stroke-dashoffset: 0;   }
+}
+.react-flow__edge.rf-diff-new .react-flow__edge-path {
+  stroke-dasharray: 200;
+  animation: copilot-edge-draw 360ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════════
    COPILOT CHAT — typography stack matching GitHub Copilot / VS Code
 ══════════════════════════════════════════════════════════════════════════════ */

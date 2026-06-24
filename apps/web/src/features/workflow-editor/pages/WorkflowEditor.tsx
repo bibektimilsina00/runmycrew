@@ -63,17 +63,39 @@ export function WorkflowEditor() {
     if (!diffActive || !proposed || !summary || !baseline) return nodes
     const added   = new Set(summary.added)
     const edited  = new Set(summary.edited)
-    const marked  = proposed.nodes.map(n => ({
-      ...n,
-      data: { ...n.data, __diff: added.has(n.id) ? 'new' : edited.has(n.id) ? 'edited' : undefined },
-    }))
+    // className on the React Flow wrapper drives the pop-in keyframe
+    // (`.react-flow__node[class*="rf-diff-new"]` in index.css).
+    const marked  = proposed.nodes.map(n => {
+      const diff = added.has(n.id) ? 'new' : edited.has(n.id) ? 'edited' : undefined
+      return {
+        ...n,
+        className: diff ? `rf-diff-${diff}` : undefined,
+        data: { ...n.data, __diff: diff },
+      }
+    })
     const ghosts  = baseline.nodes
       .filter(n => summary.deleted.includes(n.id))
-      .map(n => ({ ...n, draggable: false, selectable: false, data: { ...n.data, __diff: 'deleted' } }))
+      .map(n => ({
+        ...n,
+        draggable: false,
+        selectable: false,
+        className: 'rf-diff-deleted',
+        data: { ...n.data, __diff: 'deleted' },
+      }))
     return [...marked, ...ghosts]
   }, [diffActive, proposed, baseline, summary, nodes])
 
-  const canvasEdges = diffActive && proposed ? proposed.edges : edges
+  const canvasEdges = useMemo(() => {
+    if (!diffActive || !proposed || !baseline) return edges
+    // Edges that exist in proposed but not in baseline → mark new so the
+    // stroke-dashoffset keyframe paints them in as they stream.
+    const baseKeys = new Set(baseline.edges.map(e => `${e.source}::${e.target}::${e.sourceHandle ?? ''}`))
+    return proposed.edges.map(e => {
+      const key = `${e.source}::${e.target}::${e.sourceHandle ?? ''}`
+      const isNew = !baseKeys.has(key)
+      return isNew ? { ...e, className: 'rf-diff-new' } : e
+    })
+  }, [diffActive, proposed, baseline, edges])
 
   const hasPending = useCopilotPendingStore(s => !!s.prompt)
   useEffect(() => {
