@@ -37,7 +37,7 @@ export function DetailHeader({
 }: DetailHeaderProps) {
   const { toast } = useToast()
   const isPremium = template.is_premium && !isOwner
-  const primaryLabel = isPremium ? `Buy for ${formatPrice(template.price_cents)}` : 'Install'
+  const primaryLabel = isPremium ? `Buy for ${formatPrice(template.price_cents)}` : 'Use template'
 
   const copyLink = () => {
     void navigator.clipboard.writeText(window.location.href)

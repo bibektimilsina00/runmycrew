@@ -23,16 +23,16 @@ export function MissingCredentialsAlert({ missing }: MissingCredentialsAlertProp
   if (!missing.length) return null
 
   return (
-    <div className="flex flex-col gap-3 rounded-[10px] border border-[var(--warn)]/40 bg-[var(--warn)]/8 p-4">
-      <div className="flex items-start gap-2.5">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--warn)]" />
+    <div className="flex flex-col gap-3.5 rounded-[10px] border border-[var(--warn)]/40 bg-[var(--warn)]/8 p-5">
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[var(--warn)]" />
         <div className="flex flex-col gap-1.5">
-          <span className="text-[13px] font-semibold text-[var(--text)]">
+          <span className="text-[15px] font-semibold text-[var(--text)] tracking-[-0.01em]">
             Connect required integrations
           </span>
-          <span className="text-[12px] text-[var(--text-mute)]">
+          <span className="text-[13.5px] leading-[1.6] text-[var(--text-mute)]">
             This template uses{' '}
-            <span className="font-medium text-[var(--text)]">
+            <span className="font-semibold text-[var(--text)]">
               {missing.join(', ')}
             </span>
             . Connect them in Connections so the workflow can run.

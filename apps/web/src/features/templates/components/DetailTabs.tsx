@@ -26,21 +26,21 @@ interface DetailTabsProps {
 export function DetailTabs({ template, missingCredentials }: DetailTabsProps) {
   return (
     <div className="flex flex-col gap-[40px]">
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-4">
         <SectionHeading>Overview</SectionHeading>
         {template.summary && (
-          <p className="m-0 text-[14px] leading-[1.6] font-medium text-[var(--text)]">
+          <p className="m-0 text-[15px] leading-[1.6] font-medium text-[var(--text)]">
             {template.summary}
           </p>
         )}
-        <p className="m-0 whitespace-pre-wrap text-[13px] leading-[1.7] text-[var(--text-mute)]">
+        <p className="m-0 whitespace-pre-wrap text-[14px] leading-[1.7] text-[var(--text-mute)]">
           {template.description || 'No long-form description provided yet.'}
         </p>
       </section>
 
       <Divider />
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-4">
         <SectionHeading>Workflow graph</SectionHeading>
         <div
           className={`relative aspect-[2/1] w-full overflow-hidden rounded-[10px] border border-[var(--border-faint)] ${template.bg_variant}`}
@@ -58,14 +58,14 @@ export function DetailTabs({ template, missingCredentials }: DetailTabsProps) {
 
       <Divider />
 
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-5">
         <SectionHeading>Integrations required</SectionHeading>
         {template.credentials_required.length === 0 ? (
-          <span className="text-[12.5px] italic text-[var(--text-faint)]">
+          <span className="text-[13.5px] italic text-[var(--text-faint)]">
             No integrations required.
           </span>
         ) : (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {template.credentials_required.map((c) => (
               <Chip key={c}>{c}</Chip>
             ))}
@@ -76,13 +76,13 @@ export function DetailTabs({ template, missingCredentials }: DetailTabsProps) {
           <MissingCredentialsAlert missing={missingCredentials} />
         )}
 
-        <SectionHeading className="mt-3">Tools used</SectionHeading>
+        <SectionHeading className="mt-4">Tools used</SectionHeading>
         {template.tools_required.length === 0 ? (
-          <span className="text-[12.5px] italic text-[var(--text-faint)]">
+          <span className="text-[13.5px] italic text-[var(--text-faint)]">
             No tools used.
           </span>
         ) : (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {template.tools_required.map((t) => (
               <Chip key={t}>{t}</Chip>
             ))}
@@ -92,12 +92,12 @@ export function DetailTabs({ template, missingCredentials }: DetailTabsProps) {
 
       <Divider />
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-4">
         <SectionHeading>Getting started</SectionHeading>
-        <ol className="m-0 flex flex-col gap-2 pl-4 text-[13px] leading-[1.65] text-[var(--text-mute)]">
+        <ol className="m-0 flex flex-col gap-2.5 pl-4 text-[14px] leading-[1.7] text-[var(--text-mute)]">
           <li>
-            Click <span className="font-semibold text-[var(--text)]">Install</span> to add this
-            template as a new workflow in your workspace.
+            Click <span className="font-semibold text-[var(--text)]">Use template</span> to add
+            it as a new workflow in your workspace.
           </li>
           {template.credentials_required.length > 0 && (
             <li>
@@ -127,9 +127,12 @@ function SectionHeading({
   children: React.ReactNode
   className?: string
 }) {
+  // Matches the marketplace + dashboard heading scale — 18px semibold
+  // with the same tracking the h1 uses so detail sections read as part
+  // of the same vocabulary.
   return (
     <h2
-      className={`m-0 text-[13.5px] font-semibold text-[var(--text)] ${className ?? ''}`.trim()}
+      className={`m-0 text-[18px] font-semibold tracking-[-0.014em] text-[var(--text)] ${className ?? ''}`.trim()}
     >
       {children}
     </h2>
@@ -142,7 +145,7 @@ function Divider() {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-[6px] border border-[var(--border-faint)] bg-[var(--bg)] px-2 py-1 font-mono text-[11px] text-[var(--text-mute)]">
+    <span className="rounded-[6px] border border-[var(--border-faint)] bg-[var(--bg)] px-2.5 py-1.5 font-mono text-[12px] text-[var(--text-mute)]">
       {children}
     </span>
   )
@@ -165,25 +168,25 @@ function NodeList({ template }: { template: TemplateDetail }) {
   if (nodes.length === 0) return null
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2.5">
       <SectionHeading>Nodes ({nodes.length})</SectionHeading>
       <div className="flex flex-col divide-y divide-[var(--border-faint)] rounded-[8px] border border-[var(--border-faint)] bg-[var(--surface)]">
         {nodes.map((n, idx) => {
           const def = defByType.get(n.type ?? '')
           const colour = def?.color ?? '#5e6ad2'
           return (
-            <div key={n.id ?? idx} className="flex items-center gap-3 px-3 py-2.5">
+            <div key={n.id ?? idx} className="flex items-center gap-3 px-4 py-3">
               <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-3.5 [&_svg]:w-3.5"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-white [&_svg]:h-4 [&_svg]:w-4"
                 style={{ background: colour }}
               >
                 {def ? getIcon(def.icon) : null}
               </div>
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-[12.5px] font-medium text-[var(--text)]">
+                <span className="truncate text-[13.5px] font-medium text-[var(--text)]">
                   {def?.name ?? n.type ?? 'Node'}
                 </span>
-                <span className="truncate font-mono text-[10.5px] uppercase tracking-[0.06em] text-[var(--text-faint)]">
+                <span className="truncate font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--text-faint)]">
                   {n.type}
                 </span>
               </div>
