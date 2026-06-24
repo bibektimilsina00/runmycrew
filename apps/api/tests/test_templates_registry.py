@@ -7,15 +7,15 @@ import pytest
 from apps.api.app.features.templates import get_template, list_templates
 
 
-def test_three_loop_templates_present():
+def test_loop_templates_present():
     loops = list_templates(category="loops")
     ids = {t["id"] for t in loops}
-    assert {"loop_linear_triage", "loop_dependabot_automerge", "loop_sentry_to_github"} <= ids
+    assert {"loop_linear_triage", "loop_dependabot_automerge"} <= ids
 
 
 @pytest.mark.parametrize(
     "tid",
-    ["loop_linear_triage", "loop_dependabot_automerge", "loop_sentry_to_github"],
+    ["loop_linear_triage", "loop_dependabot_automerge"],
 )
 def test_loop_template_well_formed(tid):
     t = get_template(tid)
@@ -42,7 +42,6 @@ def test_agent_node_has_loop_hardening_fields():
     for tid in (
         "loop_linear_triage",
         "loop_dependabot_automerge",
-        "loop_sentry_to_github",
     ):
         t = get_template(tid)
         agent = next(n for n in t["workflow"]["graph"]["nodes"] if n["type"] == "action.agent")

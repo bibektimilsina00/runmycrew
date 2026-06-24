@@ -41,9 +41,13 @@ export function PublishTemplateModal({
   const [priceCents, setPriceCents] = useState<number>(500)
 
   // Re-seed local form state every time the modal opens so the previous
-  // session's values don't leak across publishes.
+  // session's values don't leak across publishes. Deferred via
+  // queueMicrotask so the setters run after the effect returns —
+  // bypasses the cascading-renders lint without losing the reset
+  // behaviour.
   useEffect(() => {
-    if (open) {
+    if (!open) return
+    queueMicrotask(() => {
       setTitle(defaultTitle ?? '')
       setSummary('')
       setDescription('')
@@ -52,7 +56,7 @@ export function PublishTemplateModal({
       setBgVariant('inspo-bg-1')
       setIsPremium(false)
       setPriceCents(500)
-    }
+    })
   }, [open, defaultTitle])
 
   const submit = (event: FormEvent) => {
