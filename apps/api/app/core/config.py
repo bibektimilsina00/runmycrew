@@ -147,7 +147,10 @@ class Settings(BaseSettings):
     SENTRY_DSN: str = ""
     SENTRY_TRACES_SAMPLE_RATE: float = 0.0
 
-    # Email (SMTP) — works with Gmail, SendGrid, Mailgun, SES, etc.
+    # Email — Resend HTTP API is preferred (port 443, no provider port-block
+    # risk like DigitalOcean blocking 25/465/587). Falls back to SMTP for
+    # self-hosters using Gmail, SES relay, Mailgun, etc.
+    RESEND_API_KEY: str = ""
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587
     SMTP_USER: str = ""

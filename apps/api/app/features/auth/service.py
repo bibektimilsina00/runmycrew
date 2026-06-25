@@ -1,3 +1,4 @@
+import asyncio
 import secrets
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
@@ -491,11 +492,17 @@ class AuthService(BaseService):
         # emails point at the production frontend, not localhost.
         reset_url = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={reset_token}"
 
-        await self.email_service.send_password_reset(
-            PasswordResetEmail(
-                to_email=user.email,
-                reset_url=reset_url,
-                expires_minutes=RESET_TOKEN_EXPIRES_MINUTES,
+        # Fire-and-forget: do not let SMTP/Resend latency block the HTTP
+        # response. EmailService swallows its own exceptions, and the
+        # endpoint always returns success (we never confirm whether an
+        # account exists, to prevent email enumeration).
+        asyncio.create_task(
+            self.email_service.send_password_reset(
+                PasswordResetEmail(
+                    to_email=user.email,
+                    reset_url=reset_url,
+                    expires_minutes=RESET_TOKEN_EXPIRES_MINUTES,
+                )
             )
         )
         return True

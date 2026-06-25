@@ -6,10 +6,21 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Protocol
 
+import httpx
+
 from apps.api.app.core.config import settings
 from apps.api.app.core.logger import get_logger
 
 logger = get_logger(__name__)
+
+# SMTP socket timeout. Without this, smtplib.SMTP() can hang forever
+# when outbound ports are blocked (e.g. DigitalOcean droplets block
+# 25/465/587 by default), pinning the request thread indefinitely.
+SMTP_TIMEOUT_SECONDS = 10
+
+# Resend HTTP API timeout. The API is fast (~200ms) so a tight cap is fine.
+RESEND_HTTP_TIMEOUT_SECONDS = 10
+RESEND_API_URL = "https://api.resend.com/emails"
 
 
 @dataclass(frozen=True)
@@ -55,7 +66,52 @@ class DevEmailProvider:
         )
 
 
-# ── SMTP provider — works with Gmail, SendGrid, Mailgun, SES relay, etc. ─────
+# ── Resend HTTP API provider — preferred (port 443, no SMTP block risk) ──────
+
+
+class ResendEmailProvider:
+    def __init__(self) -> None:
+        self.api_key = settings.RESEND_API_KEY
+        self.from_addr = settings.SMTP_FROM
+        self.from_name = settings.SMTP_FROM_NAME
+
+    async def send_workspace_invite(self, email: InviteEmail) -> None:
+        await self._send(
+            to=email.to_email,
+            subject=f"You've been invited to {email.workspace_name} on RunMyCrew",
+            html=_invite_html(email),
+            text=_invite_text(email),
+        )
+
+    async def send_password_reset(self, email: PasswordResetEmail) -> None:
+        await self._send(
+            to=email.to_email,
+            subject="Reset your RunMyCrew password",
+            html=_password_reset_html(email),
+            text=_password_reset_text(email),
+        )
+
+    async def _send(self, to: str, subject: str, html: str, text: str) -> None:
+        async with httpx.AsyncClient(timeout=RESEND_HTTP_TIMEOUT_SECONDS) as client:
+            resp = await client.post(
+                RESEND_API_URL,
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "from": f"{self.from_name} <{self.from_addr}>",
+                    "to": [to],
+                    "subject": subject,
+                    "html": html,
+                    "text": text,
+                },
+            )
+            resp.raise_for_status()
+            logger.info("Email sent (resend) → %s: %s", to, subject)
+
+
+# ── SMTP provider — fallback for self-hosters not using Resend ───────────────
 
 
 class SmtpEmailProvider:
@@ -97,14 +153,17 @@ class SmtpEmailProvider:
             msg.attach(MIMEText(text, "plain"))
             msg.attach(MIMEText(html, "html"))
 
-            smtp_cls = smtplib.SMTP_SSL if not self.use_tls else smtplib.SMTP
-            with smtp_cls(self.host, self.port) as smtp:
+            if self.use_tls:
+                smtp = smtplib.SMTP(self.host, self.port, timeout=SMTP_TIMEOUT_SECONDS)
+            else:
+                smtp = smtplib.SMTP_SSL(self.host, self.port, timeout=SMTP_TIMEOUT_SECONDS)
+            with smtp:
                 if self.use_tls:
                     smtp.starttls()
                 if self.user and self.password:
                     smtp.login(self.user, self.password)
                 smtp.sendmail(self.from_addr, [to], msg.as_string())
-            logger.info("Email sent → %s: %s", to, subject)
+            logger.info("Email sent (smtp) → %s: %s", to, subject)
 
         # Run blocking SMTP call in a thread so the event loop is not blocked
         loop = asyncio.get_event_loop()
@@ -118,12 +177,15 @@ class EmailService:
     def __init__(self, provider: EmailProvider | None = None) -> None:
         if provider is not None:
             self._provider = provider
+        elif settings.RESEND_API_KEY:
+            self._provider = ResendEmailProvider()
+            logger.info("EmailService: using Resend HTTP API")
         elif settings.SMTP_HOST:
             self._provider = SmtpEmailProvider()
             logger.info("EmailService: using SMTP (%s:%s)", settings.SMTP_HOST, settings.SMTP_PORT)
         else:
             self._provider = DevEmailProvider()
-            logger.info("EmailService: SMTP_HOST not set — emails will be logged only")
+            logger.info("EmailService: no email provider configured — emails will be logged only")
 
     async def send_workspace_invite(self, email: InviteEmail) -> None:
         try:

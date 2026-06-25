@@ -1,3 +1,4 @@
+import asyncio
 import re
 import secrets
 import uuid
@@ -109,13 +110,17 @@ class WorkspaceService:
         )
         invite_url = f"{settings.FRONTEND_URL}/invites/{token}"
         if data.send_email:
-            await self.email_service.send_workspace_invite(
-                InviteEmail(
-                    to_email=str(data.email),
-                    workspace_name=workspace.name,
-                    inviter_email=inviter.email,
-                    invite_url=invite_url,
-                    role=data.role,
+            # Fire-and-forget: do not let SMTP/Resend latency block the
+            # HTTP response. EmailService swallows its own exceptions.
+            asyncio.create_task(
+                self.email_service.send_workspace_invite(
+                    InviteEmail(
+                        to_email=str(data.email),
+                        workspace_name=workspace.name,
+                        inviter_email=inviter.email,
+                        invite_url=invite_url,
+                        role=data.role,
+                    )
                 )
             )
         return invite, invite_url
