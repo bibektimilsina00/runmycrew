@@ -43,8 +43,8 @@ class JiraNode(BaseNode[JiraProperties]):
             name="Jira",
             category="integration",
             description="Create issues, update status, add comments, and search Jira projects.",
-            icon="si:SiJira",
-            color="#0052cc",
+            icon="jira",
+            color="#ffffff",
             properties=[
                 {
                     "name": "credential",

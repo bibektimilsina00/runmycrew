@@ -14,7 +14,7 @@ export const NodeHeader = ({ label, icon, color }: NodeHeaderProps) => (
       style={{ background: color ?? 'var(--surface-3)' }}
     >
       {React.cloneElement(getIcon(icon) as React.ReactElement<{ className?: string }>, {
-        className: 'size-[12px] text-white',
+        className: 'size-[14px]',
       })}
     </div>
     <span className="truncate text-[12px] font-semibold text-text leading-none" title={label}>

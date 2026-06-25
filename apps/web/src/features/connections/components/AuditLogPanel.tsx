@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { Icons } from '@/shared/components/icons'
 import { useAuditLog } from '../hooks/useConnections'
 import type { Provider } from '../types/connectionsTypes'
+import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
 
 interface Props {
   providers: Provider[]
@@ -130,10 +131,8 @@ export function AuditLogPanel({ providers, onClose }: Props) {
                       {/* Provider tag + timestamp */}
                       <div className="flex items-center gap-2 mt-0.5">
                         {provider && (
-                          <span className="inline-flex items-center gap-1 text-[10.5px] font-mono text-[var(--text-dim)] bg-[var(--surface)] border border-[var(--border-faint)] px-2 py-0.5 rounded-[4px]">
-                            {provider.icon_url && (
-                              <img src={provider.icon_url} alt="" className="w-[10px] h-[10px] object-contain" />
-                            )}
+                          <span className="inline-flex items-center gap-1 text-[10.5px] font-mono text-[var(--text-dim)] bg-[var(--surface)] border border-[var(--border-faint)] px-2 py-0.5 rounded-[4px] [&_img]:h-[10px] [&_img]:w-[10px] [&_img]:object-contain">
+                            {provider.icon_slug && <BrandIcon slug={provider.icon_slug} />}
                             {provider.name}
                           </span>
                         )}

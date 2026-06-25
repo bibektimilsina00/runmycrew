@@ -5,6 +5,7 @@ import { Button } from '@/shared/components'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useProviders } from '@/features/connections/hooks/useConnections'
 import type { Credential, Provider } from '@/features/connections/types/connectionsTypes'
+import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
 
 /**
  * One row inside the "Integrations required" section on the detail
@@ -96,19 +97,21 @@ function IntegrationIcon({
   provider: Provider | null
   fallbackLetter: string
 }) {
+  if (provider?.icon_slug) {
+    return (
+      <div
+        className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--border-faint)] [&_img]:h-6 [&_img]:w-6 [&_img]:object-contain"
+        style={{ background: provider.color ?? 'var(--bg)' }}
+      >
+        <BrandIcon slug={provider.icon_slug} />
+      </div>
+    )
+  }
   return (
     <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--border-faint)] bg-[var(--bg)]">
-      {provider?.icon_url ? (
-        <img
-          src={provider.icon_url}
-          alt={provider.name}
-          className="h-6 w-6 object-contain"
-        />
-      ) : (
-        <span className="text-[15px] font-semibold uppercase text-[var(--accent)]">
-          {fallbackLetter.toUpperCase()}
-        </span>
-      )}
+      <span className="text-[15px] font-semibold uppercase text-[var(--accent)]">
+        {fallbackLetter.toUpperCase()}
+      </span>
     </div>
   )
 }

@@ -177,8 +177,8 @@ class GoogleDocsNode(BaseNode[GoogleDocsProperties]):
                 "text edits, structural inserts (images, tables, breaks), "
                 "find/replace, headers/footers, sharing, and exports."
             ),
-            icon="si:SiGoogledocs",
-            color="#4285f4",
+            icon="google-docs",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

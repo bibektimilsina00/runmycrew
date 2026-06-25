@@ -40,8 +40,8 @@ class AirtableNode(BaseNode[AirtableProperties]):
             name="Airtable",
             category="integration",
             description="Read and write Airtable bases, tables, and records.",
-            icon="si:SiAirtable",
-            color="#18bfff",
+            icon="airtable",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

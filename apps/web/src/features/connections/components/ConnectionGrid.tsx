@@ -4,6 +4,7 @@ import { useToast, useConfirm } from '@/shared/components'
 import { useDeleteCredential, useRenameCredential } from '../hooks/useConnections'
 import { credentialStatus } from '../types/connectionsTypes'
 import type { Credential, Provider } from '../types/connectionsTypes'
+import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
 
 interface Props {
   credentials: Credential[]
@@ -73,13 +74,13 @@ export function ConnectionGrid({ credentials, providers, canManage = true }: Pro
         return (
           <div key={cred.id} className="conn-card group">
             <div className="conn-card-head">
-              {provider?.icon_url ? (
-                <img
-                  src={provider.icon_url}
-                  alt={provider.name}
-                  className="w-[34px] h-[34px] rounded-[8px] object-contain bg-[var(--surface)] p-1"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                />
+              {provider?.icon_slug ? (
+                <div
+                  className="flex w-[34px] h-[34px] shrink-0 items-center justify-center rounded-[8px] p-1 [&_img]:h-[22px] [&_img]:w-[22px] [&_img]:object-contain"
+                  style={{ background: provider.color ?? 'var(--surface)' }}
+                >
+                  <BrandIcon slug={provider.icon_slug} />
+                </div>
               ) : (
                 <span className="conn-icon" style={{ width: 34, height: 34, borderRadius: 8, fontSize: 12.5 }}>
                   {initial}

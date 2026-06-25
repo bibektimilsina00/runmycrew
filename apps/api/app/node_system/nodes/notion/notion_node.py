@@ -33,8 +33,8 @@ class NotionNode(BaseNode[NotionProperties]):
             name="Notion",
             category="integration",
             description="Notion integration: manage pages, databases, and content.",
-            icon="si:SiNotion",
-            color="#000000",
+            icon="notion",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

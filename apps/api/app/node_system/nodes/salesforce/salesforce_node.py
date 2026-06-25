@@ -38,8 +38,8 @@ class SalesforceNode(BaseNode[SalesforceProperties]):
             name="Salesforce",
             category="integration",
             description="Create and query Salesforce records (Contacts, Leads, Accounts, Opportunities).",
-            icon="si:SiSalesforce",
-            color="#00a1e0",
+            icon="salesforce",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

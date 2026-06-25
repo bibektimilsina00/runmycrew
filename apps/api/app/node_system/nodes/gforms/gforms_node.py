@@ -183,8 +183,8 @@ class GoogleFormsNode(BaseNode[GoogleFormsProperties]):
                 "Create, edit, and read Google Forms — manage questions and "
                 "settings, share via Drive, and pull responses."
             ),
-            icon="si:SiGoogleforms",
-            color="#673ab7",
+            icon="google-forms",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

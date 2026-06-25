@@ -34,8 +34,8 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
             name="MongoDB",
             category="integration",
             description="Query or mutate a MongoDB collection.",
-            icon="si:SiMongodb",
-            color="#47a248",
+            icon="mongodb",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "connectionString",

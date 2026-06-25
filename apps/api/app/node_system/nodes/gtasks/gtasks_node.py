@@ -105,8 +105,8 @@ class GoogleTasksNode(BaseNode[GoogleTasksProperties]):
                 "Manage Google Tasks via OAuth — tasklists, tasks, "
                 "completion, ordering, and bulk clear of finished items."
             ),
-            icon="si:SiGoogletasks",
-            color="#1a73e8",
+            icon="google-tasks",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

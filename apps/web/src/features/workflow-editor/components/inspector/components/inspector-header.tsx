@@ -51,7 +51,7 @@ export function InspectorHeader({ label, definition, onLabelChange }: InspectorH
     <header className="shrink-0 border-b border-[var(--border-soft)] px-4 py-3">
       <div className="flex items-center gap-[10px]">
         <div
-          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-[14px] [&_svg]:w-[14px]"
+          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-[14px] [&_svg]:w-[14px] [&_img]:h-[14px] [&_img]:w-[14px] [&_img]:object-contain"
           style={{ background: definition.color ?? 'var(--surface-3)' }}
         >
           {Icon}

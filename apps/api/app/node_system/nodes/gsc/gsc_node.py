@@ -281,8 +281,8 @@ class GoogleSearchConsoleNode(BaseNode[GoogleSearchConsoleProperties]):
                 "date, manage sitemaps, inspect URL indexing status. "
                 "Powered by the Webmasters v3 + Search Console v1 APIs."
             ),
-            icon="si:SiGooglesearchconsole",
-            color="#4285f4",
+            icon="google-search-console",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

@@ -51,7 +51,6 @@ async def _require_manage_credentials(
 async def list_providers():
     providers = []
 
-    # Collect OAuth providers
     for p in OAUTH_PROVIDERS.values():
         providers.append(
             {
@@ -59,14 +58,14 @@ async def list_providers():
                 "name": p.name,
                 "type": p.type,
                 "description": p.description,
-                "icon_url": p.icon_url,
+                "icon_slug": p.icon_slug,
+                "color": p.color,
                 "fields": getattr(p, "fields", None),
                 "hint": getattr(p, "hint", None),
                 "scopes": getattr(p, "scopes", None),
             }
         )
 
-    # Collect API Key providers
     for p in API_KEY_PROVIDERS.values():
         providers.append(
             {
@@ -74,7 +73,8 @@ async def list_providers():
                 "name": p.name,
                 "type": p.type,
                 "description": p.description,
-                "icon_url": p.icon_url,
+                "icon_slug": p.icon_slug,
+                "color": p.color,
                 "fields": p.fields,
                 "hint": p.hint,
                 "scopes": getattr(p, "scopes", None),

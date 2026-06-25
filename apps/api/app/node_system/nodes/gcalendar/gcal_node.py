@@ -122,8 +122,8 @@ class GCalNode(BaseNode[GCalProperties]):
                 "Create, update, delete, search Google Calendar events via OAuth. "
                 "One node, six operations — pick from the dropdown."
             ),
-            icon="si:SiGooglecalendar",
-            color="#4285f4",
+            icon="google-calendar",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

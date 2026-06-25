@@ -68,8 +68,8 @@ class GoogleFormsTriggerNode(BaseNode[GoogleFormsTriggerProperties]):
                 "poll snapshots silently; later polls emit one execution per "
                 "new submission with answers keyed by question title."
             ),
-            icon="si:SiGoogleforms",
-            color="#673ab7",
+            icon="google-forms",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

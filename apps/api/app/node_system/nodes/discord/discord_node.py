@@ -40,8 +40,8 @@ class DiscordNode(BaseNode[DiscordProperties]):
             name="Discord",
             category="integration",
             description="Send messages, manage channels, and interact with Discord servers.",
-            icon="si:SiDiscord",
-            color="#5865f2",
+            icon="discord",
+            color="#ffffff",
             properties=[
                 {
                     "name": "bot_token",

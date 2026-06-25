@@ -72,8 +72,8 @@ class InstagramActionNode(BaseNode[InstagramActionProperties]):
                 "Send DMs, reply to comments, and publish posts or stories from "
                 "the connected Instagram Business account. Pick the operation below."
             ),
-            icon="Instagram",
-            color="#E1306C",
+            icon="instagram",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

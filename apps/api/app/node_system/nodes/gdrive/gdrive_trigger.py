@@ -139,8 +139,8 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                 "surfaces what changed since the last run. Visibility is "
                 "restricted to files RunMyCrew can see (drive.file scope)."
             ),
-            icon="si:SiGoogledrive",
-            color="#4285f4",
+            icon="google-drive",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

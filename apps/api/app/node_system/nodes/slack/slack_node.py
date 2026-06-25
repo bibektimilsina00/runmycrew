@@ -49,8 +49,8 @@ class SlackNode(BaseNode[SlackProperties]):
             name="Slack",
             category="integration",
             description="Complete Slack integration: messaging, channels, users, reactions, and modals.",
-            icon="si:SiSlack",
-            color="#4a154b",
+            icon="slack",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "authentication",
