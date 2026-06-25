@@ -127,10 +127,12 @@ class CollaborationService:
         workflow_id: uuid.UUID,
         session: CollaborationSession,
     ) -> None:
-        # Client sends heartbeat every 30s. If we receive nothing for 60s the
+        # Client sends heartbeat every 15s. If we receive nothing for 30s the
         # connection is dead (tab closed, network drop) — raise TimeoutError so
         # run_socket's finally block removes presence and broadcasts presence.left.
-        RECEIVE_TIMEOUT = 60.0
+        # 30s = 2x heartbeat with one slot of slack; chosen so peer drop-out is
+        # visible to the other side within ~30s rather than the previous 60s.
+        RECEIVE_TIMEOUT = 30.0
 
         while True:
             try:

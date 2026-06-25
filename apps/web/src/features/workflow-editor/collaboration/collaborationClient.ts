@@ -12,7 +12,7 @@ import type { ClientEvent, ServerEvent } from './types'
  *   the source of truth (DB persistence is separate).
  */
 
-const HEARTBEAT_MS = 30_000
+const HEARTBEAT_MS = 15_000
 const INITIAL_RECONNECT_MS = 1_000
 const MAX_RECONNECT_MS = 15_000
 

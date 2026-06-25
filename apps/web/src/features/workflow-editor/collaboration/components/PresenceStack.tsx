@@ -23,10 +23,10 @@ export function PresenceStack() {
   )
   const own = useCollaborationStore((s) => s.own)
   const connected = useCollaborationStore((s) => s.connected)
-  // If we haven't completed the handshake we have no own session yet and
-  // showing "peers" alone would mislabel the count. Hide the pill until
-  // session.ready lands, exactly like the avatar pile in n8n / Figma.
-  if (!own) return null
+  // Render nothing when the room is just you — the pill is a
+  // collaboration indicator, not a permanent toolbar element. It
+  // reappears the moment a peer joins.
+  if (!own || peers.length === 0) return null
 
   const sessions: PeerSession[] = [own, ...peers]
   const visible = sessions.slice(0, MAX_AVATARS)

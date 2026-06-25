@@ -139,7 +139,18 @@ export function useCollaborationLifecycle(workflowId: string | undefined) {
     setClient(client)
     client.connect()
 
+    // React's normal unmount cleanup handles tab navigations cleanly,
+    // but browser tab-close + reload sometimes kills the JS context
+    // before React can run cleanup, leaving the socket to be reaped by
+    // the server's 30s read timeout. `pagehide` fires earlier than
+    // `beforeunload` and is more reliable on mobile; closing the socket
+    // synchronously sends the FIN so peers see `presence.left` right
+    // away instead of after the heartbeat window.
+    const onPageHide = () => client.disconnect()
+    window.addEventListener('pagehide', onPageHide)
+
     return () => {
+      window.removeEventListener('pagehide', onPageHide)
       client.disconnect()
       setClient(null)
       reset()

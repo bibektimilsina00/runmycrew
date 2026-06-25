@@ -44,8 +44,6 @@ export function PeerCursors() {
               <path
                 d="M3 2.4L18.6 11.2C19.5 11.7 19.4 13 18.4 13.3L11.6 15.1L8.4 21.3C7.9 22.2 6.6 22 6.4 21L3 2.4Z"
                 fill={session.color}
-                stroke="#ffffff"
-                strokeWidth="1.5"
                 strokeLinejoin="round"
               />
             </svg>
