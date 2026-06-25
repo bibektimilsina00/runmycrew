@@ -222,6 +222,12 @@ BORDER = "#e6e8ec"
 CARD_BG = "#ffffff"
 PAGE_BG = "#f6f7f9"
 FONT_STACK = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+# Public PNG of the RunMyCrew brand mark on a transparent background.
+# PNG (not SVG) because Gmail and several mobile clients strip <img src>
+# pointing at SVG. Transparent variant (vs the solid-black icon-192.png
+# used for favicons) so the mark sits on the email card's white surface
+# without a black square around it.
+BRAND_LOGO_URL = "https://runmycrew.com/icon-192-transparent.png"
 
 
 def _layout(*, preheader: str, heading: str, body_html: str) -> str:
@@ -248,8 +254,8 @@ def _layout(*, preheader: str, heading: str, body_html: str) -> str:
           <td style="padding:0 4px 24px">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="vertical-align:middle">
-                  <span style="display:inline-block;width:28px;height:28px;border-radius:7px;background:{BRAND_ACCENT};vertical-align:middle"></span>
+                <td style="vertical-align:middle;line-height:0">
+                  <img src="{BRAND_LOGO_URL}" width="28" height="28" alt="RunMyCrew" style="display:block;width:28px;height:28px;border:0">
                 </td>
                 <td style="padding-left:10px;vertical-align:middle">
                   <span style="font-size:16px;font-weight:600;color:{TEXT_PRIMARY};letter-spacing:-.01em">RunMyCrew</span>
