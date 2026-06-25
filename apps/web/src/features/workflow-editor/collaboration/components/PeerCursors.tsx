@@ -23,23 +23,41 @@ export function PeerCursors() {
         return (
           <div
             key={session.session_id}
-            className="absolute transition-transform duration-75 ease-linear"
+            // ~120ms transition smooths cursor between 25fps wire updates
+            // without lagging noticeably behind the peer's actual mouse.
+            className="absolute will-change-transform transition-transform duration-[120ms] ease-out"
             style={{
-              transform: `translate(${screen.x}px, ${screen.y}px)`,
+              transform: `translate3d(${screen.x}px, ${screen.y}px, 0)`,
             }}
           >
-            <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
+            {/* Arrow — refined Figma-style glyph with a tinted soft
+                halo for visibility against dark and light surfaces. */}
+            <svg
+              width="22"
+              height="26"
+              viewBox="0 0 22 26"
+              fill="none"
+              style={{
+                filter: `drop-shadow(0 4px 10px ${session.color}55) drop-shadow(0 1px 2px rgba(0,0,0,0.25))`,
+              }}
+            >
               <path
-                d="M1 1L13 7.5L7 9.5L4.5 15.5L1 1Z"
+                d="M3 2.4L18.6 11.2C19.5 11.7 19.4 13 18.4 13.3L11.6 15.1L8.4 21.3C7.9 22.2 6.6 22 6.4 21L3 2.4Z"
                 fill={session.color}
-                stroke="white"
-                strokeWidth="1"
+                stroke="#ffffff"
+                strokeWidth="1.5"
                 strokeLinejoin="round"
               />
             </svg>
+            {/* Name pill — slight gradient + matching shadow so the
+                label reads as part of the cursor, not a sticker. */}
             <span
-              className="absolute left-[14px] top-[14px] rounded-[4px] px-1.5 py-[2px] text-[10px] font-medium text-white whitespace-nowrap shadow-sm"
-              style={{ backgroundColor: session.color }}
+              className="absolute left-[18px] top-[18px] inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-[11px] font-semibold text-white whitespace-nowrap"
+              style={{
+                backgroundColor: session.color,
+                boxShadow: `0 2px 8px ${session.color}55, 0 0 0 1.5px rgba(255,255,255,0.12)`,
+                letterSpacing: '-0.005em',
+              }}
             >
               {session.user_name}
             </span>

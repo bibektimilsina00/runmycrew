@@ -9,9 +9,25 @@ import type { ClientEvent, ServerEvent } from './types'
 
 /** Window in ms after applying a remote patch during which we treat
  *  any local graph change as the echo of that patch and skip
- *  re-broadcasting. 250ms is enough to ride out React's batched render
- *  + the `applyNodeChanges` settle. */
-const REMOTE_ECHO_WINDOW_MS = 250
+ *  re-broadcasting. Must exceed the layer's debounce or our own
+ *  setNodes/setEdges will be picked up by the watcher and bounced back
+ *  to the peer who sent it. */
+const REMOTE_ECHO_WINDOW_MS = 500
+
+/** Mirror of `isUserMidAction` in CollaborationLayer — kept inline so
+ *  this module has no circular import on the layer. */
+function isUserMidActionDOM(): boolean {
+  if (typeof document === 'undefined') return false
+  const el = document.activeElement
+  if (el) {
+    const tag = el.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return true
+    if ((el as HTMLElement).isContentEditable) return true
+  }
+  if (document.querySelector('.react-flow__pane.dragging')) return true
+  if (document.querySelector('.react-flow__node.dragging')) return true
+  return false
+}
 
 /**
  * Owns the per-workflow collaboration WebSocket lifecycle.
@@ -82,13 +98,20 @@ export function useCollaborationLifecycle(workflowId: string | undefined) {
         }
         case 'graph.patch': {
           // Last-write-wins: peer broadcasts a full graph snapshot, we
-          // replace ours. `markApplyingRemote` opens a short window
-          // during which the local change watcher in CollaborationLayer
+          // replace ours. `markApplyingRemote` opens a window during
+          // which the local change watcher in CollaborationLayer
           // suppresses its re-broadcast, breaking the feedback loop.
+          //
+          // While the local user is typing in an input or dragging a
+          // node, calling `setNodes(...)` would clobber the in-flight
+          // edit (cursor jumps, drag snaps back). Drop the patch on
+          // the floor — the peer will send another one when their
+          // edit settles, and we get the next snapshot then.
           const payload = event.payload as
             | { nodes?: Node[]; edges?: Edge[] }
             | undefined
           if (!payload) break
+          if (isUserMidActionDOM()) break
           useCollaborationStore.getState().markApplyingRemote(REMOTE_ECHO_WINDOW_MS)
           const editor = useWorkflowEditorStore.getState()
           if (payload.nodes) editor.setNodes(payload.nodes)
