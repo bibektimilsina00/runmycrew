@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 64 64">
+  <title>RunMyCrew</title>
+  <rect x="38" y="24" width="16" height="16" rx="5" fill="#5e6ad2"/>
+  <rect x="19" y="11" width="13" height="13" rx="4.5" fill="#828bdb"/>
+  <rect x="19" y="40" width="13" height="13" rx="4.5" fill="#828bdb"/>
+  <rect x="3" y="25.5" width="11" height="11" rx="3.6" fill="#b5b9e8"/>
+</svg>
