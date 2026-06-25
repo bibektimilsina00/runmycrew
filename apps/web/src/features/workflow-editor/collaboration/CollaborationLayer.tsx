@@ -123,10 +123,14 @@ export function CollaborationLayer() {
 function OwnCursorStyle() {
   const own = useCollaborationStore((s) => s.own)
   if (!own) return null
+  // No stroke — the user explicitly didn't want the white outline on
+  // their own cursor. A subtle drop-shadow in the same hue keeps the
+  // arrow visible against light AND dark canvas backgrounds without
+  // the chunky outline.
   const svg =
     `<svg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 22 26'>` +
     `<path d='M3 2.4L18.6 11.2C19.5 11.7 19.4 13 18.4 13.3L11.6 15.1L8.4 21.3C7.9 22.2 6.6 22 6.4 21L3 2.4Z' ` +
-    `fill='${own.color}' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/></svg>`
+    `fill='${own.color}' stroke-linejoin='round'/></svg>`
   const url = `data:image/svg+xml;utf8,${svg.replace(/#/g, '%23').replace(/'/g, '%22')}`
   const cursorRule = `url("${url}") 4 4, default`
   return (
