@@ -134,6 +134,12 @@ export interface NodeDefinition {
   inputs: number
   outputs: number
   outputsSchema?: { label: string; type: string }[]
+  // When set, the inspector treats this node's outputs as DYNAMIC and
+  // reads them from `node.data.properties[dynamicOutputsFrom]`, a
+  // collection of `{name, type}` rows. Lets the Start node advertise
+  // its user-defined inputs as the downstream `{{ $step.<field> }}`
+  // completions without per-node-type checks in the autocomplete.
+  dynamicOutputsFrom?: string
   allowError?: boolean
   credentialType?: string
   tools?: string[]
@@ -194,6 +200,7 @@ export const ApiNodeDefinitionSchema = z.object({
   inputs:        z.number(),
   outputs:       z.number(),
   outputs_schema: z.array(z.object({ label: z.string(), type: z.string() }).passthrough()).optional(),
+  dynamic_outputs_from: z.string().nullable().optional(),
   allow_error:   z.boolean().optional(),
   credential_type: z.union([z.string(), z.array(z.string())]).nullable().optional(),
 })
