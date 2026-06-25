@@ -29,7 +29,7 @@ export const APP_ROUTES = {
   VARIABLES: '/variables',
   CONNECTIONS: '/connections',
   WORKSPACE_SETTINGS: '/settings/workspace',
-  INVITE_ACCEPT: '/invite/:token',
+  INVITE_ACCEPT: '/invites/:token',
   WORKFLOW_DETAIL: '/workflows/:id',
   WORKFLOW: (id: string) => `/workflows/${id}`,
 } as const

@@ -61,7 +61,7 @@ export default function App() {
         </Route>
 
         {/* Public invite accept — needs auth check inside the page */}
-        <Route path="/invite/:token" element={<InviteAccept />} />
+        <Route path="/invites/:token" element={<InviteAccept />} />
 
         {/* Workflow editor — app sidebar via EditorLayout, full-bleed canvas + right panel */}
         <Route element={<ProtectedRoute />}>

@@ -15,7 +15,7 @@ export function InviteAccept() {
 
   const handleAccept = async () => {
     if (!isAuthenticated) {
-      navigate(`${APP_ROUTES.LOGIN}?redirect=/invite/${token}`)
+      navigate(`${APP_ROUTES.LOGIN}?redirect=/invites/${token}`)
       return
     }
     await accept.mutateAsync()
