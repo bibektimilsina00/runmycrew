@@ -1,4 +1,5 @@
 import { useReactFlow } from 'reactflow'
+import { useShallow } from 'zustand/react/shallow'
 import { useCollaborationStore } from '../collaborationStore'
 
 /**
@@ -9,7 +10,7 @@ import { useCollaborationStore } from '../collaborationStore'
  * convert them to screen pixels on each render.
  */
 export function PeerCursors() {
-  const peers = useCollaborationStore((s) => Object.values(s.peers))
+  const peers = useCollaborationStore(useShallow((s) => Object.values(s.peers)))
   const { flowToScreenPosition } = useReactFlow()
 
   if (peers.length === 0) return null

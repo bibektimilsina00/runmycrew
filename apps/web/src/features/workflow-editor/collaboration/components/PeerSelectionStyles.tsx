@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { useCollaborationStore } from '../collaborationStore'
 
 /**
@@ -16,7 +17,7 @@ import { useCollaborationStore } from '../collaborationStore'
  * `.react-flow__node`, so the selector is just an attribute match.
  */
 export function PeerSelectionStyles() {
-  const peers = useCollaborationStore((s) => Object.values(s.peers))
+  const peers = useCollaborationStore(useShallow((s) => Object.values(s.peers)))
 
   const css = useMemo(() => {
     if (peers.length === 0) return ''
