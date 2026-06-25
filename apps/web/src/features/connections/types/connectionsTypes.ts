@@ -13,7 +13,12 @@ export const ProviderSchema = z.object({
   name: z.string(),
   type: z.enum(['oauth', 'api_key']),
   description: z.string(),
-  icon_url: z.string().nullable().optional(),
+  // Backend owns the brand identity: `icon_slug` resolves against
+  // theSVG; `color` is the tile background CSS hex. Adding a new
+  // integration in the backend ships its visual identity along with
+  // it — frontend doesn't need a release.
+  icon_slug: z.string().nullable().optional(),
+  color: z.string().nullable().optional(),
   fields: z.array(ProviderFieldSchema).nullable().optional(),
   hint: z.string().nullable().optional(),
   scopes: z.array(z.string()).nullable().optional(),

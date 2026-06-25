@@ -45,7 +45,7 @@ class LeadTriggerNode(BaseNode[LeadTriggerProperties]):
                 "pull the full form data."
             ),
             icon="ListChecks",
-            color="#1877F2",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

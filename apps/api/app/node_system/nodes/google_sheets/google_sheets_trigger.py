@@ -107,8 +107,8 @@ class GoogleSheetsTriggerNode(BaseNode[GoogleSheetsTriggerProperties]):
                 "Pick the event below — `Row added` watches the bottom of the "
                 "sheet, `Row updated` hashes each row so in-place edits emit."
             ),
-            icon="si:SiGooglesheets",
-            color="#0f9d58",
+            icon="google-sheets",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

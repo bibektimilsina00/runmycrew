@@ -27,9 +27,10 @@ def with_expiry_metadata(token_data: dict) -> dict:
 class SlackOAuthProvider:
     id = "slack_oauth"
     name = "Slack"
+    icon_slug = "slack"
+    color = "#1c1c1c"
     type = "oauth"
     description = "Connect to your Slack workspace using OAuth 2.0"
-    icon_url = "https://cdn.brandfetch.io/slack.com/icon"
     scopes = [
         "Send messages to channels",
         "Read public and private channels",
@@ -112,9 +113,10 @@ class SlackOAuthProvider:
 class GitHubOAuthProvider:
     id = "github_oauth"
     name = "GitHub"
+    icon_slug = "github"
+    color = "#ffffff"
     type = "oauth"
     description = "Connect to GitHub using OAuth 2.0"
-    icon_url = "https://cdn.brandfetch.io/github.com/icon"
     scopes = [
         "Full access to public and private repositories",
         "Read-only access to user profile information",
@@ -193,9 +195,10 @@ class GitHubOAuthProvider:
 class NotionOAuthProvider:
     id = "notion_oauth"
     name = "Notion"
+    icon_slug = "notion"
+    color = "#ffffff"
     type = "oauth"
     description = "Connect to Notion using OAuth 2.0 (requires a public integration)"
-    icon_url = "https://cdn.brandfetch.io/notion.so/icon"
     scopes = [
         "Read and create pages and databases",
         "Access workspace content shared with the integration",
@@ -257,9 +260,10 @@ class NotionOAuthProvider:
 class GoogleOAuthProvider:
     id = "google_oauth"
     name = "Google"
+    icon_slug = "google"
+    color = "#ffffff"
     type = "oauth"
     description = "Connect Google account for Gmail, Calendar, Drive, Sheets, Docs, and more"
-    icon_url = "https://cdn.brandfetch.io/google.com/icon"
     scopes = [
         "Read, send, modify, label, and delete Gmail messages",
         "Read and write Google Calendar events",
@@ -418,12 +422,13 @@ class MetaOAuthProvider:
 
     id = "meta_oauth"
     name = "Meta (Facebook, Instagram, WhatsApp)"
+    icon_slug = "meta"
+    color = "#ffffff"
     type = "oauth"
     description = (
         "Connect Facebook Pages, Instagram Business, WhatsApp Business, and "
         "Lead Ads in one credential."
     )
-    icon_url = "https://cdn.brandfetch.io/meta.com/icon"
     scopes = [
         "Manage Facebook Pages + post on your behalf",
         "Read + reply to Page comments and mentions",
@@ -617,12 +622,13 @@ class InstagramOAuthProvider:
 
     id = "instagram_oauth"
     name = "Instagram (standalone)"
+    icon_slug = "instagram"
+    color = "#ffffff"
     type = "oauth"
     description = (
         "Connect an Instagram Business / Creator account directly, without a "
         "Facebook Page. Powers IG comment / DM / mention nodes."
     )
-    icon_url = "https://cdn.brandfetch.io/instagram.com/icon"
     scopes = [
         "Read your Instagram Business profile + media",
         "Read + reply to comments on your posts and reels",

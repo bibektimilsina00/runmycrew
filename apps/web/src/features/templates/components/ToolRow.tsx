@@ -44,7 +44,7 @@ export function ToolRow({ toolId }: ToolRowProps) {
   return (
     <div className="flex items-center gap-3.5 rounded-[10px] border border-[var(--border-faint)] bg-[var(--surface)] p-4">
       <div
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] text-white shadow-[0_4px_10px_-4px_oklch(0_0_0/0.45)] [&_svg]:h-5 [&_svg]:w-5"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] text-white shadow-[0_4px_10px_-4px_oklch(0_0_0/0.45)] [&_svg]:h-5 [&_svg]:w-5 [&_img]:h-5 [&_img]:w-5 [&_img]:object-contain"
         style={{ background: colour }}
       >
         {def ? getIcon(def.icon) : null}

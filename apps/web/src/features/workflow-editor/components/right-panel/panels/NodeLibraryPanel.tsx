@@ -48,7 +48,7 @@ export function NodeLibraryPanel() {
                     title="Click to add · Drag to position"
                   >
                     <div
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-3 [&_svg]:w-3"
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-3 [&_svg]:w-3 [&_img]:h-3 [&_img]:w-3 [&_img]:object-contain"
                       style={{ background: def.color ?? 'var(--surface-3)' }}
                     >
                       {Icon}

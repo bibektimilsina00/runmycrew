@@ -88,8 +88,8 @@ class GmailTriggerNode(BaseNode[GmailTriggerProperties]):
                 "Uses Gmail's `historyId` cursor so each poll only surfaces "
                 "what arrived since the last run — no duplicates, no missed mail."
             ),
-            icon="si:SiGmail",
-            color="#ea4335",
+            icon="gmail",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

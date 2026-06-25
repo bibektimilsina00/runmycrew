@@ -44,7 +44,7 @@ class LeadActionNode(BaseNode[LeadActionProperties]):
                 "have granted Lead Access to your Meta app."
             ),
             icon="ListChecks",
-            color="#1877F2",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

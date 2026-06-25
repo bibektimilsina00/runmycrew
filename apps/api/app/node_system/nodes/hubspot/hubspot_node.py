@@ -45,8 +45,8 @@ class HubSpotNode(BaseNode[HubSpotProperties]):
             name="HubSpot",
             category="integration",
             description="Manage contacts, deals, and companies in HubSpot CRM.",
-            icon="si:SiHubspot",
-            color="#ff7a59",
+            icon="hubspot",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

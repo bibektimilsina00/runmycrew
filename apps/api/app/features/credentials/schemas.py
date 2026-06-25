@@ -49,7 +49,12 @@ class ProviderOut(SQLModel):
     name: str
     type: str
     description: str
-    icon_url: str | None = None
+    # theSVG slug — frontend renders the brand mark as
+    # `cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/<slug>/default.svg`.
+    # When `None` the UI falls back to the provider initial.
+    icon_slug: str | None = None
+    # Tile background colour (CSS hex) for the brand icon.
+    color: str | None = None
     fields: list[ProviderField] | None = None
     hint: str | None = None
     scopes: list[str] | None = None

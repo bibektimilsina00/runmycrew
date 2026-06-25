@@ -5,6 +5,7 @@ import { PanelHead } from './PanelHead'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useProviders } from '@/features/connections/hooks/useConnections'
 import type { DashboardConnection } from '../services/dashboardAPI'
+import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
 
 interface Props {
   items: DashboardConnection[]
@@ -54,7 +55,6 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
         <div className="flex flex-col gap-[2px] pb-[8px] px-[8px]">
           {items.map(c => {
             const provider = providerMap[c.type]
-            const iconUrl  = provider?.icon_url
             const initial  = provider?.name?.slice(0, 2).toUpperCase() ?? providerInitial(c.type)
             const tone     = STATE_TONE[c.state]
             return (
@@ -63,13 +63,13 @@ export function ConnectionsPanel({ items, totalActive }: Props) {
                 onClick={() => navigate(APP_ROUTES.CONNECTIONS)}
                 className="w-full flex items-center gap-[11px] py-[8px] px-[12px] rounded-[6px] bg-transparent text-left transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.04)]"
               >
-                {iconUrl ? (
-                  <img
-                    src={iconUrl}
-                    alt={provider?.name ?? c.type}
-                    className="w-[30px] h-[30px] rounded-[8px] object-contain bg-[var(--surface-2)] p-1 shrink-0"
-                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                  />
+                {provider?.icon_slug ? (
+                  <div
+                    className="flex w-[30px] h-[30px] shrink-0 items-center justify-center rounded-[8px] p-1 [&_img]:h-[20px] [&_img]:w-[20px] [&_img]:object-contain"
+                    style={{ background: provider.color ?? 'var(--surface-2)' }}
+                  >
+                    <BrandIcon slug={provider.icon_slug} />
+                  </div>
                 ) : (
                   <span className="w-[30px] h-[30px] rounded-[8px] inline-flex items-center justify-center text-[13px] font-bold text-white shrink-0 bg-[linear-gradient(135deg,var(--surface-3),var(--surface-2))]">
                     {initial}

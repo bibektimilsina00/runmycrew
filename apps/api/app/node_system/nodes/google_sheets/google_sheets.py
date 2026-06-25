@@ -160,8 +160,8 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 "Read, write, create, and modify Google Sheets via OAuth — "
                 "values, sheets, find/replace, and raw batch requests."
             ),
-            icon="si:SiGooglesheets",
-            color="#0f9d58",
+            icon="google-sheets",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

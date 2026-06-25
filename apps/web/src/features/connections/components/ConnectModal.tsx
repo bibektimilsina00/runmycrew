@@ -4,6 +4,7 @@ import { Icons } from '@/shared/components/icons'
 import { useToast } from '@/shared/components'
 import { useCreateCredential, useOAuthUrl } from '../hooks/useConnections'
 import type { Provider } from '../types/connectionsTypes'
+import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
 
 interface Props {
   providers: Provider[]
@@ -141,11 +142,16 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
                       onClick={() => handleSelectProvider(p)}
                       className="flex items-center gap-3 px-4 py-3 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px] text-left hover:border-[var(--border-soft)] hover:bg-[var(--surface)] transition-all group"
                     >
-                      {p.icon_url ? (
-                        <img src={p.icon_url} alt={p.name} className="w-[32px] h-[32px] rounded-[7px] object-contain bg-[var(--surface)] p-1 shrink-0" onError={e => { (e.target as HTMLImageElement).style.display='none' }} />
+                      {p.icon_slug ? (
+                        <div
+                          className="flex w-[32px] h-[32px] shrink-0 items-center justify-center rounded-[7px] p-1 [&_img]:h-[22px] [&_img]:w-[22px] [&_img]:object-contain"
+                          style={{ background: p.color ?? 'var(--surface)' }}
+                        >
+                          <BrandIcon slug={p.icon_slug} />
+                        </div>
                       ) : (
                         <span className="w-[32px] h-[32px] rounded-[7px] bg-[var(--surface-2)] flex items-center justify-center text-[11px] font-bold text-[var(--text)] shrink-0">
-                          {p.name.slice(0,2).toUpperCase()}
+                          {p.name.slice(0, 2).toUpperCase()}
                         </span>
                       )}
                       <span className="flex flex-col gap-0.5 min-w-0">
@@ -166,8 +172,13 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
           <div className="p-6 flex flex-col gap-5 overflow-y-auto">
             {/* Provider info */}
             <div className="flex items-center gap-3 p-4 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px]">
-              {selected.icon_url && (
-                <img src={selected.icon_url} alt={selected.name} className="w-[40px] h-[40px] rounded-[9px] object-contain bg-[var(--surface)] p-1.5 shrink-0" />
+              {selected.icon_slug && (
+                <div
+                  className="flex w-[40px] h-[40px] shrink-0 items-center justify-center rounded-[9px] p-1.5 [&_img]:h-[26px] [&_img]:w-[26px] [&_img]:object-contain"
+                  style={{ background: selected.color ?? 'var(--surface)' }}
+                >
+                  <BrandIcon slug={selected.icon_slug} />
+                </div>
               )}
               <div className="flex flex-col gap-0.5">
                 <span className="text-[13.5px] font-semibold text-[var(--text)]">{selected.name}</span>

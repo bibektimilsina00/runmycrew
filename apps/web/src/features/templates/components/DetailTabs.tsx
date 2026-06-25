@@ -172,7 +172,7 @@ function NodeList({ template }: { template: TemplateDetail }) {
           return (
             <div key={n.id ?? idx} className="flex items-center gap-3 px-4 py-3">
               <div
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-white [&_svg]:h-4 [&_svg]:w-4"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-white [&_svg]:h-4 [&_svg]:w-4 [&_img]:h-4 [&_img]:w-4 [&_img]:object-contain"
                 style={{ background: colour }}
               >
                 {def ? getIcon(def.icon) : null}

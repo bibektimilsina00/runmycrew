@@ -79,8 +79,8 @@ class GCalTriggerNode(BaseNode[GCalTriggerProperties]):
                 "filter. Uses Calendar's `syncToken` cursor so each poll only "
                 "surfaces what changed since the last run — no duplicates."
             ),
-            icon="si:SiGooglecalendar",
-            color="#4285f4",
+            icon="google-calendar",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

@@ -31,8 +31,8 @@ class MySQLNode(BaseNode[MySQLProperties]):
             name="MySQL",
             category="integration",
             description="Query or execute SQL against a MySQL database.",
-            icon="si:SiMysql",
-            color="#00758f",
+            icon="mysql",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "connectionString",

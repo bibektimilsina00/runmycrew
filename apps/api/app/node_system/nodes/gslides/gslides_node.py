@@ -315,8 +315,8 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                 "text edits, find/replace, images, tables, shapes, speaker "
                 "notes, backgrounds, sharing, and exports."
             ),
-            icon="si:SiGoogleslides",
-            color="#f4b400",
+            icon="google-slides",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

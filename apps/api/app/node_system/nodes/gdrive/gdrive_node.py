@@ -136,8 +136,8 @@ class GDriveNode(BaseNode[GDriveProperties]):
                 "OAuth. Operates within the `drive.file` scope — only files RunMyCrew "
                 "created or the user explicitly opened with RunMyCrew are visible."
             ),
-            icon="si:SiGoogledrive",
-            color="#4285f4",
+            icon="google-drive",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",

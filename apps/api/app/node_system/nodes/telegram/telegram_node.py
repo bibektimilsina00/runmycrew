@@ -40,8 +40,8 @@ class TelegramNode(BaseNode[TelegramProperties]):
             name="Telegram",
             category="integration",
             description="Send messages, photos, and documents via a Telegram bot.",
-            icon="si:SiTelegram",
-            color="#26a5e4",
+            icon="telegram",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "bot_token",

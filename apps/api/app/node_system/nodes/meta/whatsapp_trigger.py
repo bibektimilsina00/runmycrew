@@ -40,8 +40,8 @@ class WhatsAppTriggerNode(BaseNode[WhatsAppTriggerProperties]):
                 "Fires when WhatsApp delivers an inbound message or a status "
                 "callback (sent / delivered / read / failed)."
             ),
-            icon="si:SiWhatsapp",
-            color="#25D366",
+            icon="whatsapp",
+            color="#1c1c1c",
             properties=[
                 {
                     "name": "credential",
