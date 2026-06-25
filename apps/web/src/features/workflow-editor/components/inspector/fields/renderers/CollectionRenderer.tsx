@@ -122,20 +122,40 @@ function CollapsibleItem({ index, subProps, definition, item, onUpdate, onRemove
   const [open, setOpen] = useState(true)
   const visible = subProps.filter(p => p.visibility !== 'hidden' && shouldShowProperty(p, { ...allValues, ...item }))
 
+  // Row title: prefer a "name" sub-field's value, fall back to a
+  // numbered placeholder. The type sub-field, when present, is rendered
+  // as a small badge next to the title — that's what gives the
+  // user-defined-input editor (trigger.manual) its readable per-row
+  // header without a new renderer per collection variant.
+  const hasName = subProps.some(p => p.name === 'name')
+  const hasType = subProps.some(p => p.name === 'type')
+  const rawName = hasName ? item.name : undefined
+  const displayName = typeof rawName === 'string' && rawName.trim()
+    ? rawName.trim()
+    : `Input ${index + 1}`
+  const rawType = hasType ? item.type : undefined
+  const displayType = typeof rawType === 'string' && rawType.trim() ? rawType.trim() : null
+
   return (
-    <div className="rounded-[5px] border border-border-faint bg-bg overflow-hidden">
+    <div className="rounded-[7px] border border-border-faint bg-bg overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2">
         <button
           type="button"
           onClick={() => setOpen(v => !v)}
-          className="flex flex-1 items-center gap-1.5 text-left text-[11px] font-medium text-text-mute"
+          className="flex flex-1 items-center gap-2 text-left text-[12.5px] font-medium text-text"
         >
-          <ChevronDown size={12} className={cn('shrink-0 transition-transform', !open && '-rotate-90')} />
-          Item {index + 1}
+          <ChevronDown size={12} className={cn('shrink-0 text-text-faint transition-transform', !open && '-rotate-90')} />
+          <span className="truncate">{displayName}</span>
+          {displayType && (
+            <span className="inline-flex items-center rounded-full bg-surface px-1.5 py-[1px] text-[10px] font-medium uppercase tracking-wide text-text-mute">
+              {displayType}
+            </span>
+          )}
         </button>
         <button
           type="button"
           onClick={onRemove}
+          aria-label="Remove item"
           className="flex h-5 w-5 items-center justify-center rounded text-text-faint hover:text-err transition-colors"
         >
           <X size={11} />
