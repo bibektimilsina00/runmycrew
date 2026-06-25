@@ -7,6 +7,8 @@ import { InspectorHeader } from './components/inspector-header'
 import { PropertyGroupList } from './components/property-group-list'
 import { TriggerFixtureChip } from './components/trigger-fixture-chip'
 import { UpstreamConnectionsSection } from './components/upstream-connections-section'
+import { PeerTypingIndicator, useCollaborationSenders } from '../../collaboration'
+import { useEffect } from 'react'
 
 interface EditorInspectorProps {
   nodes: Node[]
@@ -27,6 +29,15 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
     updateProperties,
     updateLabel,
   } = useInspectorNode({ nodes, updateNodeData })
+
+  // Broadcast which node *we* have open in the inspector so peers see
+  // an "is editing" badge on their copy of the same node. Clears on
+  // deselect or unmount so we never leave a stale typing flag set.
+  const { sendTyping } = useCollaborationSenders()
+  useEffect(() => {
+    sendTyping(selectedNode?.id ?? null)
+    return () => sendTyping(null)
+  }, [selectedNode?.id, sendTyping])
 
   return (
     <aside
@@ -49,6 +60,10 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
             definition={definition}
             onLabelChange={updateLabel}
           />
+
+          <div className="px-4 pt-2">
+            <PeerTypingIndicator nodeId={selectedNode.id} />
+          </div>
 
           {definition.category === 'trigger' && (
             <TriggerFixtureChip nodeId={selectedNode.id} />

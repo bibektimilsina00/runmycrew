@@ -20,6 +20,7 @@ import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../../stores/editorLayoutStore'
 import { CanvasControls } from './CanvasControls'
 import { CanvasFloatingButtons } from '../right-panel/CanvasFloatingButtons'
+import { CollaborationLayer, PresenceStack } from '../../collaboration'
 import { Modal } from '@/shared/components/Modal'
 import { cn } from '@/lib/cn'
 
@@ -228,6 +229,11 @@ function Flow({
           style={{ background: 'var(--bg)' }}
         />
 
+        {/* Realtime collaboration — peer cursors, selection rings, and
+            the WebSocket lifecycle. Lives inside ReactFlow so the
+            selection + screen↔flow conversion hooks work. */}
+        <CollaborationLayer />
+
         {/* Empty state overlay */}
         {nodes.length === 0 && (
           <div
@@ -270,6 +276,12 @@ function Flow({
         onAddNodeClick={() => setAddNodeOpen(prev => !prev)}
         isAddNodeOpen={addNodeOpen}
       />
+
+      {/* Realtime collaborators — avatar pile pinned top-left so it
+          never collides with the floating action stack on the right. */}
+      <div className="pointer-events-auto absolute left-4 top-4 z-[100]">
+        <PresenceStack />
+      </div>
 
       {/* Centered Add Node Fuzzy Search command palette / popup modal */}
       <Modal
