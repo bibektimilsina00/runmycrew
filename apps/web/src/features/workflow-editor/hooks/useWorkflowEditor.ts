@@ -56,6 +56,7 @@ export function normalizeDefinition(d: ApiNodeDefinition): NodeDefinition {
     ...d,
     allowError: d.allow_error,
     outputsSchema: d.outputs_schema,
+    dynamicOutputsFrom: d.dynamic_outputs_from ?? undefined,
     credentialType: (d.credential_type as string | undefined) ?? undefined,
   }
 }

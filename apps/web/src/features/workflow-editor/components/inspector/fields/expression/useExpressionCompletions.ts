@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import type { Node, Edge } from 'reactflow'
 import { useWorkflowEditorStore } from '../../../../stores/workflowEditorStore'
 import type { NodeDefinition } from '../../../../types/editorTypes'
+import { getOutputsSchema } from '../../../../utils/dynamicOutputs'
 
 /**
  * Completion engine for the JSONata expression editor.
@@ -215,7 +216,11 @@ function rootCompletions(prefix: string, ancestors: Ancestor[]): Completion[] {
 
 function stepFieldCompletions(target: Ancestor | null, prefix: string): Completion[] {
   if (!target) return []
-  const schema = target.definition?.outputsSchema ?? []
+  // `getOutputsSchema` returns the instance-defined dynamic outputs
+  // (e.g. user-defined Start-node inputs) when available, else the
+  // node class's static schema. Either way the shape is the same so
+  // the rest of the completion path stays unchanged.
+  const schema = getOutputsSchema(target.node, target.definition)
   return schema
     .filter(f => fuzzy(f.label, prefix))
     .map<Completion>(f => ({

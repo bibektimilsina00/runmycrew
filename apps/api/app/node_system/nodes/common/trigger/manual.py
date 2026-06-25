@@ -114,8 +114,13 @@ class TriggerNode(BaseNode[TriggerProperties]):
             inputs=0,
             outputs=1,
             outputs_schema=[
+                # Acts as a fallback when the user hasn't added any
+                # inputs yet — the inspector falls back to this static
+                # entry. Once `inputs` is populated, `dynamic_outputs_from`
+                # below takes over and exposes the user-defined names.
                 {"label": "input_data", "type": "object"},
             ],
+            dynamic_outputs_from="inputs",
         )
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:

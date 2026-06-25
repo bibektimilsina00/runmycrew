@@ -6,6 +6,7 @@ import { useWorkflowEditorStore } from '../../../stores/workflowEditorStore'
 import { getIcon } from '../../../utils/icon-map'
 import { JsonTreeView, type Reference } from '../../right-panel/panels/logs/JsonTreeView'
 import type { NodeDefinition } from '../../../types/editorTypes'
+import { getOutputsSchema } from '../../../utils/dynamicOutputs'
 
 interface UpstreamConnectionsSectionProps {
   nodeId: string
@@ -211,9 +212,12 @@ function AncestorRow({ ancestor }: { ancestor: Ancestor }) {
   const run = useWorkflowEditorStore(s => s.nodeRuns[node.id])
 
   const hasOutput = run?.status === 'success' && run.output !== undefined
+  // Use the instance-aware output schema so a Start node populated
+  // with user-defined `inputs` shows those fields in the tree even
+  // before the workflow has been run.
   const stub = useMemo(
-    () => (hasOutput ? null : schemaToStub(definition?.outputsSchema ?? [])),
-    [hasOutput, definition?.outputsSchema],
+    () => (hasOutput ? null : schemaToStub(getOutputsSchema(node, definition))),
+    [hasOutput, node, definition],
   )
   const treeValue = hasOutput ? run.output : stub
   const hasAnyValue = hasOutput || (stub !== null && Object.keys(stub).length > 0)

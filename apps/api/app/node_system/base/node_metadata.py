@@ -36,6 +36,14 @@ class NodeMetadata(BaseModel):
     icon: str = "Circle"
     color: str = "#3b82f6"
     outputs_schema: list[dict[str, Any]] = []
+    # When set, the frontend treats this node's outputs as DYNAMIC and
+    # reads them from the named instance property — a `collection` of
+    # rows whose `name` / `type` sub-fields become the output schema
+    # the inspector + expression autocomplete advertise to downstream
+    # nodes. Set to `"inputs"` on the Start node so users see the
+    # field names they defined (input1, firstName, …) instead of the
+    # generic `input_data` placeholder.
+    dynamic_outputs_from: str | None = None
     allow_error: bool = False
     credential_type: str | list[str] | None = None
     tools: list[str] | None = None
