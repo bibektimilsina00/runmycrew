@@ -5,7 +5,7 @@
   "summary": "Every 30 minutes, scans the Bug queue and labels + prioritises any unclassified issues. P0 bugs are also posted to #oncall.",
   "estimated_cost_per_fire": "USD 0.02–0.05",
   "schedule_human": "every 30 minutes",
-  "credentials_required": ["linear", "slack"],
+  "credentials_required": ["slack"],
   "tags": ["triage", "linear", "slack", "loop"],
   "is_premium": true,
   "price_cents": 900,
@@ -32,8 +32,10 @@
             "properties": {
               "provider": "anthropic",
               "model": "claude-sonnet-4-6",
-              "messages": "Triage unlabelled issues in the Linear Bug queue. Pick a label from [frontend, backend, infra, unknown] and a priority from [P0, P1, P2] based on the title + description. If P0, also post a brief alert to the #oncall Slack channel with the issue title + link.",
-              "tools": ["linear_list", "linear_update", "slack_post"],
+              "messages": "Triage unlabelled issues in the Linear Bug queue. Pick a label from [frontend, backend, infra, unknown] and a priority from [P0, P1, P2] based on the title + description. If P0, also send a brief alert to the #oncall Slack channel with the issue title + link.",
+              "tools": [
+                { "toolId": "slack_send_message", "usageControl": "auto", "kind": "tool" }
+              ],
               "toolChoice": "auto",
               "maxIterations": 8,
               "maxSeconds": 480,
@@ -45,42 +47,6 @@
               "minIterations": 0,
               "failurePolicy": "escalate",
               "retryCount": 1
-            }
-          }
-        },
-        {
-          "id": "linear_list",
-          "type": "action.linear",
-          "position": { "x": 720, "y": 80 },
-          "data": {
-            "properties": {
-              "operation": "list_issues",
-              "credential": "",
-              "team_id": "",
-              "state_filter": "open"
-            }
-          }
-        },
-        {
-          "id": "linear_update",
-          "type": "action.linear",
-          "position": { "x": 720, "y": 240 },
-          "data": {
-            "properties": {
-              "operation": "update_issue",
-              "credential": ""
-            }
-          }
-        },
-        {
-          "id": "slack_post",
-          "type": "action.slack",
-          "position": { "x": 720, "y": 400 },
-          "data": {
-            "properties": {
-              "operation": "send_message",
-              "credential": "",
-              "channel": "#oncall"
             }
           }
         }

@@ -40,20 +40,32 @@ async def seed_official_templates(db: AsyncSession) -> int:
         slug = _slug_for(raw)
         result = await db.execute(select(Template).where(Template.slug == slug))
         existing = result.scalar_one_or_none()
+        graph = _extract_graph(raw)
+        creds_required = list(raw.get("credentials_required") or [])
+        tools_required = _derive_tools(graph)
+
         if existing is not None:
-            # Keep pricing/featured flags in sync with the seed JSON so
-            # marking a template premium in source takes effect on next
-            # boot without manual DB edits. Other fields stay untouched
-            # so user-driven changes (rare) survive.
+            # Keep authoring-time fields (graph, summary, description,
+            # credentials, tools, pricing, featured) in sync with the seed
+            # JSON so edits to the source file take effect on next boot
+            # without manual DB ops. Only touches `is_official` rows so a
+            # community-published template that happens to share a slug
+            # wouldn't be silently overwritten.
             if existing.is_official:
+                existing.title = str(raw.get("name") or existing.title)
+                existing.summary = str(raw.get("summary") or existing.summary)
+                existing.description = str(
+                    raw.get("description") or raw.get("summary") or existing.description
+                )
+                existing.category = str(raw.get("category") or existing.category)
+                existing.kind = str(raw.get("kind") or existing.kind)
+                existing.graph = graph
+                existing.credentials_required = creds_required
+                existing.tools_required = tools_required
                 existing.is_premium = bool(raw.get("is_premium", False))
                 existing.price_cents = int(raw.get("price_cents", 0) or 0)
                 existing.featured = bool(raw.get("featured", False))
             continue
-
-        graph = _extract_graph(raw)
-        creds_required = list(raw.get("credentials_required") or [])
-        tools_required = _derive_tools(graph)
 
         db.add(
             Template(
