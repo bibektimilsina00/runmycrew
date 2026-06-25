@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useCollaborationStore } from '../collaborationStore'
 
 /**
@@ -8,8 +9,12 @@ import { useCollaborationStore } from '../collaborationStore'
 const MAX_VISIBLE = 4
 
 export function PresenceStack() {
-  const peers = useCollaborationStore((s) =>
-    Object.values(s.peers).map((p) => p.session),
+  // useShallow keeps Zustand from re-rendering us every commit just
+  // because Object.values returned a freshly-allocated array — without
+  // it the selector tripped React #185 (max update depth) the moment
+  // a peer joined.
+  const peers = useCollaborationStore(
+    useShallow((s) => Object.values(s.peers).map((p) => p.session)),
   )
   if (peers.length === 0) return null
 
