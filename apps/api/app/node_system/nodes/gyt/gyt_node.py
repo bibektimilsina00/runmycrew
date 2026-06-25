@@ -1586,6 +1586,17 @@ async def _fetch_transcript_via_rapidapi(
     resp.raise_for_status()
     data = resp.json()
 
+    # Provider-side error returned as 200-with-body — the most common
+    # shape is `{"error": "..."}` (also `message`, `detail`). Surface
+    # the exact reason so users see "no subtitles" / "invalid video id"
+    # / "rate limited" instead of our parser's "can't parse" fallback.
+    provider_error = _extract_provider_error(data)
+    if provider_error is not None:
+        return NodeResult(
+            success=False,
+            error=f"{provider_error} (video {vid}, provider {host})",
+        )
+
     segments = _coerce_rapidapi_segments(data)
     if segments is None:
         return NodeResult(
@@ -1685,6 +1696,39 @@ def _extract_rapidapi_language(payload: Any) -> str | None:
         lang = payload.get("language") or payload.get("language_code") or payload.get("lang")
         if isinstance(lang, str) and lang:
             return lang
+    return None
+
+
+def _extract_provider_error(payload: Any) -> str | None:
+    """Pull a human-readable error string off a RapidAPI response.
+
+    Different providers stash failures under different keys
+    (`error` / `message` / `detail` / `errors[0]`). When any of them
+    holds a non-empty string we treat it as the provider's verdict and
+    surface it to the user verbatim — far more useful than our
+    parser's "can't parse" fallback.
+
+    Returns `None` when the payload looks like a normal success
+    response so the caller falls through to segment coercion.
+    """
+    if isinstance(payload, list) and payload:
+        return _extract_provider_error(payload[0])
+    if not isinstance(payload, dict):
+        return None
+    for key in ("error", "message", "detail"):
+        v = payload.get(key)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    errors = payload.get("errors")
+    if isinstance(errors, list) and errors:
+        first = errors[0]
+        if isinstance(first, str) and first.strip():
+            return first.strip()
+        if isinstance(first, dict):
+            for key in ("error", "message", "detail"):
+                v = first.get(key)
+                if isinstance(v, str) and v.strip():
+                    return v.strip()
     return None
 
 
