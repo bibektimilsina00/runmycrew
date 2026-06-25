@@ -1,7 +1,4 @@
 export { TemplateCard }     from './components/TemplateCard'
 export { TemplatesGrid }    from './components/TemplatesGrid'
-export {
-  TEMPLATES,
-  TEMPLATE_CATEGORIES,
-} from './data/templates'
+export { fetchPublicTemplates } from './data/fetch'
 export type { Template, TemplateCategory, TemplateStep } from './data/templates'

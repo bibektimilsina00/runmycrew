@@ -52,6 +52,23 @@ async def list_marketplace(
     )
 
 
+@router.get("/public", response_model=TemplateListResponse)
+async def list_public(
+    category: str | None = None,
+    limit: int = Query(60, ge=1, le=60),
+    offset: int = Query(0, ge=0),
+    service: TemplateService = Depends(get_template_service),
+) -> TemplateListResponse:
+    """Anonymous marketing endpoint — official + published templates only.
+
+    Used by the marketing site (runmycrew.com/templates). Skips auth so
+    visitors don't need an account to browse the curated set; restricted
+    to ``is_official=True`` so user-published rows never surface here
+    until a moderation flow exists.
+    """
+    return await service.list_public(category=category, limit=limit, offset=offset)
+
+
 @router.get("/categories", response_model=TemplateCategoryListResponse)
 async def list_categories(
     _: User = Depends(get_current_user),

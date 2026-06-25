@@ -58,15 +58,20 @@ class TemplateRepository:
         sort: SortKey = "newest",
         limit: int = 24,
         offset: int = 0,
+        official_only: bool = False,
     ) -> tuple[list[Template], int]:
         """Paginated marketplace list.
 
         Always filters to ``is_published=True`` — drafts only show up via
-        ``list_by_creator``. The total count is computed in a separate
-        scalar query so the caller can render "Showing X of N" without
-        a second round trip.
+        ``list_by_creator``. ``official_only=True`` further restricts to
+        rows seeded from disk (used by the anonymous marketing endpoint
+        so user-published rows don't surface there before moderation).
+        The total count is computed in a separate scalar query so the
+        caller can render "Showing X of N" without a second round trip.
         """
         base = select(Template).where(Template.is_published.is_(True))
+        if official_only:
+            base = base.where(Template.is_official.is_(True))
         if category:
             base = base.where(Template.category == category)
         if kind:

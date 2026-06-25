@@ -87,6 +87,36 @@ class TemplateService:
             offset=offset,
         )
 
+    async def list_public(
+        self,
+        *,
+        category: str | None = None,
+        limit: int = 60,
+        offset: int = 0,
+    ) -> TemplateListResponse:
+        """Anonymous marketing endpoint — only official, published rows.
+
+        Sorted by featured first then newest so the curated entries lead
+        the grid. Creator lookup is skipped because every row is
+        first-party.
+        """
+        rows, total = await self.repo.list_published(
+            category=category,
+            kind=None,
+            q=None,
+            sort="newest",
+            limit=limit,
+            offset=offset,
+            official_only=True,
+        )
+        rows.sort(key=lambda t: (not t.featured, -int(t.created_at.timestamp())))
+        return TemplateListResponse(
+            items=[self._to_list_out(t, None) for t in rows],
+            total=total,
+            limit=limit,
+            offset=offset,
+        )
+
     async def list_categories(self) -> list[TemplateCategorySchema]:
         counts = await self.repo.category_counts()
         return [

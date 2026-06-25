@@ -1,10 +1,16 @@
 import Link from 'next/link'
 import { MarketingNav, MarketingFooter } from '@/features/marketing'
 import { Container } from '@/shared/components/Container'
-import { TemplatesGrid, TEMPLATES } from '@/features/templates'
+import { TemplatesGrid, fetchPublicTemplates } from '@/features/templates'
 import { EXTERNAL_LINKS } from '@/shared/constants/routes'
 
-export default function TemplatesPage() {
+export default async function TemplatesPage() {
+  const templates = await fetchPublicTemplates()
+  const countCopy =
+    templates.length === 0
+      ? 'Curated workflows across sales, marketing, engineering and ops.'
+      : `${templates.length} curated workflow${templates.length === 1 ? '' : 's'} across sales, marketing, engineering and ops.`
+
   return (
     <>
       <MarketingNav />
@@ -20,8 +26,7 @@ export default function TemplatesPage() {
               ship in minutes
             </h1>
             <p className="mt-5 max-w-[600px] text-[15px] leading-[1.55] text-muted-foreground">
-              {TEMPLATES.length} curated workflows across sales, marketing, engineering and ops.
-              Fork any template into your workspace and tailor the steps to your tools.
+              {countCopy} Fork any template into your workspace and tailor the steps to your tools.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-2.5">
               <Link
@@ -42,7 +47,7 @@ export default function TemplatesPage() {
 
         <section className="pb-24">
           <Container className="max-w-[1280px] px-7">
-            <TemplatesGrid />
+            <TemplatesGrid templates={templates} />
           </Container>
         </section>
       </main>

@@ -1,18 +1,34 @@
 'use client'
 
-import { useState } from 'react'
-import { TEMPLATES, TEMPLATE_CATEGORIES, type TemplateCategory } from '../data/templates'
+import { useMemo, useState } from 'react'
+import { type Template } from '../data/templates'
 import { TemplateCard } from './TemplateCard'
 
-export function TemplatesGrid() {
-  const [cat, setCat] = useState<TemplateCategory | 'All'>('All')
-  const list = cat === 'All' ? TEMPLATES : TEMPLATES.filter((t) => t.category === cat)
+export function TemplatesGrid({ templates }: { templates: Template[] }) {
+  // Derive the filter pill set from whatever the API actually returned
+  // so we never advertise a category that has zero templates behind it.
+  const categories = useMemo(
+    () => Array.from(new Set(templates.map((t) => t.category))).sort(),
+    [templates],
+  )
+  const [cat, setCat] = useState<string>('All')
+  const list = cat === 'All' ? templates : templates.filter((t) => t.category === cat)
+
+  if (templates.length === 0) {
+    return (
+      <div className="rounded-[10px] border border-dashed border-border bg-card/30 px-6 py-12 text-center">
+        <p className="m-0 text-[14px] text-muted-foreground">
+          No templates published yet — check back soon.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center gap-1.5">
         <FilterPill label="All" active={cat === 'All'} onClick={() => setCat('All')} />
-        {TEMPLATE_CATEGORIES.map((c) => (
+        {categories.map((c) => (
           <FilterPill key={c} label={c} active={cat === c} onClick={() => setCat(c)} />
         ))}
       </div>
