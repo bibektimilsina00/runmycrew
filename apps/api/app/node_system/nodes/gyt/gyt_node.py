@@ -1521,15 +1521,169 @@ async def _get_public_video(
 async def _get_video_transcript(
     node: GoogleYouTubeNode, client: httpx.AsyncClient, headers: dict[str, str]
 ) -> NodeResult:
-    """Fetch the captions track for any public video. No OAuth, no API key.
+    """Fetch captions for any public video. No OAuth required.
 
-    Uses `youtube-transcript-api` which scrapes the public timedtext
-    endpoint. Returns the full transcript as a single string plus the
-    per-segment list with timestamps so downstream nodes can do
-    summarisation or chapter detection.
+    Primary path: a RapidAPI YouTube-transcript provider, configured via
+    ``RAPIDAPI_KEY`` + ``RAPIDAPI_YOUTUBE_TRANSCRIPT_HOST``. This works
+    from cloud IPs because the proxy lives on RapidAPI's side, not
+    youtube.com.
+
+    Fallback: ``youtube-transcript-api`` direct scrape. Useful for local
+    dev where the host IP isn't cloud-blocked. In production this
+    typically fails with the ``YouTube is blocking requests from your
+    IP`` error — when the RapidAPI path is configured, we never reach
+    this fallback.
     """
-    # Imported lazily so the rest of the YouTube node still loads if the
-    # optional dep ever drops out of the image.
+    from apps.api.app.core.config import settings
+
+    vid = _extract_video_id(node.props.video_url_or_id)
+    if not vid:
+        return NodeResult(
+            success=False,
+            error="Could not parse a video ID out of `video_url_or_id`.",
+        )
+
+    preferred = (node.props.transcript_language or "en").strip() or "en"
+
+    if settings.RAPIDAPI_KEY and settings.RAPIDAPI_YOUTUBE_TRANSCRIPT_HOST:
+        try:
+            return await _fetch_transcript_via_rapidapi(vid, preferred, client)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "RapidAPI transcript fetch failed for %s; falling back to direct: %s",
+                vid,
+                exc,
+            )
+
+    return await _fetch_transcript_via_direct_scrape(vid, preferred)
+
+
+async def _fetch_transcript_via_rapidapi(
+    vid: str, preferred: str, client: httpx.AsyncClient
+) -> NodeResult:
+    """Hit the configured RapidAPI transcript endpoint.
+
+    Different providers under the RapidAPI umbrella return slightly
+    different JSON shapes (some list under ``transcript``, some under
+    ``captions``, some under ``transcriptionAsText``). The shape probe
+    here is intentionally tolerant — we look for the first plausible
+    list-of-segments payload and project it into our canonical
+    ``[{text, start, duration}]`` envelope.
+    """
+    from apps.api.app.core.config import settings
+
+    host = settings.RAPIDAPI_YOUTUBE_TRANSCRIPT_HOST
+    url = f"https://{host}/transcript"
+    resp = await client.get(
+        url,
+        headers={
+            "x-rapidapi-key": settings.RAPIDAPI_KEY,
+            "x-rapidapi-host": host,
+            "accept": "application/json",
+        },
+        params={"video_id": vid, "lang": preferred},
+    )
+    resp.raise_for_status()
+    data = resp.json()
+
+    segments = _coerce_rapidapi_segments(data)
+    if segments is None:
+        return NodeResult(
+            success=False,
+            error=(
+                f"RapidAPI host {host} returned a payload we don't know how "
+                "to parse. Check the provider's docs and confirm "
+                "RAPIDAPI_YOUTUBE_TRANSCRIPT_HOST matches the one you subscribed to."
+            ),
+        )
+
+    full_text = " ".join(seg["text"] for seg in segments).strip()
+    language = _extract_rapidapi_language(data) or preferred
+    return NodeResult(
+        success=True,
+        output_data={
+            "id": vid,
+            "language": language,
+            "text": full_text,
+            "segments": segments,
+            "segment_count": len(segments),
+            "source": "rapidapi",
+        },
+    )
+
+
+def _coerce_rapidapi_segments(payload: Any) -> list[dict[str, Any]] | None:
+    """Project a RapidAPI provider's payload into our canonical segments.
+
+    Recognises a few common shapes:
+        - ``[{text, start, duration}]``  (some providers)
+        - ``{"transcript": [...]}``      (most common)
+        - ``{"captions":  [...]}``       (older naming)
+        - ``{"data":     [...]}``        (generic wrappers)
+        - first element of a list of language-tracks, each with one of
+          the above
+
+    Each segment is normalised to ``{text: str, start: float, duration: float}``
+    — missing fields default to 0.0 so downstream consumers don't
+    crash on partial data.
+    """
+
+    def _to_segment(item: dict[str, Any]) -> dict[str, Any] | None:
+        text = item.get("text") or item.get("subtitle") or item.get("snippet")
+        if text is None:
+            return None
+        return {
+            "text": str(text),
+            "start": float(item.get("start") or item.get("offset") or 0.0),
+            "duration": float(item.get("duration") or item.get("dur") or item.get("length") or 0.0),
+        }
+
+    def _try_list(maybe_list: Any) -> list[dict[str, Any]] | None:
+        if not isinstance(maybe_list, list):
+            return None
+        segs: list[dict[str, Any]] = []
+        for item in maybe_list:
+            if isinstance(item, dict):
+                s = _to_segment(item)
+                if s is not None:
+                    segs.append(s)
+        return segs if segs else None
+
+    direct = _try_list(payload)
+    if direct is not None:
+        return direct
+    if isinstance(payload, dict):
+        for key in ("transcript", "captions", "data", "segments", "transcriptionAsText"):
+            if key not in payload:
+                continue
+            value = payload[key]
+            if isinstance(value, str):
+                return [{"text": value, "start": 0.0, "duration": 0.0}]
+            attempt = _try_list(value)
+            if attempt is not None:
+                return attempt
+    if isinstance(payload, list) and payload and isinstance(payload[0], dict):
+        # Some providers return a list of language-tracks. Take the
+        # first one's transcript and try again.
+        return _coerce_rapidapi_segments(payload[0])
+    return None
+
+
+def _extract_rapidapi_language(payload: Any) -> str | None:
+    if isinstance(payload, dict):
+        lang = payload.get("language") or payload.get("language_code") or payload.get("lang")
+        if isinstance(lang, str) and lang:
+            return lang
+    return None
+
+
+async def _fetch_transcript_via_direct_scrape(vid: str, preferred: str) -> NodeResult:
+    """Local-dev fallback when no RapidAPI key is configured.
+
+    Direct-scrapes youtube.com via ``youtube-transcript-api``. Almost
+    certainly fails in production (cloud IP block) — surfacing the
+    library's own error message tells the operator what to do.
+    """
     try:
         from youtube_transcript_api import YouTubeTranscriptApi
         from youtube_transcript_api._errors import (
@@ -1542,21 +1696,11 @@ async def _get_video_transcript(
             success=False,
             error=(
                 "youtube-transcript-api is not installed in this environment. "
-                "Add it to apps/api/pyproject.toml dependencies."
+                "Add it to apps/api/pyproject.toml or configure RAPIDAPI_KEY + "
+                "RAPIDAPI_YOUTUBE_TRANSCRIPT_HOST to use the cloud-safe path."
             ),
         )
 
-    vid = _extract_video_id(node.props.video_url_or_id)
-    if not vid:
-        return NodeResult(
-            success=False,
-            error="Could not parse a video ID out of `video_url_or_id`.",
-        )
-
-    preferred = (node.props.transcript_language or "en").strip() or "en"
-
-    # `youtube-transcript-api` is sync — push it to a thread so we don't
-    # block the event loop on the network round trip.
     import asyncio
 
     def _fetch() -> tuple[list[dict[str, Any]], str]:
@@ -1566,9 +1710,6 @@ async def _get_video_transcript(
             try:
                 transcript = transcript_list.find_transcript([preferred])
             except NoTranscriptFound:
-                # Fall back to the first generated/translated track that
-                # claims to be in the preferred language; otherwise grab
-                # whatever the first available track is.
                 try:
                     transcript = transcript_list.find_generated_transcript([preferred])
                 except NoTranscriptFound:
@@ -1595,6 +1736,7 @@ async def _get_video_transcript(
             "text": full_text,
             "segments": segments,
             "segment_count": len(segments),
+            "source": "direct",
         },
     )
 

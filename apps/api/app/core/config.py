@@ -159,6 +159,15 @@ class Settings(BaseSettings):
     SMTP_FROM_NAME: str = "RunMyCrew"
     SMTP_TLS: bool = True
 
+    # RapidAPI passthrough — used by the YouTube node's transcript op
+    # because direct scraping of youtube.com gets blocked from cloud
+    # IPs (DigitalOcean, AWS, GCP). Set the key + the host of whichever
+    # RapidAPI YouTube-transcript provider you subscribed to; if either
+    # is blank the node falls back to the direct-scrape library, which
+    # works locally but typically fails in production.
+    RAPIDAPI_KEY: str = ""
+    RAPIDAPI_YOUTUBE_TRANSCRIPT_HOST: str = "youtube-transcriptor.p.rapidapi.com"
+
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).resolve().parents[4] / ".env"),
         case_sensitive=True,
