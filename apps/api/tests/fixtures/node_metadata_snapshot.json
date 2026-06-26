@@ -15650,6 +15650,148 @@
     "tools": null,
     "type": "trigger.gforms_response"
   },
+  "trigger.gitlab_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires the instant GitLab posts a webhook delivery to your workflow URL. Pair with a project-level webhook configured in GitLab Settings \u2192 Webhooks.",
+    "dynamic_outputs_from": null,
+    "icon": "gitlab",
+    "inputs": 0,
+    "name": "GitLab Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "delivery",
+        "type": "string"
+      },
+      {
+        "label": "object_kind",
+        "type": "string"
+      },
+      {
+        "label": "repository",
+        "type": "string"
+      },
+      {
+        "label": "sender",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "description": "Sanity-check label. The URL + secret are what actually match this trigger to GitLab's deliveries.",
+        "label": "Project (display only)",
+        "name": "project",
+        "placeholder": "my-group/my-project",
+        "type": "string"
+      },
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Gitlab-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Push",
+            "value": "Push Hook"
+          },
+          {
+            "label": "Tag push",
+            "value": "Tag Push Hook"
+          },
+          {
+            "label": "Issue",
+            "value": "Issue Hook"
+          },
+          {
+            "label": "Comment",
+            "value": "Note Hook"
+          },
+          {
+            "label": "Merge request",
+            "value": "Merge Request Hook"
+          },
+          {
+            "label": "Wiki page",
+            "value": "Wiki Page Hook"
+          },
+          {
+            "label": "Pipeline",
+            "value": "Pipeline Hook"
+          },
+          {
+            "label": "Job",
+            "value": "Job Hook"
+          },
+          {
+            "label": "Deployment",
+            "value": "Deployment Hook"
+          },
+          {
+            "label": "Release",
+            "value": "Release Hook"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "GITLAB_TOKEN secret. Deliveries without a valid `X-Gitlab-Token` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in GitLab Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.gitlab_webhook"
+  },
   "trigger.gmail": {
     "allow_error": true,
     "category": "trigger",

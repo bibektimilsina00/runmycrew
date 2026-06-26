@@ -43,6 +43,7 @@ from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNo
 from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
 from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
+from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
@@ -126,6 +127,7 @@ node_registry.register(ConditionNode)
 node_registry.register(SlackNode)
 node_registry.register(SlackTriggerNode)
 node_registry.register(GitHubNode)
+node_registry.register(GitLabWebhookTriggerNode)
 node_registry.register(NotionNode)
 node_registry.register(AirtableNode)
 node_registry.register(DiscordNode)
