@@ -200,6 +200,12 @@ class ProviderManifest(BaseModel):
     auth_value_template: str = "Bearer {token}"
     # For `query_token` — name of the URL param the token rides on.
     auth_query_param: str = "api_key"
+    # For `basic` only. Empty = `{token}:` base64 (legacy). A literal
+    # value (e.g. `"api"` for Mailgun) → `{value}:{token}`. A
+    # `{credential_key}` template resolves against the live credential
+    # dict — e.g. Twilio uses `"{account_sid}"` to pull the account sid
+    # out of the credential and put it on the username side.
+    auth_basic_username: str = ""
     # Optional content-type override (`application/json` is the default).
     content_type: str = "application/json"
     # Extra static headers (e.g. `X-GitHub-Api-Version`).

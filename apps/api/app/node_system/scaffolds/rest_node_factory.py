@@ -258,6 +258,7 @@ async def _dispatch_declarative(
         token=token,
         params=params,
         json=body,
+        credential=node.credential,
     )
     output = _flatten_output(op, raw, node.props)
     # NodeResult.output_data is `dict[str, Any]` — the scaffold has to

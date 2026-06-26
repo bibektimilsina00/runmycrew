@@ -12311,6 +12311,259 @@
     "tools": null,
     "type": "action.loops"
   },
+  "action.mailgun": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "mailgun_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Mailgun \u2014 transactional + marketing email.",
+    "dynamic_outputs_from": null,
+    "icon": "mailgun",
+    "inputs": 1,
+    "name": "Mailgun",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "message",
+        "type": "string"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      },
+      {
+        "label": "is_valid",
+        "type": "boolean"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "mailgun_api_key",
+        "label": "Mailgun Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Send via Template",
+            "value": "send_template"
+          },
+          {
+            "label": "Validate Email",
+            "value": "validate_email"
+          },
+          {
+            "label": "List Mailing Lists",
+            "value": "list_mailing_lists"
+          },
+          {
+            "label": "Get Mailing List",
+            "value": "get_list"
+          },
+          {
+            "label": "Add List Member",
+            "value": "add_list_member"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "send_template"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "placeholder": "mg.example.com",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "send_template"
+          ]
+        },
+        "label": "From",
+        "name": "from_",
+        "placeholder": "\"You\" <you@example.com>",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "send_template"
+          ]
+        },
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "CC",
+        "mode": "advanced",
+        "name": "cc",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "BCC",
+        "mode": "advanced",
+        "name": "bcc",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "send_template"
+          ]
+        },
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Text body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "HTML body",
+        "name": "html",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_template"
+          ]
+        },
+        "label": "Template",
+        "mode": "advanced",
+        "name": "template",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_template"
+          ]
+        },
+        "label": "Template variables (JSON)",
+        "mode": "advanced",
+        "name": "template_variables",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "validate_email",
+            "add_list_member"
+          ]
+        },
+        "label": "Email address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_list",
+            "add_list_member"
+          ]
+        },
+        "label": "Mailing list",
+        "name": "list_address",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.mailgun"
+  },
   "action.memory": {
     "allow_error": true,
     "category": "ai",
@@ -12480,6 +12733,205 @@
     ],
     "tools": null,
     "type": "action.memory"
+  },
+  "action.messagebird": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "messagebird_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "MessageBird \u2014 SMS, voice, and verification.",
+    "dynamic_outputs_from": null,
+    "icon": "messagebird",
+    "inputs": 1,
+    "name": "MessageBird",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "recipients",
+        "type": "object"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      },
+      {
+        "label": "amount",
+        "type": "number"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "messagebird_api_key",
+        "label": "MessageBird Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "List Messages",
+            "value": "list_messages"
+          },
+          {
+            "label": "Get Balance",
+            "value": "get_balance"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "From",
+        "name": "originator",
+        "placeholder": "MyApp or +15551234",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Recipients (CSV)",
+        "name": "recipients",
+        "placeholder": "+15557654321",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Body",
+        "name": "body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "default": "sms",
+        "label": "Type",
+        "mode": "advanced",
+        "name": "type",
+        "options": [
+          {
+            "label": "SMS",
+            "value": "sms"
+          },
+          {
+            "label": "Voice",
+            "value": "voice"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_message"
+          ]
+        },
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_messages"
+          ]
+        },
+        "default": 30,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_messages"
+          ]
+        },
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.messagebird"
   },
   "action.meta.facebook": {
     "allow_error": false,
@@ -14755,6 +15207,216 @@
     "tools": null,
     "type": "action.pinecone"
   },
+  "action.plivo": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "plivo_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Plivo \u2014 SMS and voice (Twilio alternative).",
+    "dynamic_outputs_from": null,
+    "icon": "plivo",
+    "inputs": 1,
+    "name": "Plivo",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "message_uuid",
+        "type": "array"
+      },
+      {
+        "label": "api_id",
+        "type": "string"
+      },
+      {
+        "label": "message",
+        "type": "string"
+      },
+      {
+        "label": "objects",
+        "type": "array"
+      },
+      {
+        "label": "from",
+        "type": "string"
+      },
+      {
+        "label": "to",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "plivo_api_key",
+        "label": "Plivo Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "List Messages",
+            "value": "list_messages"
+          },
+          {
+            "label": "Make Call",
+            "value": "make_call"
+          },
+          {
+            "label": "Get Call",
+            "value": "get_call"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "From",
+        "name": "src",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "To",
+        "name": "dst",
+        "placeholder": "+15551234567",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Message text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "TwiML/Answer URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "From (voice)",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "To (voice)",
+        "name": "to_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_message"
+          ]
+        },
+        "label": "Message UUID",
+        "name": "message_uuid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_call"
+          ]
+        },
+        "label": "Call UUID",
+        "name": "call_uuid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_messages"
+          ]
+        },
+        "default": 20,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.plivo"
+  },
   "action.postgres": {
     "allow_error": true,
     "category": "integration",
@@ -16004,6 +16666,189 @@
     ],
     "tools": null,
     "type": "action.salesforce"
+  },
+  "action.sendblue": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "sendblue_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Sendblue \u2014 iMessage + SMS fallback messaging API.",
+    "dynamic_outputs_from": null,
+    "icon": "sendblue",
+    "inputs": 1,
+    "name": "Sendblue",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "number",
+        "type": "string"
+      },
+      {
+        "label": "content",
+        "type": "string"
+      },
+      {
+        "label": "messages",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "sendblue_api_key",
+        "label": "Sendblue Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "List Messages",
+            "value": "list_messages"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "To (phone)",
+        "name": "number",
+        "placeholder": "+15551234567",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Message content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Media URL",
+        "mode": "advanced",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Status callback",
+        "mode": "advanced",
+        "name": "status_callback",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Send style",
+        "mode": "advanced",
+        "name": "send_style",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_message"
+          ]
+        },
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_messages"
+          ]
+        },
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sendblue"
   },
   "action.sendgrid": {
     "allow_error": true,
@@ -18601,6 +19446,238 @@
     ],
     "tools": null,
     "type": "action.tts"
+  },
+  "action.twilio": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "twilio_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Twilio \u2014 send SMS / WhatsApp messages and place voice calls.",
+    "dynamic_outputs_from": null,
+    "icon": "twilio",
+    "inputs": 1,
+    "name": "Twilio",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sid",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "from",
+        "type": "string"
+      },
+      {
+        "label": "to",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "string"
+      },
+      {
+        "label": "messages",
+        "type": "array"
+      },
+      {
+        "label": "calls",
+        "type": "array"
+      },
+      {
+        "label": "date_created",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "twilio_api_key",
+        "label": "Twilio Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "List Messages",
+            "value": "list_messages"
+          },
+          {
+            "label": "Make Call",
+            "value": "make_call"
+          },
+          {
+            "label": "Get Call",
+            "value": "get_call"
+          },
+          {
+            "label": "List Calls",
+            "value": "list_calls"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "make_call"
+          ]
+        },
+        "label": "From",
+        "name": "From",
+        "placeholder": "+15551234567 or whatsapp:+1...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "make_call"
+          ]
+        },
+        "label": "To",
+        "name": "To",
+        "placeholder": "+15557654321",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Body",
+        "name": "Body",
+        "placeholder": "Message text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Media URL",
+        "mode": "advanced",
+        "name": "MediaUrl",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "make_call"
+          ]
+        },
+        "label": "Status callback URL",
+        "mode": "advanced",
+        "name": "StatusCallback",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "TwiML URL",
+        "name": "Url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_message"
+          ]
+        },
+        "label": "Message SID",
+        "name": "message_sid",
+        "placeholder": "SM...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_call"
+          ]
+        },
+        "label": "Call SID",
+        "name": "call_sid",
+        "placeholder": "CA...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_messages",
+            "list_calls"
+          ]
+        },
+        "default": 20,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.twilio"
   },
   "action.upstash_redis": {
     "allow_error": true,

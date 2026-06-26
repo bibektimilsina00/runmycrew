@@ -68,6 +68,90 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "twilio": APIKeyProvider(
+        id="twilio_api_key",
+        name="Twilio",
+        icon_slug="twilio",
+        color="#1c1c1c",
+        description="Twilio — SMS, WhatsApp, voice. Auth Token + Account SID.",
+        hint="Account SID + Auth Token",
+        fields=[
+            CredentialField(
+                id="account_sid",
+                label="Account SID",
+                type="string",
+                placeholder="AC...",
+            ),
+            CredentialField(
+                id="auth_token",
+                label="Auth Token",
+                type="password",
+                placeholder="Auth Token",
+            ),
+        ],
+    ),
+    "mailgun": APIKeyProvider(
+        id="mailgun_api_key",
+        name="Mailgun",
+        icon_slug="mailgun",
+        color="#1c1c1c",
+        description="Mailgun — transactional + marketing email.",
+        hint="key-... (private API key)",
+        fields=[
+            CredentialField(
+                id="api_key", label="Private API Key", type="password", placeholder="key-..."
+            )
+        ],
+    ),
+    "sendblue": APIKeyProvider(
+        id="sendblue_api_key",
+        name="Sendblue",
+        icon_slug="sendblue",
+        color="#1c1c1c",
+        description="Sendblue — iMessage + SMS fallback messaging.",
+        hint="API Key ID + Secret",
+        fields=[
+            CredentialField(
+                id="api_key_id",
+                label="API Key ID",
+                type="string",
+                placeholder="key id",
+            ),
+            CredentialField(
+                id="api_secret_key",
+                label="API Secret Key",
+                type="password",
+                placeholder="secret key",
+            ),
+        ],
+    ),
+    "messagebird": APIKeyProvider(
+        id="messagebird_api_key",
+        name="MessageBird",
+        icon_slug="messagebird",
+        color="#1c1c1c",
+        description="MessageBird — SMS, voice, verification.",
+        hint="Access Key",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Key", type="password", placeholder="Access Key"
+            )
+        ],
+    ),
+    "plivo": APIKeyProvider(
+        id="plivo_api_key",
+        name="Plivo",
+        icon_slug="plivo",
+        color="#1c1c1c",
+        description="Plivo — SMS and voice. Auth ID + Auth Token.",
+        hint="Auth ID + Auth Token",
+        fields=[
+            CredentialField(id="auth_id", label="Auth ID", type="string", placeholder="MA..."),
+            CredentialField(
+                id="auth_token", label="Auth Token", type="password", placeholder="Auth Token"
+            ),
+        ],
+    ),
     "supabase": APIKeyProvider(
         id="supabase_api_key",
         name="Supabase",

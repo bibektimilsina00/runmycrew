@@ -81,6 +81,8 @@ from apps.api.app.node_system.nodes.logic.loop.loop_node import LoopNode
 from apps.api.app.node_system.nodes.logic.sub_workflow.sub_workflow_node import SubWorkflowNode
 from apps.api.app.node_system.nodes.logic.while_loop.while_loop import WhileLoopNode
 from apps.api.app.node_system.nodes.loops.loops_node import LoopsNode
+from apps.api.app.node_system.nodes.mailgun.mailgun_node import MailgunNode
+from apps.api.app.node_system.nodes.messagebird.messagebird_node import MessageBirdNode
 from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
 from apps.api.app.node_system.nodes.meta.facebook_trigger import FacebookTriggerNode
 from apps.api.app.node_system.nodes.meta.instagram_action import InstagramActionNode
@@ -93,11 +95,13 @@ from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
+from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
 from apps.api.app.node_system.nodes.posthog.posthog_node import PostHogNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
+from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
 from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
@@ -108,6 +112,7 @@ from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
+from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
@@ -183,6 +188,11 @@ node_registry.register(UpstashRedisNode)
 node_registry.register(PineconeNode)
 node_registry.register(QdrantNode)
 node_registry.register(TinybirdNode)
+node_registry.register(TwilioNode)
+node_registry.register(MailgunNode)
+node_registry.register(SendblueNode)
+node_registry.register(MessageBirdNode)
+node_registry.register(PlivoNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

@@ -45,6 +45,8 @@ def build_auth(
     header_name: str,
     value_template: str,
     query_param: str,
+    basic_username: str = "",
+    credential: dict[str, Any] | None = None,
 ) -> tuple[dict[str, str], dict[str, str]]:
     """Return `(headers, query_params)` for the given auth scheme.
 
@@ -52,6 +54,13 @@ def build_auth(
     same logic without going through the generic call path — e.g. a
     GraphQL handler needs the same `Authorization` header but builds its
     own body.
+
+    `basic_username` is consulted only for `scheme="basic"`. It may be:
+      - empty string → legacy behavior, `{token}:` base64
+      - a literal value (e.g. `"api"` for Mailgun) → `{value}:{token}`
+      - a `{credential_key}` template → resolves against `credential`
+        (e.g. `"{account_sid}"` for Twilio pulls the sid out of the
+        credential dict)
     """
 
     if not token or scheme == "none":
@@ -63,8 +72,18 @@ def build_auth(
         return {header_name: token}, {}
     if scheme == "basic":
         import base64
+        import re as _re
 
-        encoded = base64.b64encode(f"{token}:".encode()).decode()
+        username = basic_username or ""
+        if username and credential:
+            # Resolve {credential_key} placeholders so the manifest can
+            # name a credential field (e.g. `"{account_sid}"`).
+            username = _re.sub(
+                r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}",
+                lambda m: str(credential.get(m.group(1), m.group(0))),
+                username,
+            )
+        encoded = base64.b64encode(f"{username}:{token}".encode()).decode()
         return {header_name: f"Basic {encoded}"}, {}
     if scheme == "query_token":
         return {}, {query_param: token}
@@ -92,6 +111,7 @@ async def rest_request(
     token: str | None,
     params: dict[str, Any] | None = None,
     json: Any = None,
+    credential: dict[str, Any] | None = None,
 ) -> tuple[Any, dict[str, str]]:
     """Issue one HTTP call against a provider.
 
@@ -99,6 +119,12 @@ async def rest_request(
     per-call. Returns `(parsed_body, response_headers)`. Raises
     `RESTError` on non-2xx so the factory can convert to a structured
     `NodeResult`.
+
+    `credential` (the decrypted credential dict) is consulted only for
+    advanced auth schemes that need a second field — e.g. Basic auth
+    where the username is `{account_sid}` from the credential. It also
+    flows into `extra_headers` templating so dual-header schemes can
+    pull any credential field, not just `{token}`.
     """
     auth_headers, auth_params = build_auth(
         token=token,
@@ -106,15 +132,28 @@ async def rest_request(
         header_name=manifest.auth_header_name,
         value_template=manifest.auth_value_template,
         query_param=manifest.auth_query_param,
+        basic_username=manifest.auth_basic_username,
+        credential=credential,
     )
-    # `extra_headers` supports `{token}` substitution so providers that
-    # require the same key under two headers (e.g. Supabase's
-    # `Authorization: Bearer X` + `apikey: X`) can declare both in the
-    # manifest without a custom handler.
-    resolved_extra = {
-        k: (v.replace("{token}", token) if isinstance(v, str) and "{token}" in v and token else v)
-        for k, v in manifest.extra_headers.items()
-    }
+    # `extra_headers` supports `{token}` plus any `{credential_key}`
+    # placeholder. Lets providers that ride two custom headers (Sendblue
+    # ships `sb-api-key-id` + `sb-api-secret-key`) declare both in the
+    # manifest pulling distinct credential fields.
+    resolved_extra: dict[str, str] = {}
+    for k, v in manifest.extra_headers.items():
+        if isinstance(v, str):
+            value = v.replace("{token}", token or "") if token else v
+            if credential:
+                import re as _re
+
+                value = _re.sub(
+                    r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}",
+                    lambda m: str(credential.get(m.group(1), m.group(0))),
+                    value,
+                )
+            resolved_extra[k] = value
+        else:
+            resolved_extra[k] = v
     headers = {
         "Content-Type": manifest.content_type,
         "Accept": "application/json",
@@ -123,14 +162,23 @@ async def rest_request(
     }
     merged_params: dict[str, Any] = {**auth_params, **(params or {})}
 
-    resp = await client.request(
-        method,
-        url,
-        headers=headers,
-        params=merged_params or None,
-        json=json,
-        timeout=manifest.timeout_seconds,
-    )
+    # Form-encoded bodies — Twilio, Mailgun, and other legacy APIs
+    # expect `application/x-www-form-urlencoded`. httpx routes those
+    # through `data=`, not `json=`, so the keys land in the right wire
+    # format.
+    request_kwargs: dict[str, Any] = {
+        "method": method,
+        "url": url,
+        "headers": headers,
+        "params": merged_params or None,
+        "timeout": manifest.timeout_seconds,
+    }
+    if manifest.content_type == "application/x-www-form-urlencoded":
+        request_kwargs["data"] = json
+    else:
+        request_kwargs["json"] = json
+
+    resp = await client.request(**request_kwargs)
     if resp.status_code >= 400:
         raise error_from_response(resp)
 
