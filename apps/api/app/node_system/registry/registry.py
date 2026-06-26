@@ -31,6 +31,7 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
 from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
@@ -131,6 +132,7 @@ node_registry.register(GitLabWebhookTriggerNode)
 node_registry.register(NotionNode)
 node_registry.register(AirtableNode)
 node_registry.register(DiscordNode)
+node_registry.register(FirecrawlNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

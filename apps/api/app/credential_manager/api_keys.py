@@ -57,6 +57,17 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="bu-...")
         ],
     ),
+    "firecrawl": APIKeyProvider(
+        id="firecrawl_api_key",
+        name="Firecrawl",
+        icon_slug="firecrawl",
+        color="#1c1c1c",
+        description="Firecrawl — scrape, crawl, map, and search the web into LLM-ready markdown.",
+        hint="fc-...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
+        ],
+    ),
     "airtable": APIKeyProvider(
         id="airtable_api_key",
         name="Airtable",

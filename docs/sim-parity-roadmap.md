@@ -23,9 +23,16 @@ Don't build 185 nodes by hand. Build scaffolds first (Phase 0), then
 fan out via manifest-driven generation (Phase 1+). Per-node cost drops
 from days → hours. Compound savings from PR ~30 onward.
 
-## Phase 0 — Foundation (1–2 weeks, 4 PRs)
+## Phase 0 — Foundation (1–2 weeks, 4 PRs) — **SHIPPED**
 
-Cut per-integration cost. Detailed scope below.
+Cut per-integration cost. Detailed scope below. PRs landed:
+
+| PR | What | Validation port |
+|---|---|---|
+| #263 | REST scaffold | airtable + linear |
+| #264 | Polling scaffold | gpeople |
+| #265 | Webhook scaffold | gitlab (new) |
+| #266 | `/new-integration` skill | firecrawl (new) |
 
 ### PR 0.1 — REST tool scaffold (4–5 days)
 

@@ -1658,6 +1658,166 @@
     "tools": null,
     "type": "action.evaluator"
   },
+  "action.firecrawl": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "firecrawl_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Scrape, crawl, map, and search the web \u2014 Firecrawl turns any site into LLM-ready markdown.",
+    "dynamic_outputs_from": null,
+    "icon": "firecrawl",
+    "inputs": 1,
+    "name": "Firecrawl",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "markdown",
+        "type": "string"
+      },
+      {
+        "label": "html",
+        "type": "string"
+      },
+      {
+        "label": "metadata",
+        "type": "object"
+      },
+      {
+        "label": "links",
+        "type": "array"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "firecrawl_api_key",
+        "label": "Firecrawl Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "scrape",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Scrape",
+            "value": "scrape"
+          },
+          {
+            "label": "Crawl",
+            "value": "crawl"
+          },
+          {
+            "label": "Map",
+            "value": "map"
+          },
+          {
+            "label": "Search",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "scrape",
+            "crawl",
+            "map"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "placeholder": "https://example.com",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "placeholder": "latest LLM papers",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "crawl",
+            "search"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "scrape",
+            "crawl"
+          ]
+        },
+        "description": "List of output formats. Defaults to [\"markdown\"].",
+        "label": "Formats (JSON array)",
+        "mode": "advanced",
+        "name": "formats",
+        "placeholder": "[\"markdown\", \"html\"]",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.firecrawl"
+  },
   "action.ga4": {
     "allow_error": true,
     "category": "integration",
