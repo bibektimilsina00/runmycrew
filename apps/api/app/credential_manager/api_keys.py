@@ -68,6 +68,81 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "typeform": APIKeyProvider(
+        id="typeform_api_key",
+        name="Typeform",
+        icon_slug="typeform",
+        color="#1c1c1c",
+        description="Typeform — forms, responses, webhooks.",
+        hint="Personal Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="Token"
+            )
+        ],
+    ),
+    "shopify": APIKeyProvider(
+        id="shopify_api_key",
+        name="Shopify",
+        icon_slug="shopify",
+        color="#1c1c1c",
+        description="Shopify Admin — orders, products, customers.",
+        hint="Admin API access token + store domain",
+        fields=[
+            CredentialField(
+                id="store_domain",
+                label="Store Domain",
+                type="string",
+                placeholder="your-store (without .myshopify.com)",
+            ),
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="shpat_..."
+            ),
+        ],
+    ),
+    "apify": APIKeyProvider(
+        id="apify_api_key",
+        name="Apify",
+        icon_slug="apify",
+        color="#1c1c1c",
+        description="Apify — actors, datasets, key-value stores.",
+        hint="Personal API token",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Token", type="password", placeholder="apify_api_..."
+            )
+        ],
+    ),
+    "algolia": APIKeyProvider(
+        id="algolia_api_key",
+        name="Algolia",
+        icon_slug="algolia",
+        color="#1c1c1c",
+        description="Algolia — index, search, manage records.",
+        hint="Application ID + Admin / Search API key",
+        fields=[
+            CredentialField(
+                id="app_id",
+                label="Application ID",
+                type="string",
+                placeholder="ABC123",
+            ),
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key"),
+        ],
+    ),
+    "square": APIKeyProvider(
+        id="square_api_key",
+        name="Square",
+        icon_slug="square",
+        color="#1c1c1c",
+        description="Square Connect — payments, orders, customers, catalog.",
+        hint="Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="EAAA..."
+            )
+        ],
+    ),
     "pipedrive": APIKeyProvider(
         id="pipedrive_api_key",
         name="Pipedrive",

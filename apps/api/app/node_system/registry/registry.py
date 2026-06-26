@@ -16,6 +16,8 @@ from apps.api.app.node_system.nodes.ai.thinking.thinking import ThinkingNode
 from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
+from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
+from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
@@ -110,14 +112,17 @@ from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
 from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
+from apps.api.app.node_system.nodes.shopify.shopify_node import ShopifyNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
+from apps.api.app.node_system.nodes.square.square_node import SquareNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
+from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
@@ -203,6 +208,11 @@ node_registry.register(AttioNode)
 node_registry.register(MixpanelNode)
 node_registry.register(MondayNode)
 node_registry.register(IntercomNode)
+node_registry.register(TypeformNode)
+node_registry.register(ShopifyNode)
+node_registry.register(ApifyNode)
+node_registry.register(AlgoliaNode)
+node_registry.register(SquareNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

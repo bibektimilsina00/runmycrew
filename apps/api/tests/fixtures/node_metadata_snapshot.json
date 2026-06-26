@@ -814,6 +814,471 @@
     "tools": null,
     "type": "action.airtable"
   },
+  "action.algolia": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "algolia_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Algolia \u2014 index, search, and manage records.",
+    "dynamic_outputs_from": null,
+    "icon": "algolia",
+    "inputs": 1,
+    "name": "Algolia",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "hits",
+        "type": "array"
+      },
+      {
+        "label": "nbHits",
+        "type": "number"
+      },
+      {
+        "label": "page",
+        "type": "number"
+      },
+      {
+        "label": "objectID",
+        "type": "string"
+      },
+      {
+        "label": "taskID",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "algolia_api_key",
+        "label": "Algolia Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "Get Object",
+            "value": "get_object"
+          },
+          {
+            "label": "Add Object",
+            "value": "add_object"
+          },
+          {
+            "label": "Save Object (Upsert)",
+            "value": "save_object"
+          },
+          {
+            "label": "Delete Object",
+            "value": "delete_object"
+          },
+          {
+            "label": "Batch Operations",
+            "value": "batch"
+          },
+          {
+            "label": "Clear Index",
+            "value": "clear_index"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "get_object",
+            "add_object",
+            "save_object",
+            "delete_object",
+            "batch",
+            "clear_index"
+          ]
+        },
+        "label": "Index",
+        "name": "index_name",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_object",
+            "save_object",
+            "delete_object"
+          ]
+        },
+        "label": "Object ID",
+        "name": "object_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_object",
+            "save_object"
+          ]
+        },
+        "label": "Record (JSON)",
+        "name": "record",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "batch"
+          ]
+        },
+        "label": "Records (JSON array)",
+        "name": "records",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Filters",
+        "mode": "advanced",
+        "name": "filters",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 20,
+        "label": "Hits per page",
+        "mode": "advanced",
+        "name": "hits_per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 0,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "label": "Object IDs (JSON array)",
+        "name": "object_ids",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.algolia"
+  },
+  "action.apify": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "apify_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Apify \u2014 run actors, fetch datasets, manage key-value stores.",
+    "dynamic_outputs_from": null,
+    "icon": "apify",
+    "inputs": 1,
+    "name": "Apify",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      },
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "defaultDatasetId",
+        "type": "string"
+      },
+      {
+        "label": "defaultKeyValueStoreId",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "apify_api_key",
+        "label": "Apify Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_actor",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Actor (sync)",
+            "value": "run_actor"
+          },
+          {
+            "label": "Start Run (async)",
+            "value": "start_run"
+          },
+          {
+            "label": "Get Run",
+            "value": "get_run"
+          },
+          {
+            "label": "Abort Run",
+            "value": "abort_run"
+          },
+          {
+            "label": "List Actors",
+            "value": "list_actors"
+          },
+          {
+            "label": "Get Dataset Items",
+            "value": "get_dataset_items"
+          },
+          {
+            "label": "Get Store Record",
+            "value": "get_store_record"
+          },
+          {
+            "label": "Put Store Record",
+            "value": "put_store_record"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_actor",
+            "start_run"
+          ]
+        },
+        "label": "Actor ID",
+        "name": "actor_id",
+        "placeholder": "username~actor-name or actorId",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_run",
+            "abort_run"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_dataset_items"
+          ]
+        },
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_store_record",
+            "put_store_record"
+          ]
+        },
+        "label": "Key-Value Store ID",
+        "name": "store_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_store_record",
+            "put_store_record"
+          ]
+        },
+        "label": "Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_actor",
+            "start_run"
+          ]
+        },
+        "label": "Actor Input (JSON)",
+        "name": "input",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "put_store_record"
+          ]
+        },
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_actors",
+            "get_dataset_items"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_actors",
+            "get_dataset_items"
+          ]
+        },
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_dataset_items"
+          ]
+        },
+        "default": true,
+        "description": "Strip metadata fields from dataset items.",
+        "label": "Clean Items",
+        "mode": "advanced",
+        "name": "clean",
+        "type": "boolean"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.apify"
+  },
   "action.attio": {
     "allow_error": true,
     "category": "integration",
@@ -18732,6 +19197,286 @@
     "tools": null,
     "type": "action.serper"
   },
+  "action.shopify": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "shopify_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Shopify Admin \u2014 orders, products, customers, inventory.",
+    "dynamic_outputs_from": null,
+    "icon": "shopify",
+    "inputs": 1,
+    "name": "Shopify",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "orders",
+        "type": "array"
+      },
+      {
+        "label": "products",
+        "type": "array"
+      },
+      {
+        "label": "customers",
+        "type": "array"
+      },
+      {
+        "label": "total_price",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "shopify_api_key",
+        "label": "Shopify Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_orders",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Orders",
+            "value": "list_orders"
+          },
+          {
+            "label": "Get Order",
+            "value": "get_order"
+          },
+          {
+            "label": "List Products",
+            "value": "list_products"
+          },
+          {
+            "label": "Get Product",
+            "value": "get_product"
+          },
+          {
+            "label": "Create Product",
+            "value": "create_product"
+          },
+          {
+            "label": "Update Product",
+            "value": "update_product"
+          },
+          {
+            "label": "Delete Product",
+            "value": "delete_product"
+          },
+          {
+            "label": "List Customers",
+            "value": "list_customers"
+          },
+          {
+            "label": "Search Customers",
+            "value": "search_customers"
+          },
+          {
+            "label": "Get Customer",
+            "value": "get_customer"
+          },
+          {
+            "label": "Create Customer",
+            "value": "create_customer"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_order"
+          ]
+        },
+        "label": "Order ID",
+        "name": "order_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_product",
+            "update_product",
+            "delete_product"
+          ]
+        },
+        "label": "Product ID",
+        "name": "product_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_customer"
+          ]
+        },
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_products"
+          ]
+        },
+        "label": "Product Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_orders"
+          ]
+        },
+        "label": "Order Status",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "any",
+            "value": "any"
+          },
+          {
+            "label": "open",
+            "value": "open"
+          },
+          {
+            "label": "closed",
+            "value": "closed"
+          },
+          {
+            "label": "cancelled",
+            "value": "cancelled"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_orders"
+          ]
+        },
+        "label": "Financial Status",
+        "mode": "advanced",
+        "name": "financial_status",
+        "type": "string"
+      },
+      {
+        "label": "Customer Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_customers"
+          ]
+        },
+        "label": "Search Query",
+        "mode": "advanced",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_orders",
+            "list_products",
+            "list_customers",
+            "search_customers"
+          ]
+        },
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_product",
+            "update_product"
+          ]
+        },
+        "label": "Product Data (JSON)",
+        "name": "product_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer"
+          ]
+        },
+        "label": "Customer Data (JSON)",
+        "name": "customer_data",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.shopify"
+  },
   "action.slack": {
     "allow_error": true,
     "category": "integration",
@@ -19217,6 +19962,272 @@
       "slack"
     ],
     "type": "action.slack"
+  },
+  "action.square": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "square_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Square Connect \u2014 payments, orders, customers, catalog.",
+    "dynamic_outputs_from": null,
+    "icon": "square",
+    "inputs": 1,
+    "name": "Square",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "customer",
+        "type": "object"
+      },
+      {
+        "label": "payment",
+        "type": "object"
+      },
+      {
+        "label": "order",
+        "type": "object"
+      },
+      {
+        "label": "customers",
+        "type": "array"
+      },
+      {
+        "label": "payments",
+        "type": "array"
+      },
+      {
+        "label": "orders",
+        "type": "array"
+      },
+      {
+        "label": "objects",
+        "type": "array"
+      },
+      {
+        "label": "locations",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "square_api_key",
+        "label": "Square Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_customer",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Customer",
+            "value": "create_customer"
+          },
+          {
+            "label": "Get Customer",
+            "value": "get_customer"
+          },
+          {
+            "label": "Search Customers",
+            "value": "search_customers"
+          },
+          {
+            "label": "List Customers",
+            "value": "list_customers"
+          },
+          {
+            "label": "Get Payment",
+            "value": "get_payment"
+          },
+          {
+            "label": "List Payments",
+            "value": "list_payments"
+          },
+          {
+            "label": "Get Order",
+            "value": "get_order"
+          },
+          {
+            "label": "Search Orders",
+            "value": "search_orders"
+          },
+          {
+            "label": "List Catalog",
+            "value": "list_catalog"
+          },
+          {
+            "label": "List Locations",
+            "value": "list_locations"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_customer"
+          ]
+        },
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_payment"
+          ]
+        },
+        "label": "Payment ID",
+        "name": "payment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_order"
+          ]
+        },
+        "label": "Order ID",
+        "name": "order_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer"
+          ]
+        },
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer"
+          ]
+        },
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer"
+          ]
+        },
+        "label": "Phone",
+        "mode": "advanced",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer"
+          ]
+        },
+        "label": "Company",
+        "mode": "advanced",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_customers",
+            "search_orders"
+          ]
+        },
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_customers",
+            "list_customers",
+            "list_payments",
+            "search_orders"
+          ]
+        },
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_payments"
+          ]
+        },
+        "label": "Location ID",
+        "name": "location_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.square"
   },
   "action.stripe": {
     "allow_error": true,
@@ -20938,6 +21949,235 @@
     ],
     "tools": null,
     "type": "action.twilio"
+  },
+  "action.typeform": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "typeform_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Typeform \u2014 list forms, fetch responses, manage webhooks.",
+    "dynamic_outputs_from": null,
+    "icon": "typeform",
+    "inputs": 1,
+    "name": "Typeform",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      },
+      {
+        "label": "total_items",
+        "type": "number"
+      },
+      {
+        "label": "page_count",
+        "type": "number"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "typeform_api_key",
+        "label": "Typeform Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_forms",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Forms",
+            "value": "list_forms"
+          },
+          {
+            "label": "Get Form",
+            "value": "get_form"
+          },
+          {
+            "label": "List Responses",
+            "value": "list_responses"
+          },
+          {
+            "label": "Get Response",
+            "value": "get_response"
+          },
+          {
+            "label": "Create Webhook",
+            "value": "create_webhook"
+          },
+          {
+            "label": "List Webhooks",
+            "value": "list_webhooks"
+          },
+          {
+            "label": "Delete Webhook",
+            "value": "delete_webhook"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_form",
+            "list_responses",
+            "get_response",
+            "create_webhook",
+            "list_webhooks",
+            "delete_webhook"
+          ]
+        },
+        "label": "Form ID",
+        "name": "form_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_webhook",
+            "delete_webhook"
+          ]
+        },
+        "label": "Webhook Tag",
+        "name": "tag",
+        "placeholder": "my-webhook",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_webhook"
+          ]
+        },
+        "label": "Webhook URL",
+        "name": "webhook_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_webhook"
+          ]
+        },
+        "default": true,
+        "label": "Enabled",
+        "mode": "advanced",
+        "name": "enabled",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_responses"
+          ]
+        },
+        "label": "Since (ISO 8601)",
+        "mode": "advanced",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_responses"
+          ]
+        },
+        "label": "Until (ISO 8601)",
+        "mode": "advanced",
+        "name": "until",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_responses"
+          ]
+        },
+        "label": "Only completed",
+        "mode": "advanced",
+        "name": "completed",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_responses"
+          ]
+        },
+        "default": 25,
+        "label": "Page size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_response"
+          ]
+        },
+        "label": "Response ID",
+        "name": "response_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.typeform"
   },
   "action.upstash_redis": {
     "allow_error": true,

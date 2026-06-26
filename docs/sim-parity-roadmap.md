@@ -141,9 +141,37 @@ If any port fails or skill is rough — fix in Phase 0, don't carry forward.
   `apps/api/tests/test_node_metadata_snapshot.py` locking every registered
   node's metadata shape. Catches accidental drift during ports.
 
-## Phase 1 — High-leverage ApiKey REST sweep (3–4 weeks)
+## Phase 1 — High-leverage ApiKey REST sweep — **SHIPPED**
 
-40 integrations via REST scaffold. Velocity ~10/week with parallel agents.
+40/40 ApiKey REST integrations landed across 8 sub-PRs. Total nodes
+now 123 (up from 83 baseline) — Sim parity ~46%.
+
+| PR | Batch | Nodes |
+|---|---|---|
+| #267 | 1.1 AI/scrape | exa, tavily, serper, brandfetch, huggingface |
+| #268 | 1.2 Email | resend, sendgrid, postmark, loops, instantly |
+| #269 | 1.3 Search/data | wikipedia, openalex, duckduckgo, hackernews, newsapi |
+| #270 | 1.4 Devops/obs | sentry, posthog, dub, vercel, cloudflare |
+| #271 | 1.5 DBs | supabase, upstash_redis, pinecone, qdrant, tinybird |
+| #272 | 1.6 Comms | twilio, mailgun, sendblue, messagebird, plivo |
+| #273 | 1.7 CRM/sales | pipedrive, attio, mixpanel, monday, intercom |
+| #274 | 1.8 Final | typeform, shopify, apify, algolia, square |
+
+Scaffold gained 7 capabilities while shipping Phase 1:
+- credential-field substitution in path/body templates (`_PropCredView`)
+- absolute-URL paths bypass `base_url` (multi-host providers)
+- `extra_headers` `{token}` + `{credential_key}` substitution
+- non-dict response normalization (lists / scalars / None → dict)
+- `auth_basic_username` with credential template (Twilio sid:token)
+- form-encoded body content_type → httpx `data=`
+- response-empty handling (`{empty: True}` for 204)
+
+40 integrations × ~80 LOC avg = 3200 LOC of manifest. Hand-written
+equivalent would have been ~10k LOC. ~3× compression.
+
+Velocity sustained ~5 nodes per batch + scaffold patches as needed.
+
+### Original Phase 1 plan
 
 Targets (priority order, may reshuffle by demand):
 
