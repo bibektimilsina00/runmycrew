@@ -68,6 +68,67 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "sentry": APIKeyProvider(
+        id="sentry_api_key",
+        name="Sentry",
+        icon_slug="sentry",
+        color="#1c1c1c",
+        description="Sentry — error tracking + release management.",
+        hint="Auth Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Auth Token", type="password", placeholder="sntrys_..."
+            )
+        ],
+    ),
+    "posthog": APIKeyProvider(
+        id="posthog_api_key",
+        name="PostHog",
+        icon_slug="posthog",
+        color="#1c1c1c",
+        description="PostHog — product analytics + feature flags.",
+        hint="phx_...",
+        fields=[
+            CredentialField(
+                id="api_key", label="Personal API Key", type="password", placeholder="phx_..."
+            )
+        ],
+    ),
+    "dub": APIKeyProvider(
+        id="dub_api_key",
+        name="Dub",
+        icon_slug="dub",
+        color="#1c1c1c",
+        description="Dub.co — short links + click analytics.",
+        hint="dub_...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="dub_...")
+        ],
+    ),
+    "vercel": APIKeyProvider(
+        id="vercel_api_key",
+        name="Vercel",
+        icon_slug="vercel",
+        color="#ffffff",
+        description="Vercel — deployments, projects, env vars, domains.",
+        hint="Personal Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="Token"
+            )
+        ],
+    ),
+    "cloudflare": APIKeyProvider(
+        id="cloudflare_api_key",
+        name="Cloudflare",
+        icon_slug="cloudflare",
+        color="#1c1c1c",
+        description="Cloudflare — zones, DNS, cache, workers via scoped API token.",
+        hint="API Token (scoped, not the global key)",
+        fields=[
+            CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
+        ],
+    ),
     "newsapi": APIKeyProvider(
         id="newsapi_api_key",
         name="NewsAPI",
