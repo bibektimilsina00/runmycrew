@@ -68,6 +68,61 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "exa": APIKeyProvider(
+        id="exa_api_key",
+        name="Exa",
+        icon_slug="exa",
+        color="#1c1c1c",
+        description="Exa — neural web search + content extraction.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "tavily": APIKeyProvider(
+        id="tavily_api_key",
+        name="Tavily",
+        icon_slug="tavily",
+        color="#1c1c1c",
+        description="Tavily — LLM-grounded search + URL extraction.",
+        hint="tvly-...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="tvly-...")
+        ],
+    ),
+    "serper": APIKeyProvider(
+        id="serper_api_key",
+        name="Serper",
+        icon_slug="serper",
+        color="#1c1c1c",
+        description="Serper — Google search results via google.serper.dev.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "brandfetch": APIKeyProvider(
+        id="brandfetch_api_key",
+        name="Brandfetch",
+        icon_slug="brandfetch",
+        color="#1c1c1c",
+        description="Brandfetch — pull brand identity assets by domain.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "huggingface": APIKeyProvider(
+        id="huggingface_api_key",
+        name="HuggingFace",
+        icon_slug="huggingface",
+        color="#ffffff",
+        description="HuggingFace Hosted Inference — run any model from the Hub.",
+        hint="hf_...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="hf_...")
+        ],
+    ),
     "airtable": APIKeyProvider(
         id="airtable_api_key",
         name="Airtable",

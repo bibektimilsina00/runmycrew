@@ -16,6 +16,7 @@ from apps.api.app.node_system.nodes.ai.thinking.thinking import ThinkingNode
 from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
+from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
@@ -31,6 +32,7 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
 from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
@@ -62,6 +64,7 @@ from apps.api.app.node_system.nodes.gyt.gyt_trigger import GoogleYouTubeTriggerN
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
+from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
@@ -82,9 +85,11 @@ from apps.api.app.node_system.nodes.meta.whatsapp_action import WhatsAppActionNo
 from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTriggerNode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
+from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
+from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 
 
@@ -133,6 +138,11 @@ node_registry.register(NotionNode)
 node_registry.register(AirtableNode)
 node_registry.register(DiscordNode)
 node_registry.register(FirecrawlNode)
+node_registry.register(ExaNode)
+node_registry.register(TavilyNode)
+node_registry.register(SerperNode)
+node_registry.register(BrandfetchNode)
+node_registry.register(HuggingFaceNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

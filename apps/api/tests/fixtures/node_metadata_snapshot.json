@@ -814,6 +814,130 @@
     "tools": null,
     "type": "action.airtable"
   },
+  "action.brandfetch": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "brandfetch_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Pull brand identity (logos, colors, fonts, links) by domain or query.",
+    "dynamic_outputs_from": null,
+    "icon": "brandfetch",
+    "inputs": 1,
+    "name": "Brandfetch",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "domain",
+        "type": "string"
+      },
+      {
+        "label": "logos",
+        "type": "array"
+      },
+      {
+        "label": "colors",
+        "type": "array"
+      },
+      {
+        "label": "fonts",
+        "type": "array"
+      },
+      {
+        "label": "links",
+        "type": "array"
+      },
+      {
+        "label": "description",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "brandfetch_api_key",
+        "label": "Brandfetch Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_brand",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Brand by Domain",
+            "value": "get_brand"
+          },
+          {
+            "label": "Search Brands",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_brand"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "placeholder": "airbnb.com",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "placeholder": "airbnb",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.brandfetch"
+  },
   "action.browser_use": {
     "allow_error": true,
     "category": "ai",
@@ -1657,6 +1781,185 @@
     ],
     "tools": null,
     "type": "action.evaluator"
+  },
+  "action.exa": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "exa_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Neural web search, find-similar pages, and full-text content extraction.",
+    "dynamic_outputs_from": null,
+    "icon": "exa",
+    "inputs": 1,
+    "name": "Exa",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "count",
+        "type": "number"
+      },
+      {
+        "label": "request_id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "exa_api_key",
+        "label": "Exa Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "Find Similar",
+            "value": "find_similar"
+          },
+          {
+            "label": "Get Contents",
+            "value": "contents"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "placeholder": "latest LLM papers",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_similar"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "placeholder": "https://example.com",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contents"
+          ]
+        },
+        "label": "URLs (JSON array)",
+        "name": "urls",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "find_similar"
+          ]
+        },
+        "default": 10,
+        "label": "Results",
+        "mode": "advanced",
+        "name": "num_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Category",
+        "mode": "advanced",
+        "name": "category",
+        "options": [
+          {
+            "label": "(any)",
+            "value": ""
+          },
+          {
+            "label": "Company",
+            "value": "company"
+          },
+          {
+            "label": "Research paper",
+            "value": "research paper"
+          },
+          {
+            "label": "News",
+            "value": "news"
+          },
+          {
+            "label": "GitHub",
+            "value": "github"
+          },
+          {
+            "label": "Tweet",
+            "value": "tweet"
+          },
+          {
+            "label": "PDF",
+            "value": "pdf"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.exa"
   },
   "action.firecrawl": {
     "allow_error": true,
@@ -9627,6 +9930,169 @@
     "tools": null,
     "type": "action.hubspot"
   },
+  "action.huggingface": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#ffffff",
+    "credential_type": "huggingface_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Run any model on the HuggingFace Hosted Inference API \u2014 text generation, summarization, classification, and more.",
+    "dynamic_outputs_from": null,
+    "icon": "huggingface",
+    "inputs": 1,
+    "name": "HuggingFace",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "generated_text",
+        "type": "string"
+      },
+      {
+        "label": "summary_text",
+        "type": "string"
+      },
+      {
+        "label": "label",
+        "type": "string"
+      },
+      {
+        "label": "score",
+        "type": "number"
+      },
+      {
+        "label": "embeddings",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "huggingface_api_key",
+        "label": "HuggingFace Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "text_generation",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Text Generation",
+            "value": "text_generation"
+          },
+          {
+            "label": "Summarization",
+            "value": "summarization"
+          },
+          {
+            "label": "Text Classification",
+            "value": "text_classification"
+          },
+          {
+            "label": "Feature Extraction (Embeddings)",
+            "value": "feature_extraction"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_generation",
+            "summarization",
+            "text_classification",
+            "feature_extraction"
+          ]
+        },
+        "description": "Full repo id from huggingface.co. Must support the Hosted Inference API.",
+        "label": "Model",
+        "name": "model_id",
+        "placeholder": "meta-llama/Llama-3.2-1B-Instruct",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_generation",
+            "summarization",
+            "text_classification",
+            "feature_extraction"
+          ]
+        },
+        "label": "Inputs",
+        "name": "inputs",
+        "placeholder": "Your prompt or text to classify\u2026",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_generation",
+            "summarization"
+          ]
+        },
+        "label": "Parameters (JSON)",
+        "mode": "advanced",
+        "name": "parameters",
+        "placeholder": "{\"max_new_tokens\": 256, \"temperature\": 0.7}",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_generation",
+            "summarization",
+            "text_classification",
+            "feature_extraction"
+          ]
+        },
+        "label": "Options (JSON)",
+        "mode": "advanced",
+        "name": "options",
+        "placeholder": "{\"wait_for_model\": true, \"use_cache\": true}",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.huggingface"
+  },
   "action.image_gen": {
     "allow_error": true,
     "category": "ai",
@@ -12439,6 +12905,192 @@
     "tools": null,
     "type": "action.salesforce"
   },
+  "action.serper": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "serper_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google search results (web, images, news, places) via Serper.dev.",
+    "dynamic_outputs_from": null,
+    "icon": "serper",
+    "inputs": 1,
+    "name": "Serper",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "organic",
+        "type": "array"
+      },
+      {
+        "label": "images",
+        "type": "array"
+      },
+      {
+        "label": "news",
+        "type": "array"
+      },
+      {
+        "label": "places",
+        "type": "array"
+      },
+      {
+        "label": "knowledgeGraph",
+        "type": "object"
+      },
+      {
+        "label": "searchParameters",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "serper_api_key",
+        "label": "Serper Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Web Search",
+            "value": "search"
+          },
+          {
+            "label": "Image Search",
+            "value": "images"
+          },
+          {
+            "label": "News Search",
+            "value": "news"
+          },
+          {
+            "label": "Places Search",
+            "value": "places"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "images",
+            "news",
+            "places"
+          ]
+        },
+        "label": "Query",
+        "name": "q",
+        "placeholder": "search query",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "images",
+            "news",
+            "places"
+          ]
+        },
+        "default": "us",
+        "label": "Country",
+        "mode": "advanced",
+        "name": "gl",
+        "placeholder": "us | uk | in | \u2026",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "images",
+            "news",
+            "places"
+          ]
+        },
+        "default": "en",
+        "label": "Language",
+        "mode": "advanced",
+        "name": "hl",
+        "placeholder": "en | es | de | \u2026",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "images",
+            "news",
+            "places"
+          ]
+        },
+        "default": 10,
+        "label": "Results",
+        "mode": "advanced",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "images",
+            "news",
+            "places"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.serper"
+  },
   "action.slack": {
     "allow_error": true,
     "category": "integration",
@@ -13270,6 +13922,210 @@
     ],
     "tools": null,
     "type": "action.stt"
+  },
+  "action.tavily": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "tavily_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "LLM-grounded web search + URL extraction tuned for RAG and agents.",
+    "dynamic_outputs_from": null,
+    "icon": "tavily",
+    "inputs": 1,
+    "name": "Tavily",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "answer",
+        "type": "string"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "images",
+        "type": "array"
+      },
+      {
+        "label": "follow_up_questions",
+        "type": "array"
+      },
+      {
+        "label": "failed_results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "tavily_api_key",
+        "label": "Tavily Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "Extract URLs",
+            "value": "extract"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "placeholder": "search query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "extract"
+          ]
+        },
+        "label": "URLs (JSON array)",
+        "name": "urls",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": "basic",
+        "label": "Search Depth",
+        "mode": "advanced",
+        "name": "search_depth",
+        "options": [
+          {
+            "label": "Basic",
+            "value": "basic"
+          },
+          {
+            "label": "Advanced",
+            "value": "advanced"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": "general",
+        "label": "Topic",
+        "mode": "advanced",
+        "name": "topic",
+        "options": [
+          {
+            "label": "General",
+            "value": "general"
+          },
+          {
+            "label": "News",
+            "value": "news"
+          },
+          {
+            "label": "Finance",
+            "value": "finance"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 5,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": true,
+        "label": "Include Answer",
+        "mode": "advanced",
+        "name": "include_answer",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": false,
+        "label": "Include Images",
+        "mode": "advanced",
+        "name": "include_images",
+        "type": "boolean"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.tavily"
   },
   "action.telegram": {
     "allow_error": true,
