@@ -68,6 +68,17 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "newsapi": APIKeyProvider(
+        id="newsapi_api_key",
+        name="NewsAPI",
+        icon_slug="newsapi",
+        color="#1c1c1c",
+        description="NewsAPI.org — search 80k+ news sources.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
     "resend": APIKeyProvider(
         id="resend_api_key",
         name="Resend",

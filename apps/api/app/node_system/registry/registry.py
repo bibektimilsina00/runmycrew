@@ -32,6 +32,7 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
 from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
@@ -61,6 +62,7 @@ from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTriggerNode
 from apps.api.app.node_system.nodes.gyt.gyt_node import GoogleYouTubeNode
 from apps.api.app.node_system.nodes.gyt.gyt_trigger import GoogleYouTubeTriggerNode
+from apps.api.app.node_system.nodes.hackernews.hackernews_node import HackerNewsNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
@@ -85,7 +87,9 @@ from apps.api.app.node_system.nodes.meta.lead_action import LeadActionNode
 from apps.api.app.node_system.nodes.meta.lead_trigger import LeadTriggerNode
 from apps.api.app.node_system.nodes.meta.whatsapp_action import WhatsAppActionNode
 from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTriggerNode
+from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
+from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
@@ -96,6 +100,7 @@ from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
+from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 
 
 class NodeRegistry:
@@ -153,6 +158,11 @@ node_registry.register(SendGridNode)
 node_registry.register(PostmarkNode)
 node_registry.register(LoopsNode)
 node_registry.register(InstantlyNode)
+node_registry.register(WikipediaNode)
+node_registry.register(OpenAlexNode)
+node_registry.register(DuckDuckGoNode)
+node_registry.register(HackerNewsNode)
+node_registry.register(NewsAPINode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

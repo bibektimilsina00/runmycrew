@@ -221,10 +221,16 @@ async def _dispatch_declarative(
         json=body,
     )
     output = _flatten_output(op, raw, node.props)
-    # 204/empty responses produce `None` — NodeResult requires a dict.
-    # Tag the empty result so downstream nodes can still branch on it.
+    # NodeResult.output_data is `dict[str, Any]` — the scaffold has to
+    # normalize any non-dict response so providers that return raw
+    # lists (Hacker News id lists), scalars (max-item endpoints), or
+    # 204 No Content (Postmark/SendGrid sends) all flow through.
     if output is None:
         output = {"empty": True}
+    elif isinstance(output, list):
+        output = {"items": output, "count": len(output)}
+    elif not isinstance(output, dict):
+        output = {"value": output}
     return NodeResult(success=True, output_data=output)
 
 

@@ -1354,6 +1354,146 @@
     "tools": null,
     "type": "action.discord"
   },
+  "action.duckduckgo": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "DuckDuckGo Instant Answer API \u2014 definitions, calculator, quick facts.",
+    "dynamic_outputs_from": null,
+    "icon": "duckduckgo",
+    "inputs": 1,
+    "name": "DuckDuckGo",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "Abstract",
+        "type": "string"
+      },
+      {
+        "label": "AbstractText",
+        "type": "string"
+      },
+      {
+        "label": "AbstractSource",
+        "type": "string"
+      },
+      {
+        "label": "AbstractURL",
+        "type": "string"
+      },
+      {
+        "label": "Answer",
+        "type": "string"
+      },
+      {
+        "label": "AnswerType",
+        "type": "string"
+      },
+      {
+        "label": "Definition",
+        "type": "string"
+      },
+      {
+        "label": "DefinitionSource",
+        "type": "string"
+      },
+      {
+        "label": "Heading",
+        "type": "string"
+      },
+      {
+        "label": "RelatedTopics",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "default": "instant_answer",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Instant Answer",
+            "value": "instant_answer"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "instant_answer"
+          ]
+        },
+        "label": "Query",
+        "name": "q",
+        "placeholder": "python language",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "instant_answer"
+          ]
+        },
+        "default": true,
+        "label": "Strip HTML",
+        "mode": "advanced",
+        "name": "no_html",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "instant_answer"
+          ]
+        },
+        "default": true,
+        "label": "Skip Disambiguation",
+        "mode": "advanced",
+        "name": "skip_disambig",
+        "type": "boolean"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.duckduckgo"
+  },
   "action.dynamodb": {
     "allow_error": true,
     "category": "integration",
@@ -9524,6 +9664,157 @@
     "tools": null,
     "type": "action.gyt"
   },
+  "action.hackernews": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Hacker News Firebase API \u2014 top stories, items, users.",
+    "dynamic_outputs_from": null,
+    "icon": "hackernews",
+    "inputs": 1,
+    "name": "Hacker News",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "by",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "score",
+        "type": "number"
+      },
+      {
+        "label": "time",
+        "type": "number"
+      },
+      {
+        "label": "kids",
+        "type": "array"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "top_stories",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Top Stories",
+            "value": "top_stories"
+          },
+          {
+            "label": "New Stories",
+            "value": "new_stories"
+          },
+          {
+            "label": "Best Stories",
+            "value": "best_stories"
+          },
+          {
+            "label": "Ask HN Stories",
+            "value": "ask_stories"
+          },
+          {
+            "label": "Show HN Stories",
+            "value": "show_stories"
+          },
+          {
+            "label": "Job Stories",
+            "value": "job_stories"
+          },
+          {
+            "label": "Get Item",
+            "value": "get_item"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Max Item ID",
+            "value": "max_item"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_item"
+          ]
+        },
+        "label": "Item ID",
+        "name": "item_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.hackernews"
+  },
   "action.http_request": {
     "allow_error": true,
     "category": "action",
@@ -12682,6 +12973,279 @@
     "tools": null,
     "type": "action.neo4j"
   },
+  "action.newsapi": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "newsapi_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Search 80k+ news sources via newsapi.org \u2014 articles, headlines, sources.",
+    "dynamic_outputs_from": null,
+    "icon": "newsapi",
+    "inputs": 1,
+    "name": "NewsAPI",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "totalResults",
+        "type": "number"
+      },
+      {
+        "label": "articles",
+        "type": "array"
+      },
+      {
+        "label": "sources",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "newsapi_api_key",
+        "label": "NewsAPI Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "everything",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search Everything",
+            "value": "everything"
+          },
+          {
+            "label": "Top Headlines",
+            "value": "top_headlines"
+          },
+          {
+            "label": "List Sources",
+            "value": "sources"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything",
+            "top_headlines"
+          ]
+        },
+        "label": "Query",
+        "name": "q",
+        "placeholder": "apple stock",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything",
+            "top_headlines",
+            "sources"
+          ]
+        },
+        "default": "en",
+        "label": "Language",
+        "mode": "advanced",
+        "name": "language",
+        "placeholder": "en | es | de | \u2026",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything",
+            "top_headlines"
+          ]
+        },
+        "default": 20,
+        "label": "Page size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything",
+            "top_headlines"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "top_headlines",
+            "sources"
+          ]
+        },
+        "label": "Country",
+        "mode": "advanced",
+        "name": "country",
+        "placeholder": "us",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "top_headlines",
+            "sources"
+          ]
+        },
+        "label": "Category",
+        "mode": "advanced",
+        "name": "category",
+        "options": [
+          {
+            "label": "(any)",
+            "value": ""
+          },
+          {
+            "label": "business",
+            "value": "business"
+          },
+          {
+            "label": "entertainment",
+            "value": "entertainment"
+          },
+          {
+            "label": "general",
+            "value": "general"
+          },
+          {
+            "label": "health",
+            "value": "health"
+          },
+          {
+            "label": "science",
+            "value": "science"
+          },
+          {
+            "label": "sports",
+            "value": "sports"
+          },
+          {
+            "label": "technology",
+            "value": "technology"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything",
+            "top_headlines"
+          ]
+        },
+        "label": "Sources (CSV)",
+        "mode": "advanced",
+        "name": "sources",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything"
+          ]
+        },
+        "label": "From (YYYY-MM-DD)",
+        "mode": "advanced",
+        "name": "from_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything"
+          ]
+        },
+        "label": "To (YYYY-MM-DD)",
+        "mode": "advanced",
+        "name": "to_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "everything"
+          ]
+        },
+        "label": "Sort By",
+        "mode": "advanced",
+        "name": "sort_by",
+        "options": [
+          {
+            "label": "relevancy",
+            "value": "relevancy"
+          },
+          {
+            "label": "popularity",
+            "value": "popularity"
+          },
+          {
+            "label": "publishedAt",
+            "value": "publishedAt"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.newsapi"
+  },
   "action.notion": {
     "allow_error": true,
     "category": "integration",
@@ -12932,6 +13496,193 @@
     ],
     "tools": null,
     "type": "action.notion"
+  },
+  "action.openalex": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Open scholarly graph \u2014 search works, authors, venues, and concepts.",
+    "dynamic_outputs_from": null,
+    "icon": "openalex",
+    "inputs": 1,
+    "name": "OpenAlex",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "meta",
+        "type": "object"
+      },
+      {
+        "label": "group_by",
+        "type": "array"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "search_works",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search Works",
+            "value": "search_works"
+          },
+          {
+            "label": "Search Authors",
+            "value": "search_authors"
+          },
+          {
+            "label": "Search Venues",
+            "value": "search_venues"
+          },
+          {
+            "label": "Search Concepts",
+            "value": "search_concepts"
+          },
+          {
+            "label": "Get Work by ID",
+            "value": "get_work"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_works",
+            "search_authors",
+            "search_venues",
+            "search_concepts"
+          ]
+        },
+        "label": "Search",
+        "name": "search",
+        "placeholder": "machine learning",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_works",
+            "search_authors",
+            "search_venues",
+            "search_concepts"
+          ]
+        },
+        "description": "OpenAlex filter syntax (key:value, comma-joined).",
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "placeholder": "publication_year:2024",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_works",
+            "search_authors",
+            "search_venues",
+            "search_concepts"
+          ]
+        },
+        "default": 25,
+        "label": "Per page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_works",
+            "search_authors",
+            "search_venues",
+            "search_concepts"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_works",
+            "search_authors",
+            "search_venues",
+            "search_concepts"
+          ]
+        },
+        "label": "Sort",
+        "mode": "advanced",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_work"
+          ]
+        },
+        "label": "Entity ID",
+        "name": "entity_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.openalex"
   },
   "action.perplexity": {
     "allow_error": true,
@@ -16045,6 +16796,136 @@
     ],
     "tools": null,
     "type": "action.wait"
+  },
+  "action.wikipedia": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#ffffff",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Wikipedia page summary, full HTML, and search \u2014 no API key required.",
+    "dynamic_outputs_from": null,
+    "icon": "wikipedia",
+    "inputs": 1,
+    "name": "Wikipedia",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "extract",
+        "type": "string"
+      },
+      {
+        "label": "description",
+        "type": "string"
+      },
+      {
+        "label": "thumbnail",
+        "type": "object"
+      },
+      {
+        "label": "content_urls",
+        "type": "object"
+      },
+      {
+        "label": "query",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "summary",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Page Summary",
+            "value": "summary"
+          },
+          {
+            "label": "Page HTML",
+            "value": "html"
+          },
+          {
+            "label": "Search",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "summary",
+            "html"
+          ]
+        },
+        "label": "Page Title",
+        "name": "title",
+        "placeholder": "Albert Einstein",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.wikipedia"
   },
   "logic.code": {
     "allow_error": false,
