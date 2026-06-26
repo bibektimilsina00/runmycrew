@@ -1127,6 +1127,294 @@
     "tools": null,
     "type": "action.browser_use"
   },
+  "action.cloudflare": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "cloudflare_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Manage Cloudflare zones, DNS records, and cache.",
+    "dynamic_outputs_from": null,
+    "icon": "cloudflare",
+    "inputs": 1,
+    "name": "Cloudflare",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "success",
+        "type": "boolean"
+      },
+      {
+        "label": "errors",
+        "type": "array"
+      },
+      {
+        "label": "messages",
+        "type": "array"
+      },
+      {
+        "label": "result_info",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "cloudflare_api_key",
+        "label": "Cloudflare Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_zones",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Zones",
+            "value": "list_zones"
+          },
+          {
+            "label": "List DNS Records",
+            "value": "list_dns_records"
+          },
+          {
+            "label": "Create DNS Record",
+            "value": "create_dns_record"
+          },
+          {
+            "label": "Update DNS Record",
+            "value": "update_dns_record"
+          },
+          {
+            "label": "Delete DNS Record",
+            "value": "delete_dns_record"
+          },
+          {
+            "label": "Purge Cache",
+            "value": "purge_cache"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_dns_records",
+            "create_dns_record",
+            "update_dns_record",
+            "delete_dns_record",
+            "purge_cache"
+          ]
+        },
+        "label": "Zone ID",
+        "name": "zone_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_dns_record",
+            "delete_dns_record"
+          ]
+        },
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_dns_records",
+            "create_dns_record",
+            "update_dns_record"
+          ]
+        },
+        "label": "Record Type",
+        "name": "record_type",
+        "options": [
+          {
+            "label": "A",
+            "value": "A"
+          },
+          {
+            "label": "AAAA",
+            "value": "AAAA"
+          },
+          {
+            "label": "CNAME",
+            "value": "CNAME"
+          },
+          {
+            "label": "TXT",
+            "value": "TXT"
+          },
+          {
+            "label": "MX",
+            "value": "MX"
+          },
+          {
+            "label": "NS",
+            "value": "NS"
+          },
+          {
+            "label": "SRV",
+            "value": "SRV"
+          },
+          {
+            "label": "CAA",
+            "value": "CAA"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_dns_records",
+            "create_dns_record",
+            "update_dns_record"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "placeholder": "@ or sub.example.com",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record",
+            "update_dns_record"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "placeholder": "93.184.216.34",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record",
+            "update_dns_record"
+          ]
+        },
+        "default": 1,
+        "description": "1 = auto",
+        "label": "TTL",
+        "mode": "advanced",
+        "name": "ttl",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record",
+            "update_dns_record"
+          ]
+        },
+        "default": false,
+        "label": "Proxied",
+        "mode": "advanced",
+        "name": "proxied",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record"
+          ]
+        },
+        "label": "MX Priority",
+        "mode": "advanced",
+        "name": "priority",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "purge_cache"
+          ]
+        },
+        "default": true,
+        "label": "Purge everything",
+        "name": "purge_everything",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "purge_cache"
+          ]
+        },
+        "label": "URL list (JSON array)",
+        "mode": "advanced",
+        "name": "purge_files",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_zones",
+            "list_dns_records"
+          ]
+        },
+        "default": 50,
+        "label": "Per page",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.cloudflare"
+  },
   "action.delay": {
     "allow_error": false,
     "category": "action",
@@ -1353,6 +1641,336 @@
     ],
     "tools": null,
     "type": "action.discord"
+  },
+  "action.dub": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "dub_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Short links + click analytics via Dub.co.",
+    "dynamic_outputs_from": null,
+    "icon": "dub",
+    "inputs": 1,
+    "name": "Dub",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "shortLink",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "clicks",
+        "type": "number"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "dub_api_key",
+        "label": "Dub Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_link",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Link",
+            "value": "create_link"
+          },
+          {
+            "label": "Update Link",
+            "value": "update_link"
+          },
+          {
+            "label": "Delete Link",
+            "value": "delete_link"
+          },
+          {
+            "label": "Get Link",
+            "value": "get_link"
+          },
+          {
+            "label": "List Links",
+            "value": "list_links"
+          },
+          {
+            "label": "Analytics",
+            "value": "analytics"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link",
+            "update_link"
+          ]
+        },
+        "label": "Destination URL",
+        "name": "url",
+        "placeholder": "https://example.com",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link"
+          ]
+        },
+        "label": "Short Key (optional)",
+        "mode": "advanced",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link",
+            "analytics"
+          ]
+        },
+        "label": "Domain",
+        "mode": "advanced",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_link",
+            "delete_link",
+            "get_link",
+            "analytics"
+          ]
+        },
+        "label": "Link ID",
+        "name": "link_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link",
+            "update_link"
+          ]
+        },
+        "label": "Title",
+        "mode": "advanced",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link",
+            "update_link"
+          ]
+        },
+        "label": "Description",
+        "mode": "advanced",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link",
+            "update_link"
+          ]
+        },
+        "label": "Expires (ISO 8601)",
+        "mode": "advanced",
+        "name": "expires_at",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_link",
+            "update_link"
+          ]
+        },
+        "label": "Tag IDs (JSON array)",
+        "mode": "advanced",
+        "name": "tag_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "analytics"
+          ]
+        },
+        "default": "clicks",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Clicks",
+            "value": "clicks"
+          },
+          {
+            "label": "Leads",
+            "value": "leads"
+          },
+          {
+            "label": "Sales",
+            "value": "sales"
+          },
+          {
+            "label": "Composite",
+            "value": "composite"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "analytics"
+          ]
+        },
+        "default": "24h",
+        "label": "Interval",
+        "name": "interval",
+        "options": [
+          {
+            "label": "1h",
+            "value": "1h"
+          },
+          {
+            "label": "24h",
+            "value": "24h"
+          },
+          {
+            "label": "7d",
+            "value": "7d"
+          },
+          {
+            "label": "30d",
+            "value": "30d"
+          },
+          {
+            "label": "90d",
+            "value": "90d"
+          },
+          {
+            "label": "ytd",
+            "value": "ytd"
+          },
+          {
+            "label": "1y",
+            "value": "1y"
+          },
+          {
+            "label": "all",
+            "value": "all"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "analytics"
+          ]
+        },
+        "label": "Group by",
+        "mode": "advanced",
+        "name": "group_by",
+        "options": [
+          {
+            "label": "Top links",
+            "value": "top_links"
+          },
+          {
+            "label": "Countries",
+            "value": "countries"
+          },
+          {
+            "label": "Referers",
+            "value": "referers"
+          },
+          {
+            "label": "Devices",
+            "value": "devices"
+          },
+          {
+            "label": "Browsers",
+            "value": "browsers"
+          },
+          {
+            "label": "OS",
+            "value": "os"
+          },
+          {
+            "label": "Timeseries",
+            "value": "timeseries"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.dub"
   },
   "action.duckduckgo": {
     "allow_error": true,
@@ -13938,6 +14556,238 @@
     "tools": null,
     "type": "action.postgres"
   },
+  "action.posthog": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "posthog_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Query PostHog events, manage feature flags + persons.",
+    "dynamic_outputs_from": null,
+    "icon": "posthog",
+    "inputs": 1,
+    "name": "PostHog",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "key",
+        "type": "string"
+      },
+      {
+        "label": "active",
+        "type": "boolean"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "count",
+        "type": "number"
+      },
+      {
+        "label": "next",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "posthog_api_key",
+        "label": "PostHog Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run HogQL Query",
+            "value": "run_query"
+          },
+          {
+            "label": "List Feature Flags",
+            "value": "list_feature_flags"
+          },
+          {
+            "label": "Get Feature Flag",
+            "value": "get_feature_flag"
+          },
+          {
+            "label": "Create Feature Flag",
+            "value": "create_feature_flag"
+          },
+          {
+            "label": "Update Feature Flag",
+            "value": "update_feature_flag"
+          },
+          {
+            "label": "List Persons",
+            "value": "list_persons"
+          },
+          {
+            "label": "Get Person",
+            "value": "get_person"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query",
+            "list_feature_flags",
+            "get_feature_flag",
+            "create_feature_flag",
+            "update_feature_flag",
+            "list_persons",
+            "get_person"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "placeholder": "12345",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_feature_flag",
+            "update_feature_flag"
+          ]
+        },
+        "label": "Feature Flag ID",
+        "name": "flag_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feature_flag"
+          ]
+        },
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feature_flag",
+            "update_feature_flag"
+          ]
+        },
+        "label": "Active",
+        "mode": "advanced",
+        "name": "active",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feature_flag",
+            "update_feature_flag"
+          ]
+        },
+        "label": "Filters (JSON)",
+        "mode": "advanced",
+        "name": "filters",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_person"
+          ]
+        },
+        "label": "Person ID",
+        "name": "person_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_persons"
+          ]
+        },
+        "label": "Distinct ID",
+        "name": "distinct_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query"
+          ]
+        },
+        "label": "HogQL Query",
+        "name": "query",
+        "placeholder": "SELECT count() FROM events",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_feature_flags",
+            "list_persons"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.posthog"
+  },
   "action.postmark": {
     "allow_error": true,
     "category": "integration",
@@ -14804,6 +15654,249 @@
     ],
     "tools": null,
     "type": "action.sendgrid"
+  },
+  "action.sentry": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "sentry_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Manage Sentry issues, releases, and projects.",
+    "dynamic_outputs_from": null,
+    "icon": "sentry",
+    "inputs": 1,
+    "name": "Sentry",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "level",
+        "type": "string"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      },
+      {
+        "label": "shortId",
+        "type": "string"
+      },
+      {
+        "label": "version",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "sentry_api_key",
+        "label": "Sentry Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_issues",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Issues",
+            "value": "list_issues"
+          },
+          {
+            "label": "Get Issue",
+            "value": "get_issue"
+          },
+          {
+            "label": "Update Issue Status",
+            "value": "update_issue"
+          },
+          {
+            "label": "Add Issue Comment",
+            "value": "add_comment"
+          },
+          {
+            "label": "List Releases",
+            "value": "list_releases"
+          },
+          {
+            "label": "Create Release",
+            "value": "create_release"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "list_releases",
+            "create_release",
+            "list_projects"
+          ]
+        },
+        "label": "Organization Slug",
+        "name": "organization_slug",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues"
+          ]
+        },
+        "label": "Project Slug",
+        "name": "project_slug",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_issue",
+            "update_issue",
+            "add_comment"
+          ]
+        },
+        "label": "Issue ID",
+        "name": "issue_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues"
+          ]
+        },
+        "label": "Query",
+        "mode": "advanced",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "list_releases"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_issue"
+          ]
+        },
+        "label": "New status",
+        "name": "status",
+        "options": [
+          {
+            "label": "Resolved",
+            "value": "resolved"
+          },
+          {
+            "label": "Ignored",
+            "value": "ignored"
+          },
+          {
+            "label": "Unresolved",
+            "value": "unresolved"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_comment"
+          ]
+        },
+        "label": "Comment",
+        "name": "comment",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release"
+          ]
+        },
+        "label": "Release Version",
+        "name": "version",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release"
+          ]
+        },
+        "label": "Project Slugs (JSON array)",
+        "name": "projects",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sentry"
   },
   "action.serper": {
     "allow_error": true,
@@ -16584,6 +17677,281 @@
     ],
     "tools": null,
     "type": "action.tts"
+  },
+  "action.vercel": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#ffffff",
+    "credential_type": "vercel_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Manage Vercel deployments, projects, domains, and env vars.",
+    "dynamic_outputs_from": null,
+    "icon": "vercel",
+    "inputs": 1,
+    "name": "Vercel",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "state",
+        "type": "string"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      },
+      {
+        "label": "deployments",
+        "type": "array"
+      },
+      {
+        "label": "projects",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "vercel_api_key",
+        "label": "Vercel Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_deployments",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Deployments",
+            "value": "list_deployments"
+          },
+          {
+            "label": "Get Deployment",
+            "value": "get_deployment"
+          },
+          {
+            "label": "Cancel Deployment",
+            "value": "cancel_deployment"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Get Project",
+            "value": "get_project"
+          },
+          {
+            "label": "List Domains",
+            "value": "list_domains"
+          },
+          {
+            "label": "Add Domain",
+            "value": "add_domain"
+          },
+          {
+            "label": "Remove Domain",
+            "value": "remove_domain"
+          },
+          {
+            "label": "List Env Vars",
+            "value": "list_env_vars"
+          },
+          {
+            "label": "Create Env Var",
+            "value": "create_env_var"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_deployments",
+            "get_deployment",
+            "cancel_deployment",
+            "list_projects",
+            "get_project",
+            "list_domains",
+            "add_domain",
+            "remove_domain",
+            "list_env_vars",
+            "create_env_var"
+          ]
+        },
+        "label": "Team ID (optional)",
+        "mode": "advanced",
+        "name": "team_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_deployments",
+            "get_project",
+            "list_domains",
+            "add_domain",
+            "remove_domain",
+            "list_env_vars",
+            "create_env_var"
+          ]
+        },
+        "label": "Project ID or name",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_deployment",
+            "cancel_deployment"
+          ]
+        },
+        "label": "Deployment ID",
+        "name": "deployment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_domain",
+            "remove_domain"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_deployments",
+            "list_projects"
+          ]
+        },
+        "default": 20,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_env_var"
+          ]
+        },
+        "label": "Env Var Key",
+        "name": "env_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_env_var"
+          ]
+        },
+        "label": "Env Var Value",
+        "name": "env_value",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_env_var"
+          ]
+        },
+        "label": "Env Target (JSON array)",
+        "mode": "advanced",
+        "name": "env_target",
+        "placeholder": "[\"production\", \"preview\"]",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_env_var"
+          ]
+        },
+        "default": "encrypted",
+        "label": "Env Var Type",
+        "mode": "advanced",
+        "name": "env_type",
+        "options": [
+          {
+            "label": "Encrypted",
+            "value": "encrypted"
+          },
+          {
+            "label": "Plain",
+            "value": "plain"
+          },
+          {
+            "label": "System",
+            "value": "system"
+          },
+          {
+            "label": "Sensitive",
+            "value": "sensitive"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.vercel"
   },
   "action.vision": {
     "allow_error": true,

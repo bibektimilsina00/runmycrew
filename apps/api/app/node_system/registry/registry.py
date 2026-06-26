@@ -17,6 +17,7 @@ from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
+from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
@@ -32,6 +33,7 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
@@ -90,16 +92,19 @@ from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTrigger
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
+from apps.api.app.node_system.nodes.posthog.posthog_node import PostHogNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
+from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
 from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
+from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 
 
@@ -163,6 +168,11 @@ node_registry.register(OpenAlexNode)
 node_registry.register(DuckDuckGoNode)
 node_registry.register(HackerNewsNode)
 node_registry.register(NewsAPINode)
+node_registry.register(SentryNode)
+node_registry.register(PostHogNode)
+node_registry.register(DubNode)
+node_registry.register(VercelNode)
+node_registry.register(CloudflareNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)
