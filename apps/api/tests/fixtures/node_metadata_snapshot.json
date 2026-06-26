@@ -17298,7 +17298,7 @@
     "properties": [
       {
         "credentialType": "google_oauth",
-        "label": "Google Account",
+        "label": "Google Contacts Account",
         "name": "credential",
         "required": true,
         "type": "credential"
@@ -17328,6 +17328,7 @@
       },
       {
         "default": 60,
+        "description": "Min 30s, max 3600s.",
         "label": "Poll interval (seconds)",
         "mode": "advanced",
         "name": "poll_interval_seconds",

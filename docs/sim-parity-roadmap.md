@@ -66,9 +66,12 @@ PollingEvent fields: `id`, `label`, `list_path`, `list_params`,
 `cursor_strategy` (`known_ids` | `since_timestamp` | `last_sha`),
 `id_field`, `filter_expr` (JMESPath), `flatten`, `fields`.
 
-Acceptance: port `github_trigger.py` to manifest (5 events). ~480 LOC
-→ ~50 LOC manifest. Identical scheduler registration + cursor
-behavior.
+Acceptance: port a multi-event polling trigger to manifest form.
+github_trigger.py would be the natural pick but lives on the unmerged
+PR #262, so PR 0.2 uses gpeople_trigger.py instead — its two events
+exercise both a builtin (known_ids) and a custom diff handler (etag
+map), validating the scaffold's full surface. github_trigger port
+becomes a Phase 1 chore once #262 lands.
 
 ### PR 0.3 — Webhook trigger scaffold (3–4 days)
 

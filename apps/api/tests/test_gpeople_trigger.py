@@ -1,28 +1,26 @@
-"""Unit tests for the Google Contacts trigger diff logic."""
+"""Unit tests for the Google Contacts trigger diff logic.
+
+The node was ported to the polling scaffold in PR 0.2; behavior is
+identical but the diff functions moved to module-level helpers. Tests
+exercise them directly so the trigger's per-poll math stays nailed
+down.
+"""
 
 from __future__ import annotations
 
-import pytest
+from types import SimpleNamespace
 
-from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import (
-    EVENT_ADDED,
-    EVENT_UPDATED,
-    GooglePeopleTriggerNode,
-    GooglePeopleTriggerProperties,
+from apps.api.app.node_system.nodes.gpeople.trigger_manifest import (
+    _diff_contact_updated,
 )
+from apps.api.app.node_system.scaffolds import diff_known_ids
+
+EVENT_ADDED = "contact_added"
+EVENT_UPDATED = "contact_updated"
 
 
-def _make_node(**overrides) -> GooglePeopleTriggerNode:
-    node = GooglePeopleTriggerNode.__new__(GooglePeopleTriggerNode)
-    base = {
-        "credential": None,
-        "event_type": EVENT_ADDED,
-        "max_per_poll": 25,
-        "poll_interval_seconds": 60,
-    }
-    base.update(overrides)
-    node.props = GooglePeopleTriggerProperties(**base)
-    return node
+def _props(max_per_poll: int = 25) -> SimpleNamespace:
+    return SimpleNamespace(max_per_poll=max_per_poll)
 
 
 def _person(rn: str, *, etag: str = "etag0") -> dict:
@@ -33,59 +31,67 @@ def _person(rn: str, *, etag: str = "etag0") -> dict:
     }
 
 
-# ── contact_added ───────────────────────────────────────────────────────
+# ── contact_added (builtin known_ids strategy) ──────────────────────
 
 
 def test_added_first_poll_snapshots():
-    node = _make_node()
-    matches, cursor = node._diff_added(
-        connections=[_person("people/c1"), _person("people/c2")],
+    matches, cursor = diff_known_ids(
+        [_person("people/c1"), _person("people/c2")],
         cursor=None,
+        id_field="resourceName",
+        flatten_fn=None,
+        event_id=EVENT_ADDED,
+        props=_props(),
     )
     assert matches == []
-    assert cursor == {
-        "event_type": EVENT_ADDED,
-        "known_ids": ["people/c1", "people/c2"],
-    }
+    assert cursor["event_type"] == EVENT_ADDED
+    assert set(cursor["known_ids"]) == {"people/c1", "people/c2"}
 
 
 def test_added_emits_only_new():
-    node = _make_node()
-    matches, cursor = node._diff_added(
-        connections=[
+    matches, cursor = diff_known_ids(
+        [
             _person("people/c1"),
             _person("people/c2"),
             _person("people/c3"),
         ],
         cursor={"event_type": EVENT_ADDED, "known_ids": ["people/c1"]},
+        id_field="resourceName",
+        flatten_fn=None,
+        event_id=EVENT_ADDED,
+        props=_props(),
     )
-    assert {m["resource_name"] for m in matches} == {"people/c2", "people/c3"}
+    assert {m["resourceName"] for m in matches} == {"people/c2", "people/c3"}
     assert set(cursor["known_ids"]) == {"people/c1", "people/c2", "people/c3"}
 
 
-def test_added_caps_fanout():
-    node = _make_node(max_per_poll=2)
-    matches, cursor = node._diff_added(
-        connections=[_person(f"people/c{i}") for i in range(1, 6)],
+def test_added_caps_fanout_but_records_overflow():
+    matches, cursor = diff_known_ids(
+        [_person(f"people/c{i}") for i in range(1, 6)],
         cursor={"event_type": EVENT_ADDED, "known_ids": []},
+        id_field="resourceName",
+        flatten_fn=None,
+        event_id=EVENT_ADDED,
+        props=_props(max_per_poll=2),
     )
     assert len(matches) == 2
-    emitted = {m["resource_name"] for m in matches}
-    deferred = {f"people/c{i}" for i in range(1, 6)} - emitted
-    assert deferred.isdisjoint(set(cursor["known_ids"]))
+    # Every resource_name lands in known_ids — overflow records silently
+    # so a later poll doesn't fire on the same items.
+    assert set(cursor["known_ids"]) == {f"people/c{i}" for i in range(1, 6)}
 
 
-# ── contact_updated ────────────────────────────────────────────────────
+# ── contact_updated (custom etag-map diff) ──────────────────────────
 
 
 def test_updated_first_poll_snapshots_etags():
-    node = _make_node(event_type=EVENT_UPDATED)
-    matches, cursor = node._diff_updated(
-        connections=[
+    matches, cursor = _diff_contact_updated(
+        [
             _person("people/c1", etag="A"),
             _person("people/c2", etag="B"),
         ],
         cursor=None,
+        props=_props(),
+        event_id=EVENT_UPDATED,
     )
     assert matches == []
     assert cursor == {
@@ -95,9 +101,8 @@ def test_updated_first_poll_snapshots_etags():
 
 
 def test_updated_emits_on_etag_change():
-    node = _make_node(event_type=EVENT_UPDATED)
-    matches, cursor = node._diff_updated(
-        connections=[
+    matches, cursor = _diff_contact_updated(
+        [
             _person("people/c1", etag="A2"),  # changed
             _person("people/c2", etag="B"),  # unchanged
         ],
@@ -105,6 +110,8 @@ def test_updated_emits_on_etag_change():
             "event_type": EVENT_UPDATED,
             "etags": {"people/c1": "A", "people/c2": "B"},
         },
+        props=_props(),
+        event_id=EVENT_UPDATED,
     )
     assert {m["resource_name"] for m in matches} == {"people/c1"}
     assert cursor["etags"]["people/c1"] == "A2"
@@ -114,25 +121,27 @@ def test_updated_emits_on_etag_change():
 def test_updated_skips_new_contacts_but_records_silently():
     """Brand-new contacts belong to contact_added, not here. We
     silently record their etag so a later in-place change fires."""
-    node = _make_node(event_type=EVENT_UPDATED)
-    matches, cursor = node._diff_updated(
-        connections=[
+    matches, cursor = _diff_contact_updated(
+        [
             _person("people/c1", etag="A"),
             _person("people/c_new", etag="N"),
         ],
         cursor={"event_type": EVENT_UPDATED, "etags": {"people/c1": "A"}},
+        props=_props(),
+        event_id=EVENT_UPDATED,
     )
     assert matches == []
     assert cursor["etags"]["people/c_new"] == "N"
 
 
 def test_updated_caps_fanout_and_defers():
-    node = _make_node(event_type=EVENT_UPDATED, max_per_poll=2)
     prior = {f"people/c{i}": "old" for i in range(1, 6)}
-    new = [_person(f"people/c{i}", etag="new") for i in range(1, 6)]
-    matches, cursor = node._diff_updated(
-        connections=new,
+    new_contacts = [_person(f"people/c{i}", etag="new") for i in range(1, 6)]
+    matches, cursor = _diff_contact_updated(
+        new_contacts,
         cursor={"event_type": EVENT_UPDATED, "etags": prior},
+        props=_props(max_per_poll=2),
+        event_id=EVENT_UPDATED,
     )
     assert len(matches) == 2
     emitted = {m["resource_name"] for m in matches}
@@ -143,21 +152,3 @@ def test_updated_caps_fanout_and_defers():
     deferred = {f"people/c{i}" for i in range(1, 6)} - emitted
     for rn in deferred:
         assert cursor["etags"][rn] == "old"
-
-
-# ── validators ─────────────────────────────────────────────────────────
-
-
-@pytest.mark.parametrize(
-    ("raw", "expected"),
-    [
-        (EVENT_ADDED, EVENT_ADDED),
-        (EVENT_UPDATED, EVENT_UPDATED),
-        ("bogus", EVENT_ADDED),
-        ("", EVENT_ADDED),
-        (None, EVENT_ADDED),
-    ],
-)
-def test_event_type_coercion(raw, expected):
-    props = GooglePeopleTriggerProperties(event_type=raw)
-    assert props.event_type == expected

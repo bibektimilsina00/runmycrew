@@ -38,6 +38,18 @@ Quick start
 Then register `NODE` in `node_system/registry/registry.py` as usual.
 """
 
+from apps.api.app.node_system.scaffolds.polling_cursor import (
+    diff_known_ids,
+    diff_last_sha,
+    diff_since_timestamp,
+)
+from apps.api.app.node_system.scaffolds.polling_manifest import (
+    CursorStrategy,
+    CustomDiff,
+    PollingEvent,
+    PollingTriggerManifest,
+)
+from apps.api.app.node_system.scaffolds.polling_node_factory import build_polling_trigger
 from apps.api.app.node_system.scaffolds.rest_dispatch import (
     RESTError,
     build_auth,
@@ -57,13 +69,21 @@ from apps.api.app.node_system.scaffolds.rest_node_factory import build_rest_node
 
 __all__ = [
     "AuthScheme",
+    "CursorStrategy",
+    "CustomDiff",
     "CustomHandler",
     "FieldSpec",
     "OpSpec",
+    "PollingEvent",
+    "PollingTriggerManifest",
     "ProviderManifest",
     "RESTError",
     "build_auth",
+    "build_polling_trigger",
     "build_rest_node",
+    "diff_known_ids",
+    "diff_last_sha",
+    "diff_since_timestamp",
     "error_from_response",
     "get_flatten",
     "register_flatten",
