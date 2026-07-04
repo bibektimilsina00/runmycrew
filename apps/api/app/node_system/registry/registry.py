@@ -67,6 +67,9 @@ from apps.api.app.node_system.nodes.docusign.docusign_node import DocuSignNode
 from apps.api.app.node_system.nodes.dropbox.dropbox_node import DropboxNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
+from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
+    EmailbisonWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
@@ -115,11 +118,17 @@ from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTrigge
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
+from apps.api.app.node_system.nodes.instantly.instantly_webhook import (
+    InstantlyWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
+from apps.api.app.node_system.nodes.lemlist.lemlist_webhook import (
+    LemlistWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
@@ -342,6 +351,10 @@ node_registry.register(WebflowWebhookTriggerNode)
 node_registry.register(GongWebhookTriggerNode)
 node_registry.register(FathomWebhookTriggerNode)
 node_registry.register(FirefliesWebhookTriggerNode)
+# Phase 4.9 — outbound webhook triggers.
+node_registry.register(InstantlyWebhookTriggerNode)
+node_registry.register(LemlistWebhookTriggerNode)
+node_registry.register(EmailbisonWebhookTriggerNode)
 # Phase 3.5 — completion (monday polling + generic RSS + IMAP).
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)

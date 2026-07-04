@@ -740,6 +740,38 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
         ],
     ),
+    "lemlist": APIKeyProvider(
+        id="lemlist_api_key",
+        name="Lemlist",
+        icon_slug="lemlist",
+        color="#1c1c1c",
+        description="Lemlist — outbound email campaigns, leads, activities.",
+        hint="API key from Lemlist Settings → API",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Lemlist API key",
+            ),
+        ],
+    ),
+    "emailbison": APIKeyProvider(
+        id="emailbison_api_key",
+        name="Emailbison",
+        icon_slug="emailbison",
+        color="#1c1c1c",
+        description="Emailbison — outbound-email campaigns, leads, workspaces.",
+        hint="API key from Emailbison workspace settings",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Emailbison API key",
+            ),
+        ],
+    ),
     "instantly": APIKeyProvider(
         id="instantly_api_key",
         name="Instantly",

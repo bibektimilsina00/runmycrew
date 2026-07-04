@@ -125,6 +125,15 @@ class WebhookTriggerManifest(BaseModel):
     # Verification.
     signature: SignatureSpec = Field(default_factory=SignatureSpec)
     event_header: str = "X-GitHub-Event"
+    # Optional body path — dotted key path into the parsed JSON body
+    # where the event kind lives. Used when the provider doesn't ship a
+    # dedicated event header (Instantly's `event_type`, Lemlist's
+    # `type`, Emailbison's `event`). Receiver tries `event_header`
+    # first, falls back to this path if it comes back empty.
+    #
+    # Simple dotted paths only: "event_type", "meta.event", or "kind".
+    # No array indexing.
+    event_body_path: str | None = None
 
     # Inspector.
     credential_type: str | list[str] | None = None

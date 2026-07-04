@@ -32205,6 +32205,145 @@
     "tools": null,
     "type": "trigger.cron"
   },
+  "trigger.emailbison_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Emailbison posts a per-email event (sent, opened, clicked, bounced, reply, lead status). Verified via HMAC-SHA256 in `x-emailbison-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "emailbison",
+    "inputs": 0,
+    "name": "Emailbison Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "reply_body",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-emailbison-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Sent",
+            "value": "email_sent"
+          },
+          {
+            "label": "Email Opened",
+            "value": "email_opened"
+          },
+          {
+            "label": "Link Clicked",
+            "value": "email_clicked"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "email_bounced"
+          },
+          {
+            "label": "Reply Received",
+            "value": "email_replied"
+          },
+          {
+            "label": "Lead Interested",
+            "value": "lead_interested"
+          },
+          {
+            "label": "Lead Not Interested",
+            "value": "lead_not_interested"
+          },
+          {
+            "label": "Lead Unsubscribed",
+            "value": "lead_unsubscribed"
+          },
+          {
+            "label": "Meeting Booked",
+            "value": "lead_meeting_booked"
+          },
+          {
+            "label": "Campaign Completed",
+            "value": "campaign_completed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `x-emailbison-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Emailbison Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.emailbison_webhook"
+  },
   "trigger.fathom_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -34736,6 +34875,177 @@
     "tools": null,
     "type": "trigger.imap"
   },
+  "trigger.instantly_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Instantly posts a per-email event (opens, clicks, replies, bounces, lead status changes). Verified via HMAC-SHA256 in `x-instantly-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "instantly",
+    "inputs": 0,
+    "name": "Instantly Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "reply_content",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-instantly-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Sent",
+            "value": "email_sent"
+          },
+          {
+            "label": "Email Opened",
+            "value": "email_opened"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "email_bounced"
+          },
+          {
+            "label": "Link Clicked",
+            "value": "link_clicked"
+          },
+          {
+            "label": "Reply Received",
+            "value": "reply_received"
+          },
+          {
+            "label": "Auto-Reply Received",
+            "value": "auto_reply_received"
+          },
+          {
+            "label": "Lead Interested",
+            "value": "lead_interested"
+          },
+          {
+            "label": "Meeting Booked",
+            "value": "lead_meeting_booked"
+          },
+          {
+            "label": "Meeting Completed",
+            "value": "lead_meeting_completed"
+          },
+          {
+            "label": "Lead Neutral",
+            "value": "lead_neutral"
+          },
+          {
+            "label": "Lead No Show",
+            "value": "lead_no_show"
+          },
+          {
+            "label": "Lead Not Interested",
+            "value": "lead_not_interested"
+          },
+          {
+            "label": "Lead Out of Office",
+            "value": "lead_out_of_office"
+          },
+          {
+            "label": "Lead Unsubscribed",
+            "value": "lead_unsubscribed"
+          },
+          {
+            "label": "Lead Wrong Person",
+            "value": "lead_wrong_person"
+          },
+          {
+            "label": "Lead Closed",
+            "value": "lead_closed"
+          },
+          {
+            "label": "Campaign Completed",
+            "value": "campaign_completed"
+          },
+          {
+            "label": "Account Error",
+            "value": "account_error"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `x-instantly-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Instantly Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.instantly_webhook"
+  },
   "trigger.intercom": {
     "allow_error": true,
     "category": "trigger",
@@ -34978,6 +35288,137 @@
     ],
     "tools": null,
     "type": "trigger.jira"
+  },
+  "trigger.lemlist_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Lemlist posts a per-email event (bounced, clicked, opened, replied, sent, interested, linkedin_replied, not_interested). Verified via bare-secret compare against `x-webhook-token`.",
+    "dynamic_outputs_from": null,
+    "icon": "lemlist",
+    "inputs": 0,
+    "name": "Lemlist Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "reply_body",
+        "type": "string"
+      },
+      {
+        "label": "date",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-lemlist-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "emailsBounced"
+          },
+          {
+            "label": "Email Clicked",
+            "value": "emailsClicked"
+          },
+          {
+            "label": "Email Opened",
+            "value": "emailsOpened"
+          },
+          {
+            "label": "Email Replied",
+            "value": "emailsReplied"
+          },
+          {
+            "label": "Email Sent",
+            "value": "emailsSent"
+          },
+          {
+            "label": "Lead Interested",
+            "value": "emailsInterested"
+          },
+          {
+            "label": "Lead Not Interested",
+            "value": "emailsNotInterested"
+          },
+          {
+            "label": "LinkedIn Replied",
+            "value": "linkedinReplied"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "GITLAB_TOKEN secret. Deliveries without a valid `x-webhook-token` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Lemlist Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.lemlist_webhook"
   },
   "trigger.linear": {
     "allow_error": true,

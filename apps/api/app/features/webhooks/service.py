@@ -135,8 +135,18 @@ class WebhookService:
             ):
                 raise HTTPException(status_code=401, detail="Invalid signature")
 
+        # ── parse body first — some providers put event kind in body,
+        # not a header, so we need the parsed body to resolve event_type.
+        try:
+            payload = json.loads(raw_body)
+        except Exception:
+            payload = {"raw": raw_body.decode("utf-8", errors="replace")}
+
         # ── event filter ────────────────────────────────────────────
-        event_type = _lookup_header(headers, manifest.event_header) or "unknown"
+        event_type = _lookup_header(headers, manifest.event_header)
+        if not event_type and manifest.event_body_path and isinstance(payload, dict):
+            event_type = _extract_body_path(payload, manifest.event_body_path) or ""
+        event_type = event_type or "unknown"
         delivery_id = (
             _lookup_header(headers, "X-Hub-Delivery")
             or _lookup_header(headers, f"X-{provider.title()}-Delivery")
@@ -153,12 +163,6 @@ class WebhookService:
                 event_type,
             )
             return {"status": "ignored", "event": event_type}
-
-        # ── parse + shape + dispatch ────────────────────────────────
-        try:
-            payload = json.loads(raw_body)
-        except Exception:
-            payload = {"raw": raw_body.decode("utf-8", errors="replace")}
 
         shape_fn = manifest.payload_shape or _default_shape
         trigger_data = shape_fn(payload, event_type, delivery_id)
@@ -205,6 +209,24 @@ def _find_trigger_node_props(workflow: Any, node_type: str, node_id: str) -> dic
         props = data.get("properties") or {}
         return props if isinstance(props, dict) else {}
     return None
+
+
+def _extract_body_path(payload: dict[str, Any], path: str) -> str:
+    """Walk a dotted key path into a parsed JSON body. Simple path only —
+    no array indexing. Returns "" on any miss.
+
+    Used by manifests that put the event kind in the body rather than a
+    header (Instantly's `event_type`, Emailbison's `event`, Lemlist's
+    `type`). Kept simple by design: if a provider gets fancy with
+    nested arrays, they can write a payload_shape and skip the built-in
+    routing entirely.
+    """
+    cur: Any = payload
+    for part in path.split("."):
+        if not isinstance(cur, dict):
+            return ""
+        cur = cur.get(part)
+    return str(cur) if cur is not None and not isinstance(cur, dict | list) else ""
 
 
 def _lookup_header(headers: dict[str, str], name: str) -> str:
