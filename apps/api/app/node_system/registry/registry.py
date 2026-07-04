@@ -55,6 +55,7 @@ from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
 from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
 from apps.api.app.node_system.nodes.calendly.calendly_trigger import CalendlyTriggerNode
+from apps.api.app.node_system.nodes.circleback.circleback_node import CirclebackNode
 from apps.api.app.node_system.nodes.clay.clay_node import ClayNode
 from apps.api.app.node_system.nodes.clickhouse.clickhouse_node import ClickHouseCloudNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
@@ -104,7 +105,9 @@ from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
 from apps.api.app.node_system.nodes.enrich.enrich_node import EnrichsoNode
 from apps.api.app.node_system.nodes.enrichment.enrichment_node import EnrichmentioNode
 from apps.api.app.node_system.nodes.enrow.enrow_node import EnrowNode
+from apps.api.app.node_system.nodes.evernote.evernote_node import EvernoteNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
+from apps.api.app.node_system.nodes.extend.extend_node import ExtendNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
 from apps.api.app.node_system.nodes.findymail.findymail_node import FindymailNode
@@ -142,6 +145,7 @@ from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleT
 from apps.api.app.node_system.nodes.grafana.grafana_node import GrafanaCloudNode
 from apps.api.app.node_system.nodes.grain.grain_node import GrainNode
 from apps.api.app.node_system.nodes.grain.grain_trigger import GrainTriggerNode
+from apps.api.app.node_system.nodes.granola.granola_node import GranolaNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_node import GreenhouseNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_trigger import GreenhouseTriggerNode
 from apps.api.app.node_system.nodes.gsc.gsc_node import GoogleSearchConsoleNode
@@ -191,6 +195,7 @@ from apps.api.app.node_system.nodes.logic.sub_workflow.sub_workflow_node import 
 from apps.api.app.node_system.nodes.logic.while_loop.while_loop import WhileLoopNode
 from apps.api.app.node_system.nodes.loops.loops_node import LoopsNode
 from apps.api.app.node_system.nodes.loops.loops_webhook import LoopsWebhookTriggerNode
+from apps.api.app.node_system.nodes.luma.luma_node import LumaNode
 from apps.api.app.node_system.nodes.mailchimp.mailchimp_node import MailchimpNode
 from apps.api.app.node_system.nodes.mailerlite.mailerlite_node import MailerLiteNode
 from apps.api.app.node_system.nodes.mailgun.mailgun_node import MailgunNode
@@ -613,3 +618,11 @@ node_registry.register(DaytonaNode)
 node_registry.register(LaunchDarklyNode)
 node_registry.register(IncidentIONode)
 node_registry.register(RootlyNode)
+
+
+# Phase 4.23 — meeting intelligence.
+node_registry.register(CirclebackNode)
+node_registry.register(EvernoteNode)
+node_registry.register(ExtendNode)
+node_registry.register(LumaNode)
+node_registry.register(GranolaNode)

@@ -6790,6 +6790,170 @@
     "tools": null,
     "type": "action.calendly"
   },
+  "action.circleback": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "circleback_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Circleback \u2014 AI meeting notes + action items.",
+    "dynamic_outputs_from": null,
+    "icon": "circleback",
+    "inputs": 1,
+    "name": "Circleback",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "circleback_api_key",
+        "label": "Circleback Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_meetings",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Meetings",
+            "value": "list_meetings"
+          },
+          {
+            "label": "Get Meeting",
+            "value": "get_meeting"
+          },
+          {
+            "label": "List Action Items",
+            "value": "list_action_items"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_meeting",
+            "list_action_items"
+          ]
+        },
+        "label": "Meeting ID",
+        "name": "meeting_id",
+        "type": "string"
+      },
+      {
+        "label": "Note ID",
+        "name": "note_id",
+        "type": "string"
+      },
+      {
+        "label": "Note GUID",
+        "name": "note_guid",
+        "type": "string"
+      },
+      {
+        "label": "Notebook GUID",
+        "name": "notebook_guid",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Document URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "Calendar API ID",
+        "name": "calendar_api_id",
+        "type": "string"
+      },
+      {
+        "label": "Event API ID",
+        "name": "api_id",
+        "type": "string"
+      },
+      {
+        "label": "Guests (JSON array of {email, name})",
+        "name": "guests",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_meetings"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.circleback"
+  },
   "action.clay": {
     "allow_error": true,
     "category": "integration",
@@ -13023,6 +13187,192 @@
     "tools": null,
     "type": "action.evaluator"
   },
+  "action.evernote": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "evernote_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Evernote \u2014 notes, notebooks, tags.",
+    "dynamic_outputs_from": null,
+    "icon": "evernote",
+    "inputs": 1,
+    "name": "Evernote",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "evernote_api_key",
+        "label": "Evernote Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_notes",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Notes",
+            "value": "list_notes"
+          },
+          {
+            "label": "Get Note",
+            "value": "get_note"
+          },
+          {
+            "label": "Create Note",
+            "value": "create_note"
+          },
+          {
+            "label": "List Notebooks",
+            "value": "list_notebooks"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Meeting ID",
+        "name": "meeting_id",
+        "type": "string"
+      },
+      {
+        "label": "Note ID",
+        "name": "note_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_note"
+          ]
+        },
+        "label": "Note GUID",
+        "name": "note_guid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_notes",
+            "create_note"
+          ]
+        },
+        "label": "Notebook GUID",
+        "name": "notebook_guid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_note"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_note"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Document URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "Calendar API ID",
+        "name": "calendar_api_id",
+        "type": "string"
+      },
+      {
+        "label": "Event API ID",
+        "name": "api_id",
+        "type": "string"
+      },
+      {
+        "label": "Guests (JSON array of {email, name})",
+        "name": "guests",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_notes"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.evernote"
+  },
   "action.exa": {
     "allow_error": true,
     "category": "integration",
@@ -13201,6 +13551,175 @@
     ],
     "tools": null,
     "type": "action.exa"
+  },
+  "action.extend": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "extend_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Extend \u2014 document extraction (invoices, receipts, PDFs).",
+    "dynamic_outputs_from": null,
+    "icon": "extend",
+    "inputs": 1,
+    "name": "Extend",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "extend_api_key",
+        "label": "Extend Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "process_document",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Process Document",
+            "value": "process_document"
+          },
+          {
+            "label": "Get Workflow Run",
+            "value": "get_run"
+          },
+          {
+            "label": "List Workflows",
+            "value": "list_workflows"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Meeting ID",
+        "name": "meeting_id",
+        "type": "string"
+      },
+      {
+        "label": "Note ID",
+        "name": "note_id",
+        "type": "string"
+      },
+      {
+        "label": "Note GUID",
+        "name": "note_guid",
+        "type": "string"
+      },
+      {
+        "label": "Notebook GUID",
+        "name": "notebook_guid",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "process_document"
+          ]
+        },
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_run"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "process_document"
+          ]
+        },
+        "label": "Document URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "Calendar API ID",
+        "name": "calendar_api_id",
+        "type": "string"
+      },
+      {
+        "label": "Event API ID",
+        "name": "api_id",
+        "type": "string"
+      },
+      {
+        "label": "Guests (JSON array of {email, name})",
+        "name": "guests",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.extend"
   },
   "action.fathom": {
     "allow_error": true,
@@ -19414,6 +19933,170 @@
     ],
     "tools": null,
     "type": "action.grain"
+  },
+  "action.granola": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "granola_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Granola \u2014 AI meeting notes for Mac.",
+    "dynamic_outputs_from": null,
+    "icon": "granola",
+    "inputs": 1,
+    "name": "Granola",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "granola_api_key",
+        "label": "Granola Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_notes",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Notes",
+            "value": "list_notes"
+          },
+          {
+            "label": "Get Note",
+            "value": "get_note"
+          },
+          {
+            "label": "Get Transcript",
+            "value": "get_transcript"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Meeting ID",
+        "name": "meeting_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_note",
+            "get_transcript"
+          ]
+        },
+        "label": "Note ID",
+        "name": "note_id",
+        "type": "string"
+      },
+      {
+        "label": "Note GUID",
+        "name": "note_guid",
+        "type": "string"
+      },
+      {
+        "label": "Notebook GUID",
+        "name": "notebook_guid",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Document URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "Calendar API ID",
+        "name": "calendar_api_id",
+        "type": "string"
+      },
+      {
+        "label": "Event API ID",
+        "name": "api_id",
+        "type": "string"
+      },
+      {
+        "label": "Guests (JSON array of {email, name})",
+        "name": "guests",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_notes"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.granola"
   },
   "action.greenhouse": {
     "allow_error": true,
@@ -26883,6 +27566,181 @@
     ],
     "tools": null,
     "type": "action.loops"
+  },
+  "action.luma": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "luma_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Luma \u2014 events + calendars via lu.ma.",
+    "dynamic_outputs_from": null,
+    "icon": "luma",
+    "inputs": 1,
+    "name": "Luma",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "luma_api_key",
+        "label": "Luma Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_events",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Events",
+            "value": "list_events"
+          },
+          {
+            "label": "Get Event",
+            "value": "get_event"
+          },
+          {
+            "label": "List Event Guests",
+            "value": "list_guests"
+          },
+          {
+            "label": "Add Guests to Event",
+            "value": "add_guests"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Meeting ID",
+        "name": "meeting_id",
+        "type": "string"
+      },
+      {
+        "label": "Note ID",
+        "name": "note_id",
+        "type": "string"
+      },
+      {
+        "label": "Note GUID",
+        "name": "note_guid",
+        "type": "string"
+      },
+      {
+        "label": "Notebook GUID",
+        "name": "notebook_guid",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Document URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_events"
+          ]
+        },
+        "label": "Calendar API ID",
+        "name": "calendar_api_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_event",
+            "list_guests",
+            "add_guests"
+          ]
+        },
+        "label": "Event API ID",
+        "name": "api_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_guests"
+          ]
+        },
+        "label": "Guests (JSON array of {email, name})",
+        "name": "guests",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.luma"
   },
   "action.mailchimp": {
     "allow_error": true,

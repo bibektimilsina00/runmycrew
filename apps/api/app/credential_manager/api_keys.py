@@ -2044,6 +2044,71 @@ PROVIDERS = {
             ),
         ],
     ),
+    "circleback": APIKeyProvider(
+        id="circleback_api_key",
+        name="Circleback",
+        icon_slug="circleback",
+        color="#1c1c1c",
+        description="Circleback — AI meeting notes + action items.",
+        hint="API key from Circleback",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Circleback API key"
+            ),
+        ],
+    ),
+    "evernote": APIKeyProvider(
+        id="evernote_api_key",
+        name="Evernote",
+        icon_slug="evernote",
+        color="#1c1c1c",
+        description="Evernote — notes, notebooks, tags.",
+        hint="API key from Evernote",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Evernote API key"
+            ),
+        ],
+    ),
+    "extend": APIKeyProvider(
+        id="extend_api_key",
+        name="Extend",
+        icon_slug="extend",
+        color="#1c1c1c",
+        description="Extend — document extraction (invoices, receipts, PDFs).",
+        hint="API key from Extend",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Extend API key"
+            ),
+        ],
+    ),
+    "luma": APIKeyProvider(
+        id="luma_api_key",
+        name="Luma",
+        icon_slug="luma",
+        color="#1c1c1c",
+        description="Luma — events + calendars via lu.ma.",
+        hint="API key from Luma",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Luma API key"
+            ),
+        ],
+    ),
+    "granola": APIKeyProvider(
+        id="granola_api_key",
+        name="Granola",
+        icon_slug="granola",
+        color="#1c1c1c",
+        description="Granola — AI meeting notes for Mac.",
+        hint="API key from Granola",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Granola API key"
+            ),
+        ],
+    ),
 }
 
 
