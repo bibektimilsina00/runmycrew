@@ -2346,6 +2346,108 @@ PROVIDERS = {
             ),
         ],
     ),
+    "wordpress": APIKeyProvider(
+        id="wordpress_api_key",
+        name="WordPress",
+        icon_slug="wordpress",
+        color="#21759B",
+        description="WordPress — posts, pages, media (REST API).",
+        hint="WordPress API access",
+        fields=[
+            CredentialField(
+                id="username", label="WordPress Username", type="string", placeholder="admin"
+            ),
+            CredentialField(
+                id="api_key",
+                label="Application Password",
+                type="password",
+                placeholder="xxxx xxxx xxxx",
+            ),
+            CredentialField(
+                id="site", label="Site domain", type="string", placeholder="myblog.com"
+            ),
+        ],
+    ),
+    "x_twitter": APIKeyProvider(
+        id="x_twitter_api_key",
+        name="X (Twitter)",
+        icon_slug="twitter",
+        color="#000000",
+        description="X (formerly Twitter) — tweets, users, timelines via API v2.",
+        hint="X (Twitter) API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key / Bearer Token",
+                type="password",
+                placeholder="X (Twitter) API key",
+            ),
+        ],
+    ),
+    "reddit": APIKeyProvider(
+        id="reddit_api_key",
+        name="Reddit",
+        icon_slug="reddit",
+        color="#FF4500",
+        description="Reddit — subreddit browsing, submissions, comments.",
+        hint="Reddit API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key / Bearer Token",
+                type="password",
+                placeholder="Reddit API key",
+            ),
+        ],
+    ),
+    "spotify": APIKeyProvider(
+        id="spotify_api_key",
+        name="Spotify",
+        icon_slug="spotify",
+        color="#1DB954",
+        description="Spotify — playback, playlists, tracks, artist metadata.",
+        hint="Spotify API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key / Bearer Token",
+                type="password",
+                placeholder="Spotify API key",
+            ),
+        ],
+    ),
+    "video_generator": APIKeyProvider(
+        id="video_generator_api_key",
+        name="Video Generator (Runway/HeyGen)",
+        icon_slug="video_generator",
+        color="#1c1c1c",
+        description="Runway Gen-3 video generation — text/image → video.",
+        hint="Video Generator (Runway/HeyGen) API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key / Bearer Token",
+                type="password",
+                placeholder="Video Generator (Runway/HeyGen) API key",
+            ),
+        ],
+    ),
+    "gamma": APIKeyProvider(
+        id="gamma_api_key",
+        name="Gamma",
+        icon_slug="gamma",
+        color="#1c1c1c",
+        description="Gamma — AI-generated presentations, docs, sites.",
+        hint="Gamma API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key / Bearer Token",
+                type="password",
+                placeholder="Gamma API key",
+            ),
+        ],
+    ),
 }
 
 

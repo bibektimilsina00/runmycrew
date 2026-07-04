@@ -15172,6 +15172,317 @@
     "tools": null,
     "type": "action.ga4"
   },
+  "action.gamma": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "gamma_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Gamma \u2014 AI-generated presentations, docs, sites.",
+    "dynamic_outputs_from": null,
+    "icon": "gamma",
+    "inputs": 1,
+    "name": "Gamma",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "gamma_api_key",
+        "label": "Gamma Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_generation",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Generation",
+            "value": "create_generation"
+          },
+          {
+            "label": "Get Generation Status",
+            "value": "get_generation"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_generation"
+          ]
+        },
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_generation"
+          ]
+        },
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_generation"
+          ]
+        },
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_generation"
+          ]
+        },
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_generation"
+          ]
+        },
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.gamma"
+  },
   "action.gcal": {
     "allow_error": true,
     "category": "integration",
@@ -40181,6 +40492,351 @@
     "tools": null,
     "type": "action.railway"
   },
+  "action.reddit": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#FF4500",
+    "credential_type": "reddit_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Reddit \u2014 subreddit browsing, submissions, comments.",
+    "dynamic_outputs_from": null,
+    "icon": "reddit",
+    "inputs": 1,
+    "name": "Reddit",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "reddit_api_key",
+        "label": "Reddit Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_subreddit",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Subreddit Posts",
+            "value": "list_subreddit"
+          },
+          {
+            "label": "Submit Post",
+            "value": "submit"
+          },
+          {
+            "label": "Get Post Comments",
+            "value": "get_comments"
+          },
+          {
+            "label": "Search Reddit",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit"
+          ]
+        },
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_subreddit",
+            "submit"
+          ]
+        },
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_subreddit"
+          ]
+        },
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_subreddit",
+            "search"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit"
+          ]
+        },
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_comments"
+          ]
+        },
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.reddit"
+  },
   "action.reducto": {
     "allow_error": true,
     "category": "integration",
@@ -44022,6 +44678,364 @@
     ],
     "type": "action.slack"
   },
+  "action.spotify": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1DB954",
+    "credential_type": "spotify_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Spotify \u2014 playback, playlists, tracks, artist metadata.",
+    "dynamic_outputs_from": null,
+    "icon": "spotify",
+    "inputs": 1,
+    "name": "Spotify",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "spotify_api_key",
+        "label": "Spotify Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "Get Track",
+            "value": "get_track"
+          },
+          {
+            "label": "Get Artist",
+            "value": "get_artist"
+          },
+          {
+            "label": "List My Playlists",
+            "value": "list_user_playlists"
+          },
+          {
+            "label": "Create Playlist",
+            "value": "create_playlist"
+          },
+          {
+            "label": "Add Tracks to Playlist",
+            "value": "add_tracks_to_playlist"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_tracks_to_playlist"
+          ]
+        },
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "list_user_playlists"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_track"
+          ]
+        },
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_artist"
+          ]
+        },
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_playlist"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_playlist"
+          ]
+        },
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_playlist"
+          ]
+        },
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_tracks_to_playlist"
+          ]
+        },
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.spotify"
+  },
   "action.square": {
     "allow_error": true,
     "category": "integration",
@@ -47476,6 +48490,317 @@
     "tools": null,
     "type": "action.vercel"
   },
+  "action.video_generator": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "video_generator_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Runway Gen-3 video generation \u2014 text/image \u2192 video.",
+    "dynamic_outputs_from": null,
+    "icon": "video_generator",
+    "inputs": 1,
+    "name": "Video Generator (Runway/HeyGen)",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "video_generator_api_key",
+        "label": "Video Generator (Runway/HeyGen) Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "generate_from_image",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Generate Video from Image",
+            "value": "generate_from_image"
+          },
+          {
+            "label": "Get Task Status",
+            "value": "get_task"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate_from_image"
+          ]
+        },
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate_from_image"
+          ]
+        },
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate_from_image"
+          ]
+        },
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate_from_image"
+          ]
+        },
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_task"
+          ]
+        },
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.video_generator"
+  },
   "action.vision": {
     "allow_error": true,
     "category": "ai",
@@ -48220,6 +49545,339 @@
     "tools": null,
     "type": "action.wiza"
   },
+  "action.wordpress": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#21759B",
+    "credential_type": "wordpress_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "WordPress \u2014 posts, pages, media (REST API).",
+    "dynamic_outputs_from": null,
+    "icon": "wordpress",
+    "inputs": 1,
+    "name": "WordPress",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "wordpress_api_key",
+        "label": "WordPress Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_posts",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Posts",
+            "value": "list_posts"
+          },
+          {
+            "label": "Get Post",
+            "value": "get_post"
+          },
+          {
+            "label": "Create Post",
+            "value": "create_post"
+          },
+          {
+            "label": "Update Post",
+            "value": "update_post"
+          },
+          {
+            "label": "Delete Post",
+            "value": "delete_post"
+          },
+          {
+            "label": "List Pages",
+            "value": "list_pages"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_post",
+            "update_post",
+            "delete_post"
+          ]
+        },
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_post",
+            "update_post"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_post",
+            "update_post"
+          ]
+        },
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_posts",
+            "create_post",
+            "update_post"
+          ]
+        },
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_posts"
+          ]
+        },
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.wordpress"
+  },
   "action.workday": {
     "allow_error": true,
     "category": "integration",
@@ -48408,6 +50066,662 @@
     ],
     "tools": null,
     "type": "action.workday"
+  },
+  "action.x_twitter": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#000000",
+    "credential_type": "x_twitter_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "X (formerly Twitter) \u2014 tweets, users, timelines via API v2.",
+    "dynamic_outputs_from": null,
+    "icon": "twitter",
+    "inputs": 1,
+    "name": "X (Twitter)",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "x_twitter_api_key",
+        "label": "X (Twitter) Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "post_tweet",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Post Tweet",
+            "value": "post_tweet"
+          },
+          {
+            "label": "Get Tweet",
+            "value": "get_tweet"
+          },
+          {
+            "label": "Delete Tweet",
+            "value": "delete_tweet"
+          },
+          {
+            "label": "Get User by Username",
+            "value": "get_user_by_username"
+          },
+          {
+            "label": "Search Recent Tweets",
+            "value": "search_recent"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_recent"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_recent"
+          ]
+        },
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "post_tweet"
+          ]
+        },
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_tweet",
+            "delete_tweet"
+          ]
+        },
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user_by_username"
+          ]
+        },
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.x_twitter"
+  },
+  "action.youtube": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#FF0000",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "YouTube \u2014 videos, playlists, comments, channel data.",
+    "dynamic_outputs_from": null,
+    "icon": "youtube",
+    "inputs": 1,
+    "name": "YouTube",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "YouTube Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search Videos",
+            "value": "search"
+          },
+          {
+            "label": "Get Video",
+            "value": "get_video"
+          },
+          {
+            "label": "List Playlist Items",
+            "value": "list_playlist_items"
+          },
+          {
+            "label": "Get Channel",
+            "value": "get_channel"
+          },
+          {
+            "label": "List Comment Threads",
+            "value": "list_comments"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "list_playlist_items",
+            "list_comments"
+          ]
+        },
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Type",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_video",
+            "list_comments"
+          ]
+        },
+        "label": "Video ID",
+        "name": "video_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_channel"
+          ]
+        },
+        "label": "Channel ID",
+        "name": "channel_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_playlist_items"
+          ]
+        },
+        "label": "Playlist ID",
+        "name": "playlist_id",
+        "type": "string"
+      },
+      {
+        "label": "Post ID",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Content (HTML)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "draft",
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tweet ID",
+        "name": "tweet_id",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Subreddit",
+        "name": "subreddit",
+        "type": "string"
+      },
+      {
+        "default": "hot",
+        "label": "Sort",
+        "name": "sort",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "self",
+        "label": "Kind (self|link)",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "label": "Article ID",
+        "name": "article",
+        "type": "string"
+      },
+      {
+        "label": "Track ID",
+        "name": "track_id",
+        "type": "string"
+      },
+      {
+        "label": "Artist ID",
+        "name": "artist_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Name",
+        "name": "playlist_name",
+        "type": "string"
+      },
+      {
+        "label": "Playlist Description",
+        "name": "playlist_description",
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Public Playlist",
+        "name": "public",
+        "type": "boolean"
+      },
+      {
+        "default": [],
+        "label": "Track URIs (JSON)",
+        "name": "track_uris",
+        "type": "json"
+      },
+      {
+        "label": "Prompt Image URL",
+        "name": "prompt_image",
+        "type": "string"
+      },
+      {
+        "label": "Prompt Text",
+        "name": "prompt_text",
+        "type": "string"
+      },
+      {
+        "default": 5,
+        "label": "Duration (sec)",
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "default": "1280:768",
+        "label": "Aspect Ratio",
+        "name": "ratio",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Input Text",
+        "name": "input_text",
+        "type": "string"
+      },
+      {
+        "default": "presentation",
+        "label": "Format",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Number of Cards",
+        "name": "num_cards",
+        "type": "number"
+      },
+      {
+        "default": "detailed",
+        "label": "Text Amount",
+        "name": "text_amount",
+        "type": "string"
+      },
+      {
+        "label": "Generation ID",
+        "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.youtube"
   },
   "action.zendesk": {
     "allow_error": true,
