@@ -50,6 +50,7 @@ from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import Cloudflare
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
+from apps.api.app.node_system.nodes.common.file.file_node import FileNode
 from apps.api.app.node_system.nodes.common.json_transform.json_transform import JsonTransformNode
 from apps.api.app.node_system.nodes.common.merge.merge import MergeNode
 from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetVariableNode
@@ -402,6 +403,7 @@ node_registry.register(JsonTransformNode)
 node_registry.register(MergeNode)
 node_registry.register(SwitchNode)
 node_registry.register(WaitNode)
+node_registry.register(FileNode)
 node_registry.register(EvaluatorNode)
 node_registry.register(ThinkingNode)
 node_registry.register(LoopNode)

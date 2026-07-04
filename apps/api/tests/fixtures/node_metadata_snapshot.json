@@ -30553,6 +30553,205 @@
     "tools": null,
     "type": "action.zoom"
   },
+  "common.file": {
+    "allow_error": true,
+    "category": "logic",
+    "color": "#f59e0b",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Read a URL, write / append text to a per-execution file, or parse a text file (JSON / CSV / plain text).",
+    "dynamic_outputs_from": null,
+    "icon": "File",
+    "inputs": 1,
+    "name": "File",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "operation",
+        "type": "string"
+      },
+      {
+        "label": "path",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "content",
+        "type": "string"
+      },
+      {
+        "label": "size_bytes",
+        "type": "number"
+      },
+      {
+        "label": "content_type",
+        "type": "string"
+      },
+      {
+        "label": "parsed",
+        "type": "object"
+      },
+      {
+        "label": "format",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "read_url",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Read from URL",
+            "value": "read_url"
+          },
+          {
+            "label": "Write file",
+            "value": "write"
+          },
+          {
+            "label": "Append to file",
+            "value": "append"
+          },
+          {
+            "label": "Parse text file",
+            "value": "parse_text"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": "read_url"
+        },
+        "label": "URL",
+        "name": "url",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": "read_url"
+        },
+        "default": 10485760,
+        "label": "Max download bytes",
+        "mode": "advanced",
+        "name": "max_bytes",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write",
+            "append",
+            "parse_text"
+          ]
+        },
+        "label": "Path (relative to execution root)",
+        "name": "path",
+        "placeholder": "output.json",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write",
+            "append"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write",
+            "append",
+            "parse_text",
+            "read_url"
+          ]
+        },
+        "default": "utf-8",
+        "label": "Encoding",
+        "mode": "advanced",
+        "name": "encoding",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": "parse_text"
+        },
+        "default": null,
+        "label": "Format (blank = auto-detect)",
+        "mode": "advanced",
+        "name": "format",
+        "options": [
+          {
+            "label": "Auto-detect",
+            "value": ""
+          },
+          {
+            "label": "JSON",
+            "value": "json"
+          },
+          {
+            "label": "CSV",
+            "value": "csv"
+          },
+          {
+            "label": "Plain text",
+            "value": "text"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "common.file"
+  },
   "logic.code": {
     "allow_error": false,
     "category": "logic",
