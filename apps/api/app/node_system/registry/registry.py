@@ -32,6 +32,7 @@ from apps.api.app.node_system.nodes.ashby.ashby_node import AshbyNode
 from apps.api.app.node_system.nodes.ashby.ashby_trigger import AshbyTriggerNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
 from apps.api.app.node_system.nodes.attio.attio_trigger import AttioTriggerNode
+from apps.api.app.node_system.nodes.aws_appconfig.aws_appconfig_node import AWSAppConfigNode
 from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
 from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
     AWSCloudFormationNode,
@@ -107,6 +108,7 @@ from apps.api.app.node_system.nodes.dspy.dspy_node import DSPyCloudNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.elasticsearch.elasticsearch_node import ElasticsearchNode
+from apps.api.app.node_system.nodes.elevenlabs.elevenlabs_node import ElevenLabsNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_trigger import EmailbisonTriggerNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
@@ -150,12 +152,14 @@ from apps.api.app.node_system.nodes.gong.gong_webhook import GongWebhookTriggerN
 from apps.api.app.node_system.nodes.google_ads.google_ads_node import GoogleAdsNode
 from apps.api.app.node_system.nodes.google_bigquery.google_bigquery_node import GoogleBigQueryNode
 from apps.api.app.node_system.nodes.google_books.google_books_node import GoogleBooksNode
+from apps.api.app.node_system.nodes.google_contacts.google_contacts_node import GoogleContactsNode
 from apps.api.app.node_system.nodes.google_groups.google_groups_node import GoogleGroupsNode
 from apps.api.app.node_system.nodes.google_maps.google_maps_node import GoogleMapsNode
 from apps.api.app.node_system.nodes.google_meet.google_meet_node import GoogleMeetNode
 from apps.api.app.node_system.nodes.google_pagespeed.google_pagespeed_node import (
     GooglePageSpeedNode,
 )
+from apps.api.app.node_system.nodes.google_search.google_search_node import GoogleSearchNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
@@ -192,6 +196,7 @@ from apps.api.app.node_system.nodes.icypeas.icypeas_node import IcypeasNode
 from apps.api.app.node_system.nodes.identity_center.identity_center_node import (
     AWSIdentityCenterNode,
 )
+from apps.api.app.node_system.nodes.image_generator.image_generator_node import ImageGeneratorNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.incidentio.incidentio_node import IncidentIONode
 from apps.api.app.node_system.nodes.infisical.infisical_node import InfisicalNode
@@ -239,6 +244,7 @@ from apps.api.app.node_system.nodes.mailerlite.mailerlite_node import MailerLite
 from apps.api.app.node_system.nodes.mailgun.mailgun_node import MailgunNode
 from apps.api.app.node_system.nodes.mailgun.mailgun_webhook import MailgunWebhookTriggerNode
 from apps.api.app.node_system.nodes.mcp.mcp_node import McpNode
+from apps.api.app.node_system.nodes.mem0.mem0_node import Mem0Node
 from apps.api.app.node_system.nodes.messagebird.messagebird_node import MessageBirdNode
 from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
 from apps.api.app.node_system.nodes.meta.facebook_trigger import FacebookTriggerNode
@@ -276,10 +282,12 @@ from apps.api.app.node_system.nodes.obsidian.obsidian_node import ObsidianNode
 from apps.api.app.node_system.nodes.okta.okta_node import OktaNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.onepassword.onepassword_node import OnePasswordConnectNode
+from apps.api.app.node_system.nodes.openai.openai_node import OpenAINode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
 from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTriggerNode
 from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
+from apps.api.app.node_system.nodes.parallel_ai.parallel_ai_node import ParallelAINode
 from apps.api.app.node_system.nodes.peopledatalabs.peopledatalabs_node import PeopleDataLabsNode
 from apps.api.app.node_system.nodes.persona.persona_node import PersonaNode
 from apps.api.app.node_system.nodes.pi.pi_node import PiNode
@@ -287,6 +295,7 @@ from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
 from apps.api.app.node_system.nodes.polymarket.polymarket_node import PolymarketNode
+from apps.api.app.node_system.nodes.postgresql.postgresql_node import PostgresqlNode
 from apps.api.app.node_system.nodes.posthog.posthog_node import PostHogNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
@@ -299,6 +308,7 @@ from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.quartr.quartr_node import QuartrNode
 from apps.api.app.node_system.nodes.quiver.quiver_node import QuiverNode
 from apps.api.app.node_system.nodes.railway.railway_node import RailwayNode
+from apps.api.app.node_system.nodes.rb2b.rb2b_node import RB2BNode
 from apps.api.app.node_system.nodes.reddit.reddit_node import RedditNode
 from apps.api.app.node_system.nodes.reducto.reducto_node import ReductoNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
@@ -309,6 +319,7 @@ from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_trigger import SalesforceTriggerNode
 from apps.api.app.node_system.nodes.sap_concur.sap_concur_node import SAPConcurNode
+from apps.api.app.node_system.nodes.sap_s4hana.sap_s4hana_node import SAPS4HANANode
 from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
@@ -342,6 +353,7 @@ from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNo
 from apps.api.app.node_system.nodes.trigger_dev.trigger_dev_node import TriggerDevNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
+from apps.api.app.node_system.nodes.twilio_sms.twilio_sms_node import TwilioSMSNode
 from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_node import TwilioVoiceNode
 from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_webhook import (
     TwilioVoiceWebhookTriggerNode,
@@ -365,6 +377,7 @@ from apps.api.app.node_system.nodes.x_twitter.x_twitter_node import XTwitterNode
 from apps.api.app.node_system.nodes.youtube.youtube_node import YouTubeNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_trigger import ZendeskTriggerNode
+from apps.api.app.node_system.nodes.zep.zep_node import ZepNode
 from apps.api.app.node_system.nodes.zerobounce.zerobounce_node import ZeroBounceNode
 from apps.api.app.node_system.nodes.zoom.zoom_node import ZoomNode
 from apps.api.app.node_system.nodes.zoominfo.zoominfo_node import ZoomInfoNode
@@ -801,3 +814,21 @@ node_registry.register(McpNode)
 node_registry.register(CirclebackWebhookTriggerNode)
 node_registry.register(WhatsAppWebhookTriggerNode)
 node_registry.register(TwilioVoiceWebhookTriggerNode)
+
+
+# Phase 4-close-5 — sim breadth gap-fillers (REST subset).
+node_registry.register(OpenAINode)
+node_registry.register(ElevenLabsNode)
+node_registry.register(ImageGeneratorNode)
+node_registry.register(Mem0Node)
+node_registry.register(ZepNode)
+node_registry.register(ParallelAINode)
+node_registry.register(GoogleContactsNode)
+node_registry.register(GoogleSearchNode)
+node_registry.register(TwilioSMSNode)
+node_registry.register(AWSAppConfigNode)
+node_registry.register(RB2BNode)
+node_registry.register(SAPS4HANANode)
+
+
+node_registry.register(PostgresqlNode)
