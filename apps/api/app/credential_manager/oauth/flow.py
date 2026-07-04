@@ -332,6 +332,24 @@ class GoogleOAuthProvider:
         ]
         if getattr(settings, "GOOGLE_DRIVE_WATCH_EXTERNAL", False):
             base.insert(3, "https://www.googleapis.com/auth/drive")
+        # Phase 4.26/4.27 extras — Ads, BigQuery, Meet, Vault, Books,
+        # PageSpeed, and Admin Directory (Groups). All feature-flagged
+        # to avoid tripping Google's Restricted-Scope verification
+        # (adwords/ediscovery/admin.directory.group are sensitive/
+        # restricted and need CASA review before general production
+        # rollout — keep off by default).
+        if getattr(settings, "GOOGLE_ADS_ENABLED", False):
+            base.append("https://www.googleapis.com/auth/adwords")
+        if getattr(settings, "GOOGLE_BIGQUERY_ENABLED", False):
+            base.append("https://www.googleapis.com/auth/bigquery")
+        if getattr(settings, "GOOGLE_MEET_ENABLED", False):
+            base.append("https://www.googleapis.com/auth/meetings.space.created")
+            base.append("https://www.googleapis.com/auth/meetings.space.readonly")
+        if getattr(settings, "GOOGLE_VAULT_ENABLED", False):
+            base.append("https://www.googleapis.com/auth/ediscovery")
+        if getattr(settings, "GOOGLE_ADMIN_DIRECTORY_ENABLED", False):
+            base.append("https://www.googleapis.com/auth/admin.directory.group")
+            base.append("https://www.googleapis.com/auth/admin.directory.group.member")
         return " ".join(base)
 
     _SCOPE_STR = ""  # populated dynamically — kept for back-compat readers
@@ -798,8 +816,13 @@ class MicrosoftOAuthProvider:
         "Keep the connection alive (offline access)",
     ]
 
-    _SCOPE_STR = " ".join(
-        [
+    # Phase 4.28 — added `User.ReadWrite.All` + `Group.ReadWrite.All` for
+    # the microsoft_ad (Entra ID) action node, and Dataverse `user_impersonation`
+    # for the microsoft_dataverse action node. Both are feature-flagged since
+    # they escalate the consent screen to admin-managed operations.
+    @classmethod
+    def _scope_str(cls) -> str:
+        base = [
             "Mail.ReadWrite",
             "Mail.Send",
             "Chat.ReadWrite",
@@ -812,7 +835,15 @@ class MicrosoftOAuthProvider:
             "User.Read",
             "offline_access",
         ]
-    )
+        if getattr(settings, "MICROSOFT_ENTRA_ADMIN_ENABLED", False):
+            base.append("User.ReadWrite.All")
+            base.append("Group.ReadWrite.All")
+            base.append("Directory.Read.All")
+        if getattr(settings, "MICROSOFT_DATAVERSE_ENABLED", False):
+            base.append("https://{org}.crm.dynamics.com/user_impersonation")
+        return " ".join(base)
+
+    _SCOPE_STR = ""  # kept for back-compat readers — real value from _scope_str()
 
     @classmethod
     def _tenant(cls) -> str:
@@ -825,7 +856,7 @@ class MicrosoftOAuthProvider:
             "client_id": getattr(settings, "MICROSOFT_CLIENT_ID", "") or "",
             "redirect_uri": REDIRECT_URI.format(service="microsoft"),
             "response_type": "code",
-            "scope": self._SCOPE_STR,
+            "scope": self._scope_str(),
             "response_mode": "query",
             "state": state,
             "prompt": "select_account",
@@ -847,7 +878,7 @@ class MicrosoftOAuthProvider:
             "code": code,
             "grant_type": "authorization_code",
             "redirect_uri": REDIRECT_URI.format(service="microsoft"),
-            "scope": self._SCOPE_STR,
+            "scope": self._scope_str(),
         }
         if code_verifier:
             data["code_verifier"] = code_verifier
@@ -874,7 +905,7 @@ class MicrosoftOAuthProvider:
                     "client_secret": getattr(settings, "MICROSOFT_CLIENT_SECRET", "") or "",
                     "refresh_token": refresh_token,
                     "grant_type": "refresh_token",
-                    "scope": self._SCOPE_STR,
+                    "scope": self._scope_str(),
                 },
             )
         body = response.json()

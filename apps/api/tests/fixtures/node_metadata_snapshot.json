@@ -1418,7 +1418,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -2110,7 +2110,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -9907,7 +9907,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -24493,7 +24493,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -26441,7 +26441,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -31198,7 +31198,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -32049,7 +32049,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -33296,7 +33296,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -33559,7 +33559,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -39988,7 +39988,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -41965,7 +41965,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -43849,7 +43849,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -44333,7 +44333,7 @@
         },
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {
@@ -44842,7 +44842,7 @@
       {
         "default": {},
         "label": "Schema (JSON)",
-        "name": "schema",
+        "name": "json_schema",
         "type": "json"
       },
       {

@@ -39,7 +39,7 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="message", label="Message", type="string"),
         FieldSpec(name="project_id", label="Project ID", type="string"),
         FieldSpec(name="file_url", label="File URL", type="string"),
-        FieldSpec(name="schema", label="Schema (JSON)", type="json", default={}),
+        FieldSpec(name="json_schema", label="Schema (JSON)", type="json", default={}),
         FieldSpec(name="job_id", label="Job ID", type="string"),
         FieldSpec(name="company_id", label="Company ID", type="string"),
         FieldSpec(name="event_id", label="Event ID", type="string"),
@@ -58,10 +58,10 @@ MANIFEST = ProviderManifest(
             label="Extract Structured Data",
             method="POST",
             path="/extract",
-            visible_fields=["file_url", "schema"],
+            visible_fields=["file_url", "json_schema"],
             body_builder=lambda v: {
                 "fileUrl": getattr(v, "file_url", "") or "",
-                "schema": getattr(v, "schema", {}) or {},
+                "schema": getattr(v, "json_schema", {}) or {},
             },
         ),
         OpSpec(
