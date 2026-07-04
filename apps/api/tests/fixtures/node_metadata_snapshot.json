@@ -19331,6 +19331,409 @@
     "tools": null,
     "type": "action.google_bigquery"
   },
+  "action.google_books": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#4285F4",
+    "credential_type": "google_books_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Books \u2014 search + fetch volume metadata.",
+    "dynamic_outputs_from": null,
+    "icon": "google_books",
+    "inputs": 1,
+    "name": "Google Books",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_books_api_key",
+        "label": "Google Books Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search_volumes",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search Volumes",
+            "value": "search_volumes"
+          },
+          {
+            "label": "Get Volume",
+            "value": "get_volume"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "mobile",
+        "label": "Strategy",
+        "name": "strategy",
+        "type": "string"
+      },
+      {
+        "default": "performance",
+        "label": "Category",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_volumes"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_volumes"
+          ]
+        },
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_volume"
+          ]
+        },
+        "label": "Volume ID",
+        "name": "volume_id",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "default": "my_customer",
+        "label": "Customer",
+        "name": "customer",
+        "type": "string"
+      },
+      {
+        "label": "Group Key",
+        "name": "group_key",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": "MEMBER",
+        "label": "Role",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "label": "Member Key",
+        "name": "member_key",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_books"
+  },
+  "action.google_groups": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#4285F4",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Groups \u2014 Directory API groups/members admin.",
+    "dynamic_outputs_from": null,
+    "icon": "google_groups",
+    "inputs": 1,
+    "name": "Google Groups",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "Google Groups Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_groups",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Groups",
+            "value": "list_groups"
+          },
+          {
+            "label": "Get Group",
+            "value": "get_group"
+          },
+          {
+            "label": "Create Group",
+            "value": "create_group"
+          },
+          {
+            "label": "Delete Group",
+            "value": "delete_group"
+          },
+          {
+            "label": "List Members",
+            "value": "list_members"
+          },
+          {
+            "label": "Add Member",
+            "value": "add_member"
+          },
+          {
+            "label": "Remove Member",
+            "value": "remove_member"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "default": "mobile",
+        "label": "Strategy",
+        "name": "strategy",
+        "type": "string"
+      },
+      {
+        "default": "performance",
+        "label": "Category",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Volume ID",
+        "name": "volume_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_groups"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_groups"
+          ]
+        },
+        "default": "my_customer",
+        "label": "Customer",
+        "name": "customer",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_group",
+            "delete_group",
+            "list_members",
+            "add_member",
+            "remove_member"
+          ]
+        },
+        "label": "Group Key",
+        "name": "group_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_group",
+            "add_member"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_group"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_group"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_member"
+          ]
+        },
+        "default": "MEMBER",
+        "label": "Role",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "remove_member"
+          ]
+        },
+        "label": "Member Key",
+        "name": "member_key",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_groups"
+  },
   "action.google_maps": {
     "allow_error": true,
     "category": "integration",
@@ -19797,6 +20200,176 @@
     ],
     "tools": null,
     "type": "action.google_meet"
+  },
+  "action.google_pagespeed": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#4285F4",
+    "credential_type": "google_pagespeed_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "PageSpeed Insights \u2014 Lighthouse audits for a URL.",
+    "dynamic_outputs_from": null,
+    "icon": "google_pagespeed",
+    "inputs": 1,
+    "name": "Google PageSpeed Insights",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_pagespeed_api_key",
+        "label": "Google PageSpeed Insights Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_audit",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Audit",
+            "value": "run_audit"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_audit"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_audit"
+          ]
+        },
+        "default": "mobile",
+        "label": "Strategy",
+        "name": "strategy",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_audit"
+          ]
+        },
+        "default": "performance",
+        "label": "Category",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "label": "Volume ID",
+        "name": "volume_id",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "default": "my_customer",
+        "label": "Customer",
+        "name": "customer",
+        "type": "string"
+      },
+      {
+        "label": "Group Key",
+        "name": "group_key",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": "MEMBER",
+        "label": "Role",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "label": "Member Key",
+        "name": "member_key",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_pagespeed"
   },
   "action.google_sheets": {
     "allow_error": true,
