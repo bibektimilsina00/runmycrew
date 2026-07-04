@@ -1279,6 +1279,236 @@
     "tools": null,
     "type": "action.apify"
   },
+  "action.apollo": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "apollo_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Apollo \u2014 B2B contact search, email finder, sequences.",
+    "dynamic_outputs_from": null,
+    "icon": "apollo",
+    "inputs": 1,
+    "name": "Apollo.io",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "people",
+        "type": "array"
+      },
+      {
+        "label": "organizations",
+        "type": "array"
+      },
+      {
+        "label": "person",
+        "type": "object"
+      },
+      {
+        "label": "organization",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "apollo_api_key",
+        "label": "Apollo.io Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search_people",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search People",
+            "value": "search_people"
+          },
+          {
+            "label": "Search Organizations",
+            "value": "search_organizations"
+          },
+          {
+            "label": "Match / Enrich Person",
+            "value": "match_person"
+          },
+          {
+            "label": "Enrich Organization",
+            "value": "enrich_organization"
+          },
+          {
+            "label": "Add Contact to Sequence",
+            "value": "add_contact_to_sequence"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_people",
+            "search_organizations"
+          ]
+        },
+        "label": "Company Domain",
+        "name": "q_organization_domains",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_people"
+          ]
+        },
+        "label": "Titles (comma-separated)",
+        "name": "person_titles",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_people",
+            "search_organizations"
+          ]
+        },
+        "label": "Keywords",
+        "name": "q_keywords",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_people",
+            "search_organizations"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_people",
+            "search_organizations"
+          ]
+        },
+        "default": 10,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "match_person"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "match_person"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "match_person"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "match_person",
+            "enrich_organization"
+          ]
+        },
+        "label": "Domain (for org enrich)",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_contact_to_sequence"
+          ]
+        },
+        "label": "Sequence ID",
+        "name": "sequence_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_contact_to_sequence"
+          ]
+        },
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.apollo"
+  },
   "action.asana": {
     "allow_error": true,
     "category": "integration",
@@ -5226,6 +5456,94 @@
     "tools": null,
     "type": "action.calendly"
   },
+  "action.clay": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "clay_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Clay \u2014 push rows into a Clay workspace table for enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "clay",
+    "inputs": 1,
+    "name": "Clay",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "success",
+        "type": "boolean"
+      },
+      {
+        "label": "row_id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "clay_api_key",
+        "label": "Clay Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "push_row",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Push Row to Clay Table",
+            "value": "push_row"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "push_row"
+          ]
+        },
+        "label": "Row data (JSON)",
+        "name": "data",
+        "required": true,
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.clay"
+  },
   "action.cloudflare": {
     "allow_error": true,
     "category": "integration",
@@ -6668,6 +6986,193 @@
     ],
     "tools": null,
     "type": "action.dropbox"
+  },
+  "action.dropcontact": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "dropcontact_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Dropcontact \u2014 GDPR-friendly B2B email enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "dropcontact",
+    "inputs": 1,
+    "name": "Dropcontact",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "request_id",
+        "type": "string"
+      },
+      {
+        "label": "data",
+        "type": "array"
+      },
+      {
+        "label": "success",
+        "type": "boolean"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "dropcontact_api_key",
+        "label": "Dropcontact Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "enrich_batch",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Enrich Batch (submit)",
+            "value": "enrich_batch"
+          },
+          {
+            "label": "Fetch Batch Result",
+            "value": "fetch_batch_result"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "label": "Company",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "label": "Website",
+        "name": "website",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "fetch_batch_result"
+          ]
+        },
+        "label": "Request ID (for status check)",
+        "name": "request_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "default": "false",
+        "label": "Siren source (data country)",
+        "mode": "advanced",
+        "name": "siren",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_batch"
+          ]
+        },
+        "default": "en",
+        "label": "Language",
+        "mode": "advanced",
+        "name": "language",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.dropcontact"
   },
   "action.dub": {
     "allow_error": true,
@@ -8152,6 +8657,159 @@
     ],
     "tools": null,
     "type": "action.fathom"
+  },
+  "action.findymail": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "findymail_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Findymail \u2014 find + verify B2B emails by name, domain, or LinkedIn URL.",
+    "dynamic_outputs_from": null,
+    "icon": "findymail",
+    "inputs": 1,
+    "name": "Findymail",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "domain",
+        "type": "string"
+      },
+      {
+        "label": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "credits",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "findymail_api_key",
+        "label": "Findymail Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "find_email_from_name",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Find Email from Name",
+            "value": "find_email_from_name"
+          },
+          {
+            "label": "Find Email from LinkedIn URL",
+            "value": "find_email_from_linkedin"
+          },
+          {
+            "label": "Verify Email",
+            "value": "verify_email"
+          },
+          {
+            "label": "Reverse Email Lookup",
+            "value": "reverse_email_lookup"
+          },
+          {
+            "label": "Get Remaining Credits",
+            "value": "get_credits"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email_from_name"
+          ]
+        },
+        "label": "Full Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email_from_name"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email_from_linkedin"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "verify_email",
+            "reverse_email_lookup"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.findymail"
   },
   "action.firecrawl": {
     "allow_error": true,
@@ -17232,6 +17890,178 @@
     "tools": null,
     "type": "action.huggingface"
   },
+  "action.hunter": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "hunter_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Hunter \u2014 find + verify emails by domain, name, or company.",
+    "dynamic_outputs_from": null,
+    "icon": "hunter",
+    "inputs": 1,
+    "name": "Hunter.io",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "emails",
+        "type": "array"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "score",
+        "type": "number"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "hunter_api_key",
+        "label": "Hunter.io Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "domain_search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Domain Search",
+            "value": "domain_search"
+          },
+          {
+            "label": "Email Finder",
+            "value": "email_finder"
+          },
+          {
+            "label": "Verify Email",
+            "value": "email_verifier"
+          },
+          {
+            "label": "Count Emails on Domain",
+            "value": "email_count"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "domain_search",
+            "email_finder",
+            "email_count"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_verifier"
+          ]
+        },
+        "label": "Email (for verify / lookup)",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "domain_search",
+            "email_finder",
+            "email_count"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "domain_search"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.hunter"
+  },
   "action.image_gen": {
     "allow_error": true,
     "category": "ai",
@@ -24131,6 +24961,214 @@
     ],
     "tools": null,
     "type": "action.outlook"
+  },
+  "action.peopledatalabs": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "peopledatalabs_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "People Data Labs \u2014 person + company enrichment API.",
+    "dynamic_outputs_from": null,
+    "icon": "peopledatalabs",
+    "inputs": 1,
+    "name": "People Data Labs",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "number"
+      },
+      {
+        "label": "likelihood",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "peopledatalabs_api_key",
+        "label": "People Data Labs Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "person_enrichment",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Person Enrichment",
+            "value": "person_enrichment"
+          },
+          {
+            "label": "Person Search",
+            "value": "person_search"
+          },
+          {
+            "label": "Company Enrichment",
+            "value": "company_enrichment"
+          },
+          {
+            "label": "Company Search",
+            "value": "company_search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_enrichment"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_enrichment"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_enrichment"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_enrichment"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_enrichment"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_enrichment",
+            "company_enrichment"
+          ]
+        },
+        "label": "Company",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "company_enrichment"
+          ]
+        },
+        "label": "Company Website / Domain",
+        "name": "website",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "company_enrichment"
+          ]
+        },
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_search",
+            "company_search"
+          ]
+        },
+        "label": "Elasticsearch DSL (advanced)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_search",
+            "company_search"
+          ]
+        },
+        "default": 10,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.peopledatalabs"
   },
   "action.perplexity": {
     "allow_error": true,
