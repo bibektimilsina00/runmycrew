@@ -120,6 +120,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.asana import (
         asana_trigger as _asana_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.attio import (
+        attio_trigger as _attio_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.calcom import (
         calcom_trigger as _calcom_trigger,  # noqa: F401
     )
@@ -181,6 +184,9 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.rss import (
         rss_trigger as _rss_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.salesforce import (
+        salesforce_trigger as _salesforce_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.telegram import (
         telegram_trigger as _telegram_trigger,  # noqa: F401

@@ -21,6 +21,7 @@ from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
+from apps.api.app.node_system.nodes.attio.attio_trigger import AttioTriggerNode
 from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
 from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
     AWSCloudFormationNode,
@@ -172,6 +173,7 @@ from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
+from apps.api.app.node_system.nodes.salesforce.salesforce_trigger import SalesforceTriggerNode
 from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
@@ -346,6 +348,9 @@ node_registry.register(FirefliesWebhookTriggerNode)
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
 node_registry.register(IMAPTriggerNode)
+# Phase 4.3 — missing trigger providers.
+node_registry.register(AttioTriggerNode)
+node_registry.register(SalesforceTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

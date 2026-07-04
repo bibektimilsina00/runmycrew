@@ -31731,6 +31731,202 @@
     "tools": null,
     "type": "trigger.asana"
   },
+  "trigger.attio": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "attio_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Attio for new records, list entries, notes, tasks, comments, or workspace members. Attio hosts custom object schemas \u2014 pick which object_slug or list_id to watch per event.",
+    "dynamic_outputs_from": null,
+    "icon": "attio",
+    "inputs": 0,
+    "name": "Attio",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "object_slug",
+        "type": "string"
+      },
+      {
+        "label": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      },
+      {
+        "label": "updated_at",
+        "type": "string"
+      },
+      {
+        "label": "values",
+        "type": "object"
+      },
+      {
+        "label": "content_plaintext",
+        "type": "string"
+      },
+      {
+        "label": "web_url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "attio_api_key",
+        "label": "Attio Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "record_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Record Created",
+            "value": "record_created"
+          },
+          {
+            "label": "Record Updated",
+            "value": "record_updated"
+          },
+          {
+            "label": "List Entry Created",
+            "value": "list_entry_created"
+          },
+          {
+            "label": "List Entry Updated",
+            "value": "list_entry_updated"
+          },
+          {
+            "label": "Note Created",
+            "value": "note_created"
+          },
+          {
+            "label": "Task Created",
+            "value": "task_created"
+          },
+          {
+            "label": "Task Updated",
+            "value": "task_updated"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment_created"
+          },
+          {
+            "label": "Workspace Member Added",
+            "value": "workspace_member_added"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "record_created",
+            "record_updated"
+          ]
+        },
+        "label": "Object slug (for record events)",
+        "name": "object_slug",
+        "placeholder": "people | companies | deals | ...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "list_entry_created",
+            "list_entry_updated"
+          ]
+        },
+        "label": "List ID (for list entry events)",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "note_created"
+          ]
+        },
+        "label": "Record ID (optional; for note_created scope)",
+        "mode": "advanced",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "comment_created"
+          ]
+        },
+        "label": "Thread ID (optional; for comment_created scope)",
+        "mode": "advanced",
+        "name": "thread_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 60,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.attio"
+  },
   "trigger.azure_devops_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -36659,6 +36855,143 @@
     ],
     "tools": null,
     "type": "trigger.rss"
+  },
+  "trigger.salesforce": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "salesforce_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Salesforce for new / updated records or opportunity stage changes on any SObject. Uses Connected App access token + instance URL from the credential.",
+    "dynamic_outputs_from": null,
+    "icon": "salesforce",
+    "inputs": 0,
+    "name": "Salesforce",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "stage",
+        "type": "string"
+      },
+      {
+        "label": "amount",
+        "type": "number"
+      },
+      {
+        "label": "created_date",
+        "type": "string"
+      },
+      {
+        "label": "last_modified_date",
+        "type": "string"
+      },
+      {
+        "label": "change",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "salesforce_api_key",
+        "label": "Salesforce Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "record_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Record Created",
+            "value": "record_created"
+          },
+          {
+            "label": "Record Updated",
+            "value": "record_updated"
+          },
+          {
+            "label": "Opportunity Stage Changed",
+            "value": "opportunity_stage_changed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "Account",
+        "label": "SObject",
+        "name": "object_type",
+        "placeholder": "Account | Contact | Lead | Opportunity | Case | ...",
+        "type": "string"
+      },
+      {
+        "label": "SOQL SELECT fields (comma-separated; blank = defaults)",
+        "mode": "advanced",
+        "name": "fields",
+        "placeholder": "Id, Name, Amount, StageName",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 60,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.salesforce"
   },
   "trigger.slack": {
     "allow_error": false,
