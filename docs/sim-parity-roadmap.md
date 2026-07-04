@@ -56,11 +56,54 @@ integration listed, batched by vertical + auth pattern.
 
 **Total in 4.1-4.12**: 25 integrations + trigger depth for 3 providers.
 
-### Phase 4.13-4.30 — Planned
+### Phase 4.13-4.32 — Shipped (backend REST scaffolds)
 
-117 real remaining. Batched below by vertical. Each batch = 4-6
-providers, action + polling/webhook where sim ships events. Estimated
-1-2 PRs per batch.
+| PR | Batch | Providers |
+|---|---|---|
+| #302 | 4.13 | resend/sendgrid/mailgun/postmark/loops webhooks |
+| #304 | 4.14 | apollo, clay, hunter, findymail, dropcontact, peopledatalabs |
+| #305 | 4.15 | datagma, enrich, enrichment, enrow, icypeas, leadmagic |
+| #306 | 4.16 | zerobounce, neverbounce, millionverifier, prospeo, persona |
+| #307 | 4.17 | zoominfo, sixtyfour, wiza, similarweb, ahrefs |
+| #308 | 4.18 | agentmail, agentphone, browser_use, context_dev, cursor, devin |
+| #309 | 4.19 | mistral_parse, jina, reducto, stagehand, brightdata, dspy |
+| #310 | 4.20 | datadog, new_relic, amplitude, grafana, langsmith, hex |
+| #311 | 4.21 | databricks, clickhouse, elasticsearch, convex, temporal |
+| — | 4.22 | railway, dagster, daytona, launchdarkly, incidentio, rootly |
+| #312 | 4.23 | circleback, evernote, extend, luma, granola |
+| #313 | 4.24 | rippling, workday, sap_concur, wealthbox, brex |
+| #314 | 4.25 | okta, clerk, onepassword, identity_center, infisical |
+| #315 | 4.26 | google_ads, bigquery, maps, meet, translate, vault |
+| #316 | 4.27 | google_pagespeed, google_books, google_groups |
+| #317 | 4.28 | microsoft_ad, microsoft_dataverse, jira_service_management, mothership |
+| #318 | 4.29 | youtube, wordpress, x_twitter, reddit, spotify, video_generator, gamma |
+| #319 | 4.30 | tailscale, textract, codepipeline, trigger_dev, vanta, kalshi, polymarket, quiver, sportmonks, revenuecat |
+| #320 | 4.31 | whatsapp, twilio_voice, arxiv (REST subset) |
+| #321 | 4.32 | agiloft, airweave, ketch, latex, linkup, linq, obsidian, pi, profound, pulse, quartr, greptile, guardrails, crowdstrike |
+
+**Total 4.13-4.32**: ~110 integrations shipped as REST scaffolds.
+**Total registered node types**: ~230.
+
+### Phase 4.31b — Deferred
+
+Non-REST providers requiring dedicated protocol libraries:
+- **smtp** — needs `aiosmtplib`
+- **sftp** — needs `asyncssh` or `paramiko`
+- **ssh** — needs `asyncssh` or `paramiko`
+- **mcp** — needs `mcp` Python SDK, plus session lifecycle handling
+
+### Frontend + credential follow-ups
+
+- Frontend node type registrations for Phase 4.13+ providers not yet
+  wired — backend registered but the UI palette will not show these
+  until a matching frontend definition per node is added.
+- `google_oauth` umbrella scope list needs `adwords`, `bigquery`,
+  `meetings.space.created`, `ediscovery` added before ads/bigquery/
+  meet/vault action nodes function end-to-end (gated on CASA review).
+- `microsoft_oauth` provider must include Graph + Dataverse scopes for
+  microsoft_ad + microsoft_dataverse.
+
+### Original Phase 4.13-4.30 plan (for reference)
 
 #### 4.13 — Outbound webhook completion (5)
 resend, sendgrid, mailgun, postmark, loops. All have action nodes
