@@ -607,6 +607,213 @@
     "tools": null,
     "type": "action.agent"
   },
+  "action.ahrefs": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "ahrefs_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Ahrefs \u2014 SEO + backlinks + keyword research.",
+    "dynamic_outputs_from": null,
+    "icon": "ahrefs",
+    "inputs": 1,
+    "name": "Ahrefs",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "ahrefs_api_key",
+        "label": "Ahrefs Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "domain_overview",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Domain Overview",
+            "value": "domain_overview"
+          },
+          {
+            "label": "Backlinks",
+            "value": "backlinks"
+          },
+          {
+            "label": "Referring Domains",
+            "value": "referring_domains"
+          },
+          {
+            "label": "Organic Keywords",
+            "value": "organic_keywords"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "domain_overview",
+            "backlinks",
+            "referring_domains",
+            "organic_keywords"
+          ]
+        },
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "backlinks",
+            "referring_domains",
+            "organic_keywords"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.ahrefs"
+  },
   "action.airtable": {
     "allow_error": true,
     "category": "integration",
@@ -23893,6 +24100,194 @@
     "tools": null,
     "type": "action.microsoft_teams"
   },
+  "action.millionverifier": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "millionverifier_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "MillionVerifier \u2014 email + phone verification.",
+    "dynamic_outputs_from": null,
+    "icon": "millionverifier",
+    "inputs": 1,
+    "name": "MillionVerifier",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "millionverifier_api_key",
+        "label": "MillionVerifier Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "verify_email",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Verify Email",
+            "value": "verify_email"
+          },
+          {
+            "label": "Get Credits",
+            "value": "get_credits"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "verify_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.millionverifier"
+  },
   "action.mixpanel": {
     "allow_error": true,
     "category": "integration",
@@ -24630,6 +25025,194 @@
     ],
     "tools": null,
     "type": "action.neo4j"
+  },
+  "action.neverbounce": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "neverbounce_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "NeverBounce \u2014 real-time email verification.",
+    "dynamic_outputs_from": null,
+    "icon": "neverbounce",
+    "inputs": 1,
+    "name": "NeverBounce",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "neverbounce_api_key",
+        "label": "NeverBounce Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "single_check",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Verify Email",
+            "value": "single_check"
+          },
+          {
+            "label": "Get Credits",
+            "value": "get_credits"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "single_check"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.neverbounce"
   },
   "action.newsapi": {
     "allow_error": true,
@@ -26232,6 +26815,226 @@
     "tools": null,
     "type": "action.perplexity"
   },
+  "action.persona": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "persona_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Persona \u2014 identity verification + KYC.",
+    "dynamic_outputs_from": null,
+    "icon": "persona",
+    "inputs": 1,
+    "name": "Persona",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "persona_api_key",
+        "label": "Persona Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_inquiry",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Inquiry",
+            "value": "get_inquiry"
+          },
+          {
+            "label": "List Inquiries",
+            "value": "list_inquiries"
+          },
+          {
+            "label": "Get Verification",
+            "value": "get_verification"
+          },
+          {
+            "label": "Get Account",
+            "value": "get_account"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_inquiries"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_inquiries"
+          ]
+        },
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_inquiry"
+          ]
+        },
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_verification"
+          ]
+        },
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_account"
+          ]
+        },
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.persona"
+  },
   "action.pinecone": {
     "allow_error": true,
     "category": "integration",
@@ -27628,6 +28431,227 @@
     ],
     "tools": null,
     "type": "action.postmark"
+  },
+  "action.prospeo": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "prospeo_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Prospeo \u2014 B2B email finder + verifier.",
+    "dynamic_outputs_from": null,
+    "icon": "prospeo",
+    "inputs": 1,
+    "name": "Prospeo",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "prospeo_api_key",
+        "label": "Prospeo Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "email_finder",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Email Finder",
+            "value": "email_finder"
+          },
+          {
+            "label": "Email Verifier",
+            "value": "email_verifier"
+          },
+          {
+            "label": "LinkedIn Email Finder",
+            "value": "linkedin_email_finder"
+          },
+          {
+            "label": "Mobile Number Finder",
+            "value": "mobile_finder"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_verifier"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "linkedin_email_finder",
+            "mobile_finder"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.prospeo"
   },
   "action.qdrant": {
     "allow_error": true,
@@ -29965,6 +30989,422 @@
     ],
     "tools": null,
     "type": "action.shopify"
+  },
+  "action.similarweb": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "similarweb_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "SimilarWeb \u2014 website + market intelligence.",
+    "dynamic_outputs_from": null,
+    "icon": "similarweb",
+    "inputs": 1,
+    "name": "SimilarWeb",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "similarweb_api_key",
+        "label": "SimilarWeb Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "website_total_traffic",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Website Total Traffic",
+            "value": "website_total_traffic"
+          },
+          {
+            "label": "Traffic Sources",
+            "value": "website_traffic_sources"
+          },
+          {
+            "label": "Geographic Distribution",
+            "value": "website_geography"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "website_total_traffic",
+            "website_traffic_sources",
+            "website_geography"
+          ]
+        },
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "website_total_traffic",
+            "website_traffic_sources",
+            "website_geography"
+          ]
+        },
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "website_total_traffic",
+            "website_traffic_sources",
+            "website_geography"
+          ]
+        },
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.similarweb"
+  },
+  "action.sixtyfour": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "sixtyfour_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "SixtyFour \u2014 AI research for lead enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "sixtyfour",
+    "inputs": 1,
+    "name": "SixtyFour",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "sixtyfour_api_key",
+        "label": "SixtyFour Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "enrich_lead",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Enrich Lead",
+            "value": "enrich_lead"
+          },
+          {
+            "label": "Enrich Company",
+            "value": "enrich_company"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_lead"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_lead"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_company"
+          ]
+        },
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_lead"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sixtyfour"
   },
   "action.slack": {
     "allow_error": true,
@@ -33693,6 +35133,204 @@
     "tools": null,
     "type": "action.wikipedia"
   },
+  "action.wiza": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "wiza_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Wiza \u2014 LinkedIn scraper + email enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "wiza",
+    "inputs": 1,
+    "name": "Wiza",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "wiza_api_key",
+        "label": "Wiza Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "prospect_search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Prospect Search (LinkedIn URL)",
+            "value": "prospect_search"
+          },
+          {
+            "label": "List All Lists",
+            "value": "list_lists"
+          },
+          {
+            "label": "Get List",
+            "value": "get_list"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "prospect_search"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_list"
+          ]
+        },
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.wiza"
+  },
   "action.zendesk": {
     "allow_error": true,
     "category": "integration",
@@ -34035,6 +35673,199 @@
     "tools": null,
     "type": "action.zendesk"
   },
+  "action.zerobounce": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "zerobounce_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "ZeroBounce \u2014 email verification + activity data.",
+    "dynamic_outputs_from": null,
+    "icon": "zerobounce",
+    "inputs": 1,
+    "name": "ZeroBounce",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "zerobounce_api_key",
+        "label": "ZeroBounce Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "validate_email",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Validate Email",
+            "value": "validate_email"
+          },
+          {
+            "label": "Get Remaining Credits",
+            "value": "get_credits"
+          },
+          {
+            "label": "Email Activity Data",
+            "value": "activity_data"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "validate_email",
+            "activity_data"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.zerobounce"
+  },
   "action.zoom": {
     "allow_error": true,
     "category": "integration",
@@ -34344,6 +36175,235 @@
     ],
     "tools": null,
     "type": "action.zoom"
+  },
+  "action.zoominfo": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "zoominfo_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "ZoomInfo \u2014 B2B contact + company database.",
+    "dynamic_outputs_from": null,
+    "icon": "zoominfo",
+    "inputs": 1,
+    "name": "ZoomInfo",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "zoominfo_api_key",
+        "label": "ZoomInfo Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "contact_enrich",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Contact Enrichment",
+            "value": "contact_enrich"
+          },
+          {
+            "label": "Company Enrichment",
+            "value": "company_enrich"
+          },
+          {
+            "label": "Contact Search",
+            "value": "contact_search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_enrich"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_enrich"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_enrich"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "company_enrich"
+          ]
+        },
+        "label": "Domain / Website",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_enrich",
+            "company_enrich"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_search"
+          ]
+        },
+        "label": "Search Query (JSON)",
+        "mode": "advanced",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_search"
+          ]
+        },
+        "default": 25,
+        "label": "Size",
+        "mode": "advanced",
+        "name": "size",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Inquiry ID",
+        "name": "inquiry_id",
+        "type": "string"
+      },
+      {
+        "label": "Verification ID",
+        "name": "verification_id",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Start Date (YYYY-MM)",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date (YYYY-MM)",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.zoominfo"
   },
   "common.file": {
     "allow_error": true,
