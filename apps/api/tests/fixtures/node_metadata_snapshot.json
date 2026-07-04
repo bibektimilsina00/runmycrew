@@ -6748,6 +6748,240 @@
     "tools": null,
     "type": "action.dynamodb"
   },
+  "action.emailbison": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "emailbison_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Emailbison \u2014 outbound-email campaigns, leads, workspaces.",
+    "dynamic_outputs_from": null,
+    "icon": "emailbison",
+    "inputs": 1,
+    "name": "Emailbison",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaigns",
+        "type": "array"
+      },
+      {
+        "label": "leads",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "emailbison_api_key",
+        "label": "Emailbison Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_campaigns",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Campaigns",
+            "value": "list_campaigns"
+          },
+          {
+            "label": "Get Campaign",
+            "value": "get_campaign"
+          },
+          {
+            "label": "List Leads",
+            "value": "list_leads"
+          },
+          {
+            "label": "Create Lead",
+            "value": "create_lead"
+          },
+          {
+            "label": "Update Lead",
+            "value": "update_lead"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_campaign",
+            "list_leads",
+            "create_lead"
+          ]
+        },
+        "label": "Campaign ID",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_lead"
+          ]
+        },
+        "label": "Lead ID",
+        "name": "lead_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Job Title",
+        "mode": "advanced",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Custom Fields (JSON)",
+        "mode": "advanced",
+        "name": "custom_fields",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_leads"
+          ]
+        },
+        "default": 25,
+        "label": "Per page",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_leads"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.emailbison"
+  },
   "action.embeddings": {
     "allow_error": true,
     "category": "ai",
@@ -32205,6 +32439,130 @@
     "tools": null,
     "type": "trigger.cron"
   },
+  "trigger.emailbison": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "emailbison_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Emailbison for new leads (workspace-wide or per-campaign) and new campaigns. Per-delivery email events require a webhook.",
+    "dynamic_outputs_from": null,
+    "icon": "emailbison",
+    "inputs": 0,
+    "name": "Emailbison",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "emailbison_api_key",
+        "label": "Emailbison Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "new_lead",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New Lead",
+            "value": "new_lead"
+          },
+          {
+            "label": "New Campaign",
+            "value": "new_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Campaign ID (optional; blank = workspace-wide leads)",
+        "mode": "advanced",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "default": 50,
+        "label": "Per page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.emailbison"
+  },
   "trigger.fathom_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -34735,6 +35093,127 @@
     ],
     "tools": null,
     "type": "trigger.imap"
+  },
+  "trigger.instantly": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "instantly_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Instantly for new leads, lead status changes (interested / meeting_booked / unsubscribed / \u2026), or completed campaigns. For per-delivery email events attach an Instantly webhook.",
+    "dynamic_outputs_from": null,
+    "icon": "instantly",
+    "inputs": 0,
+    "name": "Instantly",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "change",
+        "type": "object"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "instantly_api_key",
+        "label": "Instantly Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "new_lead",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New Lead",
+            "value": "new_lead"
+          },
+          {
+            "label": "Lead Status Changed",
+            "value": "lead_status_changed"
+          },
+          {
+            "label": "Campaign Completed",
+            "value": "campaign_completed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Campaign ID (optional; blank = all campaigns)",
+        "mode": "advanced",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.instantly"
   },
   "trigger.intercom": {
     "allow_error": true,

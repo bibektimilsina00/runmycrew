@@ -126,6 +126,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.calendly import (
         calendly_trigger as _calendly_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.emailbison import (
+        emailbison_trigger as _emailbison_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.gchat import (
         gchat_trigger as _gchat_trigger,  # noqa: F401
@@ -157,6 +160,9 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.imap import (
         imap_trigger as _imap_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.instantly import (
+        instantly_trigger as _instantly_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.intercom import (
         intercom_trigger as _intercom_trigger,  # noqa: F401

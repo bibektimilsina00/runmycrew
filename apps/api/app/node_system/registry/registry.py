@@ -67,6 +67,8 @@ from apps.api.app.node_system.nodes.docusign.docusign_node import DocuSignNode
 from apps.api.app.node_system.nodes.dropbox.dropbox_node import DropboxNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
+from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
+from apps.api.app.node_system.nodes.emailbison.emailbison_trigger import EmailbisonTriggerNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
@@ -115,6 +117,7 @@ from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTrigge
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
+from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
@@ -346,6 +349,10 @@ node_registry.register(FirefliesWebhookTriggerNode)
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
 node_registry.register(IMAPTriggerNode)
+# Phase 4.8 — outbound long-tail (instantly trigger + emailbison).
+node_registry.register(InstantlyTriggerNode)
+node_registry.register(EmailbisonNode)
+node_registry.register(EmailbisonTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)
