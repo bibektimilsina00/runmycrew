@@ -607,6 +607,625 @@
     "tools": null,
     "type": "action.agent"
   },
+  "action.agentmail": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "agentmail_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "AgentMail \u2014 AI email agent (send, receive, thread).",
+    "dynamic_outputs_from": null,
+    "icon": "agentmail",
+    "inputs": 1,
+    "name": "AgentMail",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "agentmail_api_key",
+        "label": "AgentMail Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "List Messages",
+            "value": "list_messages"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "List Inboxes",
+            "value": "list_inboxes"
+          },
+          {
+            "label": "Create Inbox",
+            "value": "create_inbox"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "list_messages",
+            "get_message"
+          ]
+        },
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_message"
+          ]
+        },
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_inbox"
+          ]
+        },
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_inbox"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_messages"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.agentmail"
+  },
+  "action.agentphone": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "agentphone_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "AgentPhone \u2014 AI voice agent (make/receive calls).",
+    "dynamic_outputs_from": null,
+    "icon": "agentphone",
+    "inputs": 1,
+    "name": "AgentPhone",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "agentphone_api_key",
+        "label": "AgentPhone Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "make_call",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Make Call",
+            "value": "make_call"
+          },
+          {
+            "label": "Get Call",
+            "value": "get_call"
+          },
+          {
+            "label": "List Calls",
+            "value": "list_calls"
+          },
+          {
+            "label": "Get Call Transcript",
+            "value": "get_transcript"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "make_call"
+          ]
+        },
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_call",
+            "get_transcript"
+          ]
+        },
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_calls"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.agentphone"
+  },
   "action.ahrefs": {
     "allow_error": true,
     "category": "integration",
@@ -4949,6 +5568,284 @@
     "tools": null,
     "type": "action.brandfetch"
   },
+  "action.brightdata": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "brightdata_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Bright Data \u2014 proxy + web scraping API.",
+    "dynamic_outputs_from": null,
+    "icon": "brightdata",
+    "inputs": 1,
+    "name": "Bright Data",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "brightdata_api_key",
+        "label": "Bright Data Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "scrape_url",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Scrape URL",
+            "value": "scrape_url"
+          },
+          {
+            "label": "Get Snapshot",
+            "value": "get_snapshot"
+          },
+          {
+            "label": "List Datasets",
+            "value": "list_datasets"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "scrape_url"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "scrape_url"
+          ]
+        },
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_snapshot"
+          ]
+        },
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.brightdata"
+  },
   "action.browser_use": {
     "allow_error": true,
     "category": "ai",
@@ -6307,6 +7204,587 @@
     "tools": null,
     "type": "action.confluence"
   },
+  "action.context_dev": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "context_dev_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Context \u2014 LLM answer analytics + user feedback.",
+    "dynamic_outputs_from": null,
+    "icon": "context_dev",
+    "inputs": 1,
+    "name": "Context",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "context_dev_api_key",
+        "label": "Context Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "log_conversation",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Log Conversation",
+            "value": "log_conversation"
+          },
+          {
+            "label": "Get Analytics",
+            "value": "get_analytics"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "log_conversation"
+          ]
+        },
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "log_conversation"
+          ]
+        },
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "log_conversation"
+          ]
+        },
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_analytics"
+          ]
+        },
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_analytics"
+          ]
+        },
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.context_dev"
+  },
+  "action.cursor": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "cursor_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Cursor \u2014 AI code editor. Background agents API.",
+    "dynamic_outputs_from": null,
+    "icon": "cursor",
+    "inputs": 1,
+    "name": "Cursor",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "cursor_api_key",
+        "label": "Cursor Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_agent",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Background Agent",
+            "value": "create_agent"
+          },
+          {
+            "label": "Get Agent Status",
+            "value": "get_agent"
+          },
+          {
+            "label": "List Agents",
+            "value": "list_agents"
+          },
+          {
+            "label": "Cancel Agent",
+            "value": "cancel_agent"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_agent"
+          ]
+        },
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_agent",
+            "cancel_agent"
+          ]
+        },
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_agent"
+          ]
+        },
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_agent"
+          ]
+        },
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_agents"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.cursor"
+  },
   "action.customer_io": {
     "allow_error": true,
     "category": "integration",
@@ -6700,6 +8178,301 @@
     ],
     "tools": null,
     "type": "action.delay"
+  },
+  "action.devin": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "devin_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Devin \u2014 Cognition AI software engineer agent.",
+    "dynamic_outputs_from": null,
+    "icon": "devin",
+    "inputs": 1,
+    "name": "Devin",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "devin_api_key",
+        "label": "Devin Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_session",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Session",
+            "value": "create_session"
+          },
+          {
+            "label": "Get Session",
+            "value": "get_session"
+          },
+          {
+            "label": "List Sessions",
+            "value": "list_sessions"
+          },
+          {
+            "label": "Send Message to Session",
+            "value": "send_message"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_session"
+          ]
+        },
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_session",
+            "send_message"
+          ]
+        },
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_session"
+          ]
+        },
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_sessions"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.devin"
   },
   "action.discord": {
     "allow_error": true,
@@ -7538,6 +9311,279 @@
     ],
     "tools": null,
     "type": "action.dropcontact"
+  },
+  "action.dspy": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "dspy_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "DSPy Cloud \u2014 prompt-program hosting + evaluation.",
+    "dynamic_outputs_from": null,
+    "icon": "dspy",
+    "inputs": 1,
+    "name": "DSPy Cloud",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "dspy_api_key",
+        "label": "DSPy Cloud Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_program",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Program",
+            "value": "run_program"
+          },
+          {
+            "label": "List Programs",
+            "value": "list_programs"
+          },
+          {
+            "label": "Get Program",
+            "value": "get_program"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_program",
+            "get_program"
+          ]
+        },
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_program"
+          ]
+        },
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.dspy"
   },
   "action.dub": {
     "allow_error": true,
@@ -19768,6 +21814,302 @@
     "tools": null,
     "type": "action.intercom"
   },
+  "action.jina": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "jina_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Jina \u2014 search, reader, embed via jina.ai.",
+    "dynamic_outputs_from": null,
+    "icon": "jina",
+    "inputs": 1,
+    "name": "Jina AI",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "jina_api_key",
+        "label": "Jina AI Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "reader",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Reader (URL \u2192 Markdown)",
+            "value": "reader"
+          },
+          {
+            "label": "Web Search",
+            "value": "search"
+          },
+          {
+            "label": "Embeddings",
+            "value": "embed"
+          },
+          {
+            "label": "Rerank",
+            "value": "rerank"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "embed",
+            "rerank"
+          ]
+        },
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "reader"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "rerank"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "embed"
+          ]
+        },
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "rerank"
+          ]
+        },
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.jina"
+  },
   "action.jira": {
     "allow_error": true,
     "category": "integration",
@@ -24287,6 +26629,280 @@
     ],
     "tools": null,
     "type": "action.millionverifier"
+  },
+  "action.mistral_parse": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "mistral_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Mistral OCR \u2014 document parsing to markdown / structured data.",
+    "dynamic_outputs_from": null,
+    "icon": "mistral_parse",
+    "inputs": 1,
+    "name": "Mistral OCR",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "mistral_api_key",
+        "label": "Mistral OCR Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "ocr_url",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "OCR from URL",
+            "value": "ocr_url"
+          },
+          {
+            "label": "Upload File for OCR",
+            "value": "upload_file"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "ocr_url"
+          ]
+        },
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "ocr_url"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upload_file"
+          ]
+        },
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.mistral_parse"
   },
   "action.mixpanel": {
     "allow_error": true,
@@ -28901,6 +31517,284 @@
     "tools": null,
     "type": "action.qdrant"
   },
+  "action.reducto": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "reducto_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Reducto \u2014 high-fidelity document parsing.",
+    "dynamic_outputs_from": null,
+    "icon": "reducto",
+    "inputs": 1,
+    "name": "Reducto",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "reducto_api_key",
+        "label": "Reducto Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "parse_url",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Parse from URL",
+            "value": "parse_url"
+          },
+          {
+            "label": "Get Job Status",
+            "value": "get_job"
+          },
+          {
+            "label": "Upload File",
+            "value": "upload_file"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "parse_url"
+          ]
+        },
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "parse_url"
+          ]
+        },
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.reducto"
+  },
   "action.resend": {
     "allow_error": true,
     "category": "integration",
@@ -32157,6 +35051,284 @@
     ],
     "tools": null,
     "type": "action.square"
+  },
+  "action.stagehand": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "stagehand_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Stagehand \u2014 Browserbase AI browser automation.",
+    "dynamic_outputs_from": null,
+    "icon": "stagehand",
+    "inputs": 1,
+    "name": "Stagehand",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "stagehand_api_key",
+        "label": "Stagehand Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_session",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Session",
+            "value": "create_session"
+          },
+          {
+            "label": "Get Session",
+            "value": "get_session"
+          },
+          {
+            "label": "List Sessions",
+            "value": "list_sessions"
+          },
+          {
+            "label": "Get Session Recording",
+            "value": "get_recording"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Inbox ID",
+        "name": "inbox_id",
+        "type": "string"
+      },
+      {
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "To (comma-separated for email; phone number for call)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message Body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Assistant ID",
+        "name": "assistant_id",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "label": "Agent ID",
+        "name": "agent_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_session",
+            "get_recording"
+          ]
+        },
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Repo (owner/name)",
+        "name": "repo",
+        "type": "string"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "label": "Conversation ID",
+        "name": "conversation_id",
+        "type": "string"
+      },
+      {
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Start Date",
+        "name": "start_date",
+        "type": "string"
+      },
+      {
+        "label": "End Date",
+        "name": "end_date",
+        "type": "string"
+      },
+      {
+        "label": "URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Input(s) (pipe-separated)",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "label": "Config (JSON)",
+        "name": "config",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_session",
+            "list_sessions"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "label": "Program ID",
+        "name": "program_id",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.stagehand"
   },
   "action.stripe": {
     "allow_error": true,

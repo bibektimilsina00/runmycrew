@@ -1636,6 +1636,149 @@ PROVIDERS = {
             ),
         ],
     ),
+    "agentmail": APIKeyProvider(
+        id="agentmail_api_key",
+        name="AgentMail",
+        icon_slug="agentmail",
+        color="#1c1c1c",
+        description="AgentMail — AI email agent (send, receive, thread).",
+        hint="API key from AgentMail dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="AgentMail API key"
+            ),
+        ],
+    ),
+    "agentphone": APIKeyProvider(
+        id="agentphone_api_key",
+        name="AgentPhone",
+        icon_slug="agentphone",
+        color="#1c1c1c",
+        description="AgentPhone — AI voice agent (make/receive calls).",
+        hint="API key from AgentPhone dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="AgentPhone API key"
+            ),
+        ],
+    ),
+    "context_dev": APIKeyProvider(
+        id="context_dev_api_key",
+        name="Context",
+        icon_slug="context_dev",
+        color="#1c1c1c",
+        description="Context — LLM answer analytics + user feedback.",
+        hint="API key from Context dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Context API key"
+            ),
+        ],
+    ),
+    "cursor": APIKeyProvider(
+        id="cursor_api_key",
+        name="Cursor",
+        icon_slug="cursor",
+        color="#1c1c1c",
+        description="Cursor — AI code editor. Background agents API.",
+        hint="API key from Cursor dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Cursor API key"
+            ),
+        ],
+    ),
+    "devin": APIKeyProvider(
+        id="devin_api_key",
+        name="Devin",
+        icon_slug="devin",
+        color="#1c1c1c",
+        description="Devin — Cognition AI software engineer agent.",
+        hint="API key from Devin dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Devin API key"
+            ),
+        ],
+    ),
+    "mistral_parse": APIKeyProvider(
+        id="mistral_api_key",
+        name="Mistral OCR",
+        icon_slug="mistral_parse",
+        color="#1c1c1c",
+        description="Mistral OCR — document parsing to markdown / structured data.",
+        hint="API key from Mistral OCR dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Mistral OCR API key"
+            ),
+        ],
+    ),
+    "jina": APIKeyProvider(
+        id="jina_api_key",
+        name="Jina AI",
+        icon_slug="jina",
+        color="#1c1c1c",
+        description="Jina — search, reader, embed via jina.ai.",
+        hint="API key from Jina AI dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Jina AI API key"
+            ),
+        ],
+    ),
+    "reducto": APIKeyProvider(
+        id="reducto_api_key",
+        name="Reducto",
+        icon_slug="reducto",
+        color="#1c1c1c",
+        description="Reducto — high-fidelity document parsing.",
+        hint="API key from Reducto dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Reducto API key"
+            ),
+        ],
+    ),
+    "stagehand": APIKeyProvider(
+        id="stagehand_api_key",
+        name="Stagehand",
+        icon_slug="stagehand",
+        color="#1c1c1c",
+        description="Stagehand — Browserbase AI browser automation.",
+        hint="API key from Stagehand dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Stagehand API key"
+            ),
+        ],
+    ),
+    "brightdata": APIKeyProvider(
+        id="brightdata_api_key",
+        name="Bright Data",
+        icon_slug="brightdata",
+        color="#1c1c1c",
+        description="Bright Data — proxy + web scraping API.",
+        hint="API key from Bright Data dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Bright Data API key"
+            ),
+        ],
+    ),
+    "dspy": APIKeyProvider(
+        id="dspy_api_key",
+        name="DSPy Cloud",
+        icon_slug="dspy",
+        color="#1c1c1c",
+        description="DSPy Cloud — prompt-program hosting + evaluation.",
+        hint="API key from DSPy Cloud dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="DSPy Cloud API key"
+            ),
+        ],
+    ),
 }
 
 

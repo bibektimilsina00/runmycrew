@@ -1,6 +1,8 @@
 from typing import Any
 
 from apps.api.app.node_system.base.base_node import BaseNode
+from apps.api.app.node_system.nodes.agentmail.agentmail_node import AgentMailNode
+from apps.api.app.node_system.nodes.agentphone.agentphone_node import AgentPhoneNode
 from apps.api.app.node_system.nodes.ahrefs.ahrefs_node import AhrefsNode
 from apps.api.app.node_system.nodes.ai.a2a.a2a import A2ANode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
@@ -47,6 +49,7 @@ from apps.api.app.node_system.nodes.azure_devops.azure_devops_webhook import (
 )
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
+from apps.api.app.node_system.nodes.brightdata.brightdata_node import BrightDataNode
 from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
 from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
@@ -68,6 +71,8 @@ from apps.api.app.node_system.nodes.confluence.confluence_trigger import Conflue
 from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
     ConfluenceWebhookTriggerNode,
 )
+from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextNode
+from apps.api.app.node_system.nodes.cursor.cursor_node import CursorNode
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
 from apps.api.app.node_system.nodes.datagma.datagma_node import DatagmaNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
@@ -75,10 +80,12 @@ from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
 from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
+from apps.api.app.node_system.nodes.devin.devin_node import DevinNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
 from apps.api.app.node_system.nodes.docusign.docusign_node import DocuSignNode
 from apps.api.app.node_system.nodes.dropbox.dropbox_node import DropboxNode
 from apps.api.app.node_system.nodes.dropcontact.dropcontact_node import DropcontactNode
+from apps.api.app.node_system.nodes.dspy.dspy_node import DSPyCloudNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
@@ -148,6 +155,7 @@ from apps.api.app.node_system.nodes.instantly.instantly_trigger import Instantly
 from apps.api.app.node_system.nodes.instantly.instantly_webhook import InstantlyWebhookTriggerNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
+from apps.api.app.node_system.nodes.jina.jina_node import JinaAINode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
@@ -192,6 +200,7 @@ from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_webhook impo
     MicrosoftTeamsWebhookTriggerNode,
 )
 from apps.api.app.node_system.nodes.millionverifier.millionverifier_node import MillionVerifierNode
+from apps.api.app.node_system.nodes.mistral_parse.mistral_parse_node import MistralOCRNode
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
 from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNode
@@ -217,6 +226,7 @@ from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
 )
 from apps.api.app.node_system.nodes.prospeo.prospeo_node import ProspeoNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
+from apps.api.app.node_system.nodes.reducto.reducto_node import ReductoNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
@@ -234,6 +244,7 @@ from apps.api.app.node_system.nodes.sixtyfour.sixtyfour_node import SixtyFourNod
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 from apps.api.app.node_system.nodes.square.square_node import SquareNode
+from apps.api.app.node_system.nodes.stagehand.stagehand_node import StagehandNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
@@ -545,3 +556,17 @@ node_registry.register(SixtyFourNode)
 node_registry.register(WizaNode)
 node_registry.register(SimilarWebNode)
 node_registry.register(AhrefsNode)
+
+
+# Phase 4.18 + 4.19 — AI ecosystem.
+node_registry.register(AgentMailNode)
+node_registry.register(AgentPhoneNode)
+node_registry.register(ContextNode)
+node_registry.register(CursorNode)
+node_registry.register(DevinNode)
+node_registry.register(MistralOCRNode)
+node_registry.register(JinaAINode)
+node_registry.register(ReductoNode)
+node_registry.register(StagehandNode)
+node_registry.register(BrightDataNode)
+node_registry.register(DSPyCloudNode)
