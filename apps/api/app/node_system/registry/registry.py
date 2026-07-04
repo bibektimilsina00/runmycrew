@@ -37,6 +37,9 @@ from apps.api.app.node_system.nodes.aws_secrets_manager.aws_secrets_manager_node
 from apps.api.app.node_system.nodes.aws_ses.aws_ses_node import AWSSESNode
 from apps.api.app.node_system.nodes.aws_sqs.aws_sqs_node import AWSSQSNode
 from apps.api.app.node_system.nodes.aws_sts.aws_sts_node import AWSSTSNode
+from apps.api.app.node_system.nodes.azure_devops.azure_devops_webhook import (
+    AzureDevOpsWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
@@ -66,8 +69,12 @@ from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
+from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
 from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
 from apps.api.app.node_system.nodes.fireflies.fireflies_node import FirefliesNode
+from apps.api.app.node_system.nodes.fireflies.fireflies_webhook import (
+    FirefliesWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
@@ -85,6 +92,7 @@ from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTr
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
 from apps.api.app.node_system.nodes.gong.gong_node import GongNode
+from apps.api.app.node_system.nodes.gong.gong_webhook import GongWebhookTriggerNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
@@ -138,6 +146,9 @@ from apps.api.app.node_system.nodes.microsoft_planner.microsoft_planner_node imp
     MicrosoftPlannerNode,
 )
 from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_node import MicrosoftTeamsNode
+from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_webhook import (
+    MicrosoftTeamsWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
@@ -174,9 +185,11 @@ from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
 from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
 from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
+from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
+from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_trigger import ZendeskTriggerNode
@@ -314,6 +327,14 @@ node_registry.register(ZendeskTriggerNode)
 node_registry.register(OutlookMailTriggerNode)
 node_registry.register(LinearTriggerNode)
 node_registry.register(TelegramTriggerNode)
+# Phase 3.4 — webhook triggers.
+node_registry.register(AzureDevOpsWebhookTriggerNode)
+node_registry.register(TwilioWebhookTriggerNode)
+node_registry.register(MicrosoftTeamsWebhookTriggerNode)
+node_registry.register(WebflowWebhookTriggerNode)
+node_registry.register(GongWebhookTriggerNode)
+node_registry.register(FathomWebhookTriggerNode)
+node_registry.register(FirefliesWebhookTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

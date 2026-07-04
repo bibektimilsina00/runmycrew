@@ -84,6 +84,7 @@ class WebhookService:
         node_id: str,
         raw_body: bytes,
         headers: dict[str, str],
+        url: str | None = None,
     ) -> dict[str, Any]:
         manifest = get_webhook_manifest(provider)
         if manifest is None:
@@ -124,7 +125,14 @@ class WebhookService:
                 raise HTTPException(
                     status_code=401, detail=f"Missing {manifest.signature.header_name} header"
                 )
-            if not verifier(raw_body, secret, sig_header, prefix=manifest.signature.prefix):
+            if not verifier(
+                raw_body,
+                secret,
+                sig_header,
+                prefix=manifest.signature.prefix,
+                headers=headers,
+                url=url,
+            ):
                 raise HTTPException(status_code=401, detail="Invalid signature")
 
         # ── event filter ────────────────────────────────────────────

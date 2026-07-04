@@ -38,12 +38,24 @@ from apps.api.app.node_system.scaffolds.rest_manifest import FieldSpec
 SignatureScheme = Literal[
     "hmac_sha256",
     "hmac_sha1",
+    # base64-encoded HMAC-SHA256 with optional prefix strip. Used by
+    # Microsoft Teams outgoing webhooks (`Authorization: HMAC {digest}`)
+    # and any provider that ships sha256 base64 instead of hex.
+    "hmac_sha256_b64",
     "stripe",
     "shopify",
     # `gitlab_token` is a bare-secret compare (no HMAC) since GitLab
     # ships the secret itself in `X-Gitlab-Token`. Verifier lives in
     # `features/webhooks/signature_schemes.py`.
     "gitlab_token",
+    # Twilio signs `URL + sorted-form-params` under HMAC-SHA1, base64.
+    # Needs the request URL — the verifier reads it from the extra
+    # `url` kwarg the router now threads through.
+    "twilio",
+    # Webflow v2 signs `timestamp:body` under HMAC-SHA256 hex. Ships
+    # the timestamp in `x-webflow-timestamp`. Includes an anti-replay
+    # tolerance window like Stripe.
+    "webflow",
     "none",
 ]
 

@@ -37,4 +37,10 @@ async def receive_webhook(
         node_id=node_id,
         raw_body=raw_body,
         headers=dict(request.headers),
+        # Twilio + any future scheme signs the delivery URL. Use the
+        # request URL as observed by FastAPI — behind a proxy this
+        # requires `X-Forwarded-Proto/Host` to be honored (see
+        # `ProxyHeadersMiddleware` in `main.py`) or the digest won't
+        # match Twilio's computation.
+        url=str(request.url),
     )
