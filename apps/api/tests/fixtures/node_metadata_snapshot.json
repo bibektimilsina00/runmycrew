@@ -7223,6 +7223,232 @@
     "tools": null,
     "type": "action.clay"
   },
+  "action.clerk": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "clerk_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Clerk \u2014 user + org management (dev-first auth).",
+    "dynamic_outputs_from": null,
+    "icon": "clerk",
+    "inputs": 1,
+    "name": "Clerk",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "clerk_api_key",
+        "label": "Clerk Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_users",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Create User",
+            "value": "create_user"
+          },
+          {
+            "label": "Update User",
+            "value": "update_user"
+          },
+          {
+            "label": "Delete User",
+            "value": "delete_user"
+          },
+          {
+            "label": "List Organizations",
+            "value": "list_organizations"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user",
+            "update_user",
+            "delete_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "Password",
+        "name": "password",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user",
+            "update_user"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user",
+            "update_user"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Vault ID",
+        "name": "vault_id",
+        "type": "string"
+      },
+      {
+        "label": "Item ID",
+        "name": "item_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Identity Store ID",
+        "name": "identity_store_id",
+        "type": "string"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment slug",
+        "name": "environment",
+        "type": "string"
+      },
+      {
+        "default": "/",
+        "label": "Secret Path",
+        "name": "secret_path",
+        "type": "string"
+      },
+      {
+        "label": "Secret Name",
+        "name": "secret_name",
+        "type": "string"
+      },
+      {
+        "label": "Secret Value",
+        "name": "secret_value",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_users",
+            "list_organizations"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.clerk"
+  },
   "action.clickhouse": {
     "allow_error": true,
     "category": "integration",
@@ -24286,6 +24512,182 @@
     "tools": null,
     "type": "action.icypeas"
   },
+  "action.identity_center": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS Identity Center (SSO) \u2014 users, groups, permissions.",
+    "dynamic_outputs_from": null,
+    "icon": "identity_center",
+    "inputs": 1,
+    "name": "AWS Identity Center",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS Identity Center Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_users",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "List Groups",
+            "value": "list_groups"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Password",
+        "name": "password",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Vault ID",
+        "name": "vault_id",
+        "type": "string"
+      },
+      {
+        "label": "Item ID",
+        "name": "item_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_users",
+            "list_groups"
+          ]
+        },
+        "label": "Identity Store ID",
+        "name": "identity_store_id",
+        "type": "string"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment slug",
+        "name": "environment",
+        "type": "string"
+      },
+      {
+        "default": "/",
+        "label": "Secret Path",
+        "name": "secret_path",
+        "type": "string"
+      },
+      {
+        "label": "Secret Name",
+        "name": "secret_name",
+        "type": "string"
+      },
+      {
+        "label": "Secret Value",
+        "name": "secret_value",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.identity_center"
+  },
   "action.image_gen": {
     "allow_error": true,
     "category": "ai",
@@ -24701,6 +25103,229 @@
     ],
     "tools": null,
     "type": "action.incidentio"
+  },
+  "action.infisical": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "infisical_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Infisical \u2014 secrets management (open-source Vault alt).",
+    "dynamic_outputs_from": null,
+    "icon": "infisical",
+    "inputs": 1,
+    "name": "Infisical",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "infisical_api_key",
+        "label": "Infisical Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_secrets",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Secrets",
+            "value": "list_secrets"
+          },
+          {
+            "label": "Get Secret",
+            "value": "get_secret"
+          },
+          {
+            "label": "Create Secret",
+            "value": "create_secret"
+          },
+          {
+            "label": "Update Secret",
+            "value": "update_secret"
+          },
+          {
+            "label": "Delete Secret",
+            "value": "delete_secret"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Password",
+        "name": "password",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Vault ID",
+        "name": "vault_id",
+        "type": "string"
+      },
+      {
+        "label": "Item ID",
+        "name": "item_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Identity Store ID",
+        "name": "identity_store_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_secrets",
+            "get_secret",
+            "create_secret",
+            "update_secret",
+            "delete_secret"
+          ]
+        },
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_secrets",
+            "get_secret",
+            "create_secret",
+            "update_secret",
+            "delete_secret"
+          ]
+        },
+        "label": "Environment slug",
+        "name": "environment",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_secrets"
+          ]
+        },
+        "default": "/",
+        "label": "Secret Path",
+        "name": "secret_path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_secret",
+            "create_secret",
+            "update_secret",
+            "delete_secret"
+          ]
+        },
+        "label": "Secret Name",
+        "name": "secret_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_secret",
+            "update_secret"
+          ]
+        },
+        "label": "Secret Value",
+        "name": "secret_value",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.infisical"
   },
   "action.instantly": {
     "allow_error": true,
@@ -32697,6 +33322,236 @@
     "tools": null,
     "type": "action.notion"
   },
+  "action.okta": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "okta_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Okta \u2014 identity users, groups, apps, MFA.",
+    "dynamic_outputs_from": null,
+    "icon": "okta",
+    "inputs": 1,
+    "name": "Okta",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "okta_api_key",
+        "label": "Okta Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_users",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Create User",
+            "value": "create_user"
+          },
+          {
+            "label": "Deactivate User",
+            "value": "deactivate_user"
+          },
+          {
+            "label": "List Groups",
+            "value": "list_groups"
+          },
+          {
+            "label": "Assign User to Group",
+            "value": "assign_group"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user",
+            "deactivate_user",
+            "assign_group"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assign_group"
+          ]
+        },
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Password",
+        "name": "password",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Vault ID",
+        "name": "vault_id",
+        "type": "string"
+      },
+      {
+        "label": "Item ID",
+        "name": "item_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Identity Store ID",
+        "name": "identity_store_id",
+        "type": "string"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment slug",
+        "name": "environment",
+        "type": "string"
+      },
+      {
+        "default": "/",
+        "label": "Secret Path",
+        "name": "secret_path",
+        "type": "string"
+      },
+      {
+        "label": "Secret Name",
+        "name": "secret_name",
+        "type": "string"
+      },
+      {
+        "label": "Secret Value",
+        "name": "secret_value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_users"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_users",
+            "list_groups"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.okta"
+  },
   "action.onedrive": {
     "allow_error": true,
     "category": "integration",
@@ -32927,6 +33782,203 @@
     ],
     "tools": null,
     "type": "action.onedrive"
+  },
+  "action.onepassword": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "onepassword_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "1Password \u2014 fetch secrets from a vault via Connect API.",
+    "dynamic_outputs_from": null,
+    "icon": "onepassword",
+    "inputs": 1,
+    "name": "1Password Connect",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "onepassword_api_key",
+        "label": "1Password Connect Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_vaults",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Vaults",
+            "value": "list_vaults"
+          },
+          {
+            "label": "List Items in Vault",
+            "value": "list_items"
+          },
+          {
+            "label": "Get Item",
+            "value": "get_item"
+          },
+          {
+            "label": "Get Item by Title (via filter)",
+            "value": "get_item_by_title"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Password",
+        "name": "password",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_items",
+            "get_item",
+            "get_item_by_title"
+          ]
+        },
+        "label": "Vault ID",
+        "name": "vault_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_item"
+          ]
+        },
+        "label": "Item ID",
+        "name": "item_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_item_by_title"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Identity Store ID",
+        "name": "identity_store_id",
+        "type": "string"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment slug",
+        "name": "environment",
+        "type": "string"
+      },
+      {
+        "default": "/",
+        "label": "Secret Path",
+        "name": "secret_path",
+        "type": "string"
+      },
+      {
+        "label": "Secret Name",
+        "name": "secret_name",
+        "type": "string"
+      },
+      {
+        "label": "Secret Value",
+        "name": "secret_value",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.onepassword"
   },
   "action.openalex": {
     "allow_error": true,

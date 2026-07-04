@@ -58,6 +58,7 @@ from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
 from apps.api.app.node_system.nodes.calendly.calendly_trigger import CalendlyTriggerNode
 from apps.api.app.node_system.nodes.circleback.circleback_node import CirclebackNode
 from apps.api.app.node_system.nodes.clay.clay_node import ClayNode
+from apps.api.app.node_system.nodes.clerk.clerk_node import ClerkNode
 from apps.api.app.node_system.nodes.clickhouse.clickhouse_node import ClickHouseCloudNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
@@ -164,8 +165,12 @@ from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTrigge
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.hunter.hunter_node import HunterNode
 from apps.api.app.node_system.nodes.icypeas.icypeas_node import IcypeasNode
+from apps.api.app.node_system.nodes.identity_center.identity_center_node import (
+    AWSIdentityCenterNode,
+)
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.incidentio.incidentio_node import IncidentIONode
+from apps.api.app.node_system.nodes.infisical.infisical_node import InfisicalNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_webhook import InstantlyWebhookTriggerNode
@@ -229,7 +234,9 @@ from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
 from apps.api.app.node_system.nodes.notion.notion_webhook import NotionWebhookTriggerNode
+from apps.api.app.node_system.nodes.okta.okta_node import OktaNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
+from apps.api.app.node_system.nodes.onepassword.onepassword_node import OnePasswordConnectNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
 from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTriggerNode
@@ -639,3 +646,11 @@ node_registry.register(WorkdayNode)
 node_registry.register(SAPConcurNode)
 node_registry.register(WealthboxNode)
 node_registry.register(BrexNode)
+
+
+# Phase 4.25 — identity / security.
+node_registry.register(OktaNode)
+node_registry.register(ClerkNode)
+node_registry.register(OnePasswordConnectNode)
+node_registry.register(AWSIdentityCenterNode)
+node_registry.register(InfisicalNode)
