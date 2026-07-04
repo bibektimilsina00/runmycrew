@@ -94,9 +94,9 @@ def test_every_node_has_minimum_metadata():
         m = cls.get_metadata()
         assert m.type == node_type, f"{node_type}: registry key vs metadata.type mismatch"
         assert m.name, f"{node_type}: empty name"
-        assert (
-            m.category in _VALID_CATEGORIES
-        ), f"{node_type}: unknown category {m.category!r} (valid={_VALID_CATEGORIES})"
+        assert m.category in _VALID_CATEGORIES, (
+            f"{node_type}: unknown category {m.category!r} (valid={_VALID_CATEGORIES})"
+        )
         assert m.description, f"{node_type}: empty description"
         assert isinstance(m.properties, list), f"{node_type}: properties not a list"
         assert isinstance(m.outputs_schema, list), f"{node_type}: outputs_schema not a list"
@@ -113,9 +113,9 @@ def test_property_rows_are_well_formed():
             assert isinstance(row, dict), f"{node_type}: non-dict property row {row!r}"
             assert row.get("name"), f"{node_type}: property row missing name"
             assert row.get("label"), f"{node_type}: property {row['name']!r} missing label"
-            assert (
-                row.get("type") in _VALID_FIELD_TYPES
-            ), f"{node_type}: property {row['name']!r} has unknown type {row.get('type')!r}"
+            assert row.get("type") in _VALID_FIELD_TYPES, (
+                f"{node_type}: property {row['name']!r} has unknown type {row.get('type')!r}"
+            )
             cond = row.get("condition")
             if isinstance(cond, dict) and "field" in cond:
                 assert cond["field"] in names, (
@@ -129,9 +129,9 @@ def test_outputs_schema_rows_are_label_type_pairs():
         m = cls.get_metadata()
         for row in m.outputs_schema:
             assert isinstance(row, dict), f"{node_type}: non-dict outputs_schema row {row!r}"
-            assert (
-                "label" in row and "type" in row
-            ), f"{node_type}: outputs_schema row missing label/type — got {row!r}"
+            assert "label" in row and "type" in row, (
+                f"{node_type}: outputs_schema row missing label/type — got {row!r}"
+            )
 
 
 def test_metadata_snapshot_locked():
