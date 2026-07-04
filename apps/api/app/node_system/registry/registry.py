@@ -23,6 +23,7 @@ from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.amplitude.amplitude_node import AmplitudeNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.apollo.apollo_node import ApolloNode
+from apps.api.app.node_system.nodes.arxiv.arxiv_node import ArxivNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
 from apps.api.app.node_system.nodes.ashby.ashby_node import AshbyNode
@@ -320,6 +321,7 @@ from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNo
 from apps.api.app.node_system.nodes.trigger_dev.trigger_dev_node import TriggerDevNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
+from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_node import TwilioVoiceNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.typeform.typeform_webhook import TypeformWebhookTriggerNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
@@ -329,6 +331,7 @@ from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTr
 from apps.api.app.node_system.nodes.video_generator.video_generator_node import VideoGeneratorNode
 from apps.api.app.node_system.nodes.wealthbox.wealthbox_node import WealthboxNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
+from apps.api.app.node_system.nodes.whatsapp.whatsapp_node import WhatsAppNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.wiza.wiza_node import WizaNode
 from apps.api.app.node_system.nodes.wordpress.wordpress_node import WordPressNode
@@ -737,3 +740,9 @@ node_registry.register(PolymarketNode)
 node_registry.register(QuiverNode)
 node_registry.register(SportMonksNode)
 node_registry.register(RevenueCatNode)
+
+
+# Phase 4.31 — comms + REST-shaped protocols.
+node_registry.register(WhatsAppNode)
+node_registry.register(TwilioVoiceNode)
+node_registry.register(ArxivNode)
