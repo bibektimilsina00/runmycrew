@@ -1503,6 +1503,139 @@ PROVIDERS = {
             ),
         ],
     ),
+    "zerobounce": APIKeyProvider(
+        id="zerobounce_api_key",
+        name="ZeroBounce",
+        icon_slug="zerobounce",
+        color="#1c1c1c",
+        description="ZeroBounce — email verification + activity data.",
+        hint="API key from ZeroBounce dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="ZeroBounce API key"
+            ),
+        ],
+    ),
+    "neverbounce": APIKeyProvider(
+        id="neverbounce_api_key",
+        name="NeverBounce",
+        icon_slug="neverbounce",
+        color="#1c1c1c",
+        description="NeverBounce — real-time email verification.",
+        hint="API key from NeverBounce dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="NeverBounce API key"
+            ),
+        ],
+    ),
+    "millionverifier": APIKeyProvider(
+        id="millionverifier_api_key",
+        name="MillionVerifier",
+        icon_slug="millionverifier",
+        color="#1c1c1c",
+        description="MillionVerifier — email + phone verification.",
+        hint="API key from MillionVerifier dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="MillionVerifier API key",
+            ),
+        ],
+    ),
+    "prospeo": APIKeyProvider(
+        id="prospeo_api_key",
+        name="Prospeo",
+        icon_slug="prospeo",
+        color="#1c1c1c",
+        description="Prospeo — B2B email finder + verifier.",
+        hint="API key from Prospeo dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Prospeo API key"
+            ),
+        ],
+    ),
+    "persona": APIKeyProvider(
+        id="persona_api_key",
+        name="Persona",
+        icon_slug="persona",
+        color="#1c1c1c",
+        description="Persona — identity verification + KYC.",
+        hint="API key from Persona dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Persona API key"
+            ),
+        ],
+    ),
+    "zoominfo": APIKeyProvider(
+        id="zoominfo_api_key",
+        name="ZoomInfo",
+        icon_slug="zoominfo",
+        color="#1c1c1c",
+        description="ZoomInfo — B2B contact + company database.",
+        hint="API key from ZoomInfo dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="ZoomInfo API key"
+            ),
+        ],
+    ),
+    "sixtyfour": APIKeyProvider(
+        id="sixtyfour_api_key",
+        name="SixtyFour",
+        icon_slug="sixtyfour",
+        color="#1c1c1c",
+        description="SixtyFour — AI research for lead enrichment.",
+        hint="API key from SixtyFour dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="SixtyFour API key"
+            ),
+        ],
+    ),
+    "wiza": APIKeyProvider(
+        id="wiza_api_key",
+        name="Wiza",
+        icon_slug="wiza",
+        color="#1c1c1c",
+        description="Wiza — LinkedIn scraper + email enrichment.",
+        hint="API key from Wiza dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Wiza API key"
+            ),
+        ],
+    ),
+    "similarweb": APIKeyProvider(
+        id="similarweb_api_key",
+        name="SimilarWeb",
+        icon_slug="similarweb",
+        color="#1c1c1c",
+        description="SimilarWeb — website + market intelligence.",
+        hint="API key from SimilarWeb dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="SimilarWeb API key"
+            ),
+        ],
+    ),
+    "ahrefs": APIKeyProvider(
+        id="ahrefs_api_key",
+        name="Ahrefs",
+        icon_slug="ahrefs",
+        color="#1c1c1c",
+        description="Ahrefs — SEO + backlinks + keyword research.",
+        hint="API key from Ahrefs dashboard",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Ahrefs API key"
+            ),
+        ],
+    ),
 }
 
 

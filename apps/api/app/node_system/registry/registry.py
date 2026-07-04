@@ -1,6 +1,7 @@
 from typing import Any
 
 from apps.api.app.node_system.base.base_node import BaseNode
+from apps.api.app.node_system.nodes.ahrefs.ahrefs_node import AhrefsNode
 from apps.api.app.node_system.nodes.ai.a2a.a2a import A2ANode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
 from apps.api.app.node_system.nodes.ai.browser_use.browser_use_node import BrowserUseNode
@@ -190,9 +191,11 @@ from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_node import 
 from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_webhook import (
     MicrosoftTeamsWebhookTriggerNode,
 )
+from apps.api.app.node_system.nodes.millionverifier.millionverifier_node import MillionVerifierNode
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
 from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNode
+from apps.api.app.node_system.nodes.neverbounce.neverbounce_node import NeverBounceNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
@@ -203,6 +206,7 @@ from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
 from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTriggerNode
 from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
 from apps.api.app.node_system.nodes.peopledatalabs.peopledatalabs_node import PeopleDataLabsNode
+from apps.api.app.node_system.nodes.persona.persona_node import PersonaNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
@@ -211,6 +215,7 @@ from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
     PostmarkWebhookTriggerNode,
 )
+from apps.api.app.node_system.nodes.prospeo.prospeo_node import ProspeoNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
@@ -224,6 +229,8 @@ from apps.api.app.node_system.nodes.servicenow.servicenow_node import ServiceNow
 from apps.api.app.node_system.nodes.servicenow.servicenow_trigger import ServiceNowTriggerNode
 from apps.api.app.node_system.nodes.sharepoint.sharepoint_node import SharePointNode
 from apps.api.app.node_system.nodes.shopify.shopify_node import ShopifyNode
+from apps.api.app.node_system.nodes.similarweb.similarweb_node import SimilarWebNode
+from apps.api.app.node_system.nodes.sixtyfour.sixtyfour_node import SixtyFourNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
 from apps.api.app.node_system.nodes.square.square_node import SquareNode
@@ -244,9 +251,12 @@ from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTriggerNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
+from apps.api.app.node_system.nodes.wiza.wiza_node import WizaNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_trigger import ZendeskTriggerNode
+from apps.api.app.node_system.nodes.zerobounce.zerobounce_node import ZeroBounceNode
 from apps.api.app.node_system.nodes.zoom.zoom_node import ZoomNode
+from apps.api.app.node_system.nodes.zoominfo.zoominfo_node import ZoomInfoNode
 
 
 class NodeRegistry:
@@ -522,3 +532,16 @@ node_registry.register(EnrichmentioNode)
 node_registry.register(EnrowNode)
 node_registry.register(IcypeasNode)
 node_registry.register(LeadMagicNode)
+
+
+# Phase 4.16 + 4.17 — email verification + B2B intel.
+node_registry.register(ZeroBounceNode)
+node_registry.register(NeverBounceNode)
+node_registry.register(MillionVerifierNode)
+node_registry.register(ProspeoNode)
+node_registry.register(PersonaNode)
+node_registry.register(ZoomInfoNode)
+node_registry.register(SixtyFourNode)
+node_registry.register(WizaNode)
+node_registry.register(SimilarWebNode)
+node_registry.register(AhrefsNode)
