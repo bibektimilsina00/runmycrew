@@ -4426,6 +4426,282 @@
     "tools": null,
     "type": "action.browser_use"
   },
+  "action.calcom": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "calcom_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Cal.com \u2014 bookings, event types, availability, users.",
+    "dynamic_outputs_from": null,
+    "icon": "calcom",
+    "inputs": 1,
+    "name": "Cal.com",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "uid",
+        "type": "string"
+      },
+      {
+        "label": "attendees",
+        "type": "array"
+      },
+      {
+        "label": "eventType",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "calcom_api_key",
+        "label": "Cal.com Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_bookings",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Bookings",
+            "value": "list_bookings"
+          },
+          {
+            "label": "Get Booking",
+            "value": "get_booking"
+          },
+          {
+            "label": "Create Booking",
+            "value": "create_booking"
+          },
+          {
+            "label": "Cancel Booking",
+            "value": "cancel_booking"
+          },
+          {
+            "label": "Reschedule Booking",
+            "value": "reschedule_booking"
+          },
+          {
+            "label": "List Event Types",
+            "value": "list_event_types"
+          },
+          {
+            "label": "Get Event Type",
+            "value": "get_event_type"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_me"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_booking",
+            "cancel_booking",
+            "reschedule_booking"
+          ]
+        },
+        "label": "Booking UID",
+        "name": "booking_uid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_booking",
+            "get_event_type"
+          ]
+        },
+        "label": "Event Type ID",
+        "name": "event_type_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_event_types"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_booking"
+          ]
+        },
+        "label": "Attendee Email",
+        "name": "attendee_email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_booking"
+          ]
+        },
+        "label": "Attendee Name",
+        "name": "attendee_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_booking",
+            "reschedule_booking"
+          ]
+        },
+        "label": "Start (ISO)",
+        "name": "start",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_booking"
+          ]
+        },
+        "default": "UTC",
+        "label": "Time Zone",
+        "mode": "advanced",
+        "name": "time_zone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_booking"
+          ]
+        },
+        "default": "en",
+        "label": "Language",
+        "mode": "advanced",
+        "name": "language",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "cancel_booking",
+            "reschedule_booking"
+          ]
+        },
+        "label": "Cancellation Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_bookings"
+          ]
+        },
+        "label": "Status",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "Upcoming",
+            "value": "upcoming"
+          },
+          {
+            "label": "Past",
+            "value": "past"
+          },
+          {
+            "label": "Cancelled",
+            "value": "cancelled"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_bookings"
+          ]
+        },
+        "default": 50,
+        "label": "Take",
+        "mode": "advanced",
+        "name": "take",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_bookings"
+          ]
+        },
+        "default": 0,
+        "label": "Skip",
+        "mode": "advanced",
+        "name": "skip",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.calcom"
+  },
   "action.calendly": {
     "allow_error": true,
     "category": "integration",
@@ -27892,6 +28168,246 @@
     "tools": null,
     "type": "action.tinybird"
   },
+  "action.trello": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "trello_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Trello \u2014 boards, lists, cards.",
+    "dynamic_outputs_from": null,
+    "icon": "trello",
+    "inputs": 1,
+    "name": "Trello",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "items",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "trello_api_key",
+        "label": "Trello Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_me",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Me",
+            "value": "get_me"
+          },
+          {
+            "label": "List My Boards",
+            "value": "list_boards"
+          },
+          {
+            "label": "Get Board",
+            "value": "get_board"
+          },
+          {
+            "label": "List Lists on Board",
+            "value": "list_lists"
+          },
+          {
+            "label": "Create List",
+            "value": "create_list"
+          },
+          {
+            "label": "List Cards on List",
+            "value": "list_cards"
+          },
+          {
+            "label": "Get Card",
+            "value": "get_card"
+          },
+          {
+            "label": "Create Card",
+            "value": "create_card"
+          },
+          {
+            "label": "Update Card",
+            "value": "update_card"
+          },
+          {
+            "label": "Delete Card",
+            "value": "delete_card"
+          },
+          {
+            "label": "Add Card Comment",
+            "value": "add_comment"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_board",
+            "list_lists",
+            "create_list"
+          ]
+        },
+        "label": "Board ID",
+        "name": "board_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_cards",
+            "create_card",
+            "update_card"
+          ]
+        },
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_card",
+            "update_card",
+            "delete_card",
+            "add_comment"
+          ]
+        },
+        "label": "Card ID",
+        "name": "card_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_list",
+            "create_card",
+            "update_card"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_card",
+            "update_card"
+          ]
+        },
+        "label": "Description",
+        "mode": "advanced",
+        "name": "desc",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_list",
+            "create_card"
+          ]
+        },
+        "default": "bottom",
+        "label": "Position",
+        "mode": "advanced",
+        "name": "pos",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_card",
+            "update_card"
+          ]
+        },
+        "label": "Due date (ISO)",
+        "mode": "advanced",
+        "name": "due",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_card"
+          ]
+        },
+        "label": "Closed",
+        "mode": "advanced",
+        "name": "closed",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_comment"
+          ]
+        },
+        "label": "Comment",
+        "name": "comment_text",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.trello"
+  },
   "action.tts": {
     "allow_error": true,
     "category": "ai",
@@ -29384,6 +29900,348 @@
     ],
     "tools": null,
     "type": "action.wikipedia"
+  },
+  "action.zendesk": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "zendesk_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Zendesk Support \u2014 tickets, users, organizations.",
+    "dynamic_outputs_from": null,
+    "icon": "zendesk",
+    "inputs": 1,
+    "name": "Zendesk",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "ticket",
+        "type": "object"
+      },
+      {
+        "label": "tickets",
+        "type": "array"
+      },
+      {
+        "label": "user",
+        "type": "object"
+      },
+      {
+        "label": "users",
+        "type": "array"
+      },
+      {
+        "label": "organization",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "count",
+        "type": "number"
+      },
+      {
+        "label": "next_page",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "zendesk_api_key",
+        "label": "Zendesk Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_tickets",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Tickets",
+            "value": "list_tickets"
+          },
+          {
+            "label": "Get Ticket",
+            "value": "get_ticket"
+          },
+          {
+            "label": "Create Ticket",
+            "value": "create_ticket"
+          },
+          {
+            "label": "Update Ticket",
+            "value": "update_ticket"
+          },
+          {
+            "label": "Delete Ticket",
+            "value": "delete_ticket"
+          },
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Create User",
+            "value": "create_user"
+          },
+          {
+            "label": "List Organizations",
+            "value": "list_organizations"
+          },
+          {
+            "label": "Get Organization",
+            "value": "get_organization"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_ticket",
+            "update_ticket",
+            "delete_ticket"
+          ]
+        },
+        "label": "Ticket ID",
+        "name": "ticket_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_organization"
+          ]
+        },
+        "label": "Organization ID",
+        "name": "org_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket"
+          ]
+        },
+        "label": "Ticket Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket",
+            "update_ticket"
+          ]
+        },
+        "label": "Ticket Comment (body)",
+        "name": "comment",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket",
+            "update_ticket"
+          ]
+        },
+        "label": "Priority",
+        "mode": "advanced",
+        "name": "priority",
+        "options": [
+          {
+            "label": "Urgent",
+            "value": "urgent"
+          },
+          {
+            "label": "High",
+            "value": "high"
+          },
+          {
+            "label": "Normal",
+            "value": "normal"
+          },
+          {
+            "label": "Low",
+            "value": "low"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_ticket"
+          ]
+        },
+        "label": "Ticket Status",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "New",
+            "value": "new"
+          },
+          {
+            "label": "Open",
+            "value": "open"
+          },
+          {
+            "label": "Pending",
+            "value": "pending"
+          },
+          {
+            "label": "Hold",
+            "value": "hold"
+          },
+          {
+            "label": "Solved",
+            "value": "solved"
+          },
+          {
+            "label": "Closed",
+            "value": "closed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket"
+          ]
+        },
+        "label": "Requester Email",
+        "name": "requester_email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "User Name",
+        "name": "user_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_user"
+          ]
+        },
+        "label": "User Email",
+        "name": "user_email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_tickets",
+            "search",
+            "list_users",
+            "list_organizations"
+          ]
+        },
+        "default": 100,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_tickets",
+            "list_users",
+            "list_organizations"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.zendesk"
   },
   "action.zoom": {
     "allow_error": true,

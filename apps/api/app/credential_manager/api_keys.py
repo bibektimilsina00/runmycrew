@@ -136,6 +136,69 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
         ],
     ),
+    "trello": APIKeyProvider(
+        id="trello_api_key",
+        name="Trello",
+        icon_slug="trello",
+        color="#1c1c1c",
+        description="Trello — boards, lists, cards. Uses API key + user token.",
+        hint="API key (public) + Token (private per-user)",
+        fields=[
+            CredentialField(
+                id="app_key",
+                label="API Key",
+                type="string",
+                placeholder="from trello.com/app-key",
+            ),
+            CredentialField(
+                id="api_key",
+                label="User Token",
+                type="password",
+                placeholder="Manual token or OAuth1 accessToken",
+            ),
+        ],
+    ),
+    "zendesk": APIKeyProvider(
+        id="zendesk_api_key",
+        name="Zendesk",
+        icon_slug="zendesk",
+        color="#1c1c1c",
+        description="Zendesk — tickets, users, orgs. Uses email/token Basic auth + per-subdomain URL.",
+        hint="Subdomain + email + API token",
+        fields=[
+            CredentialField(
+                id="subdomain",
+                label="Subdomain",
+                type="string",
+                placeholder="mycompany (from mycompany.zendesk.com)",
+            ),
+            CredentialField(
+                id="email",
+                label="Agent Email",
+                type="string",
+                placeholder="you@company.com",
+            ),
+            CredentialField(
+                id="api_key",
+                label="API Token",
+                type="password",
+                placeholder="API Token",
+            ),
+        ],
+    ),
+    "calcom": APIKeyProvider(
+        id="calcom_api_key",
+        name="Cal.com",
+        icon_slug="calcom",
+        color="#1c1c1c",
+        description="Cal.com — bookings, event types, availability.",
+        hint="cal_live_... (Cal.com API key)",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="cal_live_..."
+            )
+        ],
+    ),
     "fireflies": APIKeyProvider(
         id="fireflies_api_key",
         name="Fireflies",

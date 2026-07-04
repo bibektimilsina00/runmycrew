@@ -38,6 +38,7 @@ from apps.api.app.node_system.nodes.aws_sqs.aws_sqs_node import AWSSQSNode
 from apps.api.app.node_system.nodes.aws_sts.aws_sts_node import AWSSTSNode
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
+from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
@@ -158,11 +159,13 @@ from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
+from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
+from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
 from apps.api.app.node_system.nodes.zoom.zoom_node import ZoomNode
 
 
@@ -276,6 +279,10 @@ node_registry.register(AWSSTSNode)
 node_registry.register(AWSCloudWatchLogsNode)
 node_registry.register(AWSCloudFormationNode)
 node_registry.register(MicrosoftPlannerNode)
+# Phase 2.7 — CRM completion (trello, zendesk, calcom).
+node_registry.register(TrelloNode)
+node_registry.register(ZendeskNode)
+node_registry.register(CalcomNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

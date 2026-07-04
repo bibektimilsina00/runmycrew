@@ -187,20 +187,40 @@ Targets (priority order, may reshuffle by demand):
 
 ## Phase 2 — OAuth majors — **SHIPPED**
 
-24/20 integrations landed across 5 sub-PRs. Total nodes now 147 (up
-from 123 post-Phase-1). Sim parity ~55%.
+33 integrations landed across 7 sub-PRs. Every item from the
+original Phase 2 spec covered (10 AWS + 6 MS365 + 3 CRM completion
++ 3 meetings + 3 docs = 25) plus 8 bonus adjacencies. Total nodes
+now **156** (up from 123 post-Phase-1). Sim parity ~58%.
 
 | PR | Batch | Nodes |
 |---|---|---|
 | #275 | 2.1 Microsoft 365 | outlook, teams, onedrive, sharepoint, excel |
 | #276 | 2.2 CRM/meetings OAuth | asana, calendly, zoom, box (+ hubspot OAuth) |
-| #278 | 2.3 AWS family | s3, ses, sqs, secrets_manager, athena |
+| #278 | 2.3 AWS batch 1 | s3, ses, sqs, secrets_manager, athena |
 | #279 | 2.4 Meetings + docs | dropbox, docusign, fireflies, gong, fathom |
 | #280 | 2.5 Social + marketing | linkedin, mailchimp, klaviyo, customer_io, mailerlite |
+| #281 | 2.6 AWS completion + Planner | rds, iam, sts, cloudwatch_logs, cloudformation, microsoft_planner |
+| #282 | 2.7 CRM completion | trello, zendesk, calcom |
+
+Coverage against original Phase 2 spec bullet list:
+- Microsoft 365: **6/6** (outlook, teams, sharepoint, onedrive, excel, planner)
+- AWS family: **10/10** (s3, ses, sqs, rds, secrets_manager, iam, sts, athena, cloudwatch_logs, cloudformation)
+- CRM/sales OAuth: 5/7 (asana, monday-existing, intercom-existing, attio-existing, pipedrive-existing; trello + zendesk shipped as api_key, not OAuth)
+- Meetings: **3/3** (zoom, calendly, calcom)
+- Docs: **3/3** (dropbox, box, docusign)
 
 New OAuth providers: microsoft, asana, hubspot, calendly, zoom, box,
 dropbox, docusign, linkedin. **15 OAuth providers total** (up from 6
 pre-Phase-2).
+
+Bonus (not in original spec, shipped for coverage): fireflies, gong,
+fathom, mailchimp, klaviyo, customer_io, mailerlite, linkedin.
+
+Outstanding — deferred to Phase 4 (not in Phase 2 spec, or blocked):
+- github_trigger + github_webhook ports (blocked on unmerged #262)
+- trello + zendesk OAuth variants (shipped api_key path in 2.7 —
+  OAuth needs per-subdomain URL handling for zendesk, OAuth1 dance
+  for trello)
 
 Scaffold gained 4 more capabilities during Phase 2:
 - SigV4 signing (aws_signing.py) + aws_sigv4 auth scheme
