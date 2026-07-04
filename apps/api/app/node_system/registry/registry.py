@@ -56,6 +56,7 @@ from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNo
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
 from apps.api.app.node_system.nodes.calendly.calendly_trigger import CalendlyTriggerNode
 from apps.api.app.node_system.nodes.clay.clay_node import ClayNode
+from apps.api.app.node_system.nodes.clickhouse.clickhouse_node import ClickHouseCloudNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
@@ -73,8 +74,10 @@ from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
     ConfluenceWebhookTriggerNode,
 )
 from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextNode
+from apps.api.app.node_system.nodes.convex.convex_node import ConvexNode
 from apps.api.app.node_system.nodes.cursor.cursor_node import CursorNode
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
+from apps.api.app.node_system.nodes.databricks.databricks_node import DatabricksNode
 from apps.api.app.node_system.nodes.datadog.datadog_node import DatadogNode
 from apps.api.app.node_system.nodes.datagma.datagma_node import DatagmaNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
@@ -90,6 +93,7 @@ from apps.api.app.node_system.nodes.dropcontact.dropcontact_node import Dropcont
 from apps.api.app.node_system.nodes.dspy.dspy_node import DSPyCloudNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
+from apps.api.app.node_system.nodes.elasticsearch.elasticsearch_node import ElasticsearchNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_trigger import EmailbisonTriggerNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
@@ -256,6 +260,7 @@ from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 from apps.api.app.node_system.nodes.telegram.telegram_trigger import TelegramTriggerNode
+from apps.api.app.node_system.nodes.temporal.temporal_node import TemporalCloudNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
 from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
 from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNode
@@ -585,3 +590,11 @@ node_registry.register(AmplitudeNode)
 node_registry.register(GrafanaCloudNode)
 node_registry.register(LangSmithNode)
 node_registry.register(HexNode)
+
+
+# Phase 4.21 — data warehouses.
+node_registry.register(DatabricksNode)
+node_registry.register(ClickHouseCloudNode)
+node_registry.register(ElasticsearchNode)
+node_registry.register(ConvexNode)
+node_registry.register(TemporalCloudNode)

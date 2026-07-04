@@ -1872,6 +1872,94 @@ PROVIDERS = {
             ),
         ],
     ),
+    "databricks": APIKeyProvider(
+        id="databricks_api_key",
+        name="Databricks",
+        icon_slug="databricks",
+        color="#1c1c1c",
+        description="Databricks — SQL warehouses, jobs, notebooks.",
+        hint="Databricks credentials",
+        fields=[
+            CredentialField(
+                id="api_key", label="Personal Access Token", type="password", placeholder="dapi..."
+            ),
+            CredentialField(
+                id="workspace_url",
+                label="Workspace URL",
+                type="string",
+                placeholder="https://dbc-xxx.cloud.databricks.com",
+            ),
+        ],
+    ),
+    "clickhouse": APIKeyProvider(
+        id="clickhouse_api_key",
+        name="ClickHouse Cloud",
+        icon_slug="clickhouse",
+        color="#1c1c1c",
+        description="ClickHouse Cloud — analytics DB via HTTP interface.",
+        hint="ClickHouse Cloud credentials",
+        fields=[
+            CredentialField(id="username", label="Username", type="string", placeholder="default"),
+            CredentialField(
+                id="api_key", label="Password", type="password", placeholder="Password"
+            ),
+            CredentialField(
+                id="host", label="Host", type="string", placeholder="https://xxx.clickhouse.cloud"
+            ),
+        ],
+    ),
+    "elasticsearch": APIKeyProvider(
+        id="elasticsearch_api_key",
+        name="Elasticsearch",
+        icon_slug="elasticsearch",
+        color="#1c1c1c",
+        description="Elasticsearch — index, search, aggregate documents.",
+        hint="Elasticsearch credentials",
+        fields=[
+            CredentialField(id="username", label="Username", type="string", placeholder="elastic"),
+            CredentialField(
+                id="api_key", label="Password / API Key", type="password", placeholder="Password"
+            ),
+            CredentialField(
+                id="host",
+                label="Host",
+                type="string",
+                placeholder="https://xxx.es.us-east-1.aws.elastic.cloud",
+            ),
+        ],
+    ),
+    "convex": APIKeyProvider(
+        id="convex_api_key",
+        name="Convex",
+        icon_slug="convex",
+        color="#1c1c1c",
+        description="Convex — reactive backend / DB.",
+        hint="Convex credentials",
+        fields=[
+            CredentialField(
+                id="api_key", label="Deploy Key", type="password", placeholder="Deploy key"
+            ),
+            CredentialField(
+                id="deployment_url",
+                label="Deployment URL",
+                type="string",
+                placeholder="https://xxx.convex.cloud",
+            ),
+        ],
+    ),
+    "temporal": APIKeyProvider(
+        id="temporal_api_key",
+        name="Temporal Cloud",
+        icon_slug="temporal",
+        color="#1c1c1c",
+        description="Temporal Cloud — workflow orchestration API.",
+        hint="Temporal Cloud credentials",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Temporal Cloud API key"
+            ),
+        ],
+    ),
 }
 
 

@@ -6878,6 +6878,245 @@
     "tools": null,
     "type": "action.clay"
   },
+  "action.clickhouse": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "clickhouse_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "ClickHouse Cloud \u2014 analytics DB via HTTP interface.",
+    "dynamic_outputs_from": null,
+    "icon": "clickhouse",
+    "inputs": 1,
+    "name": "ClickHouse Cloud",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "clickhouse_api_key",
+        "label": "ClickHouse Cloud Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Query",
+            "value": "query"
+          },
+          {
+            "label": "Insert Rows (JSON)",
+            "value": "insert"
+          },
+          {
+            "label": "Show Tables",
+            "value": "show_tables"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "SQL Warehouse ID",
+        "name": "warehouse_id",
+        "type": "string"
+      },
+      {
+        "label": "SQL Statement",
+        "name": "statement",
+        "type": "string"
+      },
+      {
+        "label": "Statement ID",
+        "name": "statement_id",
+        "type": "string"
+      },
+      {
+        "label": "Catalog",
+        "name": "catalog",
+        "type": "string"
+      },
+      {
+        "label": "Schema",
+        "name": "schema_name",
+        "type": "string"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Parameters (JSON)",
+        "name": "parameters",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query"
+          ]
+        },
+        "label": "SQL",
+        "name": "sql",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query",
+            "insert",
+            "show_tables"
+          ]
+        },
+        "label": "Database",
+        "name": "database",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "insert"
+          ]
+        },
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "insert"
+          ]
+        },
+        "label": "Rows (JSONEachRow)",
+        "name": "rows",
+        "type": "string"
+      },
+      {
+        "label": "Index",
+        "name": "index",
+        "type": "string"
+      },
+      {
+        "label": "Doc ID",
+        "name": "doc_id",
+        "type": "string"
+      },
+      {
+        "label": "Document (JSON)",
+        "name": "document",
+        "type": "json"
+      },
+      {
+        "label": "Query (JSON / DSL / KQL)",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "label": "Function Path",
+        "name": "function_name",
+        "type": "string"
+      },
+      {
+        "label": "Function Args (JSON)",
+        "name": "args",
+        "type": "json"
+      },
+      {
+        "label": "Namespace",
+        "name": "namespace",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Workflow Type",
+        "name": "workflow_type",
+        "type": "string"
+      },
+      {
+        "label": "Task Queue",
+        "name": "task_queue",
+        "type": "string"
+      },
+      {
+        "label": "Input (JSON)",
+        "name": "input",
+        "type": "json"
+      },
+      {
+        "label": "Signal Name",
+        "name": "signal_name",
+        "type": "string"
+      },
+      {
+        "label": "Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.clickhouse"
+  },
   "action.cloudflare": {
     "allow_error": true,
     "category": "integration",
@@ -7720,6 +7959,235 @@
     "tools": null,
     "type": "action.context_dev"
   },
+  "action.convex": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "convex_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Convex \u2014 reactive backend / DB.",
+    "dynamic_outputs_from": null,
+    "icon": "convex",
+    "inputs": 1,
+    "name": "Convex",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "convex_api_key",
+        "label": "Convex Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Query Function",
+            "value": "run_query"
+          },
+          {
+            "label": "Run Mutation",
+            "value": "run_mutation"
+          },
+          {
+            "label": "Run Action",
+            "value": "run_action"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "SQL Warehouse ID",
+        "name": "warehouse_id",
+        "type": "string"
+      },
+      {
+        "label": "SQL Statement",
+        "name": "statement",
+        "type": "string"
+      },
+      {
+        "label": "Statement ID",
+        "name": "statement_id",
+        "type": "string"
+      },
+      {
+        "label": "Catalog",
+        "name": "catalog",
+        "type": "string"
+      },
+      {
+        "label": "Schema",
+        "name": "schema_name",
+        "type": "string"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Parameters (JSON)",
+        "name": "parameters",
+        "type": "json"
+      },
+      {
+        "label": "SQL",
+        "name": "sql",
+        "type": "string"
+      },
+      {
+        "label": "Database",
+        "name": "database",
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Rows (JSONEachRow)",
+        "name": "rows",
+        "type": "string"
+      },
+      {
+        "label": "Index",
+        "name": "index",
+        "type": "string"
+      },
+      {
+        "label": "Doc ID",
+        "name": "doc_id",
+        "type": "string"
+      },
+      {
+        "label": "Document (JSON)",
+        "name": "document",
+        "type": "json"
+      },
+      {
+        "label": "Query (JSON / DSL / KQL)",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query",
+            "run_mutation",
+            "run_action"
+          ]
+        },
+        "label": "Function Path",
+        "name": "function_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query",
+            "run_mutation",
+            "run_action"
+          ]
+        },
+        "label": "Function Args (JSON)",
+        "name": "args",
+        "type": "json"
+      },
+      {
+        "label": "Namespace",
+        "name": "namespace",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Workflow Type",
+        "name": "workflow_type",
+        "type": "string"
+      },
+      {
+        "label": "Task Queue",
+        "name": "task_queue",
+        "type": "string"
+      },
+      {
+        "label": "Input (JSON)",
+        "name": "input",
+        "type": "json"
+      },
+      {
+        "label": "Signal Name",
+        "name": "signal_name",
+        "type": "string"
+      },
+      {
+        "label": "Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.convex"
+  },
   "action.cursor": {
     "allow_error": true,
     "category": "integration",
@@ -8195,6 +8663,269 @@
     ],
     "tools": null,
     "type": "action.customer_io"
+  },
+  "action.databricks": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "databricks_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Databricks \u2014 SQL warehouses, jobs, notebooks.",
+    "dynamic_outputs_from": null,
+    "icon": "databricks",
+    "inputs": 1,
+    "name": "Databricks",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "databricks_api_key",
+        "label": "Databricks Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_sql",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run SQL Statement",
+            "value": "run_sql"
+          },
+          {
+            "label": "Get Statement Status",
+            "value": "get_statement"
+          },
+          {
+            "label": "Run Job",
+            "value": "run_job"
+          },
+          {
+            "label": "Get Job Run",
+            "value": "get_run"
+          },
+          {
+            "label": "List SQL Warehouses",
+            "value": "list_warehouses"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_sql"
+          ]
+        },
+        "label": "SQL Warehouse ID",
+        "name": "warehouse_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_sql"
+          ]
+        },
+        "label": "SQL Statement",
+        "name": "statement",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_statement"
+          ]
+        },
+        "label": "Statement ID",
+        "name": "statement_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_sql"
+          ]
+        },
+        "label": "Catalog",
+        "name": "catalog",
+        "type": "string"
+      },
+      {
+        "label": "Schema",
+        "name": "schema_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_job"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_run"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_job"
+          ]
+        },
+        "label": "Parameters (JSON)",
+        "name": "parameters",
+        "type": "json"
+      },
+      {
+        "label": "SQL",
+        "name": "sql",
+        "type": "string"
+      },
+      {
+        "label": "Database",
+        "name": "database",
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Rows (JSONEachRow)",
+        "name": "rows",
+        "type": "string"
+      },
+      {
+        "label": "Index",
+        "name": "index",
+        "type": "string"
+      },
+      {
+        "label": "Doc ID",
+        "name": "doc_id",
+        "type": "string"
+      },
+      {
+        "label": "Document (JSON)",
+        "name": "document",
+        "type": "json"
+      },
+      {
+        "label": "Query (JSON / DSL / KQL)",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "label": "Function Path",
+        "name": "function_name",
+        "type": "string"
+      },
+      {
+        "label": "Function Args (JSON)",
+        "name": "args",
+        "type": "json"
+      },
+      {
+        "label": "Namespace",
+        "name": "namespace",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Workflow Type",
+        "name": "workflow_type",
+        "type": "string"
+      },
+      {
+        "label": "Task Queue",
+        "name": "task_queue",
+        "type": "string"
+      },
+      {
+        "label": "Input (JSON)",
+        "name": "input",
+        "type": "json"
+      },
+      {
+        "label": "Signal Name",
+        "name": "signal_name",
+        "type": "string"
+      },
+      {
+        "label": "Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.databricks"
   },
   "action.datadog": {
     "allow_error": true,
@@ -10688,6 +11419,256 @@
     ],
     "tools": null,
     "type": "action.dynamodb"
+  },
+  "action.elasticsearch": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "elasticsearch_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Elasticsearch \u2014 index, search, aggregate documents.",
+    "dynamic_outputs_from": null,
+    "icon": "elasticsearch",
+    "inputs": 1,
+    "name": "Elasticsearch",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "elasticsearch_api_key",
+        "label": "Elasticsearch Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "Index Document",
+            "value": "index_document"
+          },
+          {
+            "label": "Get Document",
+            "value": "get_document"
+          },
+          {
+            "label": "Delete Document",
+            "value": "delete_document"
+          },
+          {
+            "label": "Count Documents",
+            "value": "count"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "SQL Warehouse ID",
+        "name": "warehouse_id",
+        "type": "string"
+      },
+      {
+        "label": "SQL Statement",
+        "name": "statement",
+        "type": "string"
+      },
+      {
+        "label": "Statement ID",
+        "name": "statement_id",
+        "type": "string"
+      },
+      {
+        "label": "Catalog",
+        "name": "catalog",
+        "type": "string"
+      },
+      {
+        "label": "Schema",
+        "name": "schema_name",
+        "type": "string"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Parameters (JSON)",
+        "name": "parameters",
+        "type": "json"
+      },
+      {
+        "label": "SQL",
+        "name": "sql",
+        "type": "string"
+      },
+      {
+        "label": "Database",
+        "name": "database",
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Rows (JSONEachRow)",
+        "name": "rows",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "index_document",
+            "get_document",
+            "delete_document",
+            "count"
+          ]
+        },
+        "label": "Index",
+        "name": "index",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_document",
+            "delete_document"
+          ]
+        },
+        "label": "Doc ID",
+        "name": "doc_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "index_document"
+          ]
+        },
+        "label": "Document (JSON)",
+        "name": "document",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query (JSON / DSL / KQL)",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "label": "Function Path",
+        "name": "function_name",
+        "type": "string"
+      },
+      {
+        "label": "Function Args (JSON)",
+        "name": "args",
+        "type": "json"
+      },
+      {
+        "label": "Namespace",
+        "name": "namespace",
+        "type": "string"
+      },
+      {
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "label": "Workflow Type",
+        "name": "workflow_type",
+        "type": "string"
+      },
+      {
+        "label": "Task Queue",
+        "name": "task_queue",
+        "type": "string"
+      },
+      {
+        "label": "Input (JSON)",
+        "name": "input",
+        "type": "json"
+      },
+      {
+        "label": "Signal Name",
+        "name": "signal_name",
+        "type": "string"
+      },
+      {
+        "label": "Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.elasticsearch"
   },
   "action.emailbison": {
     "allow_error": true,
@@ -37739,6 +38720,283 @@
     ],
     "tools": null,
     "type": "action.telegram"
+  },
+  "action.temporal": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "temporal_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Temporal Cloud \u2014 workflow orchestration API.",
+    "dynamic_outputs_from": null,
+    "icon": "temporal",
+    "inputs": 1,
+    "name": "Temporal Cloud",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "temporal_api_key",
+        "label": "Temporal Cloud Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "start_workflow",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Start Workflow",
+            "value": "start_workflow"
+          },
+          {
+            "label": "Describe Workflow",
+            "value": "describe_workflow"
+          },
+          {
+            "label": "Terminate Workflow",
+            "value": "terminate_workflow"
+          },
+          {
+            "label": "List Workflows",
+            "value": "list_workflows"
+          },
+          {
+            "label": "Signal Workflow",
+            "value": "signal_workflow"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "SQL Warehouse ID",
+        "name": "warehouse_id",
+        "type": "string"
+      },
+      {
+        "label": "SQL Statement",
+        "name": "statement",
+        "type": "string"
+      },
+      {
+        "label": "Statement ID",
+        "name": "statement_id",
+        "type": "string"
+      },
+      {
+        "label": "Catalog",
+        "name": "catalog",
+        "type": "string"
+      },
+      {
+        "label": "Schema",
+        "name": "schema_name",
+        "type": "string"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Parameters (JSON)",
+        "name": "parameters",
+        "type": "json"
+      },
+      {
+        "label": "SQL",
+        "name": "sql",
+        "type": "string"
+      },
+      {
+        "label": "Database",
+        "name": "database",
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Rows (JSONEachRow)",
+        "name": "rows",
+        "type": "string"
+      },
+      {
+        "label": "Index",
+        "name": "index",
+        "type": "string"
+      },
+      {
+        "label": "Doc ID",
+        "name": "doc_id",
+        "type": "string"
+      },
+      {
+        "label": "Document (JSON)",
+        "name": "document",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_workflows"
+          ]
+        },
+        "label": "Query (JSON / DSL / KQL)",
+        "name": "query",
+        "type": "json"
+      },
+      {
+        "label": "Function Path",
+        "name": "function_name",
+        "type": "string"
+      },
+      {
+        "label": "Function Args (JSON)",
+        "name": "args",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_workflow",
+            "describe_workflow",
+            "terminate_workflow",
+            "list_workflows",
+            "signal_workflow"
+          ]
+        },
+        "label": "Namespace",
+        "name": "namespace",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_workflow",
+            "describe_workflow",
+            "terminate_workflow",
+            "signal_workflow"
+          ]
+        },
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_workflow"
+          ]
+        },
+        "label": "Workflow Type",
+        "name": "workflow_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_workflow"
+          ]
+        },
+        "label": "Task Queue",
+        "name": "task_queue",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_workflow",
+            "signal_workflow"
+          ]
+        },
+        "label": "Input (JSON)",
+        "name": "input",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "signal_workflow"
+          ]
+        },
+        "label": "Signal Name",
+        "name": "signal_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "terminate_workflow"
+          ]
+        },
+        "label": "Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.temporal"
   },
   "action.thinking": {
     "allow_error": true,
