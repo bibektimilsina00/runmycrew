@@ -2186,6 +2186,73 @@ PROVIDERS = {
             ),
         ],
     ),
+    "okta": APIKeyProvider(
+        id="okta_api_key",
+        name="Okta",
+        icon_slug="okta",
+        color="#1c1c1c",
+        description="Okta — identity users, groups, apps, MFA.",
+        hint="Okta API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Okta API Token (prefix with SSWS )",
+                type="password",
+                placeholder="SSWS 00xxx...",
+            ),
+            CredentialField(
+                id="domain", label="Okta Domain", type="string", placeholder="mycompany.okta.com"
+            ),
+        ],
+    ),
+    "clerk": APIKeyProvider(
+        id="clerk_api_key",
+        name="Clerk",
+        icon_slug="clerk",
+        color="#1c1c1c",
+        description="Clerk — user + org management (dev-first auth).",
+        hint="Clerk API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Clerk API key"
+            ),
+        ],
+    ),
+    "onepassword": APIKeyProvider(
+        id="onepassword_api_key",
+        name="1Password Connect",
+        icon_slug="onepassword",
+        color="#1c1c1c",
+        description="1Password — fetch secrets from a vault via Connect API.",
+        hint="1Password Connect API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Connect Token",
+                type="password",
+                placeholder="1Password Connect token",
+            ),
+            CredentialField(
+                id="host",
+                label="Connect Host",
+                type="string",
+                placeholder="https://connect.example.com",
+            ),
+        ],
+    ),
+    "infisical": APIKeyProvider(
+        id="infisical_api_key",
+        name="Infisical",
+        icon_slug="infisical",
+        color="#1c1c1c",
+        description="Infisical — secrets management (open-source Vault alt).",
+        hint="Infisical API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Infisical API key"
+            ),
+        ],
+    ),
 }
 
 
