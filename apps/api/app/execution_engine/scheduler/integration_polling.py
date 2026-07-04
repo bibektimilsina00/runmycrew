@@ -157,14 +157,26 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.jira import (
         jira_trigger as _jira_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.linear import (
+        linear_trigger as _linear_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.notion import (
         notion_trigger as _notion_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.outlook import (
+        outlook_trigger as _outlook_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.pagerduty import (
         pagerduty_trigger as _pagerduty_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.telegram import (
+        telegram_trigger as _telegram_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.trello import (
         trello_trigger as _trello_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.zendesk import (
+        zendesk_trigger as _zendesk_trigger,  # noqa: F401
     )
 
 

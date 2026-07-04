@@ -110,6 +110,7 @@ from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
+from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
 from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
 from apps.api.app.node_system.nodes.logic.do_while.do_while import DoWhileNode
@@ -145,6 +146,7 @@ from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNo
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
+from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTriggerNode
 from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
@@ -167,6 +169,7 @@ from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
+from apps.api.app.node_system.nodes.telegram.telegram_trigger import TelegramTriggerNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
 from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
 from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNode
@@ -176,6 +179,7 @@ from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import Upst
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
+from apps.api.app.node_system.nodes.zendesk.zendesk_trigger import ZendeskTriggerNode
 from apps.api.app.node_system.nodes.zoom.zoom_node import ZoomNode
 
 
@@ -305,6 +309,11 @@ node_registry.register(CalendlyTriggerNode)
 node_registry.register(CalcomTriggerNode)
 node_registry.register(NotionTriggerNode)
 node_registry.register(IntercomTriggerNode)
+# Phase 3.3 — support/notif polling triggers.
+node_registry.register(ZendeskTriggerNode)
+node_registry.register(OutlookMailTriggerNode)
+node_registry.register(LinearTriggerNode)
+node_registry.register(TelegramTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

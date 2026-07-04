@@ -1119,6 +1119,22 @@ PROVIDERS = {
         chat_completions_url="https://api.fireworks.ai/inference/v1/chat/completions",
         models_url="https://api.fireworks.ai/inference/v1/models",
     ),
+    "telegram_bot": APIKeyProvider(
+        id="telegram_bot",
+        name="Telegram Bot",
+        icon_slug="telegram",
+        color="#1c1c1c",
+        description="Telegram bot token (from @BotFather). Used for send_message + getUpdates polling.",
+        hint="Bot token in the form 123456:ABC-DEF...",
+        fields=[
+            CredentialField(
+                id="bot_token",
+                label="Bot Token",
+                type="password",
+                placeholder="123456789:ABCDEF...",
+            ),
+        ],
+    ),
 }
 
 
