@@ -166,6 +166,35 @@ def _op_index(manifest: ProviderManifest) -> dict[str, OpSpec]:
     return {op.id: op for op in manifest.operations}
 
 
+class _PropCredView:
+    """Read-only view over node.props that falls back to the credential dict.
+
+    Lets manifests reference credential fields in path templates / body
+    templates without hand-rolling a body_builder. URL-per-instance
+    providers (Supabase, Upstash Redis, Qdrant Cloud, …) put the
+    instance URL in the credential and reference it from the manifest
+    as `{project_url}` — same syntax users already see for node props.
+
+    Lookup precedence: node prop first (so manifest can override), then
+    credential field. Missing keys return `None` to match `getattr`'s
+    normal contract.
+    """
+
+    __slots__ = ("_props", "_cred")
+
+    def __init__(self, props: Any, credential: dict[str, Any] | None) -> None:
+        self._props = props
+        self._cred = credential or {}
+
+    def __getattr__(self, name: str) -> Any:
+        if name.startswith("_"):
+            raise AttributeError(name)
+        value = getattr(self._props, name, None)
+        if value is not None:
+            return value
+        return self._cred.get(name)
+
+
 def _flatten_output(op: OpSpec, body: Any, props: Any) -> Any:
     """Apply the op's named flattener (if any), then optionally project
     into a static success template defined on the op."""
@@ -197,19 +226,29 @@ async def _dispatch_declarative(
             success=False,
             error=f"Op {op.id!r} is missing method/path and has no custom handler.",
         )
-    url = manifest.base_url + resolve_template(op.path, node.props)
+    view = _PropCredView(node.props, node.credential)
+    resolved_path = resolve_template(op.path, view)
+    # Allow per-op absolute URLs (Pinecone's data plane lives at
+    # `https://{index_host}/...` per-index, while the control plane
+    # uses the manifest's base_url). Anything starting with http:// or
+    # https:// bypasses base_url concatenation entirely.
+    url = (
+        resolved_path
+        if resolved_path.startswith(("http://", "https://"))
+        else manifest.base_url + resolved_path
+    )
     params = (
-        op.query_builder(node.props)
+        op.query_builder(view)
         if op.query_builder is not None
         else pick_props(node.props, op.query_fields)
     )
     body: Any = None
     if op.body_builder is not None:
-        body = op.body_builder(node.props)
+        body = op.body_builder(view)
     elif op.body_fields or op.body_template:
         body = pick_props(node.props, op.body_fields)
         if op.body_template:
-            body = {**body, **resolve_dict(op.body_template, node.props)}
+            body = {**body, **resolve_dict(op.body_template, view)}
 
     raw, _headers = await rest_request(
         client,
@@ -219,8 +258,20 @@ async def _dispatch_declarative(
         token=token,
         params=params,
         json=body,
+        credential=node.credential,
+        op_extra_headers=op.extra_headers or None,
     )
     output = _flatten_output(op, raw, node.props)
+    # NodeResult.output_data is `dict[str, Any]` — the scaffold has to
+    # normalize any non-dict response so providers that return raw
+    # lists (Hacker News id lists), scalars (max-item endpoints), or
+    # 204 No Content (Postmark/SendGrid sends) all flow through.
+    if output is None:
+        output = {"empty": True}
+    elif isinstance(output, list):
+        output = {"items": output, "count": len(output)}
+    elif not isinstance(output, dict):
+        output = {"value": output}
     return NodeResult(success=True, output_data=output)
 
 

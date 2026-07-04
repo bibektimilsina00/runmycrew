@@ -45,6 +45,8 @@ def build_auth(
     header_name: str,
     value_template: str,
     query_param: str,
+    basic_username: str = "",
+    credential: dict[str, Any] | None = None,
 ) -> tuple[dict[str, str], dict[str, str]]:
     """Return `(headers, query_params)` for the given auth scheme.
 
@@ -52,9 +54,23 @@ def build_auth(
     same logic without going through the generic call path — e.g. a
     GraphQL handler needs the same `Authorization` header but builds its
     own body.
+
+    `basic_username` is consulted only for `scheme="basic"`. It may be:
+      - empty string → legacy behavior, `{token}:` base64
+      - a literal value (e.g. `"api"` for Mailgun) → `{value}:{token}`
+      - a `{credential_key}` template → resolves against `credential`
+        (e.g. `"{account_sid}"` for Twilio pulls the sid out of the
+        credential dict)
     """
 
     if not token or scheme == "none":
+        return {}, {}
+
+    if scheme == "aws_sigv4":
+        # SigV4 needs the full request context (URL + body + query
+        # params) so the real signing lands in `rest_request` after
+        # body serialization. Return empty here; the outer flow will
+        # stamp Authorization + X-Amz-* headers when it's ready.
         return {}, {}
 
     if scheme == "bearer":
@@ -63,8 +79,18 @@ def build_auth(
         return {header_name: token}, {}
     if scheme == "basic":
         import base64
+        import re as _re
 
-        encoded = base64.b64encode(f"{token}:".encode()).decode()
+        username = basic_username or ""
+        if username and credential:
+            # Resolve {credential_key} placeholders so the manifest can
+            # name a credential field (e.g. `"{account_sid}"`).
+            username = _re.sub(
+                r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}",
+                lambda m: str(credential.get(m.group(1), m.group(0))),
+                username,
+            )
+        encoded = base64.b64encode(f"{username}:{token}".encode()).decode()
         return {header_name: f"Basic {encoded}"}, {}
     if scheme == "query_token":
         return {}, {query_param: token}
@@ -92,6 +118,8 @@ async def rest_request(
     token: str | None,
     params: dict[str, Any] | None = None,
     json: Any = None,
+    credential: dict[str, Any] | None = None,
+    op_extra_headers: dict[str, str] | None = None,
 ) -> tuple[Any, dict[str, str]]:
     """Issue one HTTP call against a provider.
 
@@ -99,6 +127,12 @@ async def rest_request(
     per-call. Returns `(parsed_body, response_headers)`. Raises
     `RESTError` on non-2xx so the factory can convert to a structured
     `NodeResult`.
+
+    `credential` (the decrypted credential dict) is consulted only for
+    advanced auth schemes that need a second field — e.g. Basic auth
+    where the username is `{account_sid}` from the credential. It also
+    flows into `extra_headers` templating so dual-header schemes can
+    pull any credential field, not just `{token}`.
     """
     auth_headers, auth_params = build_auth(
         token=token,
@@ -106,23 +140,123 @@ async def rest_request(
         header_name=manifest.auth_header_name,
         value_template=manifest.auth_value_template,
         query_param=manifest.auth_query_param,
+        basic_username=manifest.auth_basic_username,
+        credential=credential,
     )
+    # `extra_headers` supports `{token}` plus any `{credential_key}`
+    # placeholder. Lets providers that ride two custom headers (Sendblue
+    # ships `sb-api-key-id` + `sb-api-secret-key`) declare both in the
+    # manifest pulling distinct credential fields.
+    resolved_extra: dict[str, str] = {}
+    for k, v in manifest.extra_headers.items():
+        if isinstance(v, str):
+            value = v.replace("{token}", token or "") if token else v
+            if credential:
+                import re as _re
+
+                value = _re.sub(
+                    r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}",
+                    lambda m: str(credential.get(m.group(1), m.group(0))),
+                    value,
+                )
+            resolved_extra[k] = value
+        else:
+            resolved_extra[k] = v
+    # Per-op headers layer on top of manifest-level extra_headers.
+    # AWS JSON-protocol services (SQS, Athena, Secrets Manager) route
+    # by X-Amz-Target: <Service>.<Action> — different per op — so this
+    # is the only way to spell that without a custom handler per op.
+    op_resolved: dict[str, str] = {}
+    if op_extra_headers:
+        for k, v in op_extra_headers.items():
+            if isinstance(v, str):
+                value = v.replace("{token}", token or "") if token else v
+                if credential:
+                    import re as _re
+
+                    value = _re.sub(
+                        r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}",
+                        lambda m: str(credential.get(m.group(1), m.group(0))),
+                        value,
+                    )
+                op_resolved[k] = value
+            else:
+                op_resolved[k] = v
     headers = {
         "Content-Type": manifest.content_type,
         "Accept": "application/json",
-        **manifest.extra_headers,
+        **resolved_extra,
+        **op_resolved,
         **auth_headers,
     }
     merged_params: dict[str, Any] = {**auth_params, **(params or {})}
 
-    resp = await client.request(
-        method,
-        url,
-        headers=headers,
-        params=merged_params or None,
-        json=json,
-        timeout=manifest.timeout_seconds,
-    )
+    # Form-encoded bodies — Twilio, Mailgun, and other legacy APIs
+    # expect `application/x-www-form-urlencoded`. httpx routes those
+    # through `data=`, not `json=`, so the keys land in the right wire
+    # format.
+    request_kwargs: dict[str, Any] = {
+        "method": method,
+        "url": url,
+        "headers": headers,
+        "params": merged_params or None,
+        "timeout": manifest.timeout_seconds,
+    }
+    if manifest.content_type == "application/x-www-form-urlencoded":
+        request_kwargs["data"] = json
+    else:
+        request_kwargs["json"] = json
+
+    # AWS SigV4 signing runs after body serialization — the signer
+    # needs the exact bytes going on the wire. Region + service come
+    # from the manifest + credential; the signer stamps its own
+    # X-Amz-Date, X-Amz-Content-Sha256, and Authorization headers.
+    if manifest.auth == "aws_sigv4" and credential:
+        import json as _json
+
+        from apps.api.app.node_system.scaffolds.aws_signing import sign_v4
+
+        body_bytes = b""
+        if "json" in request_kwargs and request_kwargs["json"] is not None:
+            body_bytes = _json.dumps(request_kwargs["json"]).encode("utf-8")
+        elif "data" in request_kwargs and request_kwargs["data"] is not None:
+            data_val = request_kwargs["data"]
+            if isinstance(data_val, bytes | bytearray):
+                body_bytes = bytes(data_val)
+            elif isinstance(data_val, str):
+                body_bytes = data_val.encode("utf-8")
+            elif isinstance(data_val, dict):
+                from urllib.parse import urlencode
+
+                body_bytes = urlencode(data_val).encode("utf-8")
+        region = (credential.get("region") if credential else None) or manifest.aws_default_region
+        access_key = credential.get("access_key_id") or credential.get("aws_access_key_id") or ""
+        secret_key = (
+            credential.get("secret_access_key")
+            or credential.get("aws_secret_access_key")
+            or token
+            or ""
+        )
+        session_token = credential.get("session_token") or credential.get("aws_session_token")
+        signed = sign_v4(
+            method=method,
+            url=url,
+            headers=headers,
+            query_params=merged_params or None,
+            body=body_bytes,
+            region=region,
+            service=manifest.aws_service or "",
+            access_key=access_key,
+            secret_key=secret_key,
+            session_token=session_token,
+            unsigned_payload=manifest.aws_unsigned_payload,
+        )
+        # Overwrite the placeholder Authorization built by `build_auth`
+        # (which returned empty for `aws_sigv4`) with the SigV4 value.
+        headers.update(signed)
+        request_kwargs["headers"] = headers
+
+    resp = await client.request(**request_kwargs)
     if resp.status_code >= 400:
         raise error_from_response(resp)
 

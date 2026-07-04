@@ -26,6 +26,7 @@ from apps.api.app.features.templates.router import router as templates_router
 from apps.api.app.features.tools.router import router as tools_router
 from apps.api.app.features.triggers.router import router as triggers_router
 from apps.api.app.features.users.router import router as users_router
+from apps.api.app.features.webhooks.router import router as webhooks_router
 from apps.api.app.features.workflows.router import router as workflows_router
 from apps.api.app.features.workspaces.router import router as workspaces_router
 
@@ -54,6 +55,10 @@ router.include_router(skills_router, prefix="/skills", tags=["skills"])
 router.include_router(a2a_router, prefix="/a2a", tags=["a2a"])
 router.include_router(copilot_router, prefix="/copilot", tags=["copilot"])
 router.include_router(triggers_router)
+# Manifest-driven webhook receivers (gitlab, etc.) live under one
+# provider-agnostic router. Adding a new webhook integration is a
+# manifest file — no router edits needed.
+router.include_router(webhooks_router)
 router.include_router(meta_router)
 router.include_router(knowledge_router, prefix="/kb", tags=["knowledge"])
 router.include_router(secrets_router, prefix="/secrets", tags=["secrets"])

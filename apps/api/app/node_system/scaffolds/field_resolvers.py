@@ -13,6 +13,19 @@ import re
 from typing import Any
 
 _PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}")
+_PURE_PLACEHOLDER_RE = re.compile(r"^\{([a-zA-Z_][a-zA-Z0-9_]*)\}$")
+
+
+def _stringify(value: Any) -> str:
+    """Stringify a substituted value for embedding inside a template.
+
+    Whole-number floats lose the trailing `.0` so `numResults` doesn't
+    become `"5.0"` on the wire. Pydantic widens `number` props to float
+    which makes `int(value) == value` the right ints-only check.
+    """
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
 
 
 def resolve_template(template: str, props: Any) -> str:
@@ -29,7 +42,7 @@ def resolve_template(template: str, props: Any) -> str:
         value = getattr(props, name, None)
         if value is None:
             return match.group(0)
-        return str(value)
+        return _stringify(value)
 
     return _PLACEHOLDER_RE.sub(replace, template)
 
@@ -39,6 +52,13 @@ def resolve_dict(template: dict[str, Any] | None, props: Any) -> dict[str, Any]:
 
     Lists are walked; nested dicts recurse; numbers / booleans pass
     through untouched. Suitable for `body_template` substitution.
+
+    Special case — when a leaf is *exactly* `"{name}"` and the resolved
+    prop is a number/bool/list/dict, return the value with its native
+    type intact. Otherwise the template would coerce `5` into `"5"` and
+    break APIs that type-check (`numResults` expects an int, not a
+    string). Multi-placeholder templates (`"{a}-{b}"`) still go through
+    the string path since the joined result can't preserve types.
     """
 
     if not template:
@@ -46,6 +66,14 @@ def resolve_dict(template: dict[str, Any] | None, props: Any) -> dict[str, Any]:
 
     def walk(value: Any) -> Any:
         if isinstance(value, str):
+            pure = _PURE_PLACEHOLDER_RE.match(value)
+            if pure:
+                resolved = getattr(props, pure.group(1), None)
+                if resolved is None:
+                    return value
+                if isinstance(resolved, float) and resolved.is_integer():
+                    return int(resolved)
+                return resolved
             return resolve_template(value, props)
         if isinstance(value, dict):
             return {k: walk(v) for k, v in value.items()}
