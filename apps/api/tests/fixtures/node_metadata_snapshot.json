@@ -12767,11 +12767,11 @@
   "action.discord": {
     "allow_error": true,
     "category": "integration",
-    "color": "#ffffff",
-    "credential_type": null,
+    "color": "#5865F2",
+    "credential_type": "discord_bot_token",
     "default_height": null,
     "default_width": null,
-    "description": "Send messages, manage channels, and interact with Discord servers.",
+    "description": "Discord \u2014 messages, channels, guilds, members, roles, webhooks.",
     "dynamic_outputs_from": null,
     "icon": "discord",
     "inputs": 1,
@@ -12780,26 +12780,21 @@
     "outputs": 1,
     "outputs_schema": [
       {
+        "label": "data",
+        "type": "object"
+      },
+      {
         "label": "id",
         "type": "string"
-      },
-      {
-        "label": "content",
-        "type": "string"
-      },
-      {
-        "label": "messages",
-        "type": "array"
       }
     ],
     "properties": [
       {
-        "label": "Bot Token",
-        "name": "bot_token",
-        "placeholder": "Bot token from Discord Developer Portal",
+        "credentialType": "discord_bot_token",
+        "label": "Discord Account",
+        "name": "credential",
         "required": true,
-        "secret": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "send_message",
@@ -12811,7 +12806,7 @@
             "value": "send_message"
           },
           {
-            "label": "Send Embed",
+            "label": "Send Embed Message",
             "value": "send_embed"
           },
           {
@@ -12823,12 +12818,88 @@
             "value": "delete_message"
           },
           {
-            "label": "Get Guild Info",
+            "label": "Get Guild",
             "value": "get_guild"
           },
           {
-            "label": "Get User Info",
+            "label": "Get User",
             "value": "get_user"
+          },
+          {
+            "label": "Get Channel",
+            "value": "get_channel"
+          },
+          {
+            "label": "List Guild Channels",
+            "value": "list_guild_channels"
+          },
+          {
+            "label": "Create Guild Channel",
+            "value": "create_channel"
+          },
+          {
+            "label": "Delete Channel",
+            "value": "delete_channel"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "Edit Message",
+            "value": "edit_message"
+          },
+          {
+            "label": "Add Reaction",
+            "value": "add_reaction"
+          },
+          {
+            "label": "List Guild Members",
+            "value": "list_members"
+          },
+          {
+            "label": "Get Guild Member",
+            "value": "get_member"
+          },
+          {
+            "label": "Add Role to Member",
+            "value": "add_member_role"
+          },
+          {
+            "label": "Remove Role from Member",
+            "value": "remove_member_role"
+          },
+          {
+            "label": "Kick Guild Member",
+            "value": "kick_member"
+          },
+          {
+            "label": "Ban Guild Member",
+            "value": "ban_member"
+          },
+          {
+            "label": "List Guild Roles",
+            "value": "list_roles"
+          },
+          {
+            "label": "Create Role",
+            "value": "create_role"
+          },
+          {
+            "label": "Delete Role",
+            "value": "delete_role"
+          },
+          {
+            "label": "List Channel Webhooks",
+            "value": "list_channel_webhooks"
+          },
+          {
+            "label": "Create Channel Webhook",
+            "value": "create_webhook"
+          },
+          {
+            "label": "Execute Webhook",
+            "value": "execute_webhook"
           }
         ],
         "type": "options"
@@ -12840,54 +12911,53 @@
             "send_message",
             "send_embed",
             "get_messages",
-            "delete_message"
+            "delete_message",
+            "get_channel",
+            "delete_channel",
+            "get_message",
+            "edit_message",
+            "add_reaction",
+            "list_channel_webhooks",
+            "create_webhook"
           ]
         },
         "label": "Channel ID",
         "name": "channel_id",
-        "required": true,
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "send_message"
+          "value": [
+            "get_guild",
+            "list_guild_channels",
+            "create_channel",
+            "list_members",
+            "get_member",
+            "add_member_role",
+            "remove_member_role",
+            "kick_member",
+            "ban_member",
+            "list_roles",
+            "create_role",
+            "delete_role"
+          ]
         },
-        "label": "Message Content",
-        "name": "content",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": "send_embed"
-        },
-        "label": "Embed (JSON)",
-        "name": "embed",
-        "type": "json"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": "delete_message"
-        },
-        "label": "Message ID",
-        "name": "message_id",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": "get_guild"
-        },
-        "label": "Guild/Server ID",
+        "label": "Guild ID",
         "name": "guild_id",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "get_user"
+          "value": [
+            "get_user",
+            "get_member",
+            "add_member_role",
+            "remove_member_role",
+            "kick_member",
+            "ban_member"
+          ]
         },
         "label": "User ID",
         "name": "user_id",
@@ -12896,7 +12966,181 @@
       {
         "condition": {
           "field": "operation",
-          "value": "get_messages"
+          "value": [
+            "delete_message",
+            "get_message",
+            "edit_message",
+            "add_reaction"
+          ]
+        },
+        "label": "Message ID",
+        "name": "message_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_member_role",
+            "remove_member_role",
+            "delete_role"
+          ]
+        },
+        "label": "Role ID",
+        "name": "role_id",
+        "type": "string"
+      },
+      {
+        "label": "Member ID",
+        "name": "member_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "execute_webhook"
+          ]
+        },
+        "label": "Webhook ID",
+        "name": "webhook_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "execute_webhook"
+          ]
+        },
+        "label": "Webhook Token",
+        "name": "webhook_token",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "send_embed",
+            "edit_message",
+            "execute_webhook"
+          ]
+        },
+        "label": "Message Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_embed"
+          ]
+        },
+        "default": {},
+        "label": "Embed (JSON)",
+        "name": "embed",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "edit_message",
+            "execute_webhook"
+          ]
+        },
+        "default": [],
+        "label": "Embeds (JSON array)",
+        "name": "embeds",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_channel"
+          ]
+        },
+        "label": "Channel Name",
+        "name": "channel_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_channel"
+          ]
+        },
+        "default": 0,
+        "label": "Channel Type (0=text,2=voice,4=category)",
+        "name": "channel_type",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_role"
+          ]
+        },
+        "label": "Role Name",
+        "name": "role_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_role"
+          ]
+        },
+        "label": "Role Color (int)",
+        "name": "role_color",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_role"
+          ]
+        },
+        "label": "Role Permissions (string)",
+        "name": "role_permissions",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_webhook"
+          ]
+        },
+        "label": "Webhook Name",
+        "name": "webhook_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "ban_member"
+          ]
+        },
+        "label": "Audit Log Reason",
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_messages",
+            "list_members"
+          ]
         },
         "default": 50,
         "label": "Limit",
@@ -21743,6 +21987,571 @@
     ],
     "tools": null,
     "type": "action.github"
+  },
+  "action.gitlab": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#FC6D26",
+    "credential_type": "gitlab_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "GitLab \u2014 issues, MRs, pipelines, projects, files, releases, members.",
+    "dynamic_outputs_from": null,
+    "icon": "gitlab",
+    "inputs": 1,
+    "name": "GitLab",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "iid",
+        "type": "number"
+      },
+      {
+        "label": "web_url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "gitlab_api_key",
+        "label": "GitLab Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_issues",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Project Issues",
+            "value": "list_issues"
+          },
+          {
+            "label": "Get Issue",
+            "value": "get_issue"
+          },
+          {
+            "label": "Create Issue",
+            "value": "create_issue"
+          },
+          {
+            "label": "Update Issue",
+            "value": "update_issue"
+          },
+          {
+            "label": "Delete Issue",
+            "value": "delete_issue"
+          },
+          {
+            "label": "List Merge Requests",
+            "value": "list_mrs"
+          },
+          {
+            "label": "Get Merge Request",
+            "value": "get_mr"
+          },
+          {
+            "label": "Create Merge Request",
+            "value": "create_mr"
+          },
+          {
+            "label": "Update Merge Request",
+            "value": "update_mr"
+          },
+          {
+            "label": "Accept Merge Request",
+            "value": "accept_mr"
+          },
+          {
+            "label": "Close Merge Request",
+            "value": "close_mr"
+          },
+          {
+            "label": "List Pipelines",
+            "value": "list_pipelines"
+          },
+          {
+            "label": "Get Pipeline",
+            "value": "get_pipeline"
+          },
+          {
+            "label": "Create Pipeline",
+            "value": "create_pipeline"
+          },
+          {
+            "label": "Cancel Pipeline",
+            "value": "cancel_pipeline"
+          },
+          {
+            "label": "Retry Pipeline",
+            "value": "retry_pipeline"
+          },
+          {
+            "label": "List Pipeline Jobs",
+            "value": "list_pipeline_jobs"
+          },
+          {
+            "label": "Get Job",
+            "value": "get_job"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Get Project",
+            "value": "get_project"
+          },
+          {
+            "label": "Get File Content",
+            "value": "get_file"
+          },
+          {
+            "label": "Create File",
+            "value": "create_file"
+          },
+          {
+            "label": "Update File",
+            "value": "update_file"
+          },
+          {
+            "label": "Delete File",
+            "value": "delete_file"
+          },
+          {
+            "label": "List Releases",
+            "value": "list_releases"
+          },
+          {
+            "label": "Get Release",
+            "value": "get_release"
+          },
+          {
+            "label": "Create Release",
+            "value": "create_release"
+          },
+          {
+            "label": "List Groups",
+            "value": "list_groups"
+          },
+          {
+            "label": "Get Group",
+            "value": "get_group"
+          },
+          {
+            "label": "List Project Members",
+            "value": "list_project_members"
+          },
+          {
+            "label": "Add Project Member",
+            "value": "add_project_member"
+          },
+          {
+            "label": "Remove Project Member",
+            "value": "remove_project_member"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_current_user"
+          },
+          {
+            "label": "Search Users",
+            "value": "search_users"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "get_issue",
+            "create_issue",
+            "update_issue",
+            "delete_issue",
+            "list_mrs",
+            "get_mr",
+            "create_mr",
+            "update_mr",
+            "accept_mr",
+            "close_mr",
+            "list_pipelines",
+            "get_pipeline",
+            "create_pipeline",
+            "cancel_pipeline",
+            "retry_pipeline",
+            "list_pipeline_jobs",
+            "get_job",
+            "get_project",
+            "get_file",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "list_releases",
+            "get_release",
+            "create_release",
+            "list_project_members",
+            "add_project_member",
+            "remove_project_member"
+          ]
+        },
+        "label": "Project ID or url-encoded path",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_group"
+          ]
+        },
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_issue",
+            "update_issue",
+            "delete_issue"
+          ]
+        },
+        "label": "Issue IID",
+        "name": "issue_iid",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_mr",
+            "update_mr",
+            "accept_mr",
+            "close_mr"
+          ]
+        },
+        "label": "Merge Request IID",
+        "name": "mr_iid",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_pipeline",
+            "cancel_pipeline",
+            "retry_pipeline",
+            "list_pipeline_jobs"
+          ]
+        },
+        "label": "Pipeline ID",
+        "name": "pipeline_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_project_member",
+            "remove_project_member"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue",
+            "update_issue",
+            "create_mr",
+            "update_mr"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue",
+            "update_issue",
+            "create_mr",
+            "update_mr"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "create_issue",
+            "update_issue"
+          ]
+        },
+        "label": "Labels (comma-separated)",
+        "name": "labels",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_issue",
+            "update_mr"
+          ]
+        },
+        "label": "State Event (close|reopen)",
+        "name": "state_event",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue"
+          ]
+        },
+        "default": [],
+        "label": "Assignee IDs (JSON array)",
+        "name": "assignee_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_mr"
+          ]
+        },
+        "default": "main",
+        "label": "Target Branch",
+        "name": "target_branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_mr"
+          ]
+        },
+        "label": "Source Branch",
+        "name": "source_branch",
+        "type": "string"
+      },
+      {
+        "label": "Commit SHA",
+        "name": "commit_sha",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_file",
+            "create_file",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "File Path",
+        "name": "file_path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file"
+          ]
+        },
+        "label": "File Content",
+        "name": "file_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "Commit Message",
+        "name": "commit_message",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_pipeline",
+            "get_file",
+            "create_release"
+          ]
+        },
+        "label": "Ref (branch/tag/sha)",
+        "name": "ref",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_release",
+            "create_release"
+          ]
+        },
+        "label": "Release Tag",
+        "name": "release_tag",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release"
+          ]
+        },
+        "label": "Release Name",
+        "name": "release_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release"
+          ]
+        },
+        "label": "Release Description",
+        "name": "release_description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_project_member"
+          ]
+        },
+        "default": 30,
+        "label": "Access Level (10/20/30/40/50)",
+        "name": "access_level",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_users"
+          ]
+        },
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "list_mrs",
+            "list_projects"
+          ]
+        },
+        "default": 20,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.gitlab"
   },
   "action.gmail": {
     "allow_error": true,
@@ -34128,11 +34937,11 @@
   "action.jira": {
     "allow_error": true,
     "category": "integration",
-    "color": "#ffffff",
+    "color": "#0052CC",
     "credential_type": "jira_api_key",
     "default_height": null,
     "default_width": null,
-    "description": "Create issues, update status, add comments, and search Jira projects.",
+    "description": "Jira \u2014 issues, projects, comments, transitions, worklogs, sprints.",
     "dynamic_outputs_from": null,
     "icon": "jira",
     "inputs": 1,
@@ -34141,32 +34950,28 @@
     "outputs": 1,
     "outputs_schema": [
       {
+        "label": "data",
+        "type": "object"
+      },
+      {
         "label": "id",
         "type": "string"
       },
       {
         "label": "key",
         "type": "string"
-      },
-      {
-        "label": "summary",
-        "type": "string"
-      },
-      {
-        "label": "issues",
-        "type": "array"
       }
     ],
     "properties": [
       {
         "credentialType": "jira_api_key",
-        "label": "Jira Credential",
+        "label": "Jira Account",
         "name": "credential",
         "required": true,
         "type": "credential"
       },
       {
-        "default": "get_issue",
+        "default": "create_issue",
         "label": "Operation",
         "name": "operation",
         "options": [
@@ -34195,8 +35000,80 @@
             "value": "transition_issue"
           },
           {
-            "label": "List Transitions",
+            "label": "List Available Transitions",
             "value": "list_transitions"
+          },
+          {
+            "label": "Delete Issue",
+            "value": "delete_issue"
+          },
+          {
+            "label": "Assign Issue",
+            "value": "assign_issue"
+          },
+          {
+            "label": "Add Watcher",
+            "value": "add_watcher"
+          },
+          {
+            "label": "List Watchers",
+            "value": "list_watchers"
+          },
+          {
+            "label": "List Comments",
+            "value": "list_comments"
+          },
+          {
+            "label": "Get Comment",
+            "value": "get_comment"
+          },
+          {
+            "label": "Update Comment",
+            "value": "update_comment"
+          },
+          {
+            "label": "Delete Comment",
+            "value": "delete_comment"
+          },
+          {
+            "label": "Add Worklog",
+            "value": "add_worklog"
+          },
+          {
+            "label": "List Worklogs",
+            "value": "list_worklogs"
+          },
+          {
+            "label": "Delete Worklog",
+            "value": "delete_worklog"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Get Project",
+            "value": "get_project"
+          },
+          {
+            "label": "List Project Versions",
+            "value": "list_project_versions"
+          },
+          {
+            "label": "Create Version",
+            "value": "create_version"
+          },
+          {
+            "label": "Update Version",
+            "value": "update_version"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_current_user"
+          },
+          {
+            "label": "Search Users",
+            "value": "search_users"
           }
         ],
         "type": "options"
@@ -34209,7 +35086,18 @@
             "update_issue",
             "add_comment",
             "transition_issue",
-            "list_transitions"
+            "list_transitions",
+            "delete_issue",
+            "assign_issue",
+            "add_watcher",
+            "list_watchers",
+            "list_comments",
+            "get_comment",
+            "update_comment",
+            "delete_comment",
+            "add_worklog",
+            "list_worklogs",
+            "delete_worklog"
           ]
         },
         "label": "Issue Key",
@@ -34220,11 +35108,25 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_issue"
+          "value": [
+            "create_issue",
+            "get_project",
+            "list_project_versions"
+          ]
         },
         "label": "Project Key",
         "name": "project_key",
-        "placeholder": "PROJ",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_version"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
         "type": "string"
       },
       {
@@ -34232,7 +35134,8 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "search_users"
           ]
         },
         "label": "Summary",
@@ -34254,44 +35157,142 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_issue"
+          "value": [
+            "create_issue"
+          ]
         },
         "default": "Task",
         "label": "Issue Type",
         "name": "issue_type",
-        "options": [
-          {
-            "label": "Task",
-            "value": "Task"
-          },
-          {
-            "label": "Bug",
-            "value": "Bug"
-          },
-          {
-            "label": "Story",
-            "value": "Story"
-          },
-          {
-            "label": "Epic",
-            "value": "Epic"
-          }
-        ],
-        "type": "options"
+        "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "add_comment"
+          "value": [
+            "create_issue",
+            "update_issue"
+          ]
         },
-        "label": "Comment",
+        "label": "Priority",
+        "name": "priority",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue",
+            "assign_issue"
+          ]
+        },
+        "label": "Assignee Account ID",
+        "name": "assignee_id",
+        "type": "string"
+      },
+      {
+        "label": "Reporter Account ID",
+        "name": "reporter_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue"
+          ]
+        },
+        "default": [],
+        "label": "Labels (JSON array)",
+        "name": "labels",
+        "type": "json"
+      },
+      {
+        "default": [],
+        "label": "Components (JSON array)",
+        "name": "components",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_issues"
+          ]
+        },
+        "label": "JQL",
+        "name": "jql",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_issue",
+            "search_issues"
+          ]
+        },
+        "label": "Fields (comma-separated)",
+        "name": "fields",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_issues"
+          ]
+        },
+        "default": 50,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_issues"
+          ]
+        },
+        "default": 0,
+        "label": "Start At",
+        "mode": "advanced",
+        "name": "start_at",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_comment",
+            "update_comment"
+          ]
+        },
+        "label": "Comment Body",
         "name": "comment_body",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "transition_issue"
+          "value": [
+            "get_comment",
+            "update_comment",
+            "delete_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "transition_issue"
+          ]
         },
         "label": "Transition ID",
         "name": "transition_id",
@@ -34300,23 +35301,102 @@
       {
         "condition": {
           "field": "operation",
-          "value": "search_issues"
+          "value": [
+            "add_worklog"
+          ]
         },
-        "label": "JQL Query",
-        "name": "jql",
-        "placeholder": "project = \"PROJ\" AND status = \"Open\"",
+        "label": "Worklog Time Spent (e.g. 1h 30m)",
+        "name": "worklog_time_spent",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "search_issues"
+          "value": [
+            "add_worklog"
+          ]
         },
-        "default": 20,
-        "label": "Max Results",
-        "mode": "advanced",
-        "name": "max_results",
-        "type": "number"
+        "label": "Worklog Comment",
+        "name": "worklog_comment",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_worklog"
+          ]
+        },
+        "label": "Worklog ID",
+        "name": "worklog_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_version",
+            "update_version"
+          ]
+        },
+        "label": "Version Name",
+        "name": "version_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_version"
+          ]
+        },
+        "label": "Version ID",
+        "name": "version_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_version",
+            "update_version"
+          ]
+        },
+        "default": false,
+        "label": "Version Released",
+        "name": "version_released",
+        "type": "boolean"
+      },
+      {
+        "label": "Attachment URL",
+        "name": "attachment_url",
+        "type": "string"
+      },
+      {
+        "label": "Board ID",
+        "name": "board_id",
+        "type": "string"
+      },
+      {
+        "label": "Sprint ID",
+        "name": "sprint_id",
+        "type": "string"
+      },
+      {
+        "label": "Sprint Name",
+        "name": "sprint_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_watcher"
+          ]
+        },
+        "label": "Watcher Account ID",
+        "name": "watcher_account_id",
+        "type": "string"
       },
       {
         "default": 0,
