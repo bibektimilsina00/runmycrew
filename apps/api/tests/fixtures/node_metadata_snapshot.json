@@ -1950,6 +1950,915 @@
     "tools": null,
     "type": "action.aws_athena"
   },
+  "action.aws_cloudformation": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS CloudFormation \u2014 stacks, resources, change sets.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-cloudformation",
+    "inputs": 1,
+    "name": "AWS CloudFormation",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "Stacks",
+        "type": "array"
+      },
+      {
+        "label": "StackResources",
+        "type": "array"
+      },
+      {
+        "label": "StackId",
+        "type": "string"
+      },
+      {
+        "label": "ChangeSetId",
+        "type": "string"
+      },
+      {
+        "label": "ResponseMetadata",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS CloudFormation Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_stacks",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Stacks",
+            "value": "list_stacks"
+          },
+          {
+            "label": "Describe Stacks",
+            "value": "describe_stacks"
+          },
+          {
+            "label": "Describe Stack Resources",
+            "value": "describe_stack_resources"
+          },
+          {
+            "label": "Create Stack",
+            "value": "create_stack"
+          },
+          {
+            "label": "Update Stack",
+            "value": "update_stack"
+          },
+          {
+            "label": "Delete Stack",
+            "value": "delete_stack"
+          },
+          {
+            "label": "Create Change Set",
+            "value": "create_change_set"
+          },
+          {
+            "label": "Describe Change Set",
+            "value": "describe_change_set"
+          },
+          {
+            "label": "Execute Change Set",
+            "value": "execute_change_set"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_stacks",
+            "describe_stack_resources",
+            "create_stack",
+            "update_stack",
+            "delete_stack",
+            "create_change_set",
+            "describe_change_set",
+            "execute_change_set"
+          ]
+        },
+        "label": "Stack Name",
+        "name": "stack_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_stack",
+            "update_stack",
+            "create_change_set"
+          ]
+        },
+        "label": "Template Body (JSON/YAML)",
+        "name": "template_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_stack",
+            "update_stack",
+            "create_change_set"
+          ]
+        },
+        "label": "Template URL (S3)",
+        "mode": "advanced",
+        "name": "template_url",
+        "type": "string"
+      },
+      {
+        "label": "Parameters (JSON array)",
+        "mode": "advanced",
+        "name": "parameters",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_stack"
+          ]
+        },
+        "label": "Capabilities (JSON array)",
+        "mode": "advanced",
+        "name": "capabilities",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_change_set",
+            "describe_change_set",
+            "execute_change_set"
+          ]
+        },
+        "label": "Change Set Name",
+        "name": "change_set_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_stacks"
+          ]
+        },
+        "label": "Next Token",
+        "mode": "advanced",
+        "name": "next_token",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_cloudformation"
+  },
+  "action.aws_cloudwatch_logs": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS CloudWatch Logs \u2014 log groups, streams, events, filters.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-cloudwatch",
+    "inputs": 1,
+    "name": "AWS CloudWatch Logs",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "logGroups",
+        "type": "array"
+      },
+      {
+        "label": "logStreams",
+        "type": "array"
+      },
+      {
+        "label": "events",
+        "type": "array"
+      },
+      {
+        "label": "nextToken",
+        "type": "string"
+      },
+      {
+        "label": "nextForwardToken",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS CloudWatch Logs Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "describe_log_groups",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Describe Log Groups",
+            "value": "describe_log_groups"
+          },
+          {
+            "label": "Create Log Group",
+            "value": "create_log_group"
+          },
+          {
+            "label": "Delete Log Group",
+            "value": "delete_log_group"
+          },
+          {
+            "label": "Put Retention Policy",
+            "value": "put_retention_policy"
+          },
+          {
+            "label": "Describe Log Streams",
+            "value": "describe_log_streams"
+          },
+          {
+            "label": "Create Log Stream",
+            "value": "create_log_stream"
+          },
+          {
+            "label": "Put Log Events",
+            "value": "put_log_events"
+          },
+          {
+            "label": "Filter Log Events",
+            "value": "filter_log_events"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_log_groups",
+            "create_log_group",
+            "delete_log_group",
+            "put_retention_policy",
+            "describe_log_streams",
+            "create_log_stream",
+            "put_log_events",
+            "filter_log_events"
+          ]
+        },
+        "label": "Log Group",
+        "name": "log_group_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_log_stream",
+            "put_log_events"
+          ]
+        },
+        "label": "Log Stream",
+        "name": "log_stream_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "put_log_events"
+          ]
+        },
+        "label": "Log Events (JSON array)",
+        "name": "log_events",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "filter_log_events"
+          ]
+        },
+        "label": "Filter Pattern",
+        "mode": "advanced",
+        "name": "filter_pattern",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "filter_log_events"
+          ]
+        },
+        "label": "Start Time (ms epoch)",
+        "mode": "advanced",
+        "name": "start_time",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "filter_log_events"
+          ]
+        },
+        "label": "End Time (ms epoch)",
+        "mode": "advanced",
+        "name": "end_time",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_log_groups",
+            "describe_log_streams",
+            "filter_log_events"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_log_groups"
+          ]
+        },
+        "label": "Next Token",
+        "mode": "advanced",
+        "name": "next_token",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "put_retention_policy"
+          ]
+        },
+        "default": 30,
+        "label": "Retention Days",
+        "mode": "advanced",
+        "name": "retention_days",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_cloudwatch_logs"
+  },
+  "action.aws_iam": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS IAM \u2014 users, groups, roles, policies via SigV4.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-iam",
+    "inputs": 1,
+    "name": "AWS IAM",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "ListUsersResult",
+        "type": "object"
+      },
+      {
+        "label": "GetUserResult",
+        "type": "object"
+      },
+      {
+        "label": "CreateUserResult",
+        "type": "object"
+      },
+      {
+        "label": "ListRolesResult",
+        "type": "object"
+      },
+      {
+        "label": "ResponseMetadata",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS IAM Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_users",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Create User",
+            "value": "create_user"
+          },
+          {
+            "label": "Delete User",
+            "value": "delete_user"
+          },
+          {
+            "label": "List Roles",
+            "value": "list_roles"
+          },
+          {
+            "label": "Get Role",
+            "value": "get_role"
+          },
+          {
+            "label": "Create Role",
+            "value": "create_role"
+          },
+          {
+            "label": "Attach Managed Policy to User",
+            "value": "attach_user_policy"
+          },
+          {
+            "label": "Attach Managed Policy to Role",
+            "value": "attach_role_policy"
+          },
+          {
+            "label": "List Groups",
+            "value": "list_groups"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user",
+            "create_user",
+            "delete_user",
+            "attach_user_policy"
+          ]
+        },
+        "label": "User Name",
+        "name": "user_name",
+        "type": "string"
+      },
+      {
+        "label": "Group Name",
+        "name": "group_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_role",
+            "create_role",
+            "attach_role_policy"
+          ]
+        },
+        "label": "Role Name",
+        "name": "role_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "attach_user_policy",
+            "attach_role_policy"
+          ]
+        },
+        "label": "Policy ARN",
+        "name": "policy_arn",
+        "type": "string"
+      },
+      {
+        "label": "Policy Document (JSON)",
+        "name": "policy_document",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_role"
+          ]
+        },
+        "label": "Assume Role Policy Document (JSON)",
+        "mode": "advanced",
+        "name": "assume_role_policy_document",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_users",
+            "list_roles",
+            "list_groups"
+          ]
+        },
+        "default": 100,
+        "label": "Max Items",
+        "mode": "advanced",
+        "name": "max_items",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_users"
+          ]
+        },
+        "label": "Marker (pagination)",
+        "mode": "advanced",
+        "name": "marker",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_iam"
+  },
+  "action.aws_rds": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS RDS \u2014 describe DB instances, snapshots, clusters.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-rds",
+    "inputs": 1,
+    "name": "AWS RDS",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "DescribeDBInstancesResult",
+        "type": "object"
+      },
+      {
+        "label": "DBInstances",
+        "type": "array"
+      },
+      {
+        "label": "DBClusters",
+        "type": "array"
+      },
+      {
+        "label": "DBSnapshots",
+        "type": "array"
+      },
+      {
+        "label": "ResponseMetadata",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS RDS Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "describe_db_instances",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Describe DB Instances",
+            "value": "describe_db_instances"
+          },
+          {
+            "label": "Describe DB Clusters",
+            "value": "describe_db_clusters"
+          },
+          {
+            "label": "Describe DB Snapshots",
+            "value": "describe_db_snapshots"
+          },
+          {
+            "label": "Create DB Snapshot",
+            "value": "create_db_snapshot"
+          },
+          {
+            "label": "Delete DB Snapshot",
+            "value": "delete_db_snapshot"
+          },
+          {
+            "label": "Create DB Instance",
+            "value": "create_db_instance"
+          },
+          {
+            "label": "Delete DB Instance",
+            "value": "delete_db_instance"
+          },
+          {
+            "label": "Reboot DB Instance",
+            "value": "reboot_db_instance"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_db_instances",
+            "describe_db_snapshots",
+            "create_db_snapshot",
+            "create_db_instance",
+            "delete_db_instance",
+            "reboot_db_instance"
+          ]
+        },
+        "label": "DB Instance ID",
+        "name": "db_instance_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_db_clusters"
+          ]
+        },
+        "label": "DB Cluster ID",
+        "name": "db_cluster_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_db_snapshots",
+            "create_db_snapshot",
+            "delete_db_snapshot"
+          ]
+        },
+        "label": "Snapshot ID",
+        "name": "snapshot_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_db_instance"
+          ]
+        },
+        "label": "Engine",
+        "name": "engine",
+        "placeholder": "postgres | mysql | aurora-postgresql",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_db_instance"
+          ]
+        },
+        "label": "Instance Class",
+        "name": "instance_class",
+        "placeholder": "db.t3.micro",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_db_instance"
+          ]
+        },
+        "label": "Allocated Storage (GB)",
+        "mode": "advanced",
+        "name": "storage_gb",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_db_instance"
+          ]
+        },
+        "label": "Master Username",
+        "mode": "advanced",
+        "name": "master_username",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_db_instance"
+          ]
+        },
+        "label": "Master Password",
+        "mode": "advanced",
+        "name": "master_password",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_db_instances",
+            "describe_db_clusters"
+          ]
+        },
+        "default": 100,
+        "label": "Max Records",
+        "mode": "advanced",
+        "name": "max_records",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "describe_db_instances"
+          ]
+        },
+        "label": "Marker (pagination)",
+        "mode": "advanced",
+        "name": "marker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_db_instance"
+          ]
+        },
+        "default": true,
+        "label": "Skip final snapshot on delete",
+        "mode": "advanced",
+        "name": "skip_final_snapshot",
+        "type": "boolean"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_rds"
+  },
   "action.aws_s3": {
     "allow_error": true,
     "category": "integration",
@@ -2783,6 +3692,181 @@
     ],
     "tools": null,
     "type": "action.aws_sqs"
+  },
+  "action.aws_sts": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS STS \u2014 get caller identity, assume roles, session tokens.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-sts",
+    "inputs": 1,
+    "name": "AWS STS",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "GetCallerIdentityResult",
+        "type": "object"
+      },
+      {
+        "label": "AssumeRoleResult",
+        "type": "object"
+      },
+      {
+        "label": "Credentials",
+        "type": "object"
+      },
+      {
+        "label": "AssumedRoleUser",
+        "type": "object"
+      },
+      {
+        "label": "ResponseMetadata",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS STS Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_caller_identity",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Caller Identity",
+            "value": "get_caller_identity"
+          },
+          {
+            "label": "Assume Role",
+            "value": "assume_role"
+          },
+          {
+            "label": "Assume Role with Web Identity",
+            "value": "assume_role_with_web_identity"
+          },
+          {
+            "label": "Get Session Token",
+            "value": "get_session_token"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assume_role",
+            "assume_role_with_web_identity"
+          ]
+        },
+        "label": "Role ARN",
+        "name": "role_arn",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assume_role",
+            "assume_role_with_web_identity"
+          ]
+        },
+        "label": "Role Session Name",
+        "name": "session_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assume_role",
+            "assume_role_with_web_identity",
+            "get_session_token"
+          ]
+        },
+        "default": 3600,
+        "label": "Duration Seconds",
+        "mode": "advanced",
+        "name": "duration_seconds",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assume_role"
+          ]
+        },
+        "label": "External ID",
+        "mode": "advanced",
+        "name": "external_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assume_role"
+          ]
+        },
+        "label": "Session Policy (JSON)",
+        "mode": "advanced",
+        "name": "policy",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assume_role_with_web_identity"
+          ]
+        },
+        "label": "Web Identity Token",
+        "mode": "advanced",
+        "name": "web_identity_token",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_sts"
   },
   "action.box": {
     "allow_error": true,
@@ -18836,6 +19920,249 @@
     ],
     "tools": null,
     "type": "action.microsoft_excel"
+  },
+  "action.microsoft_planner": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "microsoft_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Microsoft Planner \u2014 plans, buckets, tasks.",
+    "dynamic_outputs_from": null,
+    "icon": "microsoft-planner",
+    "inputs": 1,
+    "name": "Microsoft Planner",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "@odata.etag",
+        "type": "string"
+      },
+      {
+        "label": "value",
+        "type": "array"
+      },
+      {
+        "label": "planId",
+        "type": "string"
+      },
+      {
+        "label": "bucketId",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "microsoft_oauth",
+        "label": "Microsoft Planner Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_plans",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Plans (by Group)",
+            "value": "list_plans"
+          },
+          {
+            "label": "Get Plan",
+            "value": "get_plan"
+          },
+          {
+            "label": "Create Plan",
+            "value": "create_plan"
+          },
+          {
+            "label": "List Buckets",
+            "value": "list_buckets"
+          },
+          {
+            "label": "Create Bucket",
+            "value": "create_bucket"
+          },
+          {
+            "label": "List Tasks",
+            "value": "list_tasks"
+          },
+          {
+            "label": "Get Task",
+            "value": "get_task"
+          },
+          {
+            "label": "Create Task",
+            "value": "create_task"
+          },
+          {
+            "label": "Update Task (If-Match required)",
+            "value": "update_task"
+          },
+          {
+            "label": "Delete Task (If-Match required)",
+            "value": "delete_task"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_plans",
+            "create_plan"
+          ]
+        },
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_plan",
+            "list_buckets",
+            "create_bucket",
+            "list_tasks",
+            "create_task"
+          ]
+        },
+        "label": "Plan ID",
+        "name": "plan_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "label": "Bucket ID",
+        "name": "bucket_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_task",
+            "update_task",
+            "delete_task"
+          ]
+        },
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_plan",
+            "create_bucket",
+            "create_task",
+            "update_task"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_task",
+            "delete_task"
+          ]
+        },
+        "label": "ETag (@odata.etag)",
+        "mode": "advanced",
+        "name": "etag",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_task"
+          ]
+        },
+        "label": "Percent Complete (0-100)",
+        "mode": "advanced",
+        "name": "percent_complete",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task",
+            "update_task"
+          ]
+        },
+        "label": "Due date (ISO)",
+        "mode": "advanced",
+        "name": "due_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "label": "Assignees (JSON object userId\u2192role)",
+        "mode": "advanced",
+        "name": "assignees",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.microsoft_planner"
   },
   "action.microsoft_teams": {
     "allow_error": true,

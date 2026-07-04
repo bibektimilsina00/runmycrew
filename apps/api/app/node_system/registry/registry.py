@@ -21,12 +21,21 @@ from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
 from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
+from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
+    AWSCloudFormationNode,
+)
+from apps.api.app.node_system.nodes.aws_cloudwatch_logs.aws_cloudwatch_logs_node import (
+    AWSCloudWatchLogsNode,
+)
+from apps.api.app.node_system.nodes.aws_iam.aws_iam_node import AWSIAMNode
+from apps.api.app.node_system.nodes.aws_rds.aws_rds_node import AWSRDSNode
 from apps.api.app.node_system.nodes.aws_s3.aws_s3_node import AWSS3Node
 from apps.api.app.node_system.nodes.aws_secrets_manager.aws_secrets_manager_node import (
     AWSSecretsManagerNode,
 )
 from apps.api.app.node_system.nodes.aws_ses.aws_ses_node import AWSSESNode
 from apps.api.app.node_system.nodes.aws_sqs.aws_sqs_node import AWSSQSNode
+from apps.api.app.node_system.nodes.aws_sts.aws_sts_node import AWSSTSNode
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
@@ -116,6 +125,9 @@ from apps.api.app.node_system.nodes.meta.lead_trigger import LeadTriggerNode
 from apps.api.app.node_system.nodes.meta.whatsapp_action import WhatsAppActionNode
 from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTriggerNode
 from apps.api.app.node_system.nodes.microsoft_excel.microsoft_excel_node import MicrosoftExcelNode
+from apps.api.app.node_system.nodes.microsoft_planner.microsoft_planner_node import (
+    MicrosoftPlannerNode,
+)
 from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_node import MicrosoftTeamsNode
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
@@ -256,6 +268,14 @@ node_registry.register(AWSSESNode)
 node_registry.register(AWSSQSNode)
 node_registry.register(AWSSecretsManagerNode)
 node_registry.register(AWSAthenaNode)
+# Phase 2.6 — AWS completion (RDS + IAM + STS + CloudWatch Logs +
+# CloudFormation) + Microsoft Planner.
+node_registry.register(AWSRDSNode)
+node_registry.register(AWSIAMNode)
+node_registry.register(AWSSTSNode)
+node_registry.register(AWSCloudWatchLogsNode)
+node_registry.register(AWSCloudFormationNode)
+node_registry.register(MicrosoftPlannerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)
