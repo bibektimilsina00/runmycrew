@@ -46,10 +46,14 @@ from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
 from apps.api.app.node_system.nodes.db.neo4j.neo4j import Neo4jNode
 from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
+from apps.api.app.node_system.nodes.docusign.docusign_node import DocuSignNode
+from apps.api.app.node_system.nodes.dropbox.dropbox_node import DropboxNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
+from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
+from apps.api.app.node_system.nodes.fireflies.fireflies_node import FirefliesNode
 from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
@@ -65,6 +69,7 @@ from apps.api.app.node_system.nodes.github.github_node import GitHubNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
+from apps.api.app.node_system.nodes.gong.gong_node import GongNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
@@ -246,6 +251,12 @@ node_registry.register(AWSSESNode)
 node_registry.register(AWSSQSNode)
 node_registry.register(AWSSecretsManagerNode)
 node_registry.register(AWSAthenaNode)
+# Phase 2.4 — meetings + docs.
+node_registry.register(DropboxNode)
+node_registry.register(DocuSignNode)
+node_registry.register(FirefliesNode)
+node_registry.register(GongNode)
+node_registry.register(FathomNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

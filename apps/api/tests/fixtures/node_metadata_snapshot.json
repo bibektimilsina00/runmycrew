@@ -4106,6 +4106,485 @@
     "tools": null,
     "type": "action.discord"
   },
+  "action.docusign": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": [
+      "docusign_oauth",
+      "docusign_creds"
+    ],
+    "default_height": null,
+    "default_width": null,
+    "description": "DocuSign \u2014 send envelopes, manage templates, track signatures.",
+    "dynamic_outputs_from": null,
+    "icon": "docusign",
+    "inputs": 1,
+    "name": "DocuSign",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "envelopeId",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "envelopes",
+        "type": "array"
+      },
+      {
+        "label": "envelopeTemplates",
+        "type": "array"
+      },
+      {
+        "label": "signers",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": [
+          "docusign_oauth",
+          "docusign_creds"
+        ],
+        "label": "DocuSign Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_envelopes",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Envelopes",
+            "value": "list_envelopes"
+          },
+          {
+            "label": "Get Envelope",
+            "value": "get_envelope"
+          },
+          {
+            "label": "Create Envelope (documents + recipients)",
+            "value": "create_envelope"
+          },
+          {
+            "label": "Send From Template",
+            "value": "send_from_template"
+          },
+          {
+            "label": "Void Envelope",
+            "value": "void_envelope"
+          },
+          {
+            "label": "List Templates",
+            "value": "list_templates"
+          },
+          {
+            "label": "Get Envelope Recipients",
+            "value": "get_envelope_recipients"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_envelope",
+            "void_envelope",
+            "get_envelope_recipients"
+          ]
+        },
+        "label": "Envelope ID",
+        "name": "envelope_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_from_template"
+          ]
+        },
+        "label": "Template ID",
+        "name": "template_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_envelope",
+            "send_from_template"
+          ]
+        },
+        "label": "Email Subject",
+        "name": "email_subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_envelope"
+          ]
+        },
+        "label": "Email Body",
+        "mode": "advanced",
+        "name": "email_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_envelope",
+            "send_from_template"
+          ]
+        },
+        "default": "sent",
+        "label": "Envelope Status",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "Draft (created)",
+            "value": "created"
+          },
+          {
+            "label": "Send now",
+            "value": "sent"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_envelope"
+          ]
+        },
+        "description": "Each: {name, fileExtension, documentId, documentBase64}. Provide either documents + recipients or template_id + template_roles.",
+        "label": "Documents (JSON array)",
+        "name": "documents",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_envelope"
+          ]
+        },
+        "label": "Recipients (JSON)",
+        "name": "recipients",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_from_template"
+          ]
+        },
+        "label": "Template Roles (JSON array)",
+        "name": "template_roles",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_envelopes"
+          ]
+        },
+        "label": "From Date (ISO)",
+        "mode": "advanced",
+        "name": "from_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_envelopes",
+            "list_templates"
+          ]
+        },
+        "default": 25,
+        "label": "Page size",
+        "mode": "advanced",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.docusign"
+  },
+  "action.dropbox": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "dropbox_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Dropbox \u2014 files, folders, share links.",
+    "dynamic_outputs_from": null,
+    "icon": "dropbox",
+    "inputs": 1,
+    "name": "Dropbox",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "path_display",
+        "type": "string"
+      },
+      {
+        "label": "entries",
+        "type": "array"
+      },
+      {
+        "label": "matches",
+        "type": "array"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "dropbox_oauth",
+        "label": "Dropbox Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_folder",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Folder",
+            "value": "list_folder"
+          },
+          {
+            "label": "Get Metadata",
+            "value": "get_metadata"
+          },
+          {
+            "label": "Create Folder",
+            "value": "create_folder"
+          },
+          {
+            "label": "Delete",
+            "value": "delete"
+          },
+          {
+            "label": "Move",
+            "value": "move"
+          },
+          {
+            "label": "Copy",
+            "value": "copy"
+          },
+          {
+            "label": "Search",
+            "value": "search"
+          },
+          {
+            "label": "Create Share Link",
+            "value": "create_share_link"
+          },
+          {
+            "label": "Get Current Account",
+            "value": "get_current_account"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_folder",
+            "get_metadata",
+            "create_folder",
+            "delete",
+            "create_share_link"
+          ]
+        },
+        "label": "Path",
+        "name": "path",
+        "placeholder": "/Documents/notes.txt",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "move",
+            "copy"
+          ]
+        },
+        "label": "From Path",
+        "name": "from_path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "move",
+            "copy"
+          ]
+        },
+        "label": "To Path",
+        "name": "to_path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_folder",
+            "move",
+            "copy"
+          ]
+        },
+        "default": false,
+        "label": "Auto-rename on conflict",
+        "mode": "advanced",
+        "name": "autorename",
+        "type": "boolean"
+      },
+      {
+        "default": false,
+        "label": "Mute notifications",
+        "mode": "advanced",
+        "name": "mute",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_folder"
+          ]
+        },
+        "default": false,
+        "label": "Recursive (list_folder)",
+        "mode": "advanced",
+        "name": "recursive",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_folder",
+            "search"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.dropbox"
+  },
   "action.dub": {
     "allow_error": true,
     "category": "integration",
@@ -5183,6 +5662,179 @@
     "tools": null,
     "type": "action.exa"
   },
+  "action.fathom": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "fathom_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Fathom.video \u2014 meetings, transcripts, action items.",
+    "dynamic_outputs_from": null,
+    "icon": "fathom",
+    "inputs": 1,
+    "name": "Fathom",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "recording_url",
+        "type": "string"
+      },
+      {
+        "label": "meetings",
+        "type": "array"
+      },
+      {
+        "label": "transcript",
+        "type": "array"
+      },
+      {
+        "label": "action_items",
+        "type": "array"
+      },
+      {
+        "label": "next_cursor",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "fathom_api_key",
+        "label": "Fathom Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_meetings",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Meetings",
+            "value": "list_meetings"
+          },
+          {
+            "label": "Get Meeting",
+            "value": "get_meeting"
+          },
+          {
+            "label": "Get Meeting Transcript",
+            "value": "get_transcript"
+          },
+          {
+            "label": "Get Meeting Summary",
+            "value": "get_summary"
+          },
+          {
+            "label": "Get Action Items",
+            "value": "get_action_items"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_meeting",
+            "get_transcript",
+            "get_summary",
+            "get_action_items"
+          ]
+        },
+        "label": "Meeting ID",
+        "name": "meeting_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_meetings"
+          ]
+        },
+        "label": "From (ISO)",
+        "name": "from_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_meetings"
+          ]
+        },
+        "label": "To (ISO)",
+        "name": "to_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_meetings"
+          ]
+        },
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_meetings"
+          ]
+        },
+        "label": "Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.fathom"
+  },
   "action.firecrawl": {
     "allow_error": true,
     "category": "integration",
@@ -5342,6 +5994,150 @@
     ],
     "tools": null,
     "type": "action.firecrawl"
+  },
+  "action.fireflies": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "fireflies_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Fireflies.ai \u2014 meeting transcripts, summaries, search via GraphQL.",
+    "dynamic_outputs_from": null,
+    "icon": "fireflies",
+    "inputs": 1,
+    "name": "Fireflies",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "summary",
+        "type": "object"
+      },
+      {
+        "label": "sentences",
+        "type": "array"
+      },
+      {
+        "label": "transcripts",
+        "type": "array"
+      },
+      {
+        "label": "users",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "fireflies_api_key",
+        "label": "Fireflies Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_transcripts",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Transcripts",
+            "value": "list_transcripts"
+          },
+          {
+            "label": "Get Transcript",
+            "value": "get_transcript"
+          },
+          {
+            "label": "Search Transcripts",
+            "value": "search_transcripts"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_user"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_transcript"
+          ]
+        },
+        "label": "Transcript ID",
+        "name": "transcript_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_transcripts"
+          ]
+        },
+        "label": "Search Keyword",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_transcripts",
+            "search_transcripts"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.fireflies"
   },
   "action.ga4": {
     "allow_error": true,
@@ -9272,6 +10068,179 @@
     ],
     "tools": null,
     "type": "action.gmail"
+  },
+  "action.gong": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "gong_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Gong.io \u2014 call recordings, transcripts, deal insights.",
+    "dynamic_outputs_from": null,
+    "icon": "gong",
+    "inputs": 1,
+    "name": "Gong",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "callId",
+        "type": "string"
+      },
+      {
+        "label": "records",
+        "type": "object"
+      },
+      {
+        "label": "calls",
+        "type": "array"
+      },
+      {
+        "label": "users",
+        "type": "array"
+      },
+      {
+        "label": "callTranscripts",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "gong_api_key",
+        "label": "Gong Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_calls",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Calls",
+            "value": "list_calls"
+          },
+          {
+            "label": "Get Call",
+            "value": "get_call"
+          },
+          {
+            "label": "Get Call Transcript",
+            "value": "get_call_transcript"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Rich Call Data",
+            "value": "list_extensive_calls"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_call",
+            "get_call_transcript"
+          ]
+        },
+        "label": "Call ID",
+        "name": "call_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Deal ID",
+        "name": "deal_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_calls",
+            "list_extensive_calls"
+          ]
+        },
+        "label": "From Date (ISO)",
+        "name": "from_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_calls",
+            "list_extensive_calls"
+          ]
+        },
+        "label": "To Date (ISO)",
+        "name": "to_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_calls",
+            "list_users"
+          ]
+        },
+        "label": "Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.gong"
   },
   "action.google_sheets": {
     "allow_error": true,

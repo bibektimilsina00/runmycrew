@@ -68,6 +68,50 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "fireflies": APIKeyProvider(
+        id="fireflies_api_key",
+        name="Fireflies",
+        icon_slug="fireflies",
+        color="#1c1c1c",
+        description="Fireflies.ai — meeting transcripts + summaries + search (GraphQL).",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "gong": APIKeyProvider(
+        id="gong_api_key",
+        name="Gong",
+        icon_slug="gong",
+        color="#1c1c1c",
+        description="Gong.io — call recordings, transcripts, deal insights.",
+        hint="Access Key + Access Key Secret",
+        fields=[
+            CredentialField(
+                id="access_key",
+                label="Access Key",
+                type="string",
+                placeholder="Access Key",
+            ),
+            CredentialField(
+                id="access_key_secret",
+                label="Access Key Secret",
+                type="password",
+                placeholder="Secret",
+            ),
+        ],
+    ),
+    "fathom": APIKeyProvider(
+        id="fathom_api_key",
+        name="Fathom",
+        icon_slug="fathom",
+        color="#1c1c1c",
+        description="Fathom.video — meeting recordings, transcripts, action items.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
     "aws": APIKeyProvider(
         id="aws_credentials",
         name="AWS",

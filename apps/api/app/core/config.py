@@ -90,6 +90,13 @@ class Settings(BaseSettings):
     ZOOM_CLIENT_SECRET: str = ""
     BOX_CLIENT_ID: str = ""
     BOX_CLIENT_SECRET: str = ""
+    DROPBOX_CLIENT_ID: str = ""
+    DROPBOX_CLIENT_SECRET: str = ""
+    DOCUSIGN_CLIENT_ID: str = ""
+    DOCUSIGN_CLIENT_SECRET: str = ""
+    # DocuSign auth host — `account-d.docusign.com` on the demo/dev
+    # tier, `account.docusign.com` in production. Default is prod.
+    DOCUSIGN_AUTH_HOST: str = "account.docusign.com"
 
     # Google Picker SDK keys (separate from OAuth client). The
     # `developer key` is a browser-restricted API key for the Picker
