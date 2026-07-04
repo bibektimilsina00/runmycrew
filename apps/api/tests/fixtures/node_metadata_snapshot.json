@@ -4075,6 +4075,442 @@
     "tools": null,
     "type": "action.attio"
   },
+  "action.aws_appconfig": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#232F3E",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS AppConfig \u2014 deploy + fetch runtime configuration.",
+    "dynamic_outputs_from": null,
+    "icon": "aws_appconfig",
+    "inputs": 1,
+    "name": "AWS AppConfig",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS AppConfig Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_applications",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Applications",
+            "value": "list_applications"
+          },
+          {
+            "label": "List Environments",
+            "value": "list_environments"
+          },
+          {
+            "label": "List Config Profiles",
+            "value": "list_configuration_profiles"
+          },
+          {
+            "label": "Get Hosted Config Version",
+            "value": "get_hosted_configuration_version"
+          },
+          {
+            "label": "Start Deployment",
+            "value": "start_deployment"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_environments",
+            "list_configuration_profiles",
+            "get_hosted_configuration_version",
+            "start_deployment"
+          ]
+        },
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_deployment"
+          ]
+        },
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_hosted_configuration_version",
+            "start_deployment"
+          ]
+        },
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_hosted_configuration_version",
+            "start_deployment"
+          ]
+        },
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_deployment"
+          ]
+        },
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_appconfig"
+  },
   "action.aws_athena": {
     "allow_error": true,
     "category": "integration",
@@ -13901,6 +14337,433 @@
     "tools": null,
     "type": "action.elasticsearch"
   },
+  "action.elevenlabs": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#000000",
+    "credential_type": "elevenlabs_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "ElevenLabs \u2014 TTS, voice cloning, speech-to-speech.",
+    "dynamic_outputs_from": null,
+    "icon": "elevenlabs",
+    "inputs": 1,
+    "name": "ElevenLabs",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "elevenlabs_api_key",
+        "label": "ElevenLabs Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "text_to_speech",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Text to Speech",
+            "value": "text_to_speech"
+          },
+          {
+            "label": "List Voices",
+            "value": "list_voices"
+          },
+          {
+            "label": "Get Voice",
+            "value": "get_voice"
+          },
+          {
+            "label": "List Models",
+            "value": "list_models"
+          },
+          {
+            "label": "Speech to Text",
+            "value": "speech_to_text"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "speech_to_text"
+          ]
+        },
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_to_speech",
+            "get_voice"
+          ]
+        },
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_to_speech"
+          ]
+        },
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_to_speech",
+            "speech_to_text"
+          ]
+        },
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.elevenlabs"
+  },
   "action.emailbison": {
     "allow_error": true,
     "category": "integration",
@@ -21072,6 +21935,466 @@
     "tools": null,
     "type": "action.google_books"
   },
+  "action.google_contacts": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#4285F4",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Contacts \u2014 read + write People API contacts.",
+    "dynamic_outputs_from": null,
+    "icon": "google_contacts",
+    "inputs": 1,
+    "name": "Google Contacts",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "Google Contacts Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_contacts",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Contacts",
+            "value": "list_contacts"
+          },
+          {
+            "label": "Get Contact",
+            "value": "get_contact"
+          },
+          {
+            "label": "Create Contact",
+            "value": "create_contact"
+          },
+          {
+            "label": "Update Contact",
+            "value": "update_contact"
+          },
+          {
+            "label": "Delete Contact",
+            "value": "delete_contact"
+          },
+          {
+            "label": "Search Contacts",
+            "value": "search_contacts"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_contacts"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact",
+            "update_contact"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_contacts"
+          ]
+        },
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_contacts",
+            "get_contact"
+          ]
+        },
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_contact",
+            "update_contact",
+            "delete_contact"
+          ]
+        },
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact",
+            "update_contact"
+          ]
+        },
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact",
+            "update_contact"
+          ]
+        },
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact",
+            "update_contact"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_contacts"
+  },
   "action.google_groups": {
     "allow_error": true,
     "category": "integration",
@@ -21937,6 +23260,421 @@
     ],
     "tools": null,
     "type": "action.google_pagespeed"
+  },
+  "action.google_search": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#4285F4",
+    "credential_type": "google_search_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Custom Search JSON API \u2014 indexed web + image results.",
+    "dynamic_outputs_from": null,
+    "icon": "google_search",
+    "inputs": 1,
+    "name": "Google Search",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_search_api_key",
+        "label": "Google Search Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Web Search",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_search"
   },
   "action.google_sheets": {
     "allow_error": true,
@@ -28958,6 +30696,438 @@
     "tools": null,
     "type": "action.image_gen"
   },
+  "action.image_generator": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#000000",
+    "credential_type": "openai_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Generic image generation \u2014 wraps OpenAI DALL-E / gpt-image-1.",
+    "dynamic_outputs_from": null,
+    "icon": "image_generator",
+    "inputs": 1,
+    "name": "Image Generator (OpenAI DALL-E)",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "openai_api_key",
+        "label": "Image Generator (OpenAI DALL-E) Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "generate",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Generate Image",
+            "value": "generate"
+          },
+          {
+            "label": "Edit Image",
+            "value": "edit"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate"
+          ]
+        },
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate",
+            "edit"
+          ]
+        },
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate"
+          ]
+        },
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate"
+          ]
+        },
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "generate"
+          ]
+        },
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "edit"
+          ]
+        },
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "edit"
+          ]
+        },
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.image_generator"
+  },
   "action.incidentio": {
     "allow_error": true,
     "category": "integration",
@@ -35080,6 +37250,457 @@
     "tools": null,
     "type": "action.mcp"
   },
+  "action.mem0": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "mem0_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Mem0 \u2014 persistent memory for AI agents.",
+    "dynamic_outputs_from": null,
+    "icon": "mem0",
+    "inputs": 1,
+    "name": "Mem0",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "mem0_api_key",
+        "label": "Mem0 Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "add_memory",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Add Memory",
+            "value": "add_memory"
+          },
+          {
+            "label": "Search Memories",
+            "value": "search"
+          },
+          {
+            "label": "List Memories",
+            "value": "list_memories"
+          },
+          {
+            "label": "Get Memory",
+            "value": "get_memory"
+          },
+          {
+            "label": "Update Memory",
+            "value": "update_memory"
+          },
+          {
+            "label": "Delete Memory",
+            "value": "delete_memory"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_memory"
+          ]
+        },
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_memory"
+          ]
+        },
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_memory",
+            "search",
+            "list_memories"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_memory",
+            "update_memory",
+            "delete_memory"
+          ]
+        },
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_memory"
+          ]
+        },
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.mem0"
+  },
   "action.memory": {
     "allow_error": true,
     "category": "ai",
@@ -40846,6 +43467,486 @@
     "tools": null,
     "type": "action.onepassword"
   },
+  "action.openai": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#000000",
+    "credential_type": "openai_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "OpenAI \u2014 chat, embeddings, images, audio.",
+    "dynamic_outputs_from": null,
+    "icon": "openai",
+    "inputs": 1,
+    "name": "OpenAI",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "openai_api_key",
+        "label": "OpenAI Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "chat",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Chat Completion",
+            "value": "chat"
+          },
+          {
+            "label": "Responses (o-series)",
+            "value": "responses"
+          },
+          {
+            "label": "Embedding",
+            "value": "embedding"
+          },
+          {
+            "label": "Image Generation",
+            "value": "image_generation"
+          },
+          {
+            "label": "Audio Transcription",
+            "value": "transcription"
+          },
+          {
+            "label": "Moderation Check",
+            "value": "moderation"
+          },
+          {
+            "label": "List Models",
+            "value": "list_models"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "chat",
+            "responses",
+            "embedding",
+            "transcription"
+          ]
+        },
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "chat"
+          ]
+        },
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "chat"
+          ]
+        },
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "chat"
+          ]
+        },
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "responses",
+            "embedding",
+            "moderation"
+          ]
+        },
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "responses"
+          ]
+        },
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "image_generation"
+          ]
+        },
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "image_generation"
+          ]
+        },
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "image_generation"
+          ]
+        },
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "image_generation"
+          ]
+        },
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "transcription"
+          ]
+        },
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.openai"
+  },
   "action.openalex": {
     "allow_error": true,
     "category": "integration",
@@ -41325,6 +44426,440 @@
     ],
     "tools": null,
     "type": "action.outlook"
+  },
+  "action.parallel_ai": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "parallel_ai_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Parallel AI \u2014 web-scale research / task API.",
+    "dynamic_outputs_from": null,
+    "icon": "parallel_ai",
+    "inputs": 1,
+    "name": "Parallel AI",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "parallel_ai_api_key",
+        "label": "Parallel AI Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_task",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Task Run",
+            "value": "create_task"
+          },
+          {
+            "label": "Get Task Run",
+            "value": "get_task"
+          },
+          {
+            "label": "Get Task Run Result",
+            "value": "get_task_result"
+          },
+          {
+            "label": "Deep Search",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_task",
+            "get_task_result"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.parallel_ai"
   },
   "action.peopledatalabs": {
     "allow_error": true,
@@ -43300,6 +46835,119 @@
     ],
     "tools": null,
     "type": "action.postgres"
+  },
+  "action.postgresql": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#336791",
+    "credential_type": "postgresql_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Run parameterized SQL against a PostgreSQL database.",
+    "dynamic_outputs_from": null,
+    "icon": "postgresql",
+    "inputs": 1,
+    "name": "PostgreSQL",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "rows",
+        "type": "array"
+      },
+      {
+        "label": "row_count",
+        "type": "number"
+      },
+      {
+        "label": "operation",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Query (SELECT)",
+            "value": "query"
+          },
+          {
+            "label": "Execute (INSERT / UPDATE / DELETE)",
+            "value": "execute"
+          },
+          {
+            "label": "Execute Many (batch)",
+            "value": "execute_many"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "SQL",
+        "name": "sql",
+        "placeholder": "SELECT id, email FROM users WHERE created_at > $1",
+        "required": true,
+        "type": "code"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query",
+            "execute"
+          ]
+        },
+        "default": [],
+        "label": "Params (JSON array \u2014 $1, $2, ...)",
+        "name": "params",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "execute_many"
+          ]
+        },
+        "default": [],
+        "label": "Batches (JSON \u2014 array of param arrays)",
+        "name": "param_batches",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.postgresql"
   },
   "action.posthog": {
     "allow_error": true,
@@ -45459,6 +49107,423 @@
     "tools": null,
     "type": "action.railway"
   },
+  "action.rb2b": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "rb2b_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "RB2B \u2014 identify anonymous website visitors (B2B).",
+    "dynamic_outputs_from": null,
+    "icon": "rb2b",
+    "inputs": 1,
+    "name": "RB2B",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "rb2b_api_key",
+        "label": "RB2B Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_visitors",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Recent Visitors",
+            "value": "list_visitors"
+          },
+          {
+            "label": "Get Visitor",
+            "value": "get_visitor"
+          },
+          {
+            "label": "Identify by Email",
+            "value": "identify_by_email"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_visitors"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "identify_by_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_visitor"
+          ]
+        },
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_visitors"
+          ]
+        },
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.rb2b"
+  },
   "action.reddit": {
     "allow_error": true,
     "category": "integration",
@@ -47308,6 +51373,435 @@
     ],
     "tools": null,
     "type": "action.sap_concur"
+  },
+  "action.sap_s4hana": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#0FAAFF",
+    "credential_type": "sap_s4hana_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "SAP S/4HANA Cloud \u2014 OData v2 business partners, sales orders, ledger.",
+    "dynamic_outputs_from": null,
+    "icon": "sap_s4hana",
+    "inputs": 1,
+    "name": "SAP S/4HANA Cloud",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "sap_s4hana_credentials",
+        "label": "SAP S/4HANA Cloud Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_business_partners",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Business Partners",
+            "value": "list_business_partners"
+          },
+          {
+            "label": "Get Business Partner",
+            "value": "get_business_partner"
+          },
+          {
+            "label": "List Sales Orders",
+            "value": "list_sales_orders"
+          },
+          {
+            "label": "Get Sales Order",
+            "value": "get_sales_order"
+          },
+          {
+            "label": "List Journal Entries",
+            "value": "list_journal_entries"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_business_partner"
+          ]
+        },
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_sales_order"
+          ]
+        },
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_business_partners",
+            "list_sales_orders",
+            "list_journal_entries"
+          ]
+        },
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_business_partners",
+            "list_sales_orders",
+            "list_journal_entries"
+          ]
+        },
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sap_s4hana"
   },
   "action.sendblue": {
     "allow_error": true,
@@ -54258,6 +58752,436 @@
     "tools": null,
     "type": "action.twilio"
   },
+  "action.twilio_sms": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#F22F46",
+    "credential_type": "twilio_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Twilio SMS/MMS \u2014 send + inspect messages.",
+    "dynamic_outputs_from": null,
+    "icon": "twilio_sms",
+    "inputs": 1,
+    "name": "Twilio SMS",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "twilio_credentials",
+        "label": "Twilio SMS Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_message",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send SMS",
+            "value": "send_message"
+          },
+          {
+            "label": "Get Message",
+            "value": "get_message"
+          },
+          {
+            "label": "List Recent Messages",
+            "value": "list_messages"
+          },
+          {
+            "label": "Delete Message",
+            "value": "delete_message"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "list_messages"
+          ]
+        },
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message",
+            "list_messages"
+          ]
+        },
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_message",
+            "delete_message"
+          ]
+        },
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.twilio_sms"
+  },
   "action.twilio_voice": {
     "allow_error": true,
     "category": "integration",
@@ -58170,6 +63094,464 @@
     ],
     "tools": null,
     "type": "action.zendesk"
+  },
+  "action.zep": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "zep_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Zep \u2014 long-term memory + session tracking for AI apps.",
+    "dynamic_outputs_from": null,
+    "icon": "zep",
+    "inputs": 1,
+    "name": "Zep",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "zep_api_key",
+        "label": "Zep Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "add_user",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create User",
+            "value": "add_user"
+          },
+          {
+            "label": "Create Session",
+            "value": "add_session"
+          },
+          {
+            "label": "Add Memory to Session",
+            "value": "add_memory"
+          },
+          {
+            "label": "Get Session Memory",
+            "value": "get_memory"
+          },
+          {
+            "label": "Search Session Memory",
+            "value": "search_memory"
+          },
+          {
+            "label": "Delete Session",
+            "value": "delete_session"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Model",
+        "name": "model",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_memory"
+          ]
+        },
+        "default": [],
+        "label": "Messages (JSON array)",
+        "name": "messages",
+        "type": "json"
+      },
+      {
+        "default": 1,
+        "label": "Temperature",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Max Tokens",
+        "name": "max_tokens",
+        "type": "number"
+      },
+      {
+        "label": "Input",
+        "name": "input",
+        "type": "string"
+      },
+      {
+        "label": "Instructions",
+        "name": "instructions",
+        "type": "string"
+      },
+      {
+        "label": "Prompt",
+        "name": "prompt",
+        "type": "string"
+      },
+      {
+        "default": "1024x1024",
+        "label": "Size",
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "default": "high",
+        "label": "Quality",
+        "name": "quality",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "n",
+        "type": "number"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "Image URL",
+        "name": "image_url",
+        "type": "string"
+      },
+      {
+        "label": "Mask URL",
+        "name": "mask_url",
+        "type": "string"
+      },
+      {
+        "label": "Voice ID",
+        "name": "voice_id",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Model ID",
+        "name": "model_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_user",
+            "add_session"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Memory ID",
+        "name": "memory_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_memory"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_memory"
+          ]
+        },
+        "default": 10,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_session",
+            "add_memory",
+            "get_memory",
+            "search_memory",
+            "delete_session"
+          ]
+        },
+        "label": "Session ID",
+        "name": "session_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_user"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_user"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_user"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Task Spec (JSON)",
+        "name": "task_spec",
+        "type": "json"
+      },
+      {
+        "default": "core",
+        "label": "Processor",
+        "name": "processor",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Input Data (JSON)",
+        "name": "input_data",
+        "type": "json"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Objective",
+        "name": "objective",
+        "type": "string"
+      },
+      {
+        "default": 100,
+        "label": "Page Size",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": "names,emailAddresses,phoneNumbers",
+        "label": "Person Fields",
+        "name": "person_fields",
+        "type": "string"
+      },
+      {
+        "label": "Resource Name",
+        "name": "resource_name",
+        "type": "string"
+      },
+      {
+        "label": "Given Name",
+        "name": "given_name",
+        "type": "string"
+      },
+      {
+        "label": "Family Name",
+        "name": "family_name",
+        "type": "string"
+      },
+      {
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "label": "Search Engine ID (cx)",
+        "name": "engine_id",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Num Results",
+        "name": "num",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Start Index",
+        "name": "start",
+        "type": "number"
+      },
+      {
+        "label": "Search Type (image or blank)",
+        "name": "search_type",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "From",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "Body Text",
+        "name": "body_text",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_url",
+        "type": "string"
+      },
+      {
+        "label": "Message SID",
+        "name": "message_sid",
+        "type": "string"
+      },
+      {
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "label": "Configuration Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "label": "Version Number",
+        "name": "version_number",
+        "type": "string"
+      },
+      {
+        "label": "Deployment Strategy ID",
+        "name": "deployment_strategy_id",
+        "type": "string"
+      },
+      {
+        "label": "Visitor ID",
+        "name": "visitor_id",
+        "type": "string"
+      },
+      {
+        "label": "Since (ISO)",
+        "name": "since",
+        "type": "string"
+      },
+      {
+        "label": "SAP Host",
+        "name": "host",
+        "type": "string"
+      },
+      {
+        "label": "Username",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Business Partner ID",
+        "name": "business_partner",
+        "type": "string"
+      },
+      {
+        "label": "Sales Order ID",
+        "name": "sales_order",
+        "type": "string"
+      },
+      {
+        "default": 20,
+        "label": "Top",
+        "mode": "advanced",
+        "name": "top",
+        "type": "number"
+      },
+      {
+        "label": "Filter",
+        "mode": "advanced",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.zep"
   },
   "action.zerobounce": {
     "allow_error": true,

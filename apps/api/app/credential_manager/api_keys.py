@@ -2814,6 +2814,111 @@ PROVIDERS = {
             ),
         ],
     ),
+    "mem0": APIKeyProvider(
+        id="mem0_api_key",
+        name="Mem0",
+        icon_slug="mem0",
+        color="#1c1c1c",
+        description="Mem0 — persistent memory for AI agents.",
+        hint="Mem0 API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Mem0 API key"
+            ),
+        ],
+    ),
+    "zep": APIKeyProvider(
+        id="zep_api_key",
+        name="Zep",
+        icon_slug="zep",
+        color="#1c1c1c",
+        description="Zep — long-term memory + session tracking for AI apps.",
+        hint="Zep API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Zep API key"
+            ),
+        ],
+    ),
+    "parallel_ai": APIKeyProvider(
+        id="parallel_ai_api_key",
+        name="Parallel AI",
+        icon_slug="parallel_ai",
+        color="#1c1c1c",
+        description="Parallel AI — web-scale research / task API.",
+        hint="Parallel AI API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Parallel AI API key"
+            ),
+        ],
+    ),
+    "google_search": APIKeyProvider(
+        id="google_search_api_key",
+        name="Google Search",
+        icon_slug="google_search",
+        color="#4285F4",
+        description="Google Custom Search JSON API — indexed web + image results.",
+        hint="Google Search API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="Google Cloud API Key", type="password", placeholder="AIzaSy..."
+            ),
+        ],
+    ),
+    "rb2b": APIKeyProvider(
+        id="rb2b_api_key",
+        name="RB2B",
+        icon_slug="rb2b",
+        color="#1c1c1c",
+        description="RB2B — identify anonymous website visitors (B2B).",
+        hint="RB2B API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="RB2B API key"
+            ),
+        ],
+    ),
+    "sap_s4hana": APIKeyProvider(
+        id="sap_s4hana_credentials",
+        name="SAP S/4HANA Cloud",
+        icon_slug="sap_s4hana",
+        color="#0FAAFF",
+        description="SAP S/4HANA Cloud — OData v2 business partners, sales orders, ledger.",
+        hint="SAP S/4HANA Cloud API access",
+        fields=[
+            CredentialField(
+                id="username", label="Username", type="string", placeholder="COMMUNICATION_USER"
+            ),
+            CredentialField(
+                id="api_key", label="Password", type="password", placeholder="tenant password"
+            ),
+            CredentialField(
+                id="host", label="Host", type="string", placeholder="my00000.s4hana.ondemand.com"
+            ),
+        ],
+    ),
+    "postgresql": APIKeyProvider(
+        id="postgresql_credentials",
+        name="PostgreSQL",
+        icon_slug="postgresql",
+        color="#336791",
+        description="PostgreSQL — connection info for asyncpg.",
+        hint="host / port / user / password / database",
+        fields=[
+            CredentialField(id="host", label="Host", type="string", placeholder="db.example.com"),
+            CredentialField(id="port", label="Port", type="number", placeholder="5432"),
+            CredentialField(id="user", label="User", type="string", placeholder="postgres"),
+            CredentialField(id="password", label="Password", type="password"),
+            CredentialField(id="database", label="Database", type="string", placeholder="myapp"),
+            CredentialField(
+                id="ssl",
+                label="SSL Mode (prefer|require|disable)",
+                type="string",
+                placeholder="prefer",
+            ),
+        ],
+    ),
 }
 
 
