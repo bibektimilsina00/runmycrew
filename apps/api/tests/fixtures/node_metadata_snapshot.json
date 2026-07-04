@@ -6281,6 +6281,164 @@
     "tools": null,
     "type": "action.customer_io"
   },
+  "action.datagma": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "datagma_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Datagma \u2014 French B2B contact + company enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "datagma",
+    "inputs": 1,
+    "name": "Datagma",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "datagma_api_key",
+        "label": "Datagma Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "full_person",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Full Person Lookup",
+            "value": "full_person"
+          },
+          {
+            "label": "Company Lookup",
+            "value": "company"
+          },
+          {
+            "label": "Find Email",
+            "value": "find_email"
+          },
+          {
+            "label": "Phone Search",
+            "value": "phone_search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "full_person"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "full_person",
+            "find_email",
+            "phone_search"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "full_person",
+            "find_email",
+            "phone_search"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "full_person",
+            "company",
+            "find_email"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "phone_search"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.datagma"
+  },
   "action.delay": {
     "allow_error": false,
     "category": "action",
@@ -8163,6 +8321,445 @@
     ],
     "tools": null,
     "type": "action.embeddings"
+  },
+  "action.enrich": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "enrich_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Enrich.so \u2014 LinkedIn scraper + email finder.",
+    "dynamic_outputs_from": null,
+    "icon": "enrich",
+    "inputs": 1,
+    "name": "Enrich.so",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "enrich_api_key",
+        "label": "Enrich.so Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "person_by_linkedin",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Person by LinkedIn URL",
+            "value": "person_by_linkedin"
+          },
+          {
+            "label": "Person by Email",
+            "value": "person_by_email"
+          },
+          {
+            "label": "Company by Domain",
+            "value": "company_by_domain"
+          },
+          {
+            "label": "Email Finder",
+            "value": "email_finder"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_by_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_finder"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "person_by_linkedin"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "company_by_domain",
+            "email_finder"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.enrich"
+  },
+  "action.enrichment": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "enrichment_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Enrichment \u2014 contact + company data-as-a-service.",
+    "dynamic_outputs_from": null,
+    "icon": "enrichment",
+    "inputs": 1,
+    "name": "Enrichment.io",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "enrichment_api_key",
+        "label": "Enrichment.io Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "enrich_contact",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Enrich Contact",
+            "value": "enrich_contact"
+          },
+          {
+            "label": "Enrich Company",
+            "value": "enrich_company"
+          },
+          {
+            "label": "Verify Email",
+            "value": "verify_email"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_contact",
+            "verify_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_contact"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_company"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.enrichment"
+  },
+  "action.enrow": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "enrow_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Enrow \u2014 waterfall B2B email finder + verifier.",
+    "dynamic_outputs_from": null,
+    "icon": "enrow",
+    "inputs": 1,
+    "name": "Enrow",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "enrow_api_key",
+        "label": "Enrow Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "find_email",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Find Email",
+            "value": "find_email"
+          },
+          {
+            "label": "Verify Email",
+            "value": "verify_email"
+          },
+          {
+            "label": "Enrich Contact",
+            "value": "enrich_contact"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "verify_email",
+            "enrich_contact"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.enrow"
   },
   "action.evaluator": {
     "allow_error": true,
@@ -18062,6 +18659,154 @@
     "tools": null,
     "type": "action.hunter"
   },
+  "action.icypeas": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "icypeas_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Icypeas \u2014 email finder + LinkedIn enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "icypeas",
+    "inputs": 1,
+    "name": "Icypeas",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "icypeas_api_key",
+        "label": "Icypeas Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "email_search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Email Search (single)",
+            "value": "email_search"
+          },
+          {
+            "label": "Email Verification",
+            "value": "email_verification"
+          },
+          {
+            "label": "LinkedIn Enrichment",
+            "value": "linkedin_enrich"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_verification"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_search"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_search"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "linkedin_enrich"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "email_search"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.icypeas"
+  },
   "action.image_gen": {
     "allow_error": true,
     "category": "ai",
@@ -19373,6 +20118,165 @@
     ],
     "tools": null,
     "type": "action.knowledge"
+  },
+  "action.leadmagic": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "leadmagic_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "LeadMagic \u2014 email finder + waterfall enrichment.",
+    "dynamic_outputs_from": null,
+    "icon": "leadmagic",
+    "inputs": 1,
+    "name": "LeadMagic",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "leadmagic_api_key",
+        "label": "LeadMagic Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "find_email",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Find Email",
+            "value": "find_email"
+          },
+          {
+            "label": "Validate Email",
+            "value": "validate_email"
+          },
+          {
+            "label": "Enrich Person",
+            "value": "enrich_person"
+          },
+          {
+            "label": "Company Search",
+            "value": "company_search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "validate_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "enrich_person"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "find_email",
+            "company_search"
+          ]
+        },
+        "label": "Domain",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "company_search"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.leadmagic"
   },
   "action.lemlist": {
     "allow_error": true,
