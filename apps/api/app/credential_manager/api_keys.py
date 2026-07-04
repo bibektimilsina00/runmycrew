@@ -2311,6 +2311,41 @@ PROVIDERS = {
             ),
         ],
     ),
+    "jira_service_management": APIKeyProvider(
+        id="jira_service_management_api_key",
+        name="Jira Service Management",
+        icon_slug="jira",
+        color="#0052CC",
+        description="Jira Service Management — requests, service desks, queues.",
+        hint="Atlassian email + API token",
+        fields=[
+            CredentialField(
+                id="email", label="Atlassian Email", type="string", placeholder="you@example.com"
+            ),
+            CredentialField(
+                id="api_key", label="API Token", type="password", placeholder="ATATT..."
+            ),
+            CredentialField(
+                id="domain",
+                label="Atlassian Domain",
+                type="string",
+                placeholder="mycompany.atlassian.net",
+            ),
+        ],
+    ),
+    "mothership": APIKeyProvider(
+        id="mothership_api_key",
+        name="Mothership",
+        icon_slug="mothership",
+        color="#1c1c1c",
+        description="Mothership — freight shipment quoting and booking.",
+        hint="Mothership API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Mothership API key"
+            ),
+        ],
+    ),
 }
 
 

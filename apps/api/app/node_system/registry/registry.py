@@ -193,6 +193,9 @@ from apps.api.app.node_system.nodes.jina.jina_node import JinaAINode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
+from apps.api.app.node_system.nodes.jira_service_management.jira_service_management_node import (
+    JiraServiceManagementNode,
+)
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.langsmith.langsmith_node import LangSmithNode
 from apps.api.app.node_system.nodes.launchdarkly.launchdarkly_node import LaunchDarklyNode
@@ -228,6 +231,10 @@ from apps.api.app.node_system.nodes.meta.lead_action import LeadActionNode
 from apps.api.app.node_system.nodes.meta.lead_trigger import LeadTriggerNode
 from apps.api.app.node_system.nodes.meta.whatsapp_action import WhatsAppActionNode
 from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTriggerNode
+from apps.api.app.node_system.nodes.microsoft_ad.microsoft_ad_node import MicrosoftEntraNode
+from apps.api.app.node_system.nodes.microsoft_dataverse.microsoft_dataverse_node import (
+    MicrosoftDataverseNode,
+)
 from apps.api.app.node_system.nodes.microsoft_excel.microsoft_excel_node import MicrosoftExcelNode
 from apps.api.app.node_system.nodes.microsoft_planner.microsoft_planner_node import (
     MicrosoftPlannerNode,
@@ -241,6 +248,7 @@ from apps.api.app.node_system.nodes.mistral_parse.mistral_parse_node import Mist
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
 from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNode
+from apps.api.app.node_system.nodes.mothership.mothership_node import MothershipNode
 from apps.api.app.node_system.nodes.neverbounce.neverbounce_node import NeverBounceNode
 from apps.api.app.node_system.nodes.new_relic.new_relic_node import NewRelicNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
@@ -682,3 +690,10 @@ node_registry.register(GoogleVaultNode)
 node_registry.register(GooglePageSpeedNode)
 node_registry.register(GoogleBooksNode)
 node_registry.register(GoogleGroupsNode)
+
+
+# Phase 4.28 — Microsoft / Atlassian gaps.
+node_registry.register(MicrosoftEntraNode)
+node_registry.register(MicrosoftDataverseNode)
+node_registry.register(JiraServiceManagementNode)
+node_registry.register(MothershipNode)
