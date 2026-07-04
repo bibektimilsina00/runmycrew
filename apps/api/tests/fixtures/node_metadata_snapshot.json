@@ -1860,6 +1860,236 @@
     "tools": null,
     "type": "action.algolia"
   },
+  "action.amplitude": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "amplitude_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Amplitude \u2014 product analytics event ingestion.",
+    "dynamic_outputs_from": null,
+    "icon": "amplitude",
+    "inputs": 1,
+    "name": "Amplitude",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "amplitude_api_key",
+        "label": "Amplitude Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "track_event",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Track Event (HTTP API v2)",
+            "value": "track_event"
+          },
+          {
+            "label": "Identify User",
+            "value": "identify_user"
+          },
+          {
+            "label": "Chart Export",
+            "value": "chart_export"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Metric Series (JSON array)",
+        "name": "series",
+        "type": "json"
+      },
+      {
+        "label": "Log Entries (JSON array)",
+        "name": "logs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "track_event"
+          ]
+        },
+        "label": "Events (JSON array)",
+        "name": "events",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "identify_user"
+          ]
+        },
+        "label": "Identifications (JSON array)",
+        "name": "identification",
+        "type": "json"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tags (comma-separated)",
+        "name": "tags",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "NRQL Query",
+        "name": "nrql",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "chart_export"
+          ]
+        },
+        "label": "Chart ID",
+        "name": "chart_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard ID (numeric)",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard UID",
+        "name": "dashboard_uid",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Run Type (chain/llm/tool)",
+        "name": "run_type",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "label": "Project / Session Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Feedback Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "label": "Score (float)",
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "label": "Input Params (JSON)",
+        "name": "input_params",
+        "type": "json"
+      },
+      {
+        "label": "Dry Run (true/false)",
+        "mode": "advanced",
+        "name": "dry_run",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.amplitude"
+  },
   "action.apify": {
     "allow_error": true,
     "category": "integration",
@@ -7965,6 +8195,258 @@
     ],
     "tools": null,
     "type": "action.customer_io"
+  },
+  "action.datadog": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "datadog_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Datadog \u2014 metrics, logs, events, monitors.",
+    "dynamic_outputs_from": null,
+    "icon": "datadog",
+    "inputs": 1,
+    "name": "Datadog",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "datadog_api_key",
+        "label": "Datadog Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "submit_metrics",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Submit Metrics",
+            "value": "submit_metrics"
+          },
+          {
+            "label": "Submit Logs",
+            "value": "submit_logs"
+          },
+          {
+            "label": "Submit Event",
+            "value": "submit_event"
+          },
+          {
+            "label": "List Monitors",
+            "value": "list_monitors"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_metrics"
+          ]
+        },
+        "label": "Metric Series (JSON array)",
+        "name": "series",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_logs"
+          ]
+        },
+        "label": "Log Entries (JSON array)",
+        "name": "logs",
+        "type": "json"
+      },
+      {
+        "label": "Events (JSON array)",
+        "name": "events",
+        "type": "json"
+      },
+      {
+        "label": "Identifications (JSON array)",
+        "name": "identification",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_event"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_event"
+          ]
+        },
+        "label": "Text / Message",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_event"
+          ]
+        },
+        "label": "Tags (comma-separated)",
+        "name": "tags",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_monitors"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "NRQL Query",
+        "name": "nrql",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "Chart ID",
+        "name": "chart_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard ID (numeric)",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard UID",
+        "name": "dashboard_uid",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Run Type (chain/llm/tool)",
+        "name": "run_type",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "label": "Project / Session Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Feedback Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "label": "Score (float)",
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "label": "Input Params (JSON)",
+        "name": "input_params",
+        "type": "json"
+      },
+      {
+        "label": "Dry Run (true/false)",
+        "mode": "advanced",
+        "name": "dry_run",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.datadog"
   },
   "action.datagma": {
     "allow_error": true,
@@ -17120,6 +17602,252 @@
     "tools": null,
     "type": "action.gpeople"
   },
+  "action.grafana": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "grafana_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Grafana Cloud \u2014 dashboards, alerts, annotations, folders.",
+    "dynamic_outputs_from": null,
+    "icon": "grafana",
+    "inputs": 1,
+    "name": "Grafana Cloud",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "grafana_api_key",
+        "label": "Grafana Cloud Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_dashboards",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Dashboards",
+            "value": "list_dashboards"
+          },
+          {
+            "label": "Get Dashboard",
+            "value": "get_dashboard"
+          },
+          {
+            "label": "Create Annotation",
+            "value": "create_annotation"
+          },
+          {
+            "label": "List Alert Rules",
+            "value": "list_alerts"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Metric Series (JSON array)",
+        "name": "series",
+        "type": "json"
+      },
+      {
+        "label": "Log Entries (JSON array)",
+        "name": "logs",
+        "type": "json"
+      },
+      {
+        "label": "Events (JSON array)",
+        "name": "events",
+        "type": "json"
+      },
+      {
+        "label": "Identifications (JSON array)",
+        "name": "identification",
+        "type": "json"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_annotation"
+          ]
+        },
+        "label": "Text / Message",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_annotation"
+          ]
+        },
+        "label": "Tags (comma-separated)",
+        "name": "tags",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_dashboards"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "NRQL Query",
+        "name": "nrql",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "Chart ID",
+        "name": "chart_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_annotation"
+          ]
+        },
+        "label": "Dashboard ID (numeric)",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_dashboard"
+          ]
+        },
+        "label": "Dashboard UID",
+        "name": "dashboard_uid",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Run Type (chain/llm/tool)",
+        "name": "run_type",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "label": "Project / Session Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Feedback Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "label": "Score (float)",
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "label": "Input Params (JSON)",
+        "name": "input_params",
+        "type": "json"
+      },
+      {
+        "label": "Dry Run (true/false)",
+        "mode": "advanced",
+        "name": "dry_run",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.grafana"
+  },
   "action.grain": {
     "allow_error": true,
     "category": "integration",
@@ -20165,6 +20893,255 @@
     "tools": null,
     "type": "action.hackernews"
   },
+  "action.hex": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "hex_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Hex \u2014 collaborative data notebooks + apps.",
+    "dynamic_outputs_from": null,
+    "icon": "hex",
+    "inputs": 1,
+    "name": "Hex",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "hex_api_key",
+        "label": "Hex Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_project",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Project",
+            "value": "run_project"
+          },
+          {
+            "label": "Get Run Status",
+            "value": "get_run_status"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Cancel Run",
+            "value": "cancel_run"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Metric Series (JSON array)",
+        "name": "series",
+        "type": "json"
+      },
+      {
+        "label": "Log Entries (JSON array)",
+        "name": "logs",
+        "type": "json"
+      },
+      {
+        "label": "Events (JSON array)",
+        "name": "events",
+        "type": "json"
+      },
+      {
+        "label": "Identifications (JSON array)",
+        "name": "identification",
+        "type": "json"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tags (comma-separated)",
+        "name": "tags",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "NRQL Query",
+        "name": "nrql",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "Chart ID",
+        "name": "chart_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard ID (numeric)",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard UID",
+        "name": "dashboard_uid",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Run Type (chain/llm/tool)",
+        "name": "run_type",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "label": "Project / Session Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_project",
+            "get_run_status",
+            "cancel_run"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_run_status",
+            "cancel_run"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Feedback Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "label": "Score (float)",
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_project"
+          ]
+        },
+        "label": "Input Params (JSON)",
+        "name": "input_params",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_project"
+          ]
+        },
+        "label": "Dry Run (true/false)",
+        "mode": "advanced",
+        "name": "dry_run",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_projects"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.hex"
+  },
   "action.http_request": {
     "allow_error": true,
     "category": "action",
@@ -22667,6 +23644,278 @@
     ],
     "tools": null,
     "type": "action.knowledge"
+  },
+  "action.langsmith": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "langsmith_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "LangSmith \u2014 LLM trace + evaluation platform.",
+    "dynamic_outputs_from": null,
+    "icon": "langsmith",
+    "inputs": 1,
+    "name": "LangSmith",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "langsmith_api_key",
+        "label": "LangSmith Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_run",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Trace Run",
+            "value": "create_run"
+          },
+          {
+            "label": "List Runs",
+            "value": "list_runs"
+          },
+          {
+            "label": "List Datasets",
+            "value": "list_datasets"
+          },
+          {
+            "label": "Create Feedback",
+            "value": "create_feedback"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Metric Series (JSON array)",
+        "name": "series",
+        "type": "json"
+      },
+      {
+        "label": "Log Entries (JSON array)",
+        "name": "logs",
+        "type": "json"
+      },
+      {
+        "label": "Events (JSON array)",
+        "name": "events",
+        "type": "json"
+      },
+      {
+        "label": "Identifications (JSON array)",
+        "name": "identification",
+        "type": "json"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tags (comma-separated)",
+        "name": "tags",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "NRQL Query",
+        "name": "nrql",
+        "type": "string"
+      },
+      {
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "Chart ID",
+        "name": "chart_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard ID (numeric)",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard UID",
+        "name": "dashboard_uid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_run"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_run"
+          ]
+        },
+        "label": "Run Type (chain/llm/tool)",
+        "name": "run_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_run"
+          ]
+        },
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_run",
+            "list_runs"
+          ]
+        },
+        "label": "Project / Session Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feedback"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feedback"
+          ]
+        },
+        "label": "Feedback Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feedback"
+          ]
+        },
+        "label": "Score (float)",
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_feedback"
+          ]
+        },
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "label": "Input Params (JSON)",
+        "name": "input_params",
+        "type": "json"
+      },
+      {
+        "label": "Dry Run (true/false)",
+        "mode": "advanced",
+        "name": "dry_run",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_runs",
+            "list_datasets"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.langsmith"
   },
   "action.leadmagic": {
     "allow_error": true,
@@ -27829,6 +29078,237 @@
     ],
     "tools": null,
     "type": "action.neverbounce"
+  },
+  "action.new_relic": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "new_relic_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "New Relic \u2014 APM, logs, metrics via NRQL + events.",
+    "dynamic_outputs_from": null,
+    "icon": "new_relic",
+    "inputs": 1,
+    "name": "New Relic",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "new_relic_api_key",
+        "label": "New Relic Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "nrql_query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "NRQL Query",
+            "value": "nrql_query"
+          },
+          {
+            "label": "Submit Custom Event",
+            "value": "submit_event"
+          },
+          {
+            "label": "List Applications",
+            "value": "list_applications"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Metric Series (JSON array)",
+        "name": "series",
+        "type": "json"
+      },
+      {
+        "label": "Log Entries (JSON array)",
+        "name": "logs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_event"
+          ]
+        },
+        "label": "Events (JSON array)",
+        "name": "events",
+        "type": "json"
+      },
+      {
+        "label": "Identifications (JSON array)",
+        "name": "identification",
+        "type": "json"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Text / Message",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Tags (comma-separated)",
+        "name": "tags",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "nrql_query"
+          ]
+        },
+        "label": "NRQL Query",
+        "name": "nrql",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "nrql_query",
+            "submit_event"
+          ]
+        },
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "label": "Chart ID",
+        "name": "chart_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard ID (numeric)",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "label": "Dashboard UID",
+        "name": "dashboard_uid",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Run Type (chain/llm/tool)",
+        "name": "run_type",
+        "type": "string"
+      },
+      {
+        "label": "Inputs (JSON)",
+        "name": "inputs",
+        "type": "json"
+      },
+      {
+        "label": "Project / Session Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "label": "Feedback Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "label": "Score (float)",
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "label": "Value",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "label": "Input Params (JSON)",
+        "name": "input_params",
+        "type": "json"
+      },
+      {
+        "label": "Dry Run (true/false)",
+        "mode": "advanced",
+        "name": "dry_run",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.new_relic"
   },
   "action.newsapi": {
     "allow_error": true,

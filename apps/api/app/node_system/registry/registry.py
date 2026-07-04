@@ -20,6 +20,7 @@ from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
 from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
+from apps.api.app.node_system.nodes.amplitude.amplitude_node import AmplitudeNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.apollo.apollo_node import ApolloNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
@@ -74,6 +75,7 @@ from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
 from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextNode
 from apps.api.app.node_system.nodes.cursor.cursor_node import CursorNode
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
+from apps.api.app.node_system.nodes.datadog.datadog_node import DatadogNode
 from apps.api.app.node_system.nodes.datagma.datagma_node import DatagmaNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
@@ -131,6 +133,7 @@ from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
 )
 from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
+from apps.api.app.node_system.nodes.grafana.grafana_node import GrafanaCloudNode
 from apps.api.app.node_system.nodes.grain.grain_node import GrainNode
 from apps.api.app.node_system.nodes.grain.grain_trigger import GrainTriggerNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_node import GreenhouseNode
@@ -142,6 +145,7 @@ from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTrig
 from apps.api.app.node_system.nodes.gyt.gyt_node import GoogleYouTubeNode
 from apps.api.app.node_system.nodes.gyt.gyt_trigger import GoogleYouTubeTriggerNode
 from apps.api.app.node_system.nodes.hackernews.hackernews_node import HackerNewsNode
+from apps.api.app.node_system.nodes.hex.hex_node import HexNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
@@ -160,6 +164,7 @@ from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
+from apps.api.app.node_system.nodes.langsmith.langsmith_node import LangSmithNode
 from apps.api.app.node_system.nodes.leadmagic.leadmagic_node import LeadMagicNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_trigger import LemlistTriggerNode
@@ -205,6 +210,7 @@ from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
 from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNode
 from apps.api.app.node_system.nodes.neverbounce.neverbounce_node import NeverBounceNode
+from apps.api.app.node_system.nodes.new_relic.new_relic_node import NewRelicNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
@@ -570,3 +576,12 @@ node_registry.register(ReductoNode)
 node_registry.register(StagehandNode)
 node_registry.register(BrightDataNode)
 node_registry.register(DSPyCloudNode)
+
+
+# Phase 4.20 — analytics + observability.
+node_registry.register(DatadogNode)
+node_registry.register(NewRelicNode)
+node_registry.register(AmplitudeNode)
+node_registry.register(GrafanaCloudNode)
+node_registry.register(LangSmithNode)
+node_registry.register(HexNode)
