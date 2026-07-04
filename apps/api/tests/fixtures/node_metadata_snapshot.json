@@ -1753,6 +1753,1037 @@
     "tools": null,
     "type": "action.attio"
   },
+  "action.aws_athena": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Amazon Athena \u2014 run SQL queries against S3 data via SigV4.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-athena",
+    "inputs": 1,
+    "name": "Amazon Athena",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "QueryExecutionId",
+        "type": "string"
+      },
+      {
+        "label": "QueryExecution",
+        "type": "object"
+      },
+      {
+        "label": "ResultSet",
+        "type": "object"
+      },
+      {
+        "label": "DatabaseList",
+        "type": "array"
+      },
+      {
+        "label": "WorkGroups",
+        "type": "array"
+      },
+      {
+        "label": "NextToken",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "Amazon Athena Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "start_query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Start Query Execution",
+            "value": "start_query"
+          },
+          {
+            "label": "Get Query Execution",
+            "value": "get_query_execution"
+          },
+          {
+            "label": "Get Query Results",
+            "value": "get_query_results"
+          },
+          {
+            "label": "Stop Query Execution",
+            "value": "stop_query"
+          },
+          {
+            "label": "List Databases",
+            "value": "list_databases"
+          },
+          {
+            "label": "List Workgroups",
+            "value": "list_workgroups"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_query"
+          ]
+        },
+        "label": "SQL Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_query"
+          ]
+        },
+        "label": "Database",
+        "name": "database",
+        "placeholder": "default",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_query"
+          ]
+        },
+        "default": "primary",
+        "label": "Workgroup",
+        "name": "workgroup",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_query"
+          ]
+        },
+        "label": "Output S3 Location",
+        "name": "output_location",
+        "placeholder": "s3://my-athena-results/",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_query_execution",
+            "get_query_results",
+            "stop_query"
+          ]
+        },
+        "label": "Query Execution ID",
+        "name": "query_execution_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_query_results"
+          ]
+        },
+        "default": 1000,
+        "label": "Max Result Rows",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_query_results"
+          ]
+        },
+        "label": "Next Token",
+        "mode": "advanced",
+        "name": "next_token",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_athena"
+  },
+  "action.aws_s3": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS S3 \u2014 buckets and objects via SigV4.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-s3",
+    "inputs": 1,
+    "name": "S3",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "Key",
+        "type": "string"
+      },
+      {
+        "label": "Size",
+        "type": "number"
+      },
+      {
+        "label": "ETag",
+        "type": "string"
+      },
+      {
+        "label": "LastModified",
+        "type": "string"
+      },
+      {
+        "label": "Contents",
+        "type": "array"
+      },
+      {
+        "label": "Buckets",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "S3 Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_buckets",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Buckets",
+            "value": "list_buckets"
+          },
+          {
+            "label": "Create Bucket",
+            "value": "create_bucket"
+          },
+          {
+            "label": "Delete Bucket",
+            "value": "delete_bucket"
+          },
+          {
+            "label": "List Objects",
+            "value": "list_objects"
+          },
+          {
+            "label": "Head Object (metadata)",
+            "value": "head_object"
+          },
+          {
+            "label": "Get Object",
+            "value": "get_object"
+          },
+          {
+            "label": "Put Object",
+            "value": "put_object"
+          },
+          {
+            "label": "Delete Object",
+            "value": "delete_object"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_bucket",
+            "delete_bucket",
+            "list_objects",
+            "head_object",
+            "get_object",
+            "put_object",
+            "delete_object"
+          ]
+        },
+        "label": "Bucket",
+        "name": "bucket",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "head_object",
+            "get_object",
+            "put_object",
+            "delete_object"
+          ]
+        },
+        "label": "Object Key",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "put_object"
+          ]
+        },
+        "label": "Body (text)",
+        "name": "body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "put_object"
+          ]
+        },
+        "default": "application/octet-stream",
+        "label": "Object Content-Type",
+        "mode": "advanced",
+        "name": "content_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_objects"
+          ]
+        },
+        "label": "Prefix",
+        "mode": "advanced",
+        "name": "prefix",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_objects"
+          ]
+        },
+        "label": "Delimiter",
+        "mode": "advanced",
+        "name": "delimiter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_objects"
+          ]
+        },
+        "default": 1000,
+        "label": "Max Keys",
+        "mode": "advanced",
+        "name": "max_keys",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_objects"
+          ]
+        },
+        "label": "Continuation Token",
+        "mode": "advanced",
+        "name": "continuation_token",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_s3"
+  },
+  "action.aws_secrets_manager": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS Secrets Manager \u2014 store and retrieve secrets via SigV4.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-secrets-manager",
+    "inputs": 1,
+    "name": "Secrets Manager",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "ARN",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "type": "string"
+      },
+      {
+        "label": "SecretString",
+        "type": "string"
+      },
+      {
+        "label": "SecretList",
+        "type": "array"
+      },
+      {
+        "label": "VersionId",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "Secrets Manager Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_secrets",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Secrets",
+            "value": "list_secrets"
+          },
+          {
+            "label": "Get Secret Value",
+            "value": "get_secret_value"
+          },
+          {
+            "label": "Create Secret",
+            "value": "create_secret"
+          },
+          {
+            "label": "Put Secret Value",
+            "value": "put_secret_value"
+          },
+          {
+            "label": "Delete Secret",
+            "value": "delete_secret"
+          },
+          {
+            "label": "Describe Secret",
+            "value": "describe_secret"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_secret_value",
+            "create_secret",
+            "put_secret_value",
+            "delete_secret",
+            "describe_secret"
+          ]
+        },
+        "label": "Secret ID (name or ARN)",
+        "name": "secret_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_secret",
+            "put_secret_value"
+          ]
+        },
+        "label": "Secret Value",
+        "name": "secret_string",
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_secret"
+          ]
+        },
+        "label": "Description",
+        "mode": "advanced",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_secret_value"
+          ]
+        },
+        "label": "Version ID",
+        "mode": "advanced",
+        "name": "version_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_secret_value"
+          ]
+        },
+        "label": "Version Stage",
+        "mode": "advanced",
+        "name": "version_stage",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_secrets"
+          ]
+        },
+        "default": 100,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_secrets"
+          ]
+        },
+        "label": "Filter Key",
+        "mode": "advanced",
+        "name": "filter_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_secrets"
+          ]
+        },
+        "label": "Filter Values (JSON array)",
+        "mode": "advanced",
+        "name": "filter_values",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_secrets_manager"
+  },
+  "action.aws_ses": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Amazon SES \u2014 transactional email via SigV4.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-ses",
+    "inputs": 1,
+    "name": "Amazon SES",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "MessageId",
+        "type": "string"
+      },
+      {
+        "label": "EmailIdentities",
+        "type": "array"
+      },
+      {
+        "label": "IdentityType",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "Amazon SES Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_email",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Email",
+            "value": "send_email"
+          },
+          {
+            "label": "Send Templated Email",
+            "value": "send_templated"
+          },
+          {
+            "label": "List Email Identities",
+            "value": "list_identities"
+          },
+          {
+            "label": "Create Email Identity",
+            "value": "create_identity"
+          },
+          {
+            "label": "Delete Email Identity",
+            "value": "delete_identity"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_email",
+            "send_templated"
+          ]
+        },
+        "label": "From",
+        "name": "from_",
+        "placeholder": "you@yourdomain.com",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_email",
+            "send_templated"
+          ]
+        },
+        "label": "To (CSV)",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_email"
+          ]
+        },
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_email"
+          ]
+        },
+        "label": "HTML body",
+        "name": "html",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_email"
+          ]
+        },
+        "label": "Text body",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_templated"
+          ]
+        },
+        "label": "Template Name",
+        "name": "template_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_templated"
+          ]
+        },
+        "label": "Template Data (JSON)",
+        "name": "template_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_identity",
+            "delete_identity"
+          ]
+        },
+        "label": "Identity",
+        "name": "identity",
+        "placeholder": "you@yourdomain.com",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_ses"
+  },
+  "action.aws_sqs": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Amazon SQS \u2014 queues + messages via SigV4.",
+    "dynamic_outputs_from": null,
+    "icon": "aws-sqs",
+    "inputs": 1,
+    "name": "Amazon SQS",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "MessageId",
+        "type": "string"
+      },
+      {
+        "label": "QueueUrl",
+        "type": "string"
+      },
+      {
+        "label": "QueueUrls",
+        "type": "array"
+      },
+      {
+        "label": "Messages",
+        "type": "array"
+      },
+      {
+        "label": "Attributes",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "Amazon SQS Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_queues",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Queues",
+            "value": "list_queues"
+          },
+          {
+            "label": "Create Queue",
+            "value": "create_queue"
+          },
+          {
+            "label": "Delete Queue",
+            "value": "delete_queue"
+          },
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Receive Messages",
+            "value": "receive_messages"
+          },
+          {
+            "label": "Delete Message",
+            "value": "delete_message"
+          },
+          {
+            "label": "Get Queue Attributes",
+            "value": "get_queue_attributes"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_queue",
+            "send_message",
+            "receive_messages",
+            "delete_message",
+            "get_queue_attributes"
+          ]
+        },
+        "label": "Queue URL",
+        "name": "queue_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_queue"
+          ]
+        },
+        "label": "Queue Name",
+        "name": "queue_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Message Body",
+        "name": "message_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "receive_messages"
+          ]
+        },
+        "default": 10,
+        "label": "Max Messages",
+        "mode": "advanced",
+        "name": "max_messages",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "receive_messages"
+          ]
+        },
+        "default": 0,
+        "label": "Wait Seconds",
+        "mode": "advanced",
+        "name": "wait_seconds",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_message"
+          ]
+        },
+        "label": "Receipt Handle",
+        "name": "receipt_handle",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "default": 0,
+        "label": "Delay Seconds",
+        "mode": "advanced",
+        "name": "delay_seconds",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_queue"
+          ]
+        },
+        "label": "Attributes (JSON)",
+        "mode": "advanced",
+        "name": "attributes",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.aws_sqs"
+  },
   "action.box": {
     "allow_error": true,
     "category": "integration",

@@ -66,6 +66,13 @@ def build_auth(
     if not token or scheme == "none":
         return {}, {}
 
+    if scheme == "aws_sigv4":
+        # SigV4 needs the full request context (URL + body + query
+        # params) so the real signing lands in `rest_request` after
+        # body serialization. Return empty here; the outer flow will
+        # stamp Authorization + X-Amz-* headers when it's ready.
+        return {}, {}
+
     if scheme == "bearer":
         return {header_name: value_template.format(token=token)}, {}
     if scheme == "header_token":
@@ -112,6 +119,7 @@ async def rest_request(
     params: dict[str, Any] | None = None,
     json: Any = None,
     credential: dict[str, Any] | None = None,
+    op_extra_headers: dict[str, str] | None = None,
 ) -> tuple[Any, dict[str, str]]:
     """Issue one HTTP call against a provider.
 
@@ -154,10 +162,31 @@ async def rest_request(
             resolved_extra[k] = value
         else:
             resolved_extra[k] = v
+    # Per-op headers layer on top of manifest-level extra_headers.
+    # AWS JSON-protocol services (SQS, Athena, Secrets Manager) route
+    # by X-Amz-Target: <Service>.<Action> — different per op — so this
+    # is the only way to spell that without a custom handler per op.
+    op_resolved: dict[str, str] = {}
+    if op_extra_headers:
+        for k, v in op_extra_headers.items():
+            if isinstance(v, str):
+                value = v.replace("{token}", token or "") if token else v
+                if credential:
+                    import re as _re
+
+                    value = _re.sub(
+                        r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}",
+                        lambda m: str(credential.get(m.group(1), m.group(0))),
+                        value,
+                    )
+                op_resolved[k] = value
+            else:
+                op_resolved[k] = v
     headers = {
         "Content-Type": manifest.content_type,
         "Accept": "application/json",
         **resolved_extra,
+        **op_resolved,
         **auth_headers,
     }
     merged_params: dict[str, Any] = {**auth_params, **(params or {})}
@@ -177,6 +206,55 @@ async def rest_request(
         request_kwargs["data"] = json
     else:
         request_kwargs["json"] = json
+
+    # AWS SigV4 signing runs after body serialization — the signer
+    # needs the exact bytes going on the wire. Region + service come
+    # from the manifest + credential; the signer stamps its own
+    # X-Amz-Date, X-Amz-Content-Sha256, and Authorization headers.
+    if manifest.auth == "aws_sigv4" and credential:
+        import json as _json
+
+        from apps.api.app.node_system.scaffolds.aws_signing import sign_v4
+
+        body_bytes = b""
+        if "json" in request_kwargs and request_kwargs["json"] is not None:
+            body_bytes = _json.dumps(request_kwargs["json"]).encode("utf-8")
+        elif "data" in request_kwargs and request_kwargs["data"] is not None:
+            data_val = request_kwargs["data"]
+            if isinstance(data_val, bytes | bytearray):
+                body_bytes = bytes(data_val)
+            elif isinstance(data_val, str):
+                body_bytes = data_val.encode("utf-8")
+            elif isinstance(data_val, dict):
+                from urllib.parse import urlencode
+
+                body_bytes = urlencode(data_val).encode("utf-8")
+        region = (credential.get("region") if credential else None) or manifest.aws_default_region
+        access_key = credential.get("access_key_id") or credential.get("aws_access_key_id") or ""
+        secret_key = (
+            credential.get("secret_access_key")
+            or credential.get("aws_secret_access_key")
+            or token
+            or ""
+        )
+        session_token = credential.get("session_token") or credential.get("aws_session_token")
+        signed = sign_v4(
+            method=method,
+            url=url,
+            headers=headers,
+            query_params=merged_params or None,
+            body=body_bytes,
+            region=region,
+            service=manifest.aws_service or "",
+            access_key=access_key,
+            secret_key=secret_key,
+            session_token=session_token,
+            unsigned_payload=manifest.aws_unsigned_payload,
+        )
+        # Overwrite the placeholder Authorization built by `build_auth`
+        # (which returned empty for `aws_sigv4`) with the SigV4 value.
+        headers.update(signed)
+        request_kwargs["headers"] = headers
 
     resp = await client.request(**request_kwargs)
     if resp.status_code >= 400:

@@ -20,6 +20,13 @@ from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
+from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
+from apps.api.app.node_system.nodes.aws_s3.aws_s3_node import AWSS3Node
+from apps.api.app.node_system.nodes.aws_secrets_manager.aws_secrets_manager_node import (
+    AWSSecretsManagerNode,
+)
+from apps.api.app.node_system.nodes.aws_ses.aws_ses_node import AWSSESNode
+from apps.api.app.node_system.nodes.aws_sqs.aws_sqs_node import AWSSQSNode
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
@@ -233,6 +240,12 @@ node_registry.register(AsanaNode)
 node_registry.register(CalendlyNode)
 node_registry.register(ZoomNode)
 node_registry.register(BoxNode)
+# Phase 2.3 — AWS family (SigV4).
+node_registry.register(AWSS3Node)
+node_registry.register(AWSSESNode)
+node_registry.register(AWSSQSNode)
+node_registry.register(AWSSecretsManagerNode)
+node_registry.register(AWSAthenaNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)
