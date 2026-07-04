@@ -1536,6 +1536,281 @@
     "tools": null,
     "type": "action.asana"
   },
+  "action.ashby": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "ashby_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Ashby ATS \u2014 candidates, applications, jobs, feedback via POST RPC.",
+    "dynamic_outputs_from": null,
+    "icon": "ashby",
+    "inputs": 1,
+    "name": "Ashby",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "success",
+        "type": "boolean"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "moreDataAvailable",
+        "type": "boolean"
+      },
+      {
+        "label": "nextCursor",
+        "type": "string"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "ashby_api_key",
+        "label": "Ashby Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_candidates",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Candidates",
+            "value": "list_candidates"
+          },
+          {
+            "label": "Get Candidate Info",
+            "value": "get_candidate"
+          },
+          {
+            "label": "Create Candidate",
+            "value": "create_candidate"
+          },
+          {
+            "label": "Update Candidate",
+            "value": "update_candidate"
+          },
+          {
+            "label": "List Applications",
+            "value": "list_applications"
+          },
+          {
+            "label": "Get Application Info",
+            "value": "get_application"
+          },
+          {
+            "label": "List Jobs",
+            "value": "list_jobs"
+          },
+          {
+            "label": "Get Job Info",
+            "value": "get_job"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Candidate ID",
+        "name": "candidate_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_application"
+          ]
+        },
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Company",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Location",
+        "name": "location",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_candidates",
+            "list_applications",
+            "list_jobs"
+          ]
+        },
+        "label": "Pagination Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_candidates",
+            "list_applications",
+            "list_jobs"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.ashby"
+  },
   "action.attio": {
     "allow_error": true,
     "category": "integration",
@@ -12834,6 +13109,297 @@
     ],
     "tools": null,
     "type": "action.gpeople"
+  },
+  "action.greenhouse": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "greenhouse_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Greenhouse ATS \u2014 jobs, candidates, applications, offers.",
+    "dynamic_outputs_from": null,
+    "icon": "greenhouse",
+    "inputs": 1,
+    "name": "Greenhouse",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "candidate",
+        "type": "object"
+      },
+      {
+        "label": "job",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "greenhouse_api_key",
+        "label": "Greenhouse Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_jobs",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Jobs",
+            "value": "list_jobs"
+          },
+          {
+            "label": "Get Job",
+            "value": "get_job"
+          },
+          {
+            "label": "List Candidates",
+            "value": "list_candidates"
+          },
+          {
+            "label": "Get Candidate",
+            "value": "get_candidate"
+          },
+          {
+            "label": "Create Candidate",
+            "value": "create_candidate"
+          },
+          {
+            "label": "List Applications",
+            "value": "list_applications"
+          },
+          {
+            "label": "Get Application",
+            "value": "get_application"
+          },
+          {
+            "label": "Add Note to Candidate",
+            "value": "add_candidate_note"
+          },
+          {
+            "label": "List Offers",
+            "value": "list_offers"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job",
+            "list_applications"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_candidate",
+            "list_applications",
+            "add_candidate_note"
+          ]
+        },
+        "label": "Candidate ID",
+        "name": "candidate_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_application"
+          ]
+        },
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Offer ID",
+        "name": "offer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_note"
+          ]
+        },
+        "label": "User ID (for note authoring)",
+        "mode": "advanced",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_note"
+          ]
+        },
+        "label": "Note Body",
+        "name": "note_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_note"
+          ]
+        },
+        "default": "admin_only",
+        "label": "Note Visibility",
+        "mode": "advanced",
+        "name": "visibility",
+        "options": [
+          {
+            "label": "Admin only",
+            "value": "admin_only"
+          },
+          {
+            "label": "Public",
+            "value": "public"
+          },
+          {
+            "label": "Private",
+            "value": "private"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_jobs",
+            "list_candidates",
+            "list_applications",
+            "list_offers"
+          ]
+        },
+        "default": 100,
+        "label": "Per page (max 500)",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_jobs",
+            "list_candidates",
+            "list_applications",
+            "list_offers"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.greenhouse"
   },
   "action.gsc": {
     "allow_error": true,
@@ -31731,6 +32297,125 @@
     "tools": null,
     "type": "trigger.asana"
   },
+  "trigger.ashby": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "ashby_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Ashby ATS for new candidates, offers, application stage changes, or hires.",
+    "dynamic_outputs_from": null,
+    "icon": "ashby",
+    "inputs": 0,
+    "name": "Ashby",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "current_interview_stage",
+        "type": "string"
+      },
+      {
+        "label": "change",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "ashby_api_key",
+        "label": "Ashby Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "candidate_new",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Candidate Created",
+            "value": "candidate_new"
+          },
+          {
+            "label": "Candidate Hired",
+            "value": "candidate_hired"
+          },
+          {
+            "label": "Offer Created",
+            "value": "offer_created"
+          },
+          {
+            "label": "Application Stage Changed",
+            "value": "application_stage_change"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.ashby"
+  },
   "trigger.azure_devops_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -34183,6 +34868,144 @@
     ],
     "tools": null,
     "type": "trigger.gpeople_change"
+  },
+  "trigger.greenhouse": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "greenhouse_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Greenhouse ATS for new / updated candidates, applications, jobs, or offers.",
+    "dynamic_outputs_from": null,
+    "icon": "greenhouse",
+    "inputs": 0,
+    "name": "Greenhouse",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      },
+      {
+        "label": "updated_at",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "greenhouse_api_key",
+        "label": "Greenhouse Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "candidate_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Candidate Created",
+            "value": "candidate_created"
+          },
+          {
+            "label": "Candidate Updated",
+            "value": "candidate_updated"
+          },
+          {
+            "label": "Application Created",
+            "value": "application_created"
+          },
+          {
+            "label": "Application Updated",
+            "value": "application_updated"
+          },
+          {
+            "label": "Job Created",
+            "value": "job_created"
+          },
+          {
+            "label": "Offer Created",
+            "value": "offer_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 100,
+        "label": "Per page (max 500)",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.greenhouse"
   },
   "trigger.gtasks_change": {
     "allow_error": true,

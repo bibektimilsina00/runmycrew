@@ -20,6 +20,8 @@ from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
+from apps.api.app.node_system.nodes.ashby.ashby_node import AshbyNode
+from apps.api.app.node_system.nodes.ashby.ashby_trigger import AshbyTriggerNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
 from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
 from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
@@ -101,6 +103,8 @@ from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
 )
 from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
+from apps.api.app.node_system.nodes.greenhouse.greenhouse_node import GreenhouseNode
+from apps.api.app.node_system.nodes.greenhouse.greenhouse_trigger import GreenhouseTriggerNode
 from apps.api.app.node_system.nodes.gsc.gsc_node import GoogleSearchConsoleNode
 from apps.api.app.node_system.nodes.gslides.gslides_node import GoogleSlidesNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
@@ -346,6 +350,11 @@ node_registry.register(FirefliesWebhookTriggerNode)
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
 node_registry.register(IMAPTriggerNode)
+# Phase 4.6 — ATS long-tail (greenhouse + ashby).
+node_registry.register(GreenhouseNode)
+node_registry.register(GreenhouseTriggerNode)
+node_registry.register(AshbyNode)
+node_registry.register(AshbyTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

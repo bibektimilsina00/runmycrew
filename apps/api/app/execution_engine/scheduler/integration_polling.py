@@ -120,6 +120,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.asana import (
         asana_trigger as _asana_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.ashby import (
+        ashby_trigger as _ashby_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.calcom import (
         calcom_trigger as _calcom_trigger,  # noqa: F401
     )
@@ -145,6 +148,9 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.gpeople import (
         gpeople_trigger as _gpeople_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.greenhouse import (
+        greenhouse_trigger as _greenhouse_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.gtasks import (
         gtasks_trigger as _gtasks_trigger,  # noqa: F401

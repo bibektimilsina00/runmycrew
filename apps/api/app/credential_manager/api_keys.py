@@ -740,6 +740,38 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
         ],
     ),
+    "greenhouse": APIKeyProvider(
+        id="greenhouse_api_key",
+        name="Greenhouse",
+        icon_slug="greenhouse",
+        color="#1c1c1c",
+        description="Greenhouse ATS — jobs, candidates, applications via Harvest API v1.",
+        hint="Harvest API key (Basic auth as user, no password)",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Harvest API Key",
+                type="password",
+                placeholder="Harvest key from Greenhouse settings",
+            ),
+        ],
+    ),
+    "ashby": APIKeyProvider(
+        id="ashby_api_key",
+        name="Ashby",
+        icon_slug="ashby",
+        color="#1c1c1c",
+        description="Ashby ATS — candidates, applications, jobs via POST-based JSON API.",
+        hint="API key from Admin → API keys",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="ashby_v1_...",
+            ),
+        ],
+    ),
     "instantly": APIKeyProvider(
         id="instantly_api_key",
         name="Instantly",
