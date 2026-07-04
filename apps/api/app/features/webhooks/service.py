@@ -141,7 +141,12 @@ class WebhookService:
                 detail=f"Unknown signature scheme {manifest.signature.scheme!r}",
             )
         if manifest.require_secret:
-            if not sig_header:
+            # A provider that puts its signature in the request body
+            # (Mailgun) declares header_name="" — the verifier reads
+            # the body itself. Skip the header-presence check for that
+            # case; the verifier will fail closed if the body signature
+            # block is missing.
+            if manifest.signature.header_name and not sig_header:
                 raise HTTPException(
                     status_code=401, detail=f"Missing {manifest.signature.header_name} header"
                 )
