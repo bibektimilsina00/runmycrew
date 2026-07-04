@@ -60990,6 +60990,117 @@
     "tools": null,
     "type": "trigger.calendly"
   },
+  "trigger.circleback_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Circleback posts a meeting event (meeting.ended, insights.ready, action_items.ready). Verified via HMAC-SHA256 in `x-circleback-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "circleback",
+    "inputs": 0,
+    "name": "Circleback Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "meeting_id",
+        "type": "string"
+      },
+      {
+        "label": "meeting_title",
+        "type": "string"
+      },
+      {
+        "label": "summary",
+        "type": "string"
+      },
+      {
+        "label": "action_items",
+        "type": "array"
+      },
+      {
+        "label": "attendees",
+        "type": "array"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Circleback-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Meeting Ended",
+            "value": "meeting.ended"
+          },
+          {
+            "label": "Insights Ready",
+            "value": "insights.ready"
+          },
+          {
+            "label": "Action Items Ready",
+            "value": "action_items.ready"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `x-circleback-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Circleback Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.circleback_webhook"
+  },
   "trigger.confluence": {
     "allow_error": true,
     "category": "trigger",
@@ -68658,6 +68769,149 @@
     "tools": null,
     "type": "trigger.trello"
   },
+  "trigger.twilio_voice": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#F22F46",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Twilio posts a Voice call status callback (initiated, ringing, answered, completed, ...). Verified via HMAC-SHA1 of URL + sorted-form-params in `X-Twilio-Signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "twilio",
+    "inputs": 0,
+    "name": "Twilio Voice Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "call_sid",
+        "type": "string"
+      },
+      {
+        "label": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "to_number",
+        "type": "string"
+      },
+      {
+        "label": "call_status",
+        "type": "string"
+      },
+      {
+        "label": "call_duration",
+        "type": "string"
+      },
+      {
+        "label": "direction",
+        "type": "string"
+      },
+      {
+        "label": "recording_url",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Twilio-Voice-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Initiated",
+            "value": "initiated"
+          },
+          {
+            "label": "Ringing",
+            "value": "ringing"
+          },
+          {
+            "label": "Answered",
+            "value": "answered"
+          },
+          {
+            "label": "In Progress",
+            "value": "in-progress"
+          },
+          {
+            "label": "Completed",
+            "value": "completed"
+          },
+          {
+            "label": "Busy",
+            "value": "busy"
+          },
+          {
+            "label": "Failed",
+            "value": "failed"
+          },
+          {
+            "label": "No Answer",
+            "value": "no-answer"
+          },
+          {
+            "label": "Canceled",
+            "value": "canceled"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "TWILIO secret. Deliveries without a valid `X-Twilio-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Twilio Voice Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.twilio_voice"
+  },
   "trigger.twilio_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -69260,6 +69514,161 @@
     ],
     "tools": null,
     "type": "trigger.webhook"
+  },
+  "trigger.whatsapp": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#25D366",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Meta's WhatsApp Cloud API posts a message or status update. Verified via HMAC-SHA256 in `X-Hub-Signature-256`.",
+    "dynamic_outputs_from": null,
+    "icon": "whatsapp",
+    "inputs": 0,
+    "name": "WhatsApp Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "from",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "message_type",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "phone_number_id",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-WhatsApp-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Text Message",
+            "value": "text"
+          },
+          {
+            "label": "Image Message",
+            "value": "image"
+          },
+          {
+            "label": "Video Message",
+            "value": "video"
+          },
+          {
+            "label": "Document Message",
+            "value": "document"
+          },
+          {
+            "label": "Audio Message",
+            "value": "audio"
+          },
+          {
+            "label": "Location Message",
+            "value": "location"
+          },
+          {
+            "label": "Contacts Message",
+            "value": "contacts"
+          },
+          {
+            "label": "Interactive Reply",
+            "value": "interactive"
+          },
+          {
+            "label": "Button Reply",
+            "value": "button"
+          },
+          {
+            "label": "Message Sent (status)",
+            "value": "sent"
+          },
+          {
+            "label": "Message Delivered (status)",
+            "value": "delivered"
+          },
+          {
+            "label": "Message Read (status)",
+            "value": "read"
+          },
+          {
+            "label": "Message Failed (status)",
+            "value": "failed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature-256` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in WhatsApp Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.whatsapp"
   },
   "trigger.zendesk": {
     "allow_error": true,
