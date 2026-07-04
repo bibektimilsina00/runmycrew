@@ -89,24 +89,3 @@ class GitHubService:
 
     async def list_comments(self, owner: str, repo: str, issue_number: int) -> list:
         return await self._client.get(f"/repos/{owner}/{repo}/issues/{issue_number}/comments")
-
-    async def list_branches(self, owner: str, repo: str, per_page: int = 100) -> list:
-        return await self._client.get(
-            f"/repos/{owner}/{repo}/branches",
-            params={"per_page": min(per_page, 100)},
-        )
-
-    async def list_open_issues(self, owner: str, repo: str, per_page: int = 50) -> list:
-        # Filter to non-PR issues; GitHub's /issues endpoint returns
-        # both kinds and tags PR-issues with a `pull_request` field.
-        items = await self._client.get(
-            f"/repos/{owner}/{repo}/issues",
-            params={"state": "open", "per_page": min(per_page, 100)},
-        )
-        return [i for i in items or [] if isinstance(i, dict) and "pull_request" not in i]
-
-    async def list_open_prs(self, owner: str, repo: str, per_page: int = 50) -> list:
-        return await self._client.get(
-            f"/repos/{owner}/{repo}/pulls",
-            params={"state": "open", "per_page": min(per_page, 100)},
-        )

@@ -50,9 +50,9 @@ class HubSpotNode(BaseNode[HubSpotProperties]):
             properties=[
                 {
                     "name": "credential",
-                    "label": "HubSpot Token",
+                    "label": "HubSpot Account",
                     "type": "credential",
-                    "credentialType": "hubspot_api_key",
+                    "credentialType": ["hubspot_oauth", "hubspot_api_key"],
                     "required": True,
                 },
                 {
@@ -182,13 +182,17 @@ class HubSpotNode(BaseNode[HubSpotProperties]):
                 {"label": "total", "type": "number"},
             ],
             allow_error=True,
-            credential_type="hubspot_api_key",
+            credential_type=["hubspot_oauth", "hubspot_api_key"],
         )
 
     def _api_key(self) -> str | None:
+        """Return the bearer token regardless of which credential type
+        is connected. OAuth creds use `access_token`; private-app tokens
+        use `api_key`. Both ride the same `Authorization: Bearer …`
+        header against HubSpot's API."""
         if not self.credential:
             return None
-        return self.credential.get("api_key")
+        return self.credential.get("access_token") or self.credential.get("api_key")
 
     def _headers(self) -> dict:
         return {"Authorization": f"Bearer {self._api_key()}", "Content-Type": "application/json"}

@@ -66,8 +66,20 @@ from apps.api.app.node_system.scaffolds.rest_manifest import (
     ProviderManifest,
 )
 from apps.api.app.node_system.scaffolds.rest_node_factory import build_rest_node
+from apps.api.app.node_system.scaffolds.webhook_manifest import (
+    EVENT_ANY,
+    SignatureScheme,
+    SignatureSpec,
+    WebhookEvent,
+    WebhookTriggerManifest,
+    all_webhook_manifests,
+    get_webhook_manifest,
+    register_webhook_manifest,
+)
+from apps.api.app.node_system.scaffolds.webhook_node_factory import build_webhook_trigger
 
 __all__ = [
+    "EVENT_ANY",
     "AuthScheme",
     "CursorStrategy",
     "CustomDiff",
@@ -78,14 +90,22 @@ __all__ = [
     "PollingTriggerManifest",
     "ProviderManifest",
     "RESTError",
+    "SignatureScheme",
+    "SignatureSpec",
+    "WebhookEvent",
+    "WebhookTriggerManifest",
+    "all_webhook_manifests",
     "build_auth",
     "build_polling_trigger",
     "build_rest_node",
+    "build_webhook_trigger",
     "diff_known_ids",
     "diff_last_sha",
     "diff_since_timestamp",
     "error_from_response",
     "get_flatten",
+    "get_webhook_manifest",
     "register_flatten",
+    "register_webhook_manifest",
     "rest_request",
 ]

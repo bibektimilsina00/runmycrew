@@ -57,23 +57,753 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="bu-...")
         ],
     ),
-    "github_pat": APIKeyProvider(
-        id="github_pat",
-        name="GitHub Personal Access Token",
-        icon_slug="github",
-        color="#ffffff",
-        description=(
-            "GitHub via fine-grained or classic Personal Access Token. "
-            "Use this if you can't connect OAuth (e.g. self-host, server-to-server)."
-        ),
-        hint="ghp_... or github_pat_...",
+    "firecrawl": APIKeyProvider(
+        id="firecrawl_api_key",
+        name="Firecrawl",
+        icon_slug="firecrawl",
+        color="#1c1c1c",
+        description="Firecrawl — scrape, crawl, map, and search the web into LLM-ready markdown.",
+        hint="fc-...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
+        ],
+    ),
+    "mailchimp": APIKeyProvider(
+        id="mailchimp_api_key",
+        name="Mailchimp",
+        icon_slug="mailchimp",
+        color="#1c1c1c",
+        description="Mailchimp — audiences, campaigns, transactional.",
+        hint="API Key (ends in -us14) + data-center suffix from the key",
         fields=[
             CredentialField(
-                id="access_token",
-                label="Personal Access Token",
+                id="api_key",
+                label="API Key",
                 type="password",
-                placeholder="ghp_... or github_pat_...",
+                placeholder="abc123-us14",
+            ),
+            CredentialField(
+                id="dc",
+                label="Data Center",
+                type="string",
+                placeholder="us14 (the suffix after the dash in your API key)",
+            ),
+        ],
+    ),
+    "klaviyo": APIKeyProvider(
+        id="klaviyo_api_key",
+        name="Klaviyo",
+        icon_slug="klaviyo",
+        color="#1c1c1c",
+        description="Klaviyo — email + SMS marketing, profiles, events.",
+        hint="Private API Key (pk_...)",
+        fields=[
+            CredentialField(
+                id="api_key", label="Private API Key", type="password", placeholder="pk_..."
             )
+        ],
+    ),
+    "customer_io": APIKeyProvider(
+        id="customer_io_api_key",
+        name="Customer.io",
+        icon_slug="customer-io",
+        color="#1c1c1c",
+        description="Customer.io — behavioral messaging + broadcasts.",
+        hint="Track site ID + track API key",
+        fields=[
+            CredentialField(
+                id="site_id",
+                label="Site ID",
+                type="string",
+                placeholder="Site ID",
+            ),
+            CredentialField(
+                id="api_key",
+                label="Track API Key",
+                type="password",
+                placeholder="Track API Key",
+            ),
+        ],
+    ),
+    "mailerlite": APIKeyProvider(
+        id="mailerlite_api_key",
+        name="MailerLite",
+        icon_slug="mailerlite",
+        color="#1c1c1c",
+        description="MailerLite — subscribers, campaigns, automations.",
+        hint="API Token",
+        fields=[
+            CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
+        ],
+    ),
+    "gitlab": APIKeyProvider(
+        id="gitlab_api_key",
+        name="GitLab",
+        icon_slug="gitlab",
+        color="#1c1c1c",
+        description="GitLab — projects, issues, MRs, pipelines.",
+        hint="Personal Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="glpat-..."
+            ),
+            CredentialField(
+                id="base_url",
+                label="Base URL (self-hosted; leave blank for gitlab.com)",
+                type="string",
+                placeholder="https://gitlab.example.com",
+            ),
+        ],
+    ),
+    "pagerduty": APIKeyProvider(
+        id="pagerduty_api_key",
+        name="PagerDuty",
+        icon_slug="pagerduty",
+        color="#1c1c1c",
+        description="PagerDuty — incidents, services, on-call.",
+        hint="REST API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "trello": APIKeyProvider(
+        id="trello_api_key",
+        name="Trello",
+        icon_slug="trello",
+        color="#1c1c1c",
+        description="Trello — boards, lists, cards. Uses API key + user token.",
+        hint="API key (public) + Token (private per-user)",
+        fields=[
+            CredentialField(
+                id="app_key",
+                label="API Key",
+                type="string",
+                placeholder="from trello.com/app-key",
+            ),
+            CredentialField(
+                id="api_key",
+                label="User Token",
+                type="password",
+                placeholder="Manual token or OAuth1 accessToken",
+            ),
+        ],
+    ),
+    "zendesk": APIKeyProvider(
+        id="zendesk_api_key",
+        name="Zendesk",
+        icon_slug="zendesk",
+        color="#1c1c1c",
+        description="Zendesk — tickets, users, orgs. Uses email/token Basic auth + per-subdomain URL.",
+        hint="Subdomain + email + API token",
+        fields=[
+            CredentialField(
+                id="subdomain",
+                label="Subdomain",
+                type="string",
+                placeholder="mycompany (from mycompany.zendesk.com)",
+            ),
+            CredentialField(
+                id="email",
+                label="Agent Email",
+                type="string",
+                placeholder="you@company.com",
+            ),
+            CredentialField(
+                id="api_key",
+                label="API Token",
+                type="password",
+                placeholder="API Token",
+            ),
+        ],
+    ),
+    "calcom": APIKeyProvider(
+        id="calcom_api_key",
+        name="Cal.com",
+        icon_slug="calcom",
+        color="#1c1c1c",
+        description="Cal.com — bookings, event types, availability.",
+        hint="cal_live_... (Cal.com API key)",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="cal_live_..."
+            )
+        ],
+    ),
+    "fireflies": APIKeyProvider(
+        id="fireflies_api_key",
+        name="Fireflies",
+        icon_slug="fireflies",
+        color="#1c1c1c",
+        description="Fireflies.ai — meeting transcripts + summaries + search (GraphQL).",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "gong": APIKeyProvider(
+        id="gong_api_key",
+        name="Gong",
+        icon_slug="gong",
+        color="#1c1c1c",
+        description="Gong.io — call recordings, transcripts, deal insights.",
+        hint="Access Key + Access Key Secret",
+        fields=[
+            CredentialField(
+                id="access_key",
+                label="Access Key",
+                type="string",
+                placeholder="Access Key",
+            ),
+            CredentialField(
+                id="access_key_secret",
+                label="Access Key Secret",
+                type="password",
+                placeholder="Secret",
+            ),
+        ],
+    ),
+    "fathom": APIKeyProvider(
+        id="fathom_api_key",
+        name="Fathom",
+        icon_slug="fathom",
+        color="#1c1c1c",
+        description="Fathom.video — meeting recordings, transcripts, action items.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "aws": APIKeyProvider(
+        id="aws_credentials",
+        name="AWS",
+        icon_slug="aws",
+        color="#1c1c1c",
+        description=(
+            "AWS access key + secret access key. Signs SigV4 requests "
+            "for S3, SES, SQS, Secrets Manager, Athena, and other AWS APIs."
+        ),
+        hint="Access Key ID + Secret Access Key + Region",
+        fields=[
+            CredentialField(
+                id="access_key_id",
+                label="Access Key ID",
+                type="string",
+                placeholder="AKIA...",
+            ),
+            CredentialField(
+                id="secret_access_key",
+                label="Secret Access Key",
+                type="password",
+                placeholder="secret",
+            ),
+            CredentialField(
+                id="region",
+                label="Default Region",
+                type="string",
+                placeholder="us-east-1",
+            ),
+            CredentialField(
+                id="session_token",
+                label="Session Token (optional, STS)",
+                type="password",
+                placeholder="STS token",
+            ),
+        ],
+    ),
+    "typeform": APIKeyProvider(
+        id="typeform_api_key",
+        name="Typeform",
+        icon_slug="typeform",
+        color="#1c1c1c",
+        description="Typeform — forms, responses, webhooks.",
+        hint="Personal Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="Token"
+            )
+        ],
+    ),
+    "shopify": APIKeyProvider(
+        id="shopify_api_key",
+        name="Shopify",
+        icon_slug="shopify",
+        color="#1c1c1c",
+        description="Shopify Admin — orders, products, customers.",
+        hint="Admin API access token + store domain",
+        fields=[
+            CredentialField(
+                id="store_domain",
+                label="Store Domain",
+                type="string",
+                placeholder="your-store (without .myshopify.com)",
+            ),
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="shpat_..."
+            ),
+        ],
+    ),
+    "apify": APIKeyProvider(
+        id="apify_api_key",
+        name="Apify",
+        icon_slug="apify",
+        color="#1c1c1c",
+        description="Apify — actors, datasets, key-value stores.",
+        hint="Personal API token",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Token", type="password", placeholder="apify_api_..."
+            )
+        ],
+    ),
+    "algolia": APIKeyProvider(
+        id="algolia_api_key",
+        name="Algolia",
+        icon_slug="algolia",
+        color="#1c1c1c",
+        description="Algolia — index, search, manage records.",
+        hint="Application ID + Admin / Search API key",
+        fields=[
+            CredentialField(
+                id="app_id",
+                label="Application ID",
+                type="string",
+                placeholder="ABC123",
+            ),
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key"),
+        ],
+    ),
+    "square": APIKeyProvider(
+        id="square_api_key",
+        name="Square",
+        icon_slug="square",
+        color="#1c1c1c",
+        description="Square Connect — payments, orders, customers, catalog.",
+        hint="Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="EAAA..."
+            )
+        ],
+    ),
+    "pipedrive": APIKeyProvider(
+        id="pipedrive_api_key",
+        name="Pipedrive",
+        icon_slug="pipedrive",
+        color="#1c1c1c",
+        description="Pipedrive CRM — deals, persons, organizations.",
+        hint="API token + company domain",
+        fields=[
+            CredentialField(
+                id="company_domain",
+                label="Company Domain",
+                type="string",
+                placeholder="your-team",
+            ),
+            CredentialField(id="api_key", label="API Token", type="password", placeholder="Token"),
+        ],
+    ),
+    "attio": APIKeyProvider(
+        id="attio_api_key",
+        name="Attio",
+        icon_slug="attio",
+        color="#1c1c1c",
+        description="Attio CRM — flexible-schema records, lists, and objects.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "mixpanel": APIKeyProvider(
+        id="mixpanel_api_key",
+        name="Mixpanel",
+        icon_slug="mixpanel",
+        color="#1c1c1c",
+        description="Mixpanel — event tracking + engagement queries.",
+        hint="Service account username + secret (project token for ingestion)",
+        fields=[
+            CredentialField(
+                id="username",
+                label="Service Account Username",
+                type="string",
+                placeholder="serviceaccount.user",
+            ),
+            CredentialField(
+                id="api_secret",
+                label="Service Account Secret",
+                type="password",
+                placeholder="Secret",
+            ),
+        ],
+    ),
+    "monday": APIKeyProvider(
+        id="monday_api_key",
+        name="Monday.com",
+        icon_slug="monday",
+        color="#1c1c1c",
+        description="Monday.com — boards, items, updates via GraphQL.",
+        hint="API token (Profile → Admin → API)",
+        fields=[
+            CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
+        ],
+    ),
+    "intercom": APIKeyProvider(
+        id="intercom_api_key",
+        name="Intercom",
+        icon_slug="intercom",
+        color="#1c1c1c",
+        description="Intercom — contacts, conversations, messages.",
+        hint="Access token (Developer Hub → Authentication)",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="Token"
+            )
+        ],
+    ),
+    "twilio": APIKeyProvider(
+        id="twilio_api_key",
+        name="Twilio",
+        icon_slug="twilio",
+        color="#1c1c1c",
+        description="Twilio — SMS, WhatsApp, voice. Auth Token + Account SID.",
+        hint="Account SID + Auth Token",
+        fields=[
+            CredentialField(
+                id="account_sid",
+                label="Account SID",
+                type="string",
+                placeholder="AC...",
+            ),
+            CredentialField(
+                id="auth_token",
+                label="Auth Token",
+                type="password",
+                placeholder="Auth Token",
+            ),
+        ],
+    ),
+    "mailgun": APIKeyProvider(
+        id="mailgun_api_key",
+        name="Mailgun",
+        icon_slug="mailgun",
+        color="#1c1c1c",
+        description="Mailgun — transactional + marketing email.",
+        hint="key-... (private API key)",
+        fields=[
+            CredentialField(
+                id="api_key", label="Private API Key", type="password", placeholder="key-..."
+            )
+        ],
+    ),
+    "sendblue": APIKeyProvider(
+        id="sendblue_api_key",
+        name="Sendblue",
+        icon_slug="sendblue",
+        color="#1c1c1c",
+        description="Sendblue — iMessage + SMS fallback messaging.",
+        hint="API Key ID + Secret",
+        fields=[
+            CredentialField(
+                id="api_key_id",
+                label="API Key ID",
+                type="string",
+                placeholder="key id",
+            ),
+            CredentialField(
+                id="api_secret_key",
+                label="API Secret Key",
+                type="password",
+                placeholder="secret key",
+            ),
+        ],
+    ),
+    "messagebird": APIKeyProvider(
+        id="messagebird_api_key",
+        name="MessageBird",
+        icon_slug="messagebird",
+        color="#1c1c1c",
+        description="MessageBird — SMS, voice, verification.",
+        hint="Access Key",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Key", type="password", placeholder="Access Key"
+            )
+        ],
+    ),
+    "plivo": APIKeyProvider(
+        id="plivo_api_key",
+        name="Plivo",
+        icon_slug="plivo",
+        color="#1c1c1c",
+        description="Plivo — SMS and voice. Auth ID + Auth Token.",
+        hint="Auth ID + Auth Token",
+        fields=[
+            CredentialField(id="auth_id", label="Auth ID", type="string", placeholder="MA..."),
+            CredentialField(
+                id="auth_token", label="Auth Token", type="password", placeholder="Auth Token"
+            ),
+        ],
+    ),
+    "supabase": APIKeyProvider(
+        id="supabase_api_key",
+        name="Supabase",
+        icon_slug="supabase",
+        color="#1c1c1c",
+        description="Supabase — read/write Postgres tables via PostgREST.",
+        hint="Service role or anon key + project URL",
+        fields=[
+            CredentialField(
+                id="project_url",
+                label="Project URL",
+                type="string",
+                placeholder="https://abc.supabase.co",
+            ),
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="eyJ..."),
+        ],
+    ),
+    "upstash_redis": APIKeyProvider(
+        id="upstash_redis_api_key",
+        name="Upstash Redis",
+        icon_slug="upstash",
+        color="#1c1c1c",
+        description="Upstash Redis — REST-driven Redis commands.",
+        hint="REST URL + REST token",
+        fields=[
+            CredentialField(
+                id="rest_url",
+                label="REST URL",
+                type="string",
+                placeholder="https://abc-12345.upstash.io",
+            ),
+            CredentialField(id="api_key", label="REST Token", type="password", placeholder="Token"),
+        ],
+    ),
+    "pinecone": APIKeyProvider(
+        id="pinecone_api_key",
+        name="Pinecone",
+        icon_slug="pinecone",
+        color="#1c1c1c",
+        description="Pinecone — vector database control + data plane.",
+        hint="API key + per-index host",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key"),
+            CredentialField(
+                id="index_host",
+                label="Index Host (optional, data-plane ops)",
+                type="string",
+                placeholder="abc-123456.svc.us-east-1.aws.pinecone.io",
+            ),
+        ],
+    ),
+    "qdrant": APIKeyProvider(
+        id="qdrant_api_key",
+        name="Qdrant",
+        icon_slug="qdrant",
+        color="#1c1c1c",
+        description="Qdrant — vector database (cloud or self-hosted).",
+        hint="Cluster URL + API key",
+        fields=[
+            CredentialField(
+                id="cluster_url",
+                label="Cluster URL",
+                type="string",
+                placeholder="https://abc.us-east.aws.cloud.qdrant.io:6333",
+            ),
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key"),
+        ],
+    ),
+    "tinybird": APIKeyProvider(
+        id="tinybird_api_key",
+        name="Tinybird",
+        icon_slug="tinybird",
+        color="#1c1c1c",
+        description="Tinybird — managed ClickHouse for product analytics.",
+        hint="Workspace admin or pipe token",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="p.eyJ...")
+        ],
+    ),
+    "sentry": APIKeyProvider(
+        id="sentry_api_key",
+        name="Sentry",
+        icon_slug="sentry",
+        color="#1c1c1c",
+        description="Sentry — error tracking + release management.",
+        hint="Auth Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Auth Token", type="password", placeholder="sntrys_..."
+            )
+        ],
+    ),
+    "posthog": APIKeyProvider(
+        id="posthog_api_key",
+        name="PostHog",
+        icon_slug="posthog",
+        color="#1c1c1c",
+        description="PostHog — product analytics + feature flags.",
+        hint="phx_...",
+        fields=[
+            CredentialField(
+                id="api_key", label="Personal API Key", type="password", placeholder="phx_..."
+            )
+        ],
+    ),
+    "dub": APIKeyProvider(
+        id="dub_api_key",
+        name="Dub",
+        icon_slug="dub",
+        color="#1c1c1c",
+        description="Dub.co — short links + click analytics.",
+        hint="dub_...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="dub_...")
+        ],
+    ),
+    "vercel": APIKeyProvider(
+        id="vercel_api_key",
+        name="Vercel",
+        icon_slug="vercel",
+        color="#ffffff",
+        description="Vercel — deployments, projects, env vars, domains.",
+        hint="Personal Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="Token"
+            )
+        ],
+    ),
+    "cloudflare": APIKeyProvider(
+        id="cloudflare_api_key",
+        name="Cloudflare",
+        icon_slug="cloudflare",
+        color="#1c1c1c",
+        description="Cloudflare — zones, DNS, cache, workers via scoped API token.",
+        hint="API Token (scoped, not the global key)",
+        fields=[
+            CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
+        ],
+    ),
+    "newsapi": APIKeyProvider(
+        id="newsapi_api_key",
+        name="NewsAPI",
+        icon_slug="newsapi",
+        color="#1c1c1c",
+        description="NewsAPI.org — search 80k+ news sources.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "resend": APIKeyProvider(
+        id="resend_api_key",
+        name="Resend",
+        icon_slug="resend",
+        color="#1c1c1c",
+        description="Resend — transactional email API.",
+        hint="re_...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="re_...")
+        ],
+    ),
+    "sendgrid": APIKeyProvider(
+        id="sendgrid_api_key",
+        name="SendGrid",
+        icon_slug="sendgrid",
+        color="#1c1c1c",
+        description="SendGrid — transactional + marketing email.",
+        hint="SG....",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="SG....")
+        ],
+    ),
+    "postmark": APIKeyProvider(
+        id="postmark_api_key",
+        name="Postmark",
+        icon_slug="postmark",
+        color="#1c1c1c",
+        description="Postmark — fast transactional email.",
+        hint="Server Token (one per Postmark server)",
+        fields=[
+            CredentialField(
+                id="api_key", label="Server Token", type="password", placeholder="Server Token"
+            )
+        ],
+    ),
+    "loops": APIKeyProvider(
+        id="loops_api_key",
+        name="Loops",
+        icon_slug="loops",
+        color="#1c1c1c",
+        description="Loops.so — product email + audience automation.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "instantly": APIKeyProvider(
+        id="instantly_api_key",
+        name="Instantly",
+        icon_slug="instantly",
+        color="#1c1c1c",
+        description="Instantly.ai — cold-email outreach + lead management.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "exa": APIKeyProvider(
+        id="exa_api_key",
+        name="Exa",
+        icon_slug="exa",
+        color="#1c1c1c",
+        description="Exa — neural web search + content extraction.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "tavily": APIKeyProvider(
+        id="tavily_api_key",
+        name="Tavily",
+        icon_slug="tavily",
+        color="#1c1c1c",
+        description="Tavily — LLM-grounded search + URL extraction.",
+        hint="tvly-...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="tvly-...")
+        ],
+    ),
+    "serper": APIKeyProvider(
+        id="serper_api_key",
+        name="Serper",
+        icon_slug="serper",
+        color="#1c1c1c",
+        description="Serper — Google search results via google.serper.dev.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "brandfetch": APIKeyProvider(
+        id="brandfetch_api_key",
+        name="Brandfetch",
+        icon_slug="brandfetch",
+        color="#1c1c1c",
+        description="Brandfetch — pull brand identity assets by domain.",
+        hint="API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
+    "huggingface": APIKeyProvider(
+        id="huggingface_api_key",
+        name="HuggingFace",
+        icon_slug="huggingface",
+        color="#ffffff",
+        description="HuggingFace Hosted Inference — run any model from the Hub.",
+        hint="hf_...",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="hf_...")
         ],
     ),
     "airtable": APIKeyProvider(
@@ -388,6 +1118,62 @@ PROVIDERS = {
         ai_api_type="openai_compatible",
         chat_completions_url="https://api.fireworks.ai/inference/v1/chat/completions",
         models_url="https://api.fireworks.ai/inference/v1/models",
+    ),
+    "imap": APIKeyProvider(
+        id="imap_creds",
+        name="IMAP Email",
+        icon_slug="mail",
+        color="#1c1c1c",
+        description="Generic IMAP mailbox — Gmail, Outlook, Yahoo, self-hosted. App-password for Gmail.",
+        hint="Host + port + username + password",
+        fields=[
+            CredentialField(
+                id="host",
+                label="IMAP Host",
+                type="string",
+                placeholder="imap.gmail.com",
+            ),
+            CredentialField(
+                id="port",
+                label="Port",
+                type="string",
+                placeholder="993 (IMAPS) or 143 (STARTTLS)",
+            ),
+            CredentialField(
+                id="username",
+                label="Username",
+                type="string",
+                placeholder="you@example.com",
+            ),
+            CredentialField(
+                id="password",
+                label="Password / App Password",
+                type="password",
+                placeholder="App-password (Gmail / Outlook 2FA)",
+            ),
+            CredentialField(
+                id="use_ssl",
+                label="Use SSL (true/false)",
+                type="string",
+                placeholder="true",
+            ),
+        ],
+    ),
+    "telegram_bot": APIKeyProvider(
+        id="telegram_bot",
+        name="Telegram Bot",
+        icon_slug="telegram",
+        color="#1c1c1c",
+        description="Telegram bot token (from @BotFather). Used for send_message + getUpdates polling.",
+        hint="Bot token in the form 123456:ABC-DEF...",
+        fields=[
+            CredentialField(
+                id="bot_token",
+                label="Bot Token",
+                type="password",
+                placeholder="123456789:ABCDEF...",
+            ),
+        ],
     ),
 }
 

@@ -69,6 +69,37 @@ class Settings(BaseSettings):
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
+
+    # Microsoft 365 OAuth (Outlook, Teams, OneDrive, SharePoint, Excel,
+    # Planner). `MICROSOFT_TENANT_ID` defaults to `common` (multi-tenant
+    # + personal accounts). Deployments that need single-tenant lock
+    # override it with the tenant guid.
+    MICROSOFT_CLIENT_ID: str = ""
+    MICROSOFT_CLIENT_SECRET: str = ""
+    MICROSOFT_TENANT_ID: str = "common"
+
+    # Phase 2.2 OAuth providers (driven by _SimpleOAuthProvider in
+    # credential_manager/oauth/flow.py — vanilla code-grant flows).
+    ASANA_CLIENT_ID: str = ""
+    ASANA_CLIENT_SECRET: str = ""
+    HUBSPOT_CLIENT_ID: str = ""
+    HUBSPOT_CLIENT_SECRET: str = ""
+    CALENDLY_CLIENT_ID: str = ""
+    CALENDLY_CLIENT_SECRET: str = ""
+    ZOOM_CLIENT_ID: str = ""
+    ZOOM_CLIENT_SECRET: str = ""
+    BOX_CLIENT_ID: str = ""
+    BOX_CLIENT_SECRET: str = ""
+    DROPBOX_CLIENT_ID: str = ""
+    DROPBOX_CLIENT_SECRET: str = ""
+    DOCUSIGN_CLIENT_ID: str = ""
+    DOCUSIGN_CLIENT_SECRET: str = ""
+    # DocuSign auth host — `account-d.docusign.com` on the demo/dev
+    # tier, `account.docusign.com` in production. Default is prod.
+    DOCUSIGN_AUTH_HOST: str = "account.docusign.com"
+    LINKEDIN_CLIENT_ID: str = ""
+    LINKEDIN_CLIENT_SECRET: str = ""
+
     # Google Picker SDK keys (separate from OAuth client). The
     # `developer key` is a browser-restricted API key for the Picker
     # library; the `app id` is the numeric Cloud-project number used by

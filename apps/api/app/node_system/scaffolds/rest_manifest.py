@@ -130,7 +130,7 @@ class OpSpec(BaseModel):
     )
 
     # Declarative form.
-    method: Literal["GET", "POST", "PUT", "PATCH", "DELETE"] | None = None
+    method: Literal["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"] | None = None
     path: str | None = None
     query_fields: list[str] = Field(default_factory=list)
     body_fields: list[str] = Field(default_factory=list)
@@ -149,6 +149,11 @@ class OpSpec(BaseModel):
     # Output shaping.
     output_flatten: str | None = None
     success_payload_template: dict[str, Any] | None = None
+    # Per-op headers that layer on top of manifest.extra_headers.
+    # Needed for AWS JSON-protocol services (SQS, Athena, Secrets
+    # Manager) that dispatch by `X-Amz-Target: <Service>.<Action>` —
+    # the header changes per operation.
+    extra_headers: dict[str, str] = Field(default_factory=dict)
 
 
 # ── provider manifest ────────────────────────────────────────────────
@@ -159,6 +164,10 @@ AuthScheme = Literal[
     "header_token",
     "basic",
     "query_token",
+    # AWS Signature V4 — service + region rides on the manifest via
+    # `aws_service` + `aws_default_region`; access_key + secret_access_key
+    # + optional session_token come from the credential dict.
+    "aws_sigv4",
     "none",
 ]
 
@@ -200,6 +209,21 @@ class ProviderManifest(BaseModel):
     auth_value_template: str = "Bearer {token}"
     # For `query_token` — name of the URL param the token rides on.
     auth_query_param: str = "api_key"
+    # For `basic` only. Empty = `{token}:` base64 (legacy). A literal
+    # value (e.g. `"api"` for Mailgun) → `{value}:{token}`. A
+    # `{credential_key}` template resolves against the live credential
+    # dict — e.g. Twilio uses `"{account_sid}"` to pull the account sid
+    # out of the credential and put it on the username side.
+    auth_basic_username: str = ""
+    # For `aws_sigv4` only. `aws_service` is the SigV4 service name
+    # (`s3`, `ses`, `sqs`, `secretsmanager`, `athena`, …). Region
+    # resolves from the credential's `region` field first, then falls
+    # back to `aws_default_region`. S3 defaults to unsigned payload
+    # hashing when body sizes routinely exceed a few MB — set
+    # `aws_unsigned_payload=True` on the manifest to opt in.
+    aws_service: str = ""
+    aws_default_region: str = "us-east-1"
+    aws_unsigned_payload: bool = False
     # Optional content-type override (`application/json` is the default).
     content_type: str = "application/json"
     # Extra static headers (e.g. `X-GitHub-Api-Version`).

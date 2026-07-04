@@ -26,7 +26,7 @@ class IntegrationService:
 
         repo = CredentialRepository(self.db)
         cred = await repo.get_by_id_and_user(uuid.UUID(credential), current_user.id)
-        if not cred or cred.type not in ("github_oauth", "github_pat"):
+        if not cred or cred.type != "github_oauth":
             raise HTTPException(status_code=404, detail="GitHub credential not found")
 
         credential_service = CredentialService(self.db)
@@ -138,78 +138,6 @@ class IntegrationService:
             raise
         except Exception as e:
             logger.error(f"Failed to list GitHub repos: {e}")
-            return IntegrationResponse(ok=False, error=str(e))
-
-    async def list_github_branches(
-        self,
-        credential: str | None,
-        owner: str | None,
-        repo: str | None,
-        current_user: User,
-    ) -> IntegrationResponse:
-        try:
-            if not (owner and repo):
-                return IntegrationResponse(ok=True, data=[])
-            service = await self.get_github_service(credential, current_user)
-            branches = await service.list_branches(owner=owner, repo=repo)
-            data = [IntegrationOption(label=b["name"], value=b["name"]) for b in branches]
-            return IntegrationResponse(ok=True, data=data)
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(f"Failed to list GitHub branches: {e}")
-            return IntegrationResponse(ok=False, error=str(e))
-
-    async def list_github_issues(
-        self,
-        credential: str | None,
-        owner: str | None,
-        repo: str | None,
-        current_user: User,
-    ) -> IntegrationResponse:
-        try:
-            if not (owner and repo):
-                return IntegrationResponse(ok=True, data=[])
-            service = await self.get_github_service(credential, current_user)
-            issues = await service.list_open_issues(owner=owner, repo=repo)
-            data = [
-                IntegrationOption(
-                    label=f"#{i['number']} — {i.get('title', '')[:80]}",
-                    value=i["number"],
-                )
-                for i in issues
-            ]
-            return IntegrationResponse(ok=True, data=data)
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(f"Failed to list GitHub issues: {e}")
-            return IntegrationResponse(ok=False, error=str(e))
-
-    async def list_github_prs(
-        self,
-        credential: str | None,
-        owner: str | None,
-        repo: str | None,
-        current_user: User,
-    ) -> IntegrationResponse:
-        try:
-            if not (owner and repo):
-                return IntegrationResponse(ok=True, data=[])
-            service = await self.get_github_service(credential, current_user)
-            prs = await service.list_open_prs(owner=owner, repo=repo)
-            data = [
-                IntegrationOption(
-                    label=f"#{p['number']} — {p.get('title', '')[:80]}",
-                    value=p["number"],
-                )
-                for p in prs
-            ]
-            return IntegrationResponse(ok=True, data=data)
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(f"Failed to list GitHub PRs: {e}")
             return IntegrationResponse(ok=False, error=str(e))
 
     async def list_notion_databases(

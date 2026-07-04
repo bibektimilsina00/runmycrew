@@ -46,23 +46,54 @@ PollerCallable = Callable[
 
 
 class PollerEntry:
-    __slots__ = ("node_type", "provider", "poller")
+    __slots__ = ("node_type", "provider", "poller", "token_fields")
 
-    def __init__(self, node_type: str, provider: str, poller: PollerCallable) -> None:
+    def __init__(
+        self,
+        node_type: str,
+        provider: str,
+        poller: PollerCallable,
+        token_fields: list[str] | None = None,
+    ) -> None:
         self.node_type = node_type
         self.provider = provider
         self.poller = poller
+        # Ordered list of credential dict keys to try when the scheduler
+        # pulls a token to hand to the poller. Defaults to `access_token`
+        # only, which works for every OAuth provider — API-key providers
+        # (GitLab, Trello, Klaviyo, PagerDuty) override with the field
+        # their credential type actually persists.
+        # `token_fields=[]` (explicit empty list) marks the provider as
+        # unauthenticated — scheduler runs the poller with an empty
+        # token and skips the credential lookup entirely. `None` still
+        # falls through to the OAuth default.
+        self.token_fields = list(token_fields) if token_fields is not None else ["access_token"]
 
 
 _BY_NODE_TYPE: dict[str, PollerEntry] = {}
 _BY_PROVIDER: dict[str, PollerEntry] = {}
 
 
-def register_poller(*, node_type: str, provider: str, poller: PollerCallable) -> None:
+def register_poller(
+    *,
+    node_type: str,
+    provider: str,
+    poller: PollerCallable,
+    token_fields: list[str] | None = None,
+) -> None:
     """Provider modules call this at import time to wire themselves into
     the scheduler. Re-registering the same `node_type` replaces — useful
-    for hot-reload in dev."""
-    entry = PollerEntry(node_type=node_type, provider=provider, poller=poller)
+    for hot-reload in dev.
+
+    `token_fields` names the credential keys the scheduler should try, in
+    order, when extracting the value to hand to the poller. Defaults to
+    `['access_token']` for OAuth."""
+    entry = PollerEntry(
+        node_type=node_type,
+        provider=provider,
+        poller=poller,
+        token_fields=token_fields,
+    )
     _BY_NODE_TYPE[node_type] = entry
     _BY_PROVIDER[provider] = entry
 
@@ -85,6 +116,16 @@ def eager_register_polling_providers() -> None:
     from both `_poll_due_rows` (scheduler tick) and the listen-mode
     Celery task means a worker that only ever runs one of those paths
     still sees the right providers."""
+    # Phase 3.1 — dev/CRM polling triggers.
+    from apps.api.app.node_system.nodes.asana import (
+        asana_trigger as _asana_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.calcom import (
+        calcom_trigger as _calcom_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.calendly import (
+        calendly_trigger as _calendly_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.gchat import (
         gchat_trigger as _gchat_trigger,  # noqa: F401
@@ -95,8 +136,8 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.gforms import (
         gforms_trigger as _gforms_trigger,  # noqa: F401
     )
-    from apps.api.app.node_system.nodes.github import (
-        github_trigger as _github_trigger,  # noqa: F401
+    from apps.api.app.node_system.nodes.gitlab import (
+        gitlab_trigger as _gitlab_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.gmail import gmail_trigger as _gmail_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.google_sheets import (
@@ -110,6 +151,45 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.gyt import (
         gyt_trigger as _gyt_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.hubspot import (
+        hubspot_trigger as _hubspot_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.imap import (
+        imap_trigger as _imap_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.intercom import (
+        intercom_trigger as _intercom_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.jira import (
+        jira_trigger as _jira_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.linear import (
+        linear_trigger as _linear_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.monday import (
+        monday_trigger as _monday_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.notion import (
+        notion_trigger as _notion_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.outlook import (
+        outlook_trigger as _outlook_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.pagerduty import (
+        pagerduty_trigger as _pagerduty_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.rss import (
+        rss_trigger as _rss_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.telegram import (
+        telegram_trigger as _telegram_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.trello import (
+        trello_trigger as _trello_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.zendesk import (
+        zendesk_trigger as _zendesk_trigger,  # noqa: F401
     )
 
 
@@ -205,24 +285,35 @@ async def _poll_due_rows() -> None:
 
             props = (node.get("data") or {}).get("properties") or {}
             credential_id = props.get("credential")
-            try:
-                token = await _resolve_access_token(cred_service, credential_id, state.workspace_id)
-            except Exception as exc:  # noqa: BLE001
-                logger.warning(
-                    "Integration polling: cred resolve failed for %s/%s: %s",
-                    state.workflow_id,
-                    state.node_id,
-                    exc,
-                )
-                state.last_error = f"Credential resolve failed: {exc}"[:1024]
-                state.next_poll_at = _retry_after(props)
-                await db.commit()
-                continue
-            if not token:
-                state.last_error = "Credential missing access_token"
-                state.next_poll_at = _retry_after(props)
-                await db.commit()
-                continue
+            if not entry.token_fields:
+                # Unauthenticated provider (RSS) — registered with an
+                # empty token_fields list. Poller runs with an empty
+                # token and doesn't touch the cred service.
+                token = ""
+            else:
+                try:
+                    token = await _resolve_access_token(
+                        cred_service,
+                        credential_id,
+                        state.workspace_id,
+                        token_fields=entry.token_fields,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning(
+                        "Integration polling: cred resolve failed for %s/%s: %s",
+                        state.workflow_id,
+                        state.node_id,
+                        exc,
+                    )
+                    state.last_error = f"Credential resolve failed: {exc}"[:1024]
+                    state.next_poll_at = _retry_after(props)
+                    await db.commit()
+                    continue
+                if not token:
+                    state.last_error = "Credential missing access_token"
+                    state.next_poll_at = _retry_after(props)
+                    await db.commit()
+                    continue
 
             try:
                 matches, new_cursor = await entry.poller(token, state.cursor, props)
@@ -277,11 +368,20 @@ def _find_trigger_node(graph: dict[str, Any], node_id: str) -> dict[str, Any] | 
 
 
 async def _resolve_access_token(
-    cred_service: Any, credential_id: Any, workspace_id: Any
+    cred_service: Any,
+    credential_id: Any,
+    workspace_id: Any,
+    *,
+    token_fields: list[str] | None = None,
 ) -> str | None:
-    """Pull the OAuth access token off a credential, refreshing if the
-    stored expiry is past. Uses the same service the runtime path uses
-    so a refresh here keeps subsequent node runs aligned."""
+    """Pull the auth token off a credential, refreshing if the stored
+    expiry is past. Uses the same service the runtime path uses so a
+    refresh here keeps subsequent node runs aligned.
+
+    `token_fields` is an ordered list of credential-dict keys to try —
+    OAuth providers use `['access_token']`, API-key ones override with
+    `['api_key']` or similar. Falling through both keeps mixed-auth
+    providers (HubSpot supports OAuth or an api_key) working."""
     import uuid
 
     if not credential_id or not workspace_id:
@@ -297,8 +397,11 @@ async def _resolve_access_token(
     data = await cred_service.get_decrypted_credential(cred)
     if not isinstance(data, dict):
         return None
-    token = data.get("access_token")
-    return str(token) if isinstance(token, str) else None
+    for key in token_fields or ["access_token"]:
+        value = data.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
 
 
 def _next_poll_at_from_props(props: dict[str, Any]) -> datetime:
