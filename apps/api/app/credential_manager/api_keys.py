@@ -2109,6 +2109,83 @@ PROVIDERS = {
             ),
         ],
     ),
+    "rippling": APIKeyProvider(
+        id="rippling_api_key",
+        name="Rippling",
+        icon_slug="rippling",
+        color="#1c1c1c",
+        description="Rippling — HR platform (employees, orgs, payroll).",
+        hint="Rippling API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Rippling API key"
+            ),
+        ],
+    ),
+    "workday": APIKeyProvider(
+        id="workday_api_key",
+        name="Workday",
+        icon_slug="workday",
+        color="#1c1c1c",
+        description="Workday — HR + finance ERP (RaaS + REST APIs).",
+        hint="Workday API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="OAuth Access Token",
+                type="password",
+                placeholder="Workday token",
+            ),
+            CredentialField(
+                id="tenant_url",
+                label="Tenant URL",
+                type="string",
+                placeholder="https://xxx.workday.com",
+            ),
+            CredentialField(
+                id="tenant", label="Tenant Name", type="string", placeholder="mycompany"
+            ),
+        ],
+    ),
+    "sap_concur": APIKeyProvider(
+        id="sap_concur_api_key",
+        name="SAP Concur",
+        icon_slug="sap_concur",
+        color="#1c1c1c",
+        description="SAP Concur — travel + expense management.",
+        hint="SAP Concur API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="SAP Concur API key"
+            ),
+        ],
+    ),
+    "wealthbox": APIKeyProvider(
+        id="wealthbox_api_key",
+        name="Wealthbox",
+        icon_slug="wealthbox",
+        color="#1c1c1c",
+        description="Wealthbox — CRM for financial advisors.",
+        hint="Wealthbox API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Wealthbox API key"
+            ),
+        ],
+    ),
+    "brex": APIKeyProvider(
+        id="brex_api_key",
+        name="Brex",
+        icon_slug="brex",
+        color="#1c1c1c",
+        description="Brex — corporate cards + expense management.",
+        hint="Brex API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Brex API key"
+            ),
+        ],
+    ),
 }
 
 

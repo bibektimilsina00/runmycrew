@@ -5798,6 +5798,187 @@
     "tools": null,
     "type": "action.brandfetch"
   },
+  "action.brex": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "brex_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Brex \u2014 corporate cards + expense management.",
+    "dynamic_outputs_from": null,
+    "icon": "brex",
+    "inputs": 1,
+    "name": "Brex",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "brex_api_key",
+        "label": "Brex Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_transactions",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Card Transactions",
+            "value": "list_transactions"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "List Expenses",
+            "value": "list_expenses"
+          },
+          {
+            "label": "Get Expense",
+            "value": "get_expense"
+          },
+          {
+            "label": "List Budgets",
+            "value": "list_budgets"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Employee ID",
+        "name": "employee_id",
+        "type": "string"
+      },
+      {
+        "label": "Worker ID",
+        "name": "worker_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "label": "Tenant",
+        "name": "tenant",
+        "type": "string"
+      },
+      {
+        "label": "RaaS Report URL",
+        "name": "raas_url",
+        "type": "string"
+      },
+      {
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_expense"
+          ]
+        },
+        "label": "Expense ID",
+        "name": "expense_id",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_transactions",
+            "list_users",
+            "list_expenses",
+            "list_budgets"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.brex"
+  },
   "action.brightdata": {
     "allow_error": true,
     "category": "integration",
@@ -36385,6 +36566,184 @@
     "tools": null,
     "type": "action.resend"
   },
+  "action.rippling": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "rippling_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Rippling \u2014 HR platform (employees, orgs, payroll).",
+    "dynamic_outputs_from": null,
+    "icon": "rippling",
+    "inputs": 1,
+    "name": "Rippling",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "rippling_api_key",
+        "label": "Rippling Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_employees",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Employees",
+            "value": "list_employees"
+          },
+          {
+            "label": "Get Employee",
+            "value": "get_employee"
+          },
+          {
+            "label": "List Departments",
+            "value": "list_departments"
+          },
+          {
+            "label": "List Teams",
+            "value": "list_teams"
+          },
+          {
+            "label": "List Work Locations",
+            "value": "list_work_locations"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_employee"
+          ]
+        },
+        "label": "Employee ID",
+        "name": "employee_id",
+        "type": "string"
+      },
+      {
+        "label": "Worker ID",
+        "name": "worker_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "label": "Tenant",
+        "name": "tenant",
+        "type": "string"
+      },
+      {
+        "label": "RaaS Report URL",
+        "name": "raas_url",
+        "type": "string"
+      },
+      {
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "label": "Expense ID",
+        "name": "expense_id",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_employees"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.rippling"
+  },
   "action.rootly": {
     "allow_error": true,
     "category": "integration",
@@ -36784,6 +37143,177 @@
     ],
     "tools": null,
     "type": "action.salesforce"
+  },
+  "action.sap_concur": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "sap_concur_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "SAP Concur \u2014 travel + expense management.",
+    "dynamic_outputs_from": null,
+    "icon": "sap_concur",
+    "inputs": 1,
+    "name": "SAP Concur",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "sap_concur_api_key",
+        "label": "SAP Concur Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_reports",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Expense Reports",
+            "value": "list_reports"
+          },
+          {
+            "label": "Get Expense Report",
+            "value": "get_report"
+          },
+          {
+            "label": "List Entries in Report",
+            "value": "list_entries"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Employee ID",
+        "name": "employee_id",
+        "type": "string"
+      },
+      {
+        "label": "Worker ID",
+        "name": "worker_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_reports"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "label": "Tenant",
+        "name": "tenant",
+        "type": "string"
+      },
+      {
+        "label": "RaaS Report URL",
+        "name": "raas_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_report",
+            "list_entries"
+          ]
+        },
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "label": "Expense ID",
+        "name": "expense_id",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sap_concur"
   },
   "action.sendblue": {
     "allow_error": true,
@@ -43022,6 +43552,210 @@
     "tools": null,
     "type": "action.wait"
   },
+  "action.wealthbox": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "wealthbox_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Wealthbox \u2014 CRM for financial advisors.",
+    "dynamic_outputs_from": null,
+    "icon": "wealthbox",
+    "inputs": 1,
+    "name": "Wealthbox",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "wealthbox_api_key",
+        "label": "Wealthbox Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_contacts",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Contacts",
+            "value": "list_contacts"
+          },
+          {
+            "label": "Get Contact",
+            "value": "get_contact"
+          },
+          {
+            "label": "Create Contact",
+            "value": "create_contact"
+          },
+          {
+            "label": "List Notes",
+            "value": "list_notes"
+          },
+          {
+            "label": "Create Note",
+            "value": "create_note"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Employee ID",
+        "name": "employee_id",
+        "type": "string"
+      },
+      {
+        "label": "Worker ID",
+        "name": "worker_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_contact",
+            "create_note"
+          ]
+        },
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "label": "Tenant",
+        "name": "tenant",
+        "type": "string"
+      },
+      {
+        "label": "RaaS Report URL",
+        "name": "raas_url",
+        "type": "string"
+      },
+      {
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "label": "Expense ID",
+        "name": "expense_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_note"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_contacts",
+            "list_notes"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.wealthbox"
+  },
   "action.wikipedia": {
     "allow_error": true,
     "category": "integration",
@@ -43349,6 +44083,195 @@
     ],
     "tools": null,
     "type": "action.wiza"
+  },
+  "action.workday": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "workday_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Workday \u2014 HR + finance ERP (RaaS + REST APIs).",
+    "dynamic_outputs_from": null,
+    "icon": "workday",
+    "inputs": 1,
+    "name": "Workday",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "workday_api_key",
+        "label": "Workday Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_worker",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Worker",
+            "value": "get_worker"
+          },
+          {
+            "label": "List Workers",
+            "value": "list_workers"
+          },
+          {
+            "label": "Run RaaS Report (URL)",
+            "value": "run_raas_report"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Employee ID",
+        "name": "employee_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_worker"
+          ]
+        },
+        "label": "Worker ID",
+        "name": "worker_id",
+        "type": "string"
+      },
+      {
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_worker",
+            "list_workers"
+          ]
+        },
+        "label": "Tenant",
+        "name": "tenant",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_raas_report"
+          ]
+        },
+        "label": "RaaS Report URL",
+        "name": "raas_url",
+        "type": "string"
+      },
+      {
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "label": "Expense ID",
+        "name": "expense_id",
+        "type": "string"
+      },
+      {
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_workers"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_workers"
+          ]
+        },
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.workday"
   },
   "action.zendesk": {
     "allow_error": true,
