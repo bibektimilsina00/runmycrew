@@ -2919,6 +2919,17 @@ PROVIDERS = {
             ),
         ],
     ),
+    "discord_bot_token": APIKeyProvider(
+        id="discord_bot_token",
+        name="Discord Bot Token",
+        icon_slug="discord",
+        color="#5865F2",
+        description="Discord — bot token for the Discord action node.",
+        hint="Bot token from Discord Developer Portal",
+        fields=[
+            CredentialField(id="api_key", label="Bot Token", type="password", placeholder="MTA..."),
+        ],
+    ),
 }
 
 

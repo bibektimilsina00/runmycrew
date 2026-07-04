@@ -143,6 +143,7 @@ from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTrig
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
 from apps.api.app.node_system.nodes.github.github_trigger import GitHubTriggerNode
 from apps.api.app.node_system.nodes.github.github_webhook import GitHubWebhookTriggerNode
+from apps.api.app.node_system.nodes.gitlab.gitlab_node import GitLabNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_trigger import GitLabTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
@@ -832,3 +833,6 @@ node_registry.register(SAPS4HANANode)
 
 
 node_registry.register(PostgresqlNode)
+
+
+node_registry.register(GitLabNode)
