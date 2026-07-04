@@ -39323,6 +39323,272 @@
     "tools": null,
     "type": "trigger.linear_webhook"
   },
+  "trigger.loops_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Loops posts a delivery / engagement event. Verified via HMAC-SHA256 in `X-Loops-Signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "loops",
+    "inputs": 0,
+    "name": "Loops Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "contact_id",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "url_clicked",
+        "type": "string"
+      },
+      {
+        "label": "sent_at",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Loops-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Sent",
+            "value": "email_sent"
+          },
+          {
+            "label": "Email Delivered",
+            "value": "email_delivered"
+          },
+          {
+            "label": "Email Opened",
+            "value": "email_opened"
+          },
+          {
+            "label": "Email Clicked",
+            "value": "email_clicked"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "email_bounced"
+          },
+          {
+            "label": "Spam Complaint",
+            "value": "email_complained"
+          },
+          {
+            "label": "Contact Subscribed",
+            "value": "contact_subscribed"
+          },
+          {
+            "label": "Contact Unsubscribed",
+            "value": "contact_unsubscribed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Loops-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Loops Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.loops_webhook"
+  },
+  "trigger.mailgun_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Mailgun posts a delivery event (delivered, opened, clicked, failed, complained, unsubscribed). Body-based signature verified via HMAC-SHA256 of {timestamp}{token} under the API key, with 5-min anti-replay tolerance.",
+    "dynamic_outputs_from": null,
+    "icon": "mailgun",
+    "inputs": 0,
+    "name": "Mailgun Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "recipient",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "subject",
+        "type": "string"
+      },
+      {
+        "label": "delivery_code",
+        "type": "number"
+      },
+      {
+        "label": "delivery_message",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Mailgun-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Accepted",
+            "value": "accepted"
+          },
+          {
+            "label": "Rejected",
+            "value": "rejected"
+          },
+          {
+            "label": "Delivered",
+            "value": "delivered"
+          },
+          {
+            "label": "Failed",
+            "value": "failed"
+          },
+          {
+            "label": "Opened",
+            "value": "opened"
+          },
+          {
+            "label": "Clicked",
+            "value": "clicked"
+          },
+          {
+            "label": "Complained",
+            "value": "complained"
+          },
+          {
+            "label": "Unsubscribed",
+            "value": "unsubscribed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "MAILGUN secret. Deliveries without a valid `` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Mailgun Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.mailgun_webhook"
+  },
   "trigger.manual": {
     "allow_error": false,
     "category": "trigger",
@@ -40944,6 +41210,133 @@
     ],
     "tools": null,
     "type": "trigger.pagerduty"
+  },
+  "trigger.postmark_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Postmark posts a delivery event (Delivery, Bounce, Open, Click, SpamComplaint, SubscriptionChange, ManualSuppression). Verified via base64 HMAC-SHA1 in `X-Postmark-Signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "postmark",
+    "inputs": 0,
+    "name": "Postmark Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "recipient",
+        "type": "string"
+      },
+      {
+        "label": "delivered_at",
+        "type": "string"
+      },
+      {
+        "label": "bounce_type",
+        "type": "string"
+      },
+      {
+        "label": "click_link",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Postmark-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Delivery",
+            "value": "Delivery"
+          },
+          {
+            "label": "Bounce",
+            "value": "Bounce"
+          },
+          {
+            "label": "Open",
+            "value": "Open"
+          },
+          {
+            "label": "Click",
+            "value": "Click"
+          },
+          {
+            "label": "Spam Complaint",
+            "value": "SpamComplaint"
+          },
+          {
+            "label": "Subscription Change",
+            "value": "SubscriptionChange"
+          },
+          {
+            "label": "Manual Suppression",
+            "value": "ManualSuppression"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA1_B64 secret. Deliveries without a valid `X-Postmark-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Postmark Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.postmark_webhook"
   },
   "trigger.rss": {
     "allow_error": true,

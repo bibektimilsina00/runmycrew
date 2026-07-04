@@ -157,9 +157,11 @@ from apps.api.app.node_system.nodes.logic.loop.loop_node import LoopNode
 from apps.api.app.node_system.nodes.logic.sub_workflow.sub_workflow_node import SubWorkflowNode
 from apps.api.app.node_system.nodes.logic.while_loop.while_loop import WhileLoopNode
 from apps.api.app.node_system.nodes.loops.loops_node import LoopsNode
+from apps.api.app.node_system.nodes.loops.loops_webhook import LoopsWebhookTriggerNode
 from apps.api.app.node_system.nodes.mailchimp.mailchimp_node import MailchimpNode
 from apps.api.app.node_system.nodes.mailerlite.mailerlite_node import MailerLiteNode
 from apps.api.app.node_system.nodes.mailgun.mailgun_node import MailgunNode
+from apps.api.app.node_system.nodes.mailgun.mailgun_webhook import MailgunWebhookTriggerNode
 from apps.api.app.node_system.nodes.messagebird.messagebird_node import MessageBirdNode
 from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
 from apps.api.app.node_system.nodes.meta.facebook_trigger import FacebookTriggerNode
@@ -194,6 +196,9 @@ from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNod
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
 from apps.api.app.node_system.nodes.posthog.posthog_node import PostHogNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
+from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
+    PostmarkWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
@@ -483,3 +488,8 @@ node_registry.register(NotionWebhookTriggerNode)
 node_registry.register(ConfluenceWebhookTriggerNode)
 node_registry.register(VercelWebhookTriggerNode)
 node_registry.register(TypeformWebhookTriggerNode)
+
+# Phase 4.13 — outbound webhook completion (postmark + loops + mailgun).
+node_registry.register(PostmarkWebhookTriggerNode)
+node_registry.register(LoopsWebhookTriggerNode)
+node_registry.register(MailgunWebhookTriggerNode)

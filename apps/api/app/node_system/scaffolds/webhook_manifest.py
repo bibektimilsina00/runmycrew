@@ -56,6 +56,14 @@ SignatureScheme = Literal[
     # the timestamp in `x-webflow-timestamp`. Includes an anti-replay
     # tolerance window like Stripe.
     "webflow",
+    # Postmark ships `X-Postmark-Signature` = base64(HMAC-SHA1(body))
+    # under the server webhook secret. Base64 flavor of hmac_sha1.
+    "hmac_sha1_b64",
+    # Mailgun's signature isn't in a header — it's in the body under
+    # `signature.timestamp / .token / .signature`. Signature =
+    # hex(HMAC-SHA256("{timestamp}{token}", api_key)). Includes 5-min
+    # anti-replay tolerance on the timestamp.
+    "mailgun",
     "none",
 ]
 

@@ -263,6 +263,69 @@ def verify_webflow(
     return hmac.compare_digest(header_value, expected)
 
 
+def verify_hmac_sha1_b64(
+    raw_body: bytes,
+    secret: str,
+    header_value: str,
+    *,
+    prefix: str = "",
+    headers: dict[str, str] | None = None,  # noqa: ARG001
+    url: str | None = None,  # noqa: ARG001
+) -> bool:
+    """HMAC-SHA1 base64. Postmark's `X-Postmark-Signature` is
+    `base64(hmac_sha1(body, secret))` — bare digest, no prefix. Same
+    algorithm as legacy GitHub v1, different encoding."""
+    if not secret or not header_value:
+        return False
+    received = _strip_prefix(header_value, prefix)
+    digest = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha1).digest()
+    expected = base64.b64encode(digest).decode()
+    return hmac.compare_digest(received, expected)
+
+
+def verify_mailgun(
+    raw_body: bytes,
+    secret: str,
+    header_value: str,  # noqa: ARG001 — Mailgun ships signature in body, not header
+    *,
+    prefix: str = "",  # noqa: ARG001
+    tolerance_seconds: int = 60 * 5,
+    headers: dict[str, str] | None = None,  # noqa: ARG001
+    url: str | None = None,  # noqa: ARG001
+) -> bool:
+    """Mailgun's webhook signature lives in the JSON body under
+    `signature: {timestamp, token, signature}`. Formula:
+    hex(hmac_sha256(f"{timestamp}{token}", api_key)). 5-min anti-replay
+    tolerance on the timestamp — matches Mailgun's own guidance.
+
+    See https://documentation.mailgun.com/docs/mailgun/user-manual/tracking-messages/#securing-webhooks.
+    """
+    if not secret or not raw_body:
+        return False
+    try:
+        import json as _json
+
+        payload = _json.loads(raw_body)
+    except Exception:  # noqa: BLE001
+        return False
+    sig_block = payload.get("signature") if isinstance(payload, dict) else None
+    if not isinstance(sig_block, dict):
+        return False
+    ts = str(sig_block.get("timestamp") or "")
+    token = str(sig_block.get("token") or "")
+    provided = str(sig_block.get("signature") or "")
+    if not ts or not token or not provided:
+        return False
+    try:
+        delta = abs(int(time.time()) - int(ts))
+    except ValueError:
+        return False
+    if delta > tolerance_seconds:
+        return False
+    expected = _hmac_hex(secret, f"{ts}{token}".encode(), "sha256")
+    return hmac.compare_digest(provided, expected)
+
+
 def verify_none(
     raw_body: bytes,  # noqa: ARG001
     secret: str,  # noqa: ARG001
@@ -282,11 +345,13 @@ _VERIFIERS: dict[SignatureScheme, object] = {
     "hmac_sha256": verify_hmac_sha256,
     "hmac_sha1": verify_hmac_sha1,
     "hmac_sha256_b64": verify_hmac_sha256_b64,
+    "hmac_sha1_b64": verify_hmac_sha1_b64,
     "stripe": verify_stripe,
     "shopify": verify_shopify,
     "gitlab_token": verify_gitlab_token,
     "twilio": verify_twilio,
     "webflow": verify_webflow,
+    "mailgun": verify_mailgun,
     "none": verify_none,
 }
 
