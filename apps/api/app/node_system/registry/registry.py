@@ -3,6 +3,7 @@ from typing import Any
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.nodes.agentmail.agentmail_node import AgentMailNode
 from apps.api.app.node_system.nodes.agentphone.agentphone_node import AgentPhoneNode
+from apps.api.app.node_system.nodes.agiloft.agiloft_node import AgiloftNode
 from apps.api.app.node_system.nodes.ahrefs.ahrefs_node import AhrefsNode
 from apps.api.app.node_system.nodes.ai.a2a.a2a import A2ANode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
@@ -19,6 +20,7 @@ from apps.api.app.node_system.nodes.ai.thinking.thinking import ThinkingNode
 from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
+from apps.api.app.node_system.nodes.airweave.airweave_node import AirweaveNode
 from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.amplitude.amplitude_node import AmplitudeNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
@@ -80,6 +82,7 @@ from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
 )
 from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextNode
 from apps.api.app.node_system.nodes.convex.convex_node import ConvexNode
+from apps.api.app.node_system.nodes.crowdstrike.crowdstrike_node import CrowdStrikeNode
 from apps.api.app.node_system.nodes.cursor.cursor_node import CursorNode
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
 from apps.api.app.node_system.nodes.dagster.dagster_node import DagsterCloudNode
@@ -166,10 +169,12 @@ from apps.api.app.node_system.nodes.grain.grain_trigger import GrainTriggerNode
 from apps.api.app.node_system.nodes.granola.granola_node import GranolaNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_node import GreenhouseNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_trigger import GreenhouseTriggerNode
+from apps.api.app.node_system.nodes.greptile.greptile_node import GreptileNode
 from apps.api.app.node_system.nodes.gsc.gsc_node import GoogleSearchConsoleNode
 from apps.api.app.node_system.nodes.gslides.gslides_node import GoogleSlidesNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTriggerNode
+from apps.api.app.node_system.nodes.guardrails.guardrails_node import GuardrailsNode
 from apps.api.app.node_system.nodes.gyt.gyt_node import GoogleYouTubeNode
 from apps.api.app.node_system.nodes.gyt.gyt_trigger import GoogleYouTubeTriggerNode
 from apps.api.app.node_system.nodes.hackernews.hackernews_node import HackerNewsNode
@@ -200,8 +205,10 @@ from apps.api.app.node_system.nodes.jira_service_management.jira_service_managem
     JiraServiceManagementNode,
 )
 from apps.api.app.node_system.nodes.kalshi.kalshi_node import KalshiNode
+from apps.api.app.node_system.nodes.ketch.ketch_node import KetchNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.langsmith.langsmith_node import LangSmithNode
+from apps.api.app.node_system.nodes.latex.latex_node import LatexNode
 from apps.api.app.node_system.nodes.launchdarkly.launchdarkly_node import LaunchDarklyNode
 from apps.api.app.node_system.nodes.leadmagic.leadmagic_node import LeadMagicNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
@@ -211,6 +218,8 @@ from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
 from apps.api.app.node_system.nodes.linear.linear_webhook import LinearWebhookTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
+from apps.api.app.node_system.nodes.linkup.linkup_node import LinkupNode
+from apps.api.app.node_system.nodes.linq.linq_node import LinqNode
 from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
 from apps.api.app.node_system.nodes.logic.do_while.do_while import DoWhileNode
 from apps.api.app.node_system.nodes.logic.for_loop.for_loop import ForLoopNode
@@ -259,6 +268,7 @@ from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
 from apps.api.app.node_system.nodes.notion.notion_webhook import NotionWebhookTriggerNode
+from apps.api.app.node_system.nodes.obsidian.obsidian_node import ObsidianNode
 from apps.api.app.node_system.nodes.okta.okta_node import OktaNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.onepassword.onepassword_node import OnePasswordConnectNode
@@ -268,6 +278,7 @@ from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTr
 from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
 from apps.api.app.node_system.nodes.peopledatalabs.peopledatalabs_node import PeopleDataLabsNode
 from apps.api.app.node_system.nodes.persona.persona_node import PersonaNode
+from apps.api.app.node_system.nodes.pi.pi_node import PiNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
@@ -277,8 +288,11 @@ from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
     PostmarkWebhookTriggerNode,
 )
+from apps.api.app.node_system.nodes.profound.profound_node import ProfoundNode
 from apps.api.app.node_system.nodes.prospeo.prospeo_node import ProspeoNode
+from apps.api.app.node_system.nodes.pulse.pulse_node import PulseNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
+from apps.api.app.node_system.nodes.quartr.quartr_node import QuartrNode
 from apps.api.app.node_system.nodes.quiver.quiver_node import QuiverNode
 from apps.api.app.node_system.nodes.railway.railway_node import RailwayNode
 from apps.api.app.node_system.nodes.reddit.reddit_node import RedditNode
@@ -746,3 +760,20 @@ node_registry.register(RevenueCatNode)
 node_registry.register(WhatsAppNode)
 node_registry.register(TwilioVoiceNode)
 node_registry.register(ArxivNode)
+
+
+# Phase 4.32 — misc long-tail.
+node_registry.register(AgiloftNode)
+node_registry.register(AirweaveNode)
+node_registry.register(KetchNode)
+node_registry.register(LatexNode)
+node_registry.register(LinkupNode)
+node_registry.register(LinqNode)
+node_registry.register(ObsidianNode)
+node_registry.register(PiNode)
+node_registry.register(ProfoundNode)
+node_registry.register(PulseNode)
+node_registry.register(QuartrNode)
+node_registry.register(GreptileNode)
+node_registry.register(GuardrailsNode)
+node_registry.register(CrowdStrikeNode)
