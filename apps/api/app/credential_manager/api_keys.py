@@ -2930,6 +2930,23 @@ PROVIDERS = {
             CredentialField(id="api_key", label="Bot Token", type="password", placeholder="MTA..."),
         ],
     ),
+    "azure_devops": APIKeyProvider(
+        id="azure_devops_api_key",
+        name="Azure DevOps",
+        icon_slug="azure_devops",
+        color="#0078D7",
+        description="Azure DevOps — Personal Access Token (PAT).",
+        hint="PAT from Azure DevOps → User Settings → Personal Access Tokens",
+        fields=[
+            CredentialField(
+                id="api_key", label="Personal Access Token", type="password", placeholder="pat_..."
+            ),
+            CredentialField(
+                id="organization", label="Organization", type="string", placeholder="my-org"
+            ),
+            CredentialField(id="project", label="Project", type="string", placeholder="my-project"),
+        ],
+    ),
 }
 
 
