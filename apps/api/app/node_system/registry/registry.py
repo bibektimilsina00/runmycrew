@@ -19,6 +19,7 @@ from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
 from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
+from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
 from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
 from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
@@ -77,6 +78,7 @@ from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNo
 from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
 from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
+from apps.api.app.node_system.nodes.gitlab.gitlab_trigger import GitLabTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
@@ -97,10 +99,12 @@ from apps.api.app.node_system.nodes.hackernews.hackernews_node import HackerNews
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
 from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
+from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTriggerNode
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
+from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
@@ -137,6 +141,7 @@ from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
+from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
@@ -283,6 +288,12 @@ node_registry.register(MicrosoftPlannerNode)
 node_registry.register(TrelloNode)
 node_registry.register(ZendeskNode)
 node_registry.register(CalcomNode)
+# Phase 3.1 — dev/CRM polling triggers.
+node_registry.register(GitLabTriggerNode)
+node_registry.register(JiraTriggerNode)
+node_registry.register(HubSpotTriggerNode)
+node_registry.register(AsanaTriggerNode)
+node_registry.register(PagerDutyTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

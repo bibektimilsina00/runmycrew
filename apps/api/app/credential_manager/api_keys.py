@@ -136,6 +136,36 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
         ],
     ),
+    "gitlab": APIKeyProvider(
+        id="gitlab_api_key",
+        name="GitLab",
+        icon_slug="gitlab",
+        color="#1c1c1c",
+        description="GitLab — projects, issues, MRs, pipelines.",
+        hint="Personal Access Token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="glpat-..."
+            ),
+            CredentialField(
+                id="base_url",
+                label="Base URL (self-hosted; leave blank for gitlab.com)",
+                type="string",
+                placeholder="https://gitlab.example.com",
+            ),
+        ],
+    ),
+    "pagerduty": APIKeyProvider(
+        id="pagerduty_api_key",
+        name="PagerDuty",
+        icon_slug="pagerduty",
+        color="#1c1c1c",
+        description="PagerDuty — incidents, services, on-call.",
+        hint="REST API Key",
+        fields=[
+            CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
+        ],
+    ),
     "trello": APIKeyProvider(
         id="trello_api_key",
         name="Trello",

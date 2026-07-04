@@ -85,6 +85,10 @@ def eager_register_polling_providers() -> None:
     from both `_poll_due_rows` (scheduler tick) and the listen-mode
     Celery task means a worker that only ever runs one of those paths
     still sees the right providers."""
+    # Phase 3.1 — dev/CRM polling triggers.
+    from apps.api.app.node_system.nodes.asana import (
+        asana_trigger as _asana_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.gchat import (
         gchat_trigger as _gchat_trigger,  # noqa: F401
@@ -94,6 +98,9 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.gforms import (
         gforms_trigger as _gforms_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.gitlab import (
+        gitlab_trigger as _gitlab_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.gmail import gmail_trigger as _gmail_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.google_sheets import (
@@ -107,6 +114,15 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.gyt import (
         gyt_trigger as _gyt_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.hubspot import (
+        hubspot_trigger as _hubspot_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.jira import (
+        jira_trigger as _jira_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.pagerduty import (
+        pagerduty_trigger as _pagerduty_trigger,  # noqa: F401
     )
 
 
