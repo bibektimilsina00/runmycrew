@@ -49,6 +49,7 @@ from apps.api.app.node_system.nodes.aws_secrets_manager.aws_secrets_manager_node
 from apps.api.app.node_system.nodes.aws_ses.aws_ses_node import AWSSESNode
 from apps.api.app.node_system.nodes.aws_sqs.aws_sqs_node import AWSSQSNode
 from apps.api.app.node_system.nodes.aws_sts.aws_sts_node import AWSSTSNode
+from apps.api.app.node_system.nodes.azure_devops.azure_devops_node import AzureDevOpsNode
 from apps.api.app.node_system.nodes.azure_devops.azure_devops_webhook import (
     AzureDevOpsWebhookTriggerNode,
 )
@@ -836,3 +837,6 @@ node_registry.register(PostgresqlNode)
 
 
 node_registry.register(GitLabNode)
+
+
+node_registry.register(AzureDevOpsNode)
