@@ -1311,6 +1311,102 @@ PROVIDERS = {
             ),
         ],
     ),
+    "apollo": APIKeyProvider(
+        id="apollo_api_key",
+        name="Apollo.io",
+        icon_slug="apollo",
+        color="#1c1c1c",
+        description="Apollo — B2B contact search + email finder.",
+        hint="API key from Apollo Settings → Integrations → API",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Apollo API key"
+            ),
+        ],
+    ),
+    "hunter": APIKeyProvider(
+        id="hunter_api_key",
+        name="Hunter.io",
+        icon_slug="hunter",
+        color="#1c1c1c",
+        description="Hunter — email finder + verifier by domain.",
+        hint="API key from Hunter Dashboard → API",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Hunter API key"
+            ),
+        ],
+    ),
+    "findymail": APIKeyProvider(
+        id="findymail_api_key",
+        name="Findymail",
+        icon_slug="findymail",
+        color="#1c1c1c",
+        description="Findymail — verified B2B emails from name / LinkedIn.",
+        hint="Bearer token from Findymail settings",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Findymail API key",
+            ),
+        ],
+    ),
+    "dropcontact": APIKeyProvider(
+        id="dropcontact_api_key",
+        name="Dropcontact",
+        icon_slug="dropcontact",
+        color="#1c1c1c",
+        description="Dropcontact — GDPR-friendly B2B email enrichment.",
+        hint="Access token from Dropcontact settings",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Access Token",
+                type="password",
+                placeholder="Dropcontact access token",
+            ),
+        ],
+    ),
+    "peopledatalabs": APIKeyProvider(
+        id="peopledatalabs_api_key",
+        name="People Data Labs",
+        icon_slug="peopledatalabs",
+        color="#1c1c1c",
+        description="People Data Labs — person + company enrichment.",
+        hint="API key from PDL dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="PDL API key",
+            ),
+        ],
+    ),
+    "clay": APIKeyProvider(
+        id="clay_api_key",
+        name="Clay",
+        icon_slug="clay",
+        color="#1c1c1c",
+        description="Clay — push rows into a workspace table for enrichment.",
+        hint="Workspace webhook URL from a Clay table (paste as api_key)",
+        fields=[
+            CredentialField(
+                id="webhook_url",
+                label="Clay Workspace Webhook URL",
+                type="string",
+                placeholder="https://api.clay.com/v3/sources/webhook/...",
+            ),
+            CredentialField(
+                id="api_key",
+                label="Auth Token (optional; some workspaces require)",
+                type="password",
+                placeholder="Optional",
+            ),
+        ],
+    ),
 }
 
 

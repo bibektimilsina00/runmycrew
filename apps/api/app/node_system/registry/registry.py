@@ -18,6 +18,7 @@ from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
 from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
+from apps.api.app.node_system.nodes.apollo.apollo_node import ApolloNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
 from apps.api.app.node_system.nodes.ashby.ashby_node import AshbyNode
@@ -49,6 +50,7 @@ from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
 from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
 from apps.api.app.node_system.nodes.calendly.calendly_trigger import CalendlyTriggerNode
+from apps.api.app.node_system.nodes.clay.clay_node import ClayNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
@@ -74,6 +76,7 @@ from apps.api.app.node_system.nodes.db.postgres.postgres import PostgresNode
 from apps.api.app.node_system.nodes.discord.discord_node import DiscordNode
 from apps.api.app.node_system.nodes.docusign.docusign_node import DocuSignNode
 from apps.api.app.node_system.nodes.dropbox.dropbox_node import DropboxNode
+from apps.api.app.node_system.nodes.dropcontact.dropcontact_node import DropcontactNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
@@ -84,6 +87,7 @@ from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
+from apps.api.app.node_system.nodes.findymail.findymail_node import FindymailNode
 from apps.api.app.node_system.nodes.firecrawl.firecrawl_node import FirecrawlNode
 from apps.api.app.node_system.nodes.fireflies.fireflies_node import FirefliesNode
 from apps.api.app.node_system.nodes.fireflies.fireflies_webhook import (
@@ -131,6 +135,7 @@ from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNo
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTriggerNode
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
+from apps.api.app.node_system.nodes.hunter.hunter_node import HunterNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
@@ -191,6 +196,7 @@ from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
 from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTriggerNode
 from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
+from apps.api.app.node_system.nodes.peopledatalabs.peopledatalabs_node import PeopleDataLabsNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
@@ -493,3 +499,11 @@ node_registry.register(TypeformWebhookTriggerNode)
 node_registry.register(PostmarkWebhookTriggerNode)
 node_registry.register(LoopsWebhookTriggerNode)
 node_registry.register(MailgunWebhookTriggerNode)
+
+# Phase 4.14 — data enrichment tier 1.
+node_registry.register(ApolloNode)
+node_registry.register(HunterNode)
+node_registry.register(FindymailNode)
+node_registry.register(DropcontactNode)
+node_registry.register(PeopleDataLabsNode)
+node_registry.register(ClayNode)
