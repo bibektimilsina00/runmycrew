@@ -125,6 +125,10 @@ class WebhookTriggerManifest(BaseModel):
     # Verification.
     signature: SignatureSpec = Field(default_factory=SignatureSpec)
     event_header: str = "X-GitHub-Event"
+    # Optional body path (single or list joined with `.`) into the
+    # parsed JSON body where the event kind lives. Mirrors identical
+    # additions in the still-open Phase 4.9-4.11 PRs — dedupes on merge.
+    event_body_path: str | list[str] | None = None
 
     # Inspector.
     credential_type: str | list[str] | None = None

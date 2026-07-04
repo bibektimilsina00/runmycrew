@@ -37224,6 +37224,252 @@
     "tools": null,
     "type": "trigger.twilio_webhook"
   },
+  "trigger.typeform_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when a Typeform is submitted. Verified via HMAC-SHA256 base64 in `Typeform-Signature`. Answers are flattened into `answers[]` + a `by_ref` map keyed on field ref for stable access.",
+    "dynamic_outputs_from": null,
+    "icon": "typeform",
+    "inputs": 0,
+    "name": "Typeform Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "form_id",
+        "type": "string"
+      },
+      {
+        "label": "form_title",
+        "type": "string"
+      },
+      {
+        "label": "response_id",
+        "type": "string"
+      },
+      {
+        "label": "submitted_at",
+        "type": "string"
+      },
+      {
+        "label": "answers",
+        "type": "array"
+      },
+      {
+        "label": "by_ref",
+        "type": "object"
+      },
+      {
+        "label": "hidden",
+        "type": "object"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-typeform-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Form Submitted",
+            "value": "form_response"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256_B64 secret. Deliveries without a valid `Typeform-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Typeform Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.typeform_webhook"
+  },
+  "trigger.vercel_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Vercel posts a webhook delivery \u2014 deployment lifecycle, project creation. HMAC-SHA1 verified via `x-vercel-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "vercel",
+    "inputs": 0,
+    "name": "Vercel Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "deployment_id",
+        "type": "string"
+      },
+      {
+        "label": "deployment_url",
+        "type": "string"
+      },
+      {
+        "label": "deployment_state",
+        "type": "string"
+      },
+      {
+        "label": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "commit_sha",
+        "type": "string"
+      },
+      {
+        "label": "commit_message",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-vercel-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Deployment Created",
+            "value": "deployment.created"
+          },
+          {
+            "label": "Deployment Succeeded",
+            "value": "deployment.succeeded"
+          },
+          {
+            "label": "Deployment Ready",
+            "value": "deployment.ready"
+          },
+          {
+            "label": "Deployment Canceled",
+            "value": "deployment.canceled"
+          },
+          {
+            "label": "Deployment Error",
+            "value": "deployment.error"
+          },
+          {
+            "label": "Deployment Promoted",
+            "value": "deployment.promoted"
+          },
+          {
+            "label": "Project Created",
+            "value": "project.created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA1 secret. Deliveries without a valid `x-vercel-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Vercel Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.vercel_webhook"
+  },
   "trigger.webflow_webhook": {
     "allow_error": true,
     "category": "trigger",

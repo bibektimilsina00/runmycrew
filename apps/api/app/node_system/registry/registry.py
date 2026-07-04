@@ -192,8 +192,12 @@ from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNo
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
+from apps.api.app.node_system.nodes.typeform.typeform_webhook import (
+    TypeformWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
+from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTriggerNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
@@ -342,6 +346,9 @@ node_registry.register(WebflowWebhookTriggerNode)
 node_registry.register(GongWebhookTriggerNode)
 node_registry.register(FathomWebhookTriggerNode)
 node_registry.register(FirefliesWebhookTriggerNode)
+# Phase 4.12 — vercel + typeform webhook triggers.
+node_registry.register(VercelWebhookTriggerNode)
+node_registry.register(TypeformWebhookTriggerNode)
 # Phase 3.5 — completion (monday polling + generic RSS + IMAP).
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
