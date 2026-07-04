@@ -37913,6 +37913,62 @@
           {
             "label": "Get Viewer (me)",
             "value": "get_viewer"
+          },
+          {
+            "label": "Archive Issue",
+            "value": "archive_issue"
+          },
+          {
+            "label": "Delete Issue",
+            "value": "delete_issue"
+          },
+          {
+            "label": "Search Issues",
+            "value": "search_issues"
+          },
+          {
+            "label": "Create Comment",
+            "value": "create_comment"
+          },
+          {
+            "label": "List Issue Comments",
+            "value": "list_comments"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Get Project",
+            "value": "get_project"
+          },
+          {
+            "label": "Create Project",
+            "value": "create_project"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "List Labels",
+            "value": "list_labels"
+          },
+          {
+            "label": "List Workflow States",
+            "value": "list_workflow_states"
+          },
+          {
+            "label": "List Cycles",
+            "value": "list_cycles"
+          },
+          {
+            "label": "Add Label to Issue",
+            "value": "add_label_to_issue"
+          },
+          {
+            "label": "Remove Label from Issue",
+            "value": "remove_label_from_issue"
           }
         ],
         "type": "options"
@@ -37922,7 +37978,8 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "create_project"
           ]
         },
         "label": "Title",
@@ -37934,7 +37991,8 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "create_project"
           ]
         },
         "label": "Description (Markdown)",
@@ -37945,7 +38003,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "create_issue"
+            "create_issue",
+            "create_project"
           ]
         },
         "label": "Team ID",
@@ -37957,7 +38016,13 @@
           "field": "operation",
           "value": [
             "update_issue",
-            "get_issue"
+            "get_issue",
+            "archive_issue",
+            "delete_issue",
+            "create_comment",
+            "list_comments",
+            "add_label_to_issue",
+            "remove_label_from_issue"
           ]
         },
         "label": "Issue ID",
@@ -38002,6 +38067,51 @@
         "mode": "advanced",
         "name": "priority",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_comment"
+          ]
+        },
+        "label": "Comment Body",
+        "name": "comment_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_issues"
+          ]
+        },
+        "label": "Search Term",
+        "name": "search_term",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_project"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_label_to_issue",
+            "remove_label_from_issue"
+          ]
+        },
+        "label": "Label ID",
+        "name": "label_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -54844,11 +54954,11 @@
   "action.salesforce": {
     "allow_error": true,
     "category": "integration",
-    "color": "#1c1c1c",
-    "credential_type": "salesforce_api_key",
+    "color": "#00A1E0",
+    "credential_type": "salesforce_oauth",
     "default_height": null,
     "default_width": null,
-    "description": "Create and query Salesforce records (Contacts, Leads, Accounts, Opportunities).",
+    "description": "Salesforce \u2014 SObject records (Lead, Contact, Account, Opportunity, Case).",
     "dynamic_outputs_from": null,
     "icon": "salesforce",
     "inputs": 1,
@@ -54856,6 +54966,10 @@
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
       {
         "label": "id",
         "type": "string"
@@ -54867,16 +54981,12 @@
       {
         "label": "totalSize",
         "type": "number"
-      },
-      {
-        "label": "record",
-        "type": "object"
       }
     ],
     "properties": [
       {
-        "credentialType": "salesforce_api_key",
-        "label": "Salesforce Credential",
+        "credentialType": "salesforce_oauth",
+        "label": "Salesforce Account",
         "name": "credential",
         "required": true,
         "type": "credential"
@@ -54907,8 +55017,88 @@
             "value": "delete_record"
           },
           {
-            "label": "List Object Types",
+            "label": "List Available SObjects",
             "value": "list_objects"
+          },
+          {
+            "label": "Upsert Record by External ID",
+            "value": "upsert_by_external_id"
+          },
+          {
+            "label": "Query All (includes deleted)",
+            "value": "query_all"
+          },
+          {
+            "label": "Query More (cursor pagination)",
+            "value": "query_more"
+          },
+          {
+            "label": "SOSL Search",
+            "value": "search"
+          },
+          {
+            "label": "Describe SObject",
+            "value": "describe_sobject"
+          },
+          {
+            "label": "SObject Basic Info",
+            "value": "sobject_basic"
+          },
+          {
+            "label": "Recently Viewed Records",
+            "value": "recent_records"
+          },
+          {
+            "label": "Create Lead",
+            "value": "create_lead"
+          },
+          {
+            "label": "Create Contact",
+            "value": "create_contact"
+          },
+          {
+            "label": "Create Account",
+            "value": "create_account"
+          },
+          {
+            "label": "Create Opportunity",
+            "value": "create_opportunity"
+          },
+          {
+            "label": "Create Case",
+            "value": "create_case"
+          },
+          {
+            "label": "Run Report",
+            "value": "run_report"
+          },
+          {
+            "label": "List Reports",
+            "value": "list_reports"
+          },
+          {
+            "label": "Get Dashboard",
+            "value": "get_dashboard"
+          },
+          {
+            "label": "List Dashboards",
+            "value": "list_dashboards"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_current_user"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Apex REST GET",
+            "value": "apex_get"
+          },
+          {
+            "label": "Apex REST POST",
+            "value": "apex_post"
           }
         ],
         "type": "options"
@@ -54920,12 +55110,15 @@
             "create_record",
             "get_record",
             "update_record",
-            "delete_record"
+            "delete_record",
+            "upsert_by_external_id",
+            "describe_sobject",
+            "sobject_basic",
+            "recent_records"
           ]
         },
-        "label": "Object Type",
-        "name": "object_type",
-        "placeholder": "Contact, Lead, Account, Opportunity\u2026",
+        "label": "SObject (Lead|Contact|Account|Opportunity|Case|...)",
+        "name": "sobject",
         "type": "string"
       },
       {
@@ -54946,41 +55139,137 @@
           "field": "operation",
           "value": [
             "create_record",
-            "update_record"
+            "update_record",
+            "upsert_by_external_id",
+            "create_lead",
+            "create_contact",
+            "create_account",
+            "create_opportunity",
+            "create_case"
           ]
         },
-        "label": "Fields (JSON)",
+        "default": {},
+        "label": "Record Data (JSON)",
         "name": "record_data",
-        "placeholder": "{\"FirstName\":\"John\",\"Email\":\"john@example.com\"}",
         "type": "json"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "get_record"
+          "value": [
+            "query",
+            "query_all"
+          ]
         },
-        "label": "Fields to Return",
-        "mode": "advanced",
-        "name": "fields",
-        "placeholder": "Id,Name,Email",
+        "label": "SOQL",
+        "name": "soql",
+        "placeholder": "SELECT Id, Name FROM Account LIMIT 10",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "query"
+          "value": [
+            "upsert_by_external_id"
+          ]
         },
-        "label": "SOQL Query",
-        "name": "soql_query",
-        "placeholder": "SELECT Id, Name FROM Contact LIMIT 10",
+        "label": "External ID Field",
+        "name": "external_id_field",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "query"
+          "value": [
+            "upsert_by_external_id",
+            "query_more"
+          ]
         },
-        "default": 10,
+        "label": "External ID Value",
+        "name": "external_id_value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "SOSL",
+        "name": "search_sosl",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record"
+          ]
+        },
+        "label": "Field Names (comma-separated)",
+        "name": "field_names",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_report"
+          ]
+        },
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_dashboard"
+          ]
+        },
+        "label": "Dashboard ID",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "apex_get",
+            "apex_post"
+          ]
+        },
+        "label": "Apex Class Name (REST)",
+        "name": "apex_class",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "apex_post"
+          ]
+        },
+        "default": {},
+        "label": "Apex Body (JSON)",
+        "name": "apex_body",
+        "type": "json"
+      },
+      {
+        "default": 200,
         "label": "Limit",
         "mode": "advanced",
         "name": "limit",

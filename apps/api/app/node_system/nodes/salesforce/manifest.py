@@ -1,0 +1,258 @@
+"""Salesforce action node — manifest form.
+
+Salesforce REST API v60.0. Base URL resolves per-org from the OAuth
+credential's `instance_url` (`https://mycompany.my.salesforce.com`) +
+`/services/data/v60.0`. The scaffold's `{instance_url}` template is
+read from the credential dict via `_PropCredView`.
+
+Refactored from a custom BaseNode. Existing 6 op names preserved:
+query, create_record, get_record, update_record, delete_record,
+list_objects. Adds 20+ new ops toward sim's 40-op parity.
+"""
+
+from __future__ import annotations
+
+from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+
+MANIFEST = ProviderManifest(
+    type="action.salesforce",
+    name="Salesforce",
+    category="integration",
+    description="Salesforce — SObject records (Lead, Contact, Account, Opportunity, Case).",
+    icon_slug="salesforce",
+    color="#00A1E0",
+    base_url="{instance_url}/services/data/v60.0",
+    credential_type="salesforce_oauth",
+    token_field=["access_token"],
+    auth="bearer",
+    fields=[
+        FieldSpec(
+            name="sobject",
+            label="SObject (Lead|Contact|Account|Opportunity|Case|...)",
+            type="string",
+        ),
+        FieldSpec(name="record_id", label="Record ID", type="string"),
+        FieldSpec(name="record_data", label="Record Data (JSON)", type="json", default={}),
+        FieldSpec(
+            name="soql",
+            label="SOQL",
+            type="string",
+            placeholder="SELECT Id, Name FROM Account LIMIT 10",
+        ),
+        FieldSpec(name="external_id_field", label="External ID Field", type="string"),
+        FieldSpec(name="external_id_value", label="External ID Value", type="string"),
+        FieldSpec(name="search_sosl", label="SOSL", type="string"),
+        FieldSpec(name="field_names", label="Field Names (comma-separated)", type="string"),
+        FieldSpec(name="report_id", label="Report ID", type="string"),
+        FieldSpec(name="dashboard_id", label="Dashboard ID", type="string"),
+        FieldSpec(name="user_id", label="User ID", type="string"),
+        FieldSpec(name="apex_class", label="Apex Class Name (REST)", type="string"),
+        FieldSpec(name="apex_body", label="Apex Body (JSON)", type="json", default={}),
+        FieldSpec(name="limit", label="Limit", type="number", default=200, mode="advanced"),
+    ],
+    operations=[
+        # ─── legacy 6 ops ─────────────────────────────────────────
+        OpSpec(
+            id="query",
+            label="SOQL Query",
+            method="GET",
+            path="/query",
+            visible_fields=["soql"],
+            query_builder=lambda v: {"q": getattr(v, "soql", "") or ""},
+        ),
+        OpSpec(
+            id="create_record",
+            label="Create Record",
+            method="POST",
+            path="/sobjects/{sobject}",
+            visible_fields=["sobject", "record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="get_record",
+            label="Get Record",
+            method="GET",
+            path="/sobjects/{sobject}/{record_id}",
+            visible_fields=["sobject", "record_id", "field_names"],
+            query_builder=lambda v: {"fields": getattr(v, "field_names", None) or None},
+        ),
+        OpSpec(
+            id="update_record",
+            label="Update Record",
+            method="PATCH",
+            path="/sobjects/{sobject}/{record_id}",
+            visible_fields=["sobject", "record_id", "record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="delete_record",
+            label="Delete Record",
+            method="DELETE",
+            path="/sobjects/{sobject}/{record_id}",
+            visible_fields=["sobject", "record_id"],
+        ),
+        OpSpec(
+            id="list_objects",
+            label="List Available SObjects",
+            method="GET",
+            path="/sobjects",
+        ),
+        # ─── record + query depth ──────────────────────────────────
+        OpSpec(
+            id="upsert_by_external_id",
+            label="Upsert Record by External ID",
+            method="PATCH",
+            path="/sobjects/{sobject}/{external_id_field}/{external_id_value}",
+            visible_fields=["sobject", "external_id_field", "external_id_value", "record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="query_all",
+            label="Query All (includes deleted)",
+            method="GET",
+            path="/queryAll",
+            visible_fields=["soql"],
+            query_builder=lambda v: {"q": getattr(v, "soql", "") or ""},
+        ),
+        OpSpec(
+            id="query_more",
+            label="Query More (cursor pagination)",
+            method="GET",
+            path="/query/{external_id_value}",
+            visible_fields=["external_id_value"],
+        ),
+        OpSpec(
+            id="search",
+            label="SOSL Search",
+            method="GET",
+            path="/search",
+            visible_fields=["search_sosl"],
+            query_builder=lambda v: {"q": getattr(v, "search_sosl", "") or ""},
+        ),
+        OpSpec(
+            id="describe_sobject",
+            label="Describe SObject",
+            method="GET",
+            path="/sobjects/{sobject}/describe",
+            visible_fields=["sobject"],
+        ),
+        OpSpec(
+            id="sobject_basic",
+            label="SObject Basic Info",
+            method="GET",
+            path="/sobjects/{sobject}",
+            visible_fields=["sobject"],
+        ),
+        OpSpec(
+            id="recent_records",
+            label="Recently Viewed Records",
+            method="GET",
+            path="/sobjects/{sobject}/listviews",
+            visible_fields=["sobject"],
+        ),
+        # ─── typed shortcuts (Lead / Contact / Opportunity / Case) ─
+        OpSpec(
+            id="create_lead",
+            label="Create Lead",
+            method="POST",
+            path="/sobjects/Lead",
+            visible_fields=["record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="create_contact",
+            label="Create Contact",
+            method="POST",
+            path="/sobjects/Contact",
+            visible_fields=["record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="create_account",
+            label="Create Account",
+            method="POST",
+            path="/sobjects/Account",
+            visible_fields=["record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="create_opportunity",
+            label="Create Opportunity",
+            method="POST",
+            path="/sobjects/Opportunity",
+            visible_fields=["record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        OpSpec(
+            id="create_case",
+            label="Create Case",
+            method="POST",
+            path="/sobjects/Case",
+            visible_fields=["record_data"],
+            body_builder=lambda v: getattr(v, "record_data", None) or {},
+        ),
+        # ─── reports + dashboards + users ─────────────────────────
+        OpSpec(
+            id="run_report",
+            label="Run Report",
+            method="GET",
+            path="/analytics/reports/{report_id}",
+            visible_fields=["report_id"],
+        ),
+        OpSpec(
+            id="list_reports",
+            label="List Reports",
+            method="GET",
+            path="/analytics/reports",
+        ),
+        OpSpec(
+            id="get_dashboard",
+            label="Get Dashboard",
+            method="GET",
+            path="/analytics/dashboards/{dashboard_id}",
+            visible_fields=["dashboard_id"],
+        ),
+        OpSpec(
+            id="list_dashboards",
+            label="List Dashboards",
+            method="GET",
+            path="/analytics/dashboards",
+        ),
+        OpSpec(
+            id="get_current_user",
+            label="Get Current User",
+            method="GET",
+            path="/chatter/users/me",
+        ),
+        OpSpec(
+            id="get_user",
+            label="Get User",
+            method="GET",
+            path="/sobjects/User/{user_id}",
+            visible_fields=["user_id"],
+        ),
+        # ─── apex REST ─────────────────────────────────────────────
+        OpSpec(
+            id="apex_get",
+            label="Apex REST GET",
+            method="GET",
+            path="/apexrest/{apex_class}",
+            visible_fields=["apex_class"],
+        ),
+        OpSpec(
+            id="apex_post",
+            label="Apex REST POST",
+            method="POST",
+            path="/apexrest/{apex_class}",
+            visible_fields=["apex_class", "apex_body"],
+            body_builder=lambda v: getattr(v, "apex_body", None) or {},
+        ),
+    ],
+    outputs_schema=[
+        {"label": "data", "type": "object"},
+        {"label": "id", "type": "string"},
+        {"label": "records", "type": "array"},
+        {"label": "totalSize", "type": "number"},
+    ],
+    allow_error=True,
+)
