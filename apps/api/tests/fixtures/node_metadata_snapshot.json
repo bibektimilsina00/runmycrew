@@ -4945,10 +4945,13 @@
     "allow_error": true,
     "category": "integration",
     "color": "#ffffff",
-    "credential_type": "github_oauth",
+    "credential_type": [
+      "github_oauth",
+      "github_pat"
+    ],
     "default_height": null,
     "default_width": null,
-    "description": "GitHub integration: manage issues, comments, and repositories.",
+    "description": "Manage GitHub issues, pull requests, repos, branches, files, releases, workflows, gists, and search across the public REST API.",
     "dynamic_outputs_from": null,
     "icon": "github",
     "inputs": 1,
@@ -4957,11 +4960,11 @@
     "outputs": 1,
     "outputs_schema": [
       {
-        "label": "number",
+        "label": "id",
         "type": "number"
       },
       {
-        "label": "id",
+        "label": "number",
         "type": "number"
       },
       {
@@ -4981,29 +4984,30 @@
         "type": "string"
       },
       {
-        "label": "user",
+        "label": "author",
         "type": "object"
       },
       {
-        "label": "labels",
-        "type": "array"
-      },
-      {
-        "label": "issues",
-        "type": "array"
-      },
-      {
-        "label": "repos",
-        "type": "array"
-      },
-      {
-        "label": "comments",
+        "label": "items",
         "type": "array"
       }
     ],
     "properties": [
       {
-        "credentialType": "github_oauth",
+        "condition": {
+          "field": "operation",
+          "operator": "notIn",
+          "value": [
+            "get_public_repo",
+            "get_public_file",
+            "list_user_public_repos",
+            "search_public_code"
+          ]
+        },
+        "credentialType": [
+          "github_oauth",
+          "github_pat"
+        ],
         "label": "GitHub Account",
         "name": "credential",
         "required": true,
@@ -5015,12 +5019,24 @@
         "name": "operation",
         "options": [
           {
-            "label": "Create Issue",
-            "value": "create_issue"
+            "label": "Get Public Repo (no auth)",
+            "value": "get_public_repo"
           },
           {
-            "label": "List Issues",
-            "value": "list_issues"
+            "label": "Get Public File (no auth)",
+            "value": "get_public_file"
+          },
+          {
+            "label": "List User Public Repos (no auth)",
+            "value": "list_user_public_repos"
+          },
+          {
+            "label": "Search Public Code (no auth)",
+            "value": "search_public_code"
+          },
+          {
+            "label": "Create Issue",
+            "value": "create_issue"
           },
           {
             "label": "Get Issue",
@@ -5031,6 +5047,22 @@
             "value": "update_issue"
           },
           {
+            "label": "List Issues",
+            "value": "list_issues"
+          },
+          {
+            "label": "Lock Issue",
+            "value": "lock_issue"
+          },
+          {
+            "label": "Unlock Issue",
+            "value": "unlock_issue"
+          },
+          {
+            "label": "Search Issues",
+            "value": "search_issues"
+          },
+          {
             "label": "Add Comment",
             "value": "add_comment"
           },
@@ -5039,12 +5071,208 @@
             "value": "list_comments"
           },
           {
+            "label": "Update Comment",
+            "value": "update_comment"
+          },
+          {
+            "label": "Delete Comment",
+            "value": "delete_comment"
+          },
+          {
+            "label": "Create Pull Request",
+            "value": "create_pr"
+          },
+          {
+            "label": "Get Pull Request",
+            "value": "get_pr"
+          },
+          {
+            "label": "Update Pull Request",
+            "value": "update_pr"
+          },
+          {
+            "label": "List Pull Requests",
+            "value": "list_prs"
+          },
+          {
+            "label": "Merge Pull Request",
+            "value": "merge_pr"
+          },
+          {
+            "label": "Add PR Comment",
+            "value": "add_pr_comment"
+          },
+          {
+            "label": "Request Review",
+            "value": "request_review"
+          },
+          {
+            "label": "List Reviews",
+            "value": "list_reviews"
+          },
+          {
             "label": "Get Repository",
             "value": "get_repo"
           },
           {
-            "label": "List Repositories",
+            "label": "List My Repositories",
             "value": "list_repos"
+          },
+          {
+            "label": "Create Repository",
+            "value": "create_repo"
+          },
+          {
+            "label": "Delete Repository",
+            "value": "delete_repo"
+          },
+          {
+            "label": "Star Repository",
+            "value": "star_repo"
+          },
+          {
+            "label": "Unstar Repository",
+            "value": "unstar_repo"
+          },
+          {
+            "label": "List Starred",
+            "value": "list_starred"
+          },
+          {
+            "label": "Create Branch",
+            "value": "create_branch"
+          },
+          {
+            "label": "Get Branch",
+            "value": "get_branch"
+          },
+          {
+            "label": "List Branches",
+            "value": "list_branches"
+          },
+          {
+            "label": "Delete Branch",
+            "value": "delete_branch"
+          },
+          {
+            "label": "Get Default Branch",
+            "value": "get_default_branch"
+          },
+          {
+            "label": "Get File Content",
+            "value": "get_file_content"
+          },
+          {
+            "label": "Create File",
+            "value": "create_file"
+          },
+          {
+            "label": "Update File",
+            "value": "update_file"
+          },
+          {
+            "label": "Delete File",
+            "value": "delete_file"
+          },
+          {
+            "label": "List Directory",
+            "value": "list_dir"
+          },
+          {
+            "label": "Create Release",
+            "value": "create_release"
+          },
+          {
+            "label": "Get Release",
+            "value": "get_release"
+          },
+          {
+            "label": "List Releases",
+            "value": "list_releases"
+          },
+          {
+            "label": "Update Release",
+            "value": "update_release"
+          },
+          {
+            "label": "Delete Release",
+            "value": "delete_release"
+          },
+          {
+            "label": "Create Tag",
+            "value": "create_tag"
+          },
+          {
+            "label": "List Tags",
+            "value": "list_tags"
+          },
+          {
+            "label": "Get Commit",
+            "value": "get_commit"
+          },
+          {
+            "label": "List Commits",
+            "value": "list_commits"
+          },
+          {
+            "label": "Compare Commits",
+            "value": "compare_commits"
+          },
+          {
+            "label": "List Workflows",
+            "value": "list_workflows"
+          },
+          {
+            "label": "Get Workflow Run",
+            "value": "get_workflow_run"
+          },
+          {
+            "label": "Dispatch Workflow",
+            "value": "dispatch_workflow"
+          },
+          {
+            "label": "Cancel Workflow Run",
+            "value": "cancel_workflow_run"
+          },
+          {
+            "label": "Rerun Workflow",
+            "value": "rerun_workflow"
+          },
+          {
+            "label": "Get Authenticated User",
+            "value": "get_authenticated_user"
+          },
+          {
+            "label": "Get User by Username",
+            "value": "get_user"
+          },
+          {
+            "label": "Create Gist",
+            "value": "create_gist"
+          },
+          {
+            "label": "Get Gist",
+            "value": "get_gist"
+          },
+          {
+            "label": "List My Gists",
+            "value": "list_gists"
+          },
+          {
+            "label": "Update Gist",
+            "value": "update_gist"
+          },
+          {
+            "label": "Delete Gist",
+            "value": "delete_gist"
+          },
+          {
+            "label": "Search Repos",
+            "value": "search_repos"
+          },
+          {
+            "label": "Search Users",
+            "value": "search_users"
           }
         ],
         "type": "options"
@@ -5054,15 +5282,55 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "list_issues",
             "get_issue",
             "update_issue",
+            "list_issues",
+            "lock_issue",
+            "unlock_issue",
             "add_comment",
             "list_comments",
-            "get_repo"
+            "update_comment",
+            "delete_comment",
+            "create_pr",
+            "get_pr",
+            "update_pr",
+            "list_prs",
+            "merge_pr",
+            "request_review",
+            "list_reviews",
+            "add_pr_comment",
+            "get_repo",
+            "delete_repo",
+            "star_repo",
+            "unstar_repo",
+            "create_branch",
+            "get_branch",
+            "list_branches",
+            "delete_branch",
+            "get_default_branch",
+            "get_file_content",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "list_dir",
+            "create_release",
+            "get_release",
+            "list_releases",
+            "update_release",
+            "delete_release",
+            "create_tag",
+            "list_tags",
+            "get_commit",
+            "list_commits",
+            "compare_commits",
+            "list_workflows",
+            "get_workflow_run",
+            "dispatch_workflow",
+            "cancel_workflow_run",
+            "rerun_workflow"
           ]
         },
-        "label": "Owner (user or org)",
+        "label": "Owner",
         "name": "owner",
         "placeholder": "octocat",
         "required": true,
@@ -5073,12 +5341,52 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "list_issues",
             "get_issue",
             "update_issue",
+            "list_issues",
+            "lock_issue",
+            "unlock_issue",
             "add_comment",
             "list_comments",
-            "get_repo"
+            "update_comment",
+            "delete_comment",
+            "create_pr",
+            "get_pr",
+            "update_pr",
+            "list_prs",
+            "merge_pr",
+            "request_review",
+            "list_reviews",
+            "add_pr_comment",
+            "get_repo",
+            "delete_repo",
+            "star_repo",
+            "unstar_repo",
+            "create_branch",
+            "get_branch",
+            "list_branches",
+            "delete_branch",
+            "get_default_branch",
+            "get_file_content",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "list_dir",
+            "create_release",
+            "get_release",
+            "list_releases",
+            "update_release",
+            "delete_release",
+            "create_tag",
+            "list_tags",
+            "get_commit",
+            "list_commits",
+            "compare_commits",
+            "list_workflows",
+            "get_workflow_run",
+            "dispatch_workflow",
+            "cancel_workflow_run",
+            "rerun_workflow"
           ]
         },
         "label": "Repository",
@@ -5096,13 +5404,142 @@
         "condition": {
           "field": "operation",
           "value": [
+            "get_public_repo",
+            "get_public_file"
+          ]
+        },
+        "description": "GitHub username or org. Public read \u2014 no sign-in needed.",
+        "label": "Owner",
+        "name": "public_owner",
+        "placeholder": "octocat",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_public_repo",
+            "get_public_file"
+          ]
+        },
+        "label": "Repository",
+        "name": "public_repo",
+        "placeholder": "hello-world",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_user_public_repos"
+          ]
+        },
+        "label": "Username",
+        "name": "public_username",
+        "placeholder": "octocat",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_public_file"
+          ]
+        },
+        "label": "File Path",
+        "name": "public_path",
+        "placeholder": "README.md",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_branch",
+            "delete_branch",
+            "dispatch_workflow"
+          ]
+        },
+        "label": "Branch",
+        "loadOptions": "/integrations/github/branches",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner",
+          "repo"
+        ],
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_pr",
+            "create_branch",
+            "compare_commits",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "get_file_content",
+            "list_dir",
+            "list_commits"
+          ]
+        },
+        "default": "main",
+        "label": "Base Branch",
+        "loadOptions": "/integrations/github/branches",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner",
+          "repo"
+        ],
+        "name": "base_branch",
+        "placeholder": "main",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_pr",
+            "create_branch",
+            "compare_commits"
+          ]
+        },
+        "label": "Head Branch (source)",
+        "loadOptions": "/integrations/github/branches",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner",
+          "repo"
+        ],
+        "name": "head_branch",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
             "get_issue",
             "update_issue",
+            "lock_issue",
+            "unlock_issue",
             "add_comment",
             "list_comments"
           ]
         },
         "label": "Issue Number",
+        "loadOptions": "/integrations/github/issues",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner",
+          "repo"
+        ],
         "name": "issue_number",
         "required": true,
         "type": "number"
@@ -5111,11 +5548,146 @@
         "condition": {
           "field": "operation",
           "value": [
-            "create_issue",
-            "update_issue"
+            "get_pr",
+            "update_pr",
+            "merge_pr",
+            "request_review",
+            "list_reviews",
+            "add_pr_comment"
           ]
         },
-        "description": "Required for create_issue, optional for update_issue",
+        "label": "Pull Request Number",
+        "loadOptions": "/integrations/github/prs",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner",
+          "repo"
+        ],
+        "name": "pr_number",
+        "required": true,
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_comment",
+            "delete_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "required": true,
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_release",
+            "update_release",
+            "delete_release"
+          ]
+        },
+        "label": "Release ID",
+        "name": "release_id",
+        "required": true,
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "dispatch_workflow",
+            "rerun_workflow"
+          ]
+        },
+        "label": "Workflow ID or filename",
+        "name": "workflow_id_or_file",
+        "placeholder": "ci.yml",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_workflow_run",
+            "cancel_workflow_run",
+            "rerun_workflow"
+          ]
+        },
+        "label": "Workflow Run ID",
+        "name": "workflow_run_id",
+        "required": true,
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_commit",
+            "create_branch",
+            "create_tag"
+          ]
+        },
+        "label": "Commit SHA",
+        "name": "sha",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "compare_commits"
+          ]
+        },
+        "label": "Base SHA",
+        "name": "base_sha",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "compare_commits"
+          ]
+        },
+        "label": "Head SHA",
+        "name": "head_sha",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release",
+            "create_tag"
+          ]
+        },
+        "label": "Tag Name",
+        "name": "tag_name",
+        "placeholder": "v1.0.0",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue",
+            "update_issue",
+            "create_pr",
+            "update_pr",
+            "create_release",
+            "update_release"
+          ]
+        },
+        "description": "Required for create ops; optional for update.",
         "label": "Title",
         "name": "title",
         "type": "string"
@@ -5125,28 +5697,121 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "create_pr",
+            "update_pr",
+            "create_release",
+            "update_release"
           ]
         },
         "label": "Body",
         "name": "body",
-        "type": "string"
+        "type": "string",
+        "typeOptions": {
+          "multiline": true,
+          "rows": 5
+        }
       },
       {
         "condition": {
           "field": "operation",
-          "value": "add_comment"
+          "value": [
+            "add_comment",
+            "add_pr_comment",
+            "update_comment"
+          ]
         },
         "label": "Comment",
         "name": "comment_body",
+        "required": true,
+        "type": "string",
+        "typeOptions": {
+          "multiline": true,
+          "rows": 4
+        }
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_file_content",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "list_dir"
+          ]
+        },
+        "label": "File Path",
+        "name": "file_path",
+        "placeholder": "src/index.ts",
         "required": true,
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "update_issue"
+          "value": [
+            "create_file",
+            "update_file"
+          ]
         },
+        "description": "Raw text. Will be base64-encoded for the GitHub API.",
+        "label": "File Content",
+        "name": "file_content",
+        "required": true,
+        "type": "string",
+        "typeOptions": {
+          "multiline": true,
+          "rows": 8
+        }
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file"
+          ]
+        },
+        "default": "utf-8",
+        "label": "Content Encoding",
+        "mode": "advanced",
+        "name": "file_encoding",
+        "options": [
+          {
+            "label": "UTF-8 (text)",
+            "value": "utf-8"
+          },
+          {
+            "label": "Base64 (binary)",
+            "value": "base64"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "Commit Message",
+        "name": "commit_message",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_issue",
+            "update_pr"
+          ]
+        },
+        "default": "open",
         "label": "State",
         "name": "state",
         "options": [
@@ -5164,10 +5829,13 @@
       {
         "condition": {
           "field": "operation",
-          "value": "list_issues"
+          "value": [
+            "list_issues",
+            "list_prs"
+          ]
         },
         "default": "open",
-        "label": "State Filter",
+        "label": "Filter by State",
         "name": "state_filter",
         "options": [
           {
@@ -5189,6 +5857,58 @@
         "condition": {
           "field": "operation",
           "value": [
+            "list_issues",
+            "list_prs"
+          ]
+        },
+        "default": "created",
+        "label": "Sort",
+        "mode": "advanced",
+        "name": "sort",
+        "options": [
+          {
+            "label": "Created",
+            "value": "created"
+          },
+          {
+            "label": "Updated",
+            "value": "updated"
+          },
+          {
+            "label": "Comments",
+            "value": "comments"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "list_prs"
+          ]
+        },
+        "default": "desc",
+        "label": "Direction",
+        "mode": "advanced",
+        "name": "direction",
+        "options": [
+          {
+            "label": "Descending",
+            "value": "desc"
+          },
+          {
+            "label": "Ascending",
+            "value": "asc"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
             "create_issue",
             "update_issue",
             "list_issues"
@@ -5196,18 +5916,233 @@
         },
         "label": "Labels (comma-separated)",
         "name": "labels",
-        "required": false,
+        "placeholder": "bug, urgent",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "create_issue"
+          "value": [
+            "create_issue",
+            "update_issue"
+          ]
         },
-        "label": "Assignees (comma-separated)",
+        "label": "Assignees (comma-separated logins)",
         "mode": "advanced",
         "name": "assignees",
-        "required": false,
+        "placeholder": "octocat, monalisa",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "request_review"
+          ]
+        },
+        "label": "User Reviewers (comma-separated logins)",
+        "name": "reviewers",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "request_review"
+          ]
+        },
+        "label": "Team Reviewers (comma-separated slugs)",
+        "mode": "advanced",
+        "name": "team_reviewers",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release"
+          ]
+        },
+        "default": false,
+        "label": "Draft",
+        "mode": "advanced",
+        "name": "draft",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release"
+          ]
+        },
+        "default": false,
+        "label": "Pre-release",
+        "mode": "advanced",
+        "name": "prerelease",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_repo"
+          ]
+        },
+        "label": "Repository Name",
+        "name": "new_repo_name",
+        "placeholder": "my-new-repo",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_repo"
+          ]
+        },
+        "label": "Description",
+        "name": "new_repo_description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_repo"
+          ]
+        },
+        "default": false,
+        "label": "Private",
+        "name": "new_repo_private",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_repo"
+          ]
+        },
+        "default": true,
+        "label": "Initialize with README",
+        "mode": "advanced",
+        "name": "new_repo_auto_init",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "merge_pr"
+          ]
+        },
+        "default": "merge",
+        "label": "Merge Method",
+        "name": "merge_method",
+        "options": [
+          {
+            "label": "Merge commit",
+            "value": "merge"
+          },
+          {
+            "label": "Squash",
+            "value": "squash"
+          },
+          {
+            "label": "Rebase",
+            "value": "rebase"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "dispatch_workflow"
+          ]
+        },
+        "default": {},
+        "label": "Workflow Inputs",
+        "mode": "advanced",
+        "name": "workflow_inputs",
+        "placeholder": "{\"environment\": \"staging\"}",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_gist",
+            "update_gist",
+            "delete_gist"
+          ]
+        },
+        "label": "Gist ID",
+        "name": "gist_id",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_gist",
+            "update_gist"
+          ]
+        },
+        "label": "Description",
+        "name": "gist_description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_gist",
+            "update_gist"
+          ]
+        },
+        "default": {},
+        "description": "Map of filename \u2192 content string.",
+        "label": "Files",
+        "name": "gist_files",
+        "placeholder": "{\"hello.py\": \"print('hi')\"}",
+        "required": true,
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_gist"
+          ]
+        },
+        "default": false,
+        "label": "Public",
+        "name": "gist_public",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_repos",
+            "search_issues",
+            "search_users",
+            "search_code",
+            "search_public_code"
+          ]
+        },
+        "description": "GitHub search syntax (see docs.github.com/en/search-github/).",
+        "label": "Search Query",
+        "name": "query",
+        "placeholder": "stars:>1000 language:python",
+        "required": true,
         "type": "string"
       },
       {
@@ -5216,13 +6151,60 @@
           "value": [
             "list_issues",
             "list_comments",
-            "list_repos"
+            "list_prs",
+            "list_reviews",
+            "list_repos",
+            "list_starred",
+            "list_user_public_repos",
+            "list_branches",
+            "list_tags",
+            "list_releases",
+            "list_commits",
+            "list_workflows",
+            "list_gists",
+            "list_dir",
+            "search_repos",
+            "search_issues",
+            "search_users",
+            "search_code",
+            "search_public_code"
           ]
         },
         "default": 30,
-        "label": "Limit",
+        "label": "Per page",
         "mode": "advanced",
         "name": "per_page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "list_comments",
+            "list_prs",
+            "list_reviews",
+            "list_repos",
+            "list_starred",
+            "list_user_public_repos",
+            "list_branches",
+            "list_tags",
+            "list_releases",
+            "list_commits",
+            "list_workflows",
+            "list_gists",
+            "list_dir",
+            "search_repos",
+            "search_issues",
+            "search_users",
+            "search_code",
+            "search_public_code"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
         "type": "number"
       },
       {
@@ -15649,6 +16631,352 @@
     ],
     "tools": null,
     "type": "trigger.gforms_response"
+  },
+  "trigger.github": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#ffffff",
+    "credential_type": [
+      "github_oauth",
+      "github_pat"
+    ],
+    "default_height": null,
+    "default_width": null,
+    "description": "Polls a GitHub repo for new issues, pull requests, issue comments, releases, or commits. First poll snapshots silently; later polls emit one execution per new item. Use the GitHub Webhook trigger instead when you can expose a public URL.",
+    "dynamic_outputs_from": null,
+    "icon": "github",
+    "inputs": 0,
+    "name": "GitHub",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "number",
+        "type": "number"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "event_type",
+        "type": "string"
+      },
+      {
+        "label": "html_url",
+        "type": "string"
+      },
+      {
+        "label": "author",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": [
+          "github_oauth",
+          "github_pat"
+        ],
+        "label": "GitHub Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "new_issue",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New issue",
+            "value": "new_issue"
+          },
+          {
+            "label": "New pull request",
+            "value": "new_pr"
+          },
+          {
+            "label": "New issue / PR comment",
+            "value": "new_issue_comment"
+          },
+          {
+            "label": "New release",
+            "value": "new_release"
+          },
+          {
+            "label": "New commit",
+            "value": "new_commit"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Owner (user or org)",
+        "name": "owner",
+        "placeholder": "octocat",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Repository",
+        "loadOptions": "/integrations/github/repos",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner"
+        ],
+        "name": "repo",
+        "placeholder": "hello-world",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": "new_commit"
+        },
+        "description": "Leave blank to track the repo's default branch.",
+        "label": "Branch (optional)",
+        "loadOptions": "/integrations/github/branches",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner",
+          "repo"
+        ],
+        "name": "branch",
+        "placeholder": "main",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 120,
+        "description": "Min 30s. GitHub's unauthenticated rate limit is 60/hr.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.github"
+  },
+  "trigger.github_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#ffffff",
+    "credential_type": [
+      "github_oauth",
+      "github_pat"
+    ],
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires the instant GitHub posts a webhook delivery to your workflow URL. Pair with a repo-level webhook configured in GitHub Settings \u2192 Webhooks. Use the polling GitHub trigger if you can't expose a public URL.",
+    "dynamic_outputs_from": null,
+    "icon": "github",
+    "inputs": 0,
+    "name": "GitHub Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "delivery",
+        "type": "string"
+      },
+      {
+        "label": "action",
+        "type": "string"
+      },
+      {
+        "label": "repository",
+        "type": "string"
+      },
+      {
+        "label": "sender",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": [
+          "github_oauth",
+          "github_pat"
+        ],
+        "description": "Optional \u2014 only needed if downstream nodes call GitHub APIs on the same flow.",
+        "label": "GitHub Account (optional)",
+        "name": "credential",
+        "required": false,
+        "type": "credential"
+      },
+      {
+        "description": "Only used as a label / sanity check; the URL is what GitHub posts to.",
+        "label": "Owner (user or org)",
+        "name": "owner",
+        "placeholder": "octocat",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Repository",
+        "loadOptions": "/integrations/github/repos",
+        "loadOptionsDependsOn": [
+          "credential",
+          "owner"
+        ],
+        "name": "repo",
+        "placeholder": "hello-world",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "default": "*",
+        "description": "Filter applied to GitHub's `X-GitHub-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Issues (issues)",
+            "value": "issues"
+          },
+          {
+            "label": "Issue comment (issue_comment)",
+            "value": "issue_comment"
+          },
+          {
+            "label": "Pull request (pull_request)",
+            "value": "pull_request"
+          },
+          {
+            "label": "Pull request review (pull_request_review)",
+            "value": "pull_request_review"
+          },
+          {
+            "label": "Pull request review comment (pull_request_review_comment)",
+            "value": "pull_request_review_comment"
+          },
+          {
+            "label": "Push (push)",
+            "value": "push"
+          },
+          {
+            "label": "Release (release)",
+            "value": "release"
+          },
+          {
+            "label": "Star (star)",
+            "value": "star"
+          },
+          {
+            "label": "Fork (fork)",
+            "value": "fork"
+          },
+          {
+            "label": "Workflow run (workflow_run)",
+            "value": "workflow_run"
+          },
+          {
+            "label": "Discussion (discussion)",
+            "value": "discussion"
+          },
+          {
+            "label": "Deployment (deployment)",
+            "value": "deployment"
+          },
+          {
+            "label": "Check run (check_run)",
+            "value": "check_run"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC-SHA256 secret. Deliveries without a matching `X-Hub-Signature-256` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in GitHub \u2192 Webhook \u2192 Secret",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.github_webhook"
   },
   "trigger.gmail": {
     "allow_error": true,
