@@ -20888,7 +20888,7 @@
     "credential_type": "github_oauth",
     "default_height": null,
     "default_width": null,
-    "description": "GitHub integration: manage issues, comments, and repositories.",
+    "description": "GitHub \u2014 issues, PRs, files, branches, releases, workflows, projects.",
     "dynamic_outputs_from": null,
     "icon": "github",
     "inputs": 1,
@@ -20897,48 +20897,20 @@
     "outputs": 1,
     "outputs_schema": [
       {
-        "label": "number",
-        "type": "number"
+        "label": "data",
+        "type": "object"
       },
       {
         "label": "id",
         "type": "number"
       },
       {
-        "label": "title",
-        "type": "string"
-      },
-      {
-        "label": "body",
-        "type": "string"
-      },
-      {
-        "label": "state",
-        "type": "string"
+        "label": "number",
+        "type": "number"
       },
       {
         "label": "html_url",
         "type": "string"
-      },
-      {
-        "label": "user",
-        "type": "object"
-      },
-      {
-        "label": "labels",
-        "type": "array"
-      },
-      {
-        "label": "issues",
-        "type": "array"
-      },
-      {
-        "label": "repos",
-        "type": "array"
-      },
-      {
-        "label": "comments",
-        "type": "array"
       }
     ],
     "properties": [
@@ -20983,8 +20955,176 @@
             "value": "get_repo"
           },
           {
-            "label": "List Repositories",
+            "label": "List Repositories (authenticated user)",
             "value": "list_repos"
+          },
+          {
+            "label": "Close Issue",
+            "value": "close_issue"
+          },
+          {
+            "label": "Add Labels to Issue",
+            "value": "add_labels"
+          },
+          {
+            "label": "Remove Label from Issue",
+            "value": "remove_label"
+          },
+          {
+            "label": "Add Assignees",
+            "value": "add_assignees"
+          },
+          {
+            "label": "Update Comment",
+            "value": "update_comment"
+          },
+          {
+            "label": "Delete Comment",
+            "value": "delete_comment"
+          },
+          {
+            "label": "List Pull Requests",
+            "value": "list_prs"
+          },
+          {
+            "label": "Get Pull Request",
+            "value": "get_pr"
+          },
+          {
+            "label": "Create Pull Request",
+            "value": "create_pr"
+          },
+          {
+            "label": "Update Pull Request",
+            "value": "update_pr"
+          },
+          {
+            "label": "Close Pull Request",
+            "value": "close_pr"
+          },
+          {
+            "label": "Merge Pull Request",
+            "value": "merge_pr"
+          },
+          {
+            "label": "Get PR Files",
+            "value": "get_pr_files"
+          },
+          {
+            "label": "List PR Review Comments",
+            "value": "list_pr_comments"
+          },
+          {
+            "label": "Request Reviewers on PR",
+            "value": "request_reviewers"
+          },
+          {
+            "label": "List Branches",
+            "value": "list_branches"
+          },
+          {
+            "label": "Get Branch",
+            "value": "get_branch"
+          },
+          {
+            "label": "Create Branch (from base sha)",
+            "value": "create_branch"
+          },
+          {
+            "label": "Delete Branch",
+            "value": "delete_branch"
+          },
+          {
+            "label": "Get File Content",
+            "value": "get_file_content"
+          },
+          {
+            "label": "Create File",
+            "value": "create_file"
+          },
+          {
+            "label": "Update File",
+            "value": "update_file"
+          },
+          {
+            "label": "Delete File",
+            "value": "delete_file"
+          },
+          {
+            "label": "Get Latest Commit on Branch",
+            "value": "latest_commit"
+          },
+          {
+            "label": "Get Git Tree",
+            "value": "get_tree"
+          },
+          {
+            "label": "List Releases",
+            "value": "list_releases"
+          },
+          {
+            "label": "Get Release",
+            "value": "get_release"
+          },
+          {
+            "label": "Create Release",
+            "value": "create_release"
+          },
+          {
+            "label": "Update Release",
+            "value": "update_release"
+          },
+          {
+            "label": "Delete Release",
+            "value": "delete_release"
+          },
+          {
+            "label": "List Workflows",
+            "value": "list_workflows"
+          },
+          {
+            "label": "Get Workflow",
+            "value": "get_workflow"
+          },
+          {
+            "label": "Trigger Workflow Dispatch",
+            "value": "trigger_workflow"
+          },
+          {
+            "label": "List Workflow Runs",
+            "value": "list_workflow_runs"
+          },
+          {
+            "label": "Get Workflow Run",
+            "value": "get_workflow_run"
+          },
+          {
+            "label": "Cancel Workflow Run",
+            "value": "cancel_workflow_run"
+          },
+          {
+            "label": "Rerun Workflow Run",
+            "value": "rerun_workflow"
+          },
+          {
+            "label": "List Repo Labels",
+            "value": "list_labels"
+          },
+          {
+            "label": "Create Repo Label",
+            "value": "create_label"
+          },
+          {
+            "label": "Delete Repo Label",
+            "value": "delete_label"
+          },
+          {
+            "label": "List Collaborators",
+            "value": "list_collaborators"
+          },
+          {
+            "label": "Get Authenticated User",
+            "value": "get_authenticated_user"
           }
         ],
         "type": "options"
@@ -20999,13 +21139,53 @@
             "update_issue",
             "add_comment",
             "list_comments",
-            "get_repo"
+            "get_repo",
+            "close_issue",
+            "add_labels",
+            "remove_label",
+            "add_assignees",
+            "update_comment",
+            "delete_comment",
+            "list_prs",
+            "get_pr",
+            "create_pr",
+            "update_pr",
+            "close_pr",
+            "merge_pr",
+            "get_pr_files",
+            "list_pr_comments",
+            "request_reviewers",
+            "list_branches",
+            "get_branch",
+            "create_branch",
+            "delete_branch",
+            "get_file_content",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "latest_commit",
+            "get_tree",
+            "list_releases",
+            "get_release",
+            "create_release",
+            "update_release",
+            "delete_release",
+            "list_workflows",
+            "get_workflow",
+            "trigger_workflow",
+            "list_workflow_runs",
+            "get_workflow_run",
+            "cancel_workflow_run",
+            "rerun_workflow",
+            "list_labels",
+            "create_label",
+            "delete_label",
+            "list_collaborators"
           ]
         },
         "label": "Owner (user or org)",
         "name": "owner",
         "placeholder": "octocat",
-        "required": true,
         "type": "string"
       },
       {
@@ -21018,18 +21198,53 @@
             "update_issue",
             "add_comment",
             "list_comments",
-            "get_repo"
+            "get_repo",
+            "close_issue",
+            "add_labels",
+            "remove_label",
+            "add_assignees",
+            "update_comment",
+            "delete_comment",
+            "list_prs",
+            "get_pr",
+            "create_pr",
+            "update_pr",
+            "close_pr",
+            "merge_pr",
+            "get_pr_files",
+            "list_pr_comments",
+            "request_reviewers",
+            "list_branches",
+            "get_branch",
+            "create_branch",
+            "delete_branch",
+            "get_file_content",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "latest_commit",
+            "get_tree",
+            "list_releases",
+            "get_release",
+            "create_release",
+            "update_release",
+            "delete_release",
+            "list_workflows",
+            "get_workflow",
+            "trigger_workflow",
+            "list_workflow_runs",
+            "get_workflow_run",
+            "cancel_workflow_run",
+            "rerun_workflow",
+            "list_labels",
+            "create_label",
+            "delete_label",
+            "list_collaborators"
           ]
         },
         "label": "Repository",
-        "loadOptions": "/integrations/github/repos",
-        "loadOptionsDependsOn": [
-          "credential",
-          "owner"
-        ],
         "name": "repo",
         "placeholder": "hello-world",
-        "required": true,
         "type": "string"
       },
       {
@@ -21039,12 +21254,32 @@
             "get_issue",
             "update_issue",
             "add_comment",
-            "list_comments"
+            "list_comments",
+            "close_issue",
+            "add_labels",
+            "remove_label",
+            "add_assignees"
           ]
         },
         "label": "Issue Number",
         "name": "issue_number",
-        "required": true,
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_pr",
+            "update_pr",
+            "close_pr",
+            "merge_pr",
+            "get_pr_files",
+            "list_pr_comments",
+            "request_reviewers"
+          ]
+        },
+        "label": "Pull Request Number",
+        "name": "pull_number",
         "type": "number"
       },
       {
@@ -21052,10 +21287,11 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "create_pr",
+            "update_pr"
           ]
         },
-        "description": "Required for create_issue, optional for update_issue",
         "label": "Title",
         "name": "title",
         "type": "string"
@@ -21065,7 +21301,10 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "create_pr",
+            "update_pr",
+            "create_label"
           ]
         },
         "label": "Body",
@@ -21075,79 +21314,51 @@
       {
         "condition": {
           "field": "operation",
-          "value": "add_comment"
+          "value": [
+            "update_issue",
+            "update_pr"
+          ]
         },
-        "label": "Comment",
-        "name": "comment_body",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": "update_issue"
-        },
-        "label": "State",
+        "label": "State (open|closed)",
         "name": "state",
-        "options": [
-          {
-            "label": "Open",
-            "value": "open"
-          },
-          {
-            "label": "Closed",
-            "value": "closed"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": "list_issues"
-        },
-        "default": "open",
-        "label": "State Filter",
-        "name": "state_filter",
-        "options": [
-          {
-            "label": "Open",
-            "value": "open"
-          },
-          {
-            "label": "Closed",
-            "value": "closed"
-          },
-          {
-            "label": "All",
-            "value": "all"
-          }
-        ],
-        "type": "options"
+        "type": "string"
       },
       {
         "condition": {
           "field": "operation",
           "value": [
             "create_issue",
+            "list_issues",
             "update_issue",
-            "list_issues"
+            "add_labels"
           ]
         },
         "label": "Labels (comma-separated)",
         "name": "labels",
-        "required": false,
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "create_issue"
+          "value": [
+            "create_issue",
+            "add_assignees"
+          ]
         },
         "label": "Assignees (comma-separated)",
-        "mode": "advanced",
         "name": "assignees",
-        "required": false,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_comment",
+            "update_comment"
+          ]
+        },
+        "label": "Comment Body",
+        "name": "comment_body",
         "type": "string"
       },
       {
@@ -21155,15 +21366,351 @@
           "field": "operation",
           "value": [
             "list_issues",
-            "list_comments",
-            "list_repos"
+            "list_prs"
+          ]
+        },
+        "default": "open",
+        "label": "State Filter",
+        "name": "state_filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_issues",
+            "list_repos",
+            "list_prs",
+            "list_branches",
+            "list_releases",
+            "list_workflow_runs"
           ]
         },
         "default": 30,
-        "label": "Limit",
+        "label": "Per Page",
         "mode": "advanced",
         "name": "per_page",
         "type": "number"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_branch",
+            "create_branch",
+            "delete_branch",
+            "create_file",
+            "update_file",
+            "delete_file",
+            "latest_commit"
+          ]
+        },
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_pr"
+          ]
+        },
+        "default": "main",
+        "label": "Base Branch",
+        "name": "base_branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_pr"
+          ]
+        },
+        "label": "Head Branch",
+        "name": "head_branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_file_content",
+            "trigger_workflow"
+          ]
+        },
+        "label": "Ref (branch/tag/sha)",
+        "name": "ref",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_branch",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "Commit SHA",
+        "name": "sha",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_file_content",
+            "create_file",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "File Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file"
+          ]
+        },
+        "label": "Content (base64)",
+        "name": "content_base64",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_file",
+            "update_file",
+            "delete_file"
+          ]
+        },
+        "label": "Commit Message",
+        "name": "commit_message",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release"
+          ]
+        },
+        "label": "Release Tag",
+        "name": "release_tag",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release"
+          ]
+        },
+        "label": "Release Name",
+        "name": "release_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release"
+          ]
+        },
+        "label": "Release Body",
+        "name": "release_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_release",
+            "update_release",
+            "delete_release"
+          ]
+        },
+        "label": "Release ID",
+        "name": "release_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release"
+          ]
+        },
+        "default": false,
+        "label": "Prerelease",
+        "name": "prerelease",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_release",
+            "update_release"
+          ]
+        },
+        "default": false,
+        "label": "Draft",
+        "name": "draft",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_workflow",
+            "trigger_workflow",
+            "list_workflow_runs"
+          ]
+        },
+        "label": "Workflow ID or filename",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_workflow_run",
+            "cancel_workflow_run",
+            "rerun_workflow"
+          ]
+        },
+        "label": "Workflow Run ID",
+        "name": "run_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "trigger_workflow"
+          ]
+        },
+        "default": {},
+        "label": "Workflow Inputs (JSON)",
+        "name": "workflow_inputs",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_comment",
+            "delete_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "request_reviewers"
+          ]
+        },
+        "label": "Reviewers (comma-separated)",
+        "name": "reviewers",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "request_reviewers"
+          ]
+        },
+        "label": "Team Reviewers (comma-separated)",
+        "name": "team_reviewers",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "merge_pr"
+          ]
+        },
+        "label": "Merge Commit Message",
+        "name": "commit_message_merge",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "merge_pr"
+          ]
+        },
+        "default": "merge",
+        "label": "Merge Method (merge|squash|rebase)",
+        "name": "merge_method",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_tree"
+          ]
+        },
+        "label": "Tree SHA",
+        "name": "tree_sha",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "remove_label",
+            "create_label",
+            "delete_label"
+          ]
+        },
+        "label": "Label Name",
+        "name": "label_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_label"
+          ]
+        },
+        "label": "Label Color (hex, no #)",
+        "name": "label_color",
+        "type": "string"
       },
       {
         "default": 0,
