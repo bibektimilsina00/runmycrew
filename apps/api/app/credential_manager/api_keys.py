@@ -2555,6 +2555,181 @@ PROVIDERS = {
             ),
         ],
     ),
+    "agiloft": APIKeyProvider(
+        id="agiloft_api_key",
+        name="Agiloft",
+        icon_slug="agiloft",
+        color="#1c1c1c",
+        description="Agiloft — contract lifecycle management (CLM) records.",
+        hint="Agiloft API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Agiloft API key"
+            ),
+        ],
+    ),
+    "airweave": APIKeyProvider(
+        id="airweave_api_key",
+        name="Airweave",
+        icon_slug="airweave",
+        color="#1c1c1c",
+        description="Airweave — RAG data pipeline sync sources → destinations.",
+        hint="Airweave API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Airweave API key"
+            ),
+        ],
+    ),
+    "ketch": APIKeyProvider(
+        id="ketch_api_key",
+        name="Ketch",
+        icon_slug="ketch",
+        color="#1c1c1c",
+        description="Ketch — privacy consent, DSAR (data subject access requests).",
+        hint="Ketch API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Ketch API key"
+            ),
+        ],
+    ),
+    "linkup": APIKeyProvider(
+        id="linkup_api_key",
+        name="Linkup",
+        icon_slug="linkup",
+        color="#1c1c1c",
+        description="Linkup — real-time web search (better recall than SerpAPI).",
+        hint="Linkup API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Linkup API key"
+            ),
+        ],
+    ),
+    "linq": APIKeyProvider(
+        id="linq_api_key",
+        name="LinQ",
+        icon_slug="linq",
+        color="#1c1c1c",
+        description="LinQ — enterprise procurement + supplier data.",
+        hint="LinQ API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="LinQ API key"
+            ),
+        ],
+    ),
+    "obsidian": APIKeyProvider(
+        id="obsidian_api_key",
+        name="Obsidian Local REST",
+        icon_slug="obsidian",
+        color="#7C3AED",
+        description="Obsidian Local REST plugin — vault notes CRUD.",
+        hint="Obsidian Local REST API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Obsidian Local REST API key",
+            ),
+        ],
+    ),
+    "pi": APIKeyProvider(
+        id="pi_api_key",
+        name="Pi",
+        icon_slug="pi",
+        color="#1c1c1c",
+        description="Pi — Inflection AI conversational assistant.",
+        hint="Pi API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Pi API key"
+            ),
+        ],
+    ),
+    "profound": APIKeyProvider(
+        id="profound_api_key",
+        name="Profound",
+        icon_slug="profound",
+        color="#1c1c1c",
+        description="Profound — AI-answer / share-of-voice analytics.",
+        hint="Profound API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Profound API key"
+            ),
+        ],
+    ),
+    "pulse": APIKeyProvider(
+        id="pulse_api_key",
+        name="Pulse",
+        icon_slug="pulse",
+        color="#1c1c1c",
+        description="Pulse — document parsing (PDF → structured JSON/markdown).",
+        hint="Pulse API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Pulse API key"
+            ),
+        ],
+    ),
+    "quartr": APIKeyProvider(
+        id="quartr_api_key",
+        name="Quartr",
+        icon_slug="quartr",
+        color="#1c1c1c",
+        description="Quartr — earnings-call transcripts + investor events.",
+        hint="Quartr API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Quartr API key"
+            ),
+        ],
+    ),
+    "greptile": APIKeyProvider(
+        id="greptile_api_key",
+        name="Greptile",
+        icon_slug="greptile",
+        color="#1c1c1c",
+        description="Greptile — natural-language code search over your repos.",
+        hint="Greptile API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Greptile API key"
+            ),
+        ],
+    ),
+    "guardrails": APIKeyProvider(
+        id="guardrails_api_key",
+        name="Guardrails AI",
+        icon_slug="guardrails",
+        color="#1c1c1c",
+        description="Guardrails AI — validate + repair LLM output against JSON schema.",
+        hint="Guardrails AI API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Guardrails AI API key"
+            ),
+        ],
+    ),
+    "crowdstrike": APIKeyProvider(
+        id="crowdstrike_api_key",
+        name="CrowdStrike Falcon",
+        icon_slug="crowdstrike",
+        color="#FA2A00",
+        description="CrowdStrike Falcon — hosts, detects, incidents.",
+        hint="CrowdStrike Falcon API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="CrowdStrike Falcon API key",
+            ),
+        ],
+    ),
 }
 
 

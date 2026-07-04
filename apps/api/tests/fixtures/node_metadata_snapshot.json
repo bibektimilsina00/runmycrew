@@ -1226,6 +1226,294 @@
     "tools": null,
     "type": "action.agentphone"
   },
+  "action.agiloft": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "agiloft_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Agiloft \u2014 contract lifecycle management (CLM) records.",
+    "dynamic_outputs_from": null,
+    "icon": "agiloft",
+    "inputs": 1,
+    "name": "Agiloft",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "agiloft_api_key",
+        "label": "Agiloft Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_records",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Records",
+            "value": "list_records"
+          },
+          {
+            "label": "Get Record",
+            "value": "get_record"
+          },
+          {
+            "label": "Create Record",
+            "value": "create_record"
+          },
+          {
+            "label": "Update Record",
+            "value": "update_record"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records",
+            "get_record",
+            "create_record",
+            "update_record"
+          ]
+        },
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "update_record"
+          ]
+        },
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records"
+          ]
+        },
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_record",
+            "update_record"
+          ]
+        },
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.agiloft"
+  },
   "action.ahrefs": {
     "allow_error": true,
     "category": "integration",
@@ -1639,6 +1927,284 @@
     ],
     "tools": null,
     "type": "action.airtable"
+  },
+  "action.airweave": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "airweave_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Airweave \u2014 RAG data pipeline sync sources \u2192 destinations.",
+    "dynamic_outputs_from": null,
+    "icon": "airweave",
+    "inputs": 1,
+    "name": "Airweave",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "airweave_api_key",
+        "label": "Airweave Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_sync_configs",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Sync Configs",
+            "value": "list_sync_configs"
+          },
+          {
+            "label": "Get Sync Config",
+            "value": "get_sync_config"
+          },
+          {
+            "label": "Trigger Sync",
+            "value": "trigger_sync"
+          },
+          {
+            "label": "Query Semantic Index",
+            "value": "query"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_sync_config",
+            "trigger_sync"
+          ]
+        },
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query"
+          ]
+        },
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query"
+          ]
+        },
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.airweave"
   },
   "action.algolia": {
     "allow_error": true,
@@ -9169,6 +9735,285 @@
     ],
     "tools": null,
     "type": "action.convex"
+  },
+  "action.crowdstrike": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#FA2A00",
+    "credential_type": "crowdstrike_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "CrowdStrike Falcon \u2014 hosts, detects, incidents.",
+    "dynamic_outputs_from": null,
+    "icon": "crowdstrike",
+    "inputs": 1,
+    "name": "CrowdStrike Falcon",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "crowdstrike_api_key",
+        "label": "CrowdStrike Falcon Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "query_hosts",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Query Hosts",
+            "value": "query_hosts"
+          },
+          {
+            "label": "Get Host Details",
+            "value": "get_host"
+          },
+          {
+            "label": "Query Detections",
+            "value": "query_detects"
+          },
+          {
+            "label": "Query Incidents",
+            "value": "query_incidents"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query_hosts",
+            "query_detects",
+            "query_incidents"
+          ]
+        },
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_host"
+          ]
+        },
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query_hosts"
+          ]
+        },
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.crowdstrike"
   },
   "action.cursor": {
     "allow_error": true,
@@ -23482,6 +24327,293 @@
     "tools": null,
     "type": "action.greenhouse"
   },
+  "action.greptile": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "greptile_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Greptile \u2014 natural-language code search over your repos.",
+    "dynamic_outputs_from": null,
+    "icon": "greptile",
+    "inputs": 1,
+    "name": "Greptile",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "greptile_api_key",
+        "label": "Greptile Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "submit_repo",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Submit Repo for Indexing",
+            "value": "submit_repo"
+          },
+          {
+            "label": "Query Code",
+            "value": "query"
+          },
+          {
+            "label": "Search Code",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query",
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_repo"
+          ]
+        },
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_repo"
+          ]
+        },
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_repo"
+          ]
+        },
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query",
+            "search"
+          ]
+        },
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.greptile"
+  },
   "action.gsc": {
     "allow_error": true,
     "category": "integration",
@@ -25153,6 +26285,269 @@
     ],
     "tools": null,
     "type": "action.gtasks"
+  },
+  "action.guardrails": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "guardrails_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Guardrails AI \u2014 validate + repair LLM output against JSON schema.",
+    "dynamic_outputs_from": null,
+    "icon": "guardrails",
+    "inputs": 1,
+    "name": "Guardrails AI",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "guardrails_api_key",
+        "label": "Guardrails AI Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "validate",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Validate LLM Output",
+            "value": "validate"
+          },
+          {
+            "label": "List Guards",
+            "value": "list_guards"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "validate"
+          ]
+        },
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "validate"
+          ]
+        },
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.guardrails"
   },
   "action.gyt": {
     "allow_error": true,
@@ -29629,6 +31024,276 @@
     "tools": null,
     "type": "action.kalshi"
   },
+  "action.ketch": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "ketch_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Ketch \u2014 privacy consent, DSAR (data subject access requests).",
+    "dynamic_outputs_from": null,
+    "icon": "ketch",
+    "inputs": 1,
+    "name": "Ketch",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "ketch_api_key",
+        "label": "Ketch Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_consent",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Consent Config",
+            "value": "get_consent"
+          },
+          {
+            "label": "Create DSAR Request",
+            "value": "create_dsar"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_consent",
+            "create_dsar"
+          ]
+        },
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dsar"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dsar"
+          ]
+        },
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.ketch"
+  },
   "action.klaviyo": {
     "allow_error": true,
     "category": "integration",
@@ -30233,6 +31898,252 @@
     ],
     "tools": null,
     "type": "action.langsmith"
+  },
+  "action.latex": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#008080",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "LaTeX Online \u2014 compile .tex to PDF via a public renderer.",
+    "dynamic_outputs_from": null,
+    "icon": "latex",
+    "inputs": 1,
+    "name": "LaTeX (latexonline.cc)",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "compile_from_source",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Compile from LaTeX Source",
+            "value": "compile_from_source"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "compile_from_source"
+          ]
+        },
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.latex"
   },
   "action.launchdarkly": {
     "allow_error": true,
@@ -31215,6 +33126,534 @@
     ],
     "tools": null,
     "type": "action.linkedin"
+  },
+  "action.linkup": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "linkup_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Linkup \u2014 real-time web search (better recall than SerpAPI).",
+    "dynamic_outputs_from": null,
+    "icon": "linkup",
+    "inputs": 1,
+    "name": "Linkup",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "linkup_api_key",
+        "label": "Linkup Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search",
+            "value": "search"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.linkup"
+  },
+  "action.linq": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "linq_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "LinQ \u2014 enterprise procurement + supplier data.",
+    "dynamic_outputs_from": null,
+    "icon": "linq",
+    "inputs": 1,
+    "name": "LinQ",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "linq_api_key",
+        "label": "LinQ Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "search_suppliers",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search Suppliers",
+            "value": "search_suppliers"
+          },
+          {
+            "label": "Get Supplier",
+            "value": "get_supplier"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_suppliers"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_supplier"
+          ]
+        },
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.linq"
   },
   "action.llm": {
     "allow_error": true,
@@ -37372,6 +39811,279 @@
     "tools": null,
     "type": "action.notion"
   },
+  "action.obsidian": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#7C3AED",
+    "credential_type": "obsidian_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Obsidian Local REST plugin \u2014 vault notes CRUD.",
+    "dynamic_outputs_from": null,
+    "icon": "obsidian",
+    "inputs": 1,
+    "name": "Obsidian Local REST",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "obsidian_api_key",
+        "label": "Obsidian Local REST Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_note",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Note",
+            "value": "get_note"
+          },
+          {
+            "label": "Create / Update Note",
+            "value": "create_or_update"
+          },
+          {
+            "label": "Delete Note",
+            "value": "delete_note"
+          },
+          {
+            "label": "List Files in Vault",
+            "value": "list_files"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_note",
+            "create_or_update",
+            "delete_note"
+          ]
+        },
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_or_update"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.obsidian"
+  },
   "action.okta": {
     "allow_error": true,
     "category": "integration",
@@ -39096,6 +41808,259 @@
     "tools": null,
     "type": "action.persona"
   },
+  "action.pi": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "pi_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Pi \u2014 Inflection AI conversational assistant.",
+    "dynamic_outputs_from": null,
+    "icon": "pi",
+    "inputs": 1,
+    "name": "Pi",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "pi_api_key",
+        "label": "Pi Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "chat",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Chat",
+            "value": "chat"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "chat"
+          ]
+        },
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.pi"
+  },
   "action.pinecone": {
     "allow_error": true,
     "category": "integration",
@@ -40718,6 +43683,268 @@
     "tools": null,
     "type": "action.postmark"
   },
+  "action.profound": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "profound_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Profound \u2014 AI-answer / share-of-voice analytics.",
+    "dynamic_outputs_from": null,
+    "icon": "profound",
+    "inputs": 1,
+    "name": "Profound",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "profound_api_key",
+        "label": "Profound Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_projects",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Get Project Share of Voice",
+            "value": "get_project_share"
+          },
+          {
+            "label": "List AI Answers",
+            "value": "list_answers"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_project_share",
+            "list_answers"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.profound"
+  },
   "action.prospeo": {
     "allow_error": true,
     "category": "integration",
@@ -40938,6 +44165,275 @@
     ],
     "tools": null,
     "type": "action.prospeo"
+  },
+  "action.pulse": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "pulse_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Pulse \u2014 document parsing (PDF \u2192 structured JSON/markdown).",
+    "dynamic_outputs_from": null,
+    "icon": "pulse",
+    "inputs": 1,
+    "name": "Pulse",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "pulse_api_key",
+        "label": "Pulse Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "extract",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Extract Structured Data",
+            "value": "extract"
+          },
+          {
+            "label": "Get Job Status",
+            "value": "get_job"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "extract"
+          ]
+        },
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "extract"
+          ]
+        },
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.pulse"
   },
   "action.qdrant": {
     "allow_error": true,
@@ -41186,6 +44682,274 @@
     ],
     "tools": null,
     "type": "action.qdrant"
+  },
+  "action.quartr": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "quartr_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Quartr \u2014 earnings-call transcripts + investor events.",
+    "dynamic_outputs_from": null,
+    "icon": "quartr",
+    "inputs": 1,
+    "name": "Quartr",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "quartr_api_key",
+        "label": "Quartr Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_company",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Company",
+            "value": "get_company"
+          },
+          {
+            "label": "List Events for Company",
+            "value": "list_events"
+          },
+          {
+            "label": "Get Transcript",
+            "value": "get_transcript"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Table",
+        "name": "table",
+        "type": "string"
+      },
+      {
+        "label": "Record ID",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Data (JSON)",
+        "name": "data",
+        "type": "json"
+      },
+      {
+        "label": "Sync Config ID",
+        "name": "config_id",
+        "type": "string"
+      },
+      {
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "label": "Destination ID",
+        "name": "destination_id",
+        "type": "string"
+      },
+      {
+        "label": "Property ID",
+        "name": "property_id",
+        "type": "string"
+      },
+      {
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "default": "delete",
+        "label": "Right (delete|access|...)",
+        "name": "right",
+        "type": "string"
+      },
+      {
+        "label": "LaTeX Source",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": "standard",
+        "label": "Depth (standard|deep)",
+        "name": "depth",
+        "type": "string"
+      },
+      {
+        "default": "searchResults",
+        "label": "Output Type",
+        "name": "output_type",
+        "type": "string"
+      },
+      {
+        "label": "Supplier ID",
+        "name": "supplier_id",
+        "type": "string"
+      },
+      {
+        "label": "Path",
+        "name": "path",
+        "type": "string"
+      },
+      {
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "File URL",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Schema (JSON)",
+        "name": "schema",
+        "type": "json"
+      },
+      {
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_company",
+            "list_events"
+          ]
+        },
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_transcript"
+          ]
+        },
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "default": "github",
+        "label": "Remote (github|gitlab)",
+        "name": "remote",
+        "type": "string"
+      },
+      {
+        "label": "Repository (owner/repo)",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "default": "main",
+        "label": "Branch",
+        "name": "branch",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Repositories (JSON)",
+        "name": "repositories",
+        "type": "json"
+      },
+      {
+        "label": "Guard Name",
+        "name": "guard_name",
+        "type": "string"
+      },
+      {
+        "label": "LLM Output",
+        "name": "llm_output",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Host IDs (JSON)",
+        "name": "host_ids",
+        "type": "json"
+      },
+      {
+        "default": 50,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.quartr"
   },
   "action.quiver": {
     "allow_error": true,
