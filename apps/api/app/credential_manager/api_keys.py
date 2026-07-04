@@ -2253,6 +2253,35 @@ PROVIDERS = {
             ),
         ],
     ),
+    "google_maps": APIKeyProvider(
+        id="google_maps_api_key",
+        name="Google Maps",
+        icon_slug="google_maps",
+        color="#4285F4",
+        description="Google Maps — geocoding, places, distance matrix.",
+        hint="Google Maps API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Google Maps API key"
+            ),
+        ],
+    ),
+    "google_translate": APIKeyProvider(
+        id="google_translate_api_key",
+        name="Google Translate",
+        icon_slug="google_translate",
+        color="#4285F4",
+        description="Google Translate — translate text between languages.",
+        hint="Google Translate API key",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Google Translate API key",
+            ),
+        ],
+    ),
 }
 
 
