@@ -7976,6 +7976,222 @@
     "tools": null,
     "type": "action.cloudflare"
   },
+  "action.codepipeline": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#232F3E",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS CodePipeline \u2014 start / stop / inspect pipelines.",
+    "dynamic_outputs_from": null,
+    "icon": "codepipeline",
+    "inputs": 1,
+    "name": "AWS CodePipeline",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS CodePipeline Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_pipelines",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Pipelines",
+            "value": "list_pipelines"
+          },
+          {
+            "label": "Get Pipeline State",
+            "value": "get_pipeline_state"
+          },
+          {
+            "label": "Start Pipeline Execution",
+            "value": "start_pipeline_execution"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_pipeline_state",
+            "start_pipeline_execution"
+          ]
+        },
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.codepipeline"
+  },
   "action.confluence": {
     "allow_error": true,
     "category": "integration",
@@ -28974,6 +29190,250 @@
     "tools": null,
     "type": "action.jira_service_management"
   },
+  "action.kalshi": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "kalshi_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Kalshi \u2014 prediction market events, markets, orders.",
+    "dynamic_outputs_from": null,
+    "icon": "kalshi",
+    "inputs": 1,
+    "name": "Kalshi",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "kalshi_api_key",
+        "label": "Kalshi Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_events",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Events",
+            "value": "list_events"
+          },
+          {
+            "label": "List Markets",
+            "value": "list_markets"
+          },
+          {
+            "label": "Get Market",
+            "value": "get_market"
+          },
+          {
+            "label": "Place Order",
+            "value": "place_order"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_markets"
+          ]
+        },
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_market",
+            "place_order"
+          ]
+        },
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "place_order"
+          ]
+        },
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "place_order"
+          ]
+        },
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "place_order"
+          ]
+        },
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.kalshi"
+  },
   "action.klaviyo": {
     "allow_error": true,
     "category": "integration",
@@ -39256,6 +39716,231 @@
     "tools": null,
     "type": "action.plivo"
   },
+  "action.polymarket": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Polymarket \u2014 CLOB markets, orderbook, prices.",
+    "dynamic_outputs_from": null,
+    "icon": "polymarket",
+    "inputs": 1,
+    "name": "Polymarket",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "list_markets",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Markets",
+            "value": "list_markets"
+          },
+          {
+            "label": "Get Market",
+            "value": "get_market"
+          },
+          {
+            "label": "Get Orderbook",
+            "value": "get_orderbook"
+          },
+          {
+            "label": "Get Price",
+            "value": "get_price"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_price"
+          ]
+        },
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_market"
+          ]
+        },
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_orderbook",
+            "get_price"
+          ]
+        },
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.polymarket"
+  },
   "action.postgres": {
     "allow_error": true,
     "category": "integration",
@@ -40307,6 +40992,225 @@
     "tools": null,
     "type": "action.qdrant"
   },
+  "action.quiver": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "quiver_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Quiver \u2014 congressional trades, lobbying, WSB, gov contracts.",
+    "dynamic_outputs_from": null,
+    "icon": "quiver",
+    "inputs": 1,
+    "name": "Quiver Quantitative",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "quiver_api_key",
+        "label": "Quiver Quantitative Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "congress_recent",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Recent Congressional Trades",
+            "value": "congress_recent"
+          },
+          {
+            "label": "Congressional Trades by Ticker",
+            "value": "congress_by_ticker"
+          },
+          {
+            "label": "Recent Lobbying",
+            "value": "lobbying_recent"
+          },
+          {
+            "label": "WSB Top Tickers",
+            "value": "wsb_top"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "congress_by_ticker"
+          ]
+        },
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.quiver"
+  },
   "action.railway": {
     "allow_error": true,
     "category": "integration",
@@ -41357,6 +42261,241 @@
     ],
     "tools": null,
     "type": "action.resend"
+  },
+  "action.revenuecat": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#F71768",
+    "credential_type": "revenuecat_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "RevenueCat \u2014 subscribers, entitlements, offerings.",
+    "dynamic_outputs_from": null,
+    "icon": "revenuecat",
+    "inputs": 1,
+    "name": "RevenueCat",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "revenuecat_api_key",
+        "label": "RevenueCat Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_subscriber",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Subscriber",
+            "value": "get_subscriber"
+          },
+          {
+            "label": "Grant Entitlement",
+            "value": "grant_entitlement"
+          },
+          {
+            "label": "Revoke Promo Entitlement",
+            "value": "revoke_entitlement"
+          },
+          {
+            "label": "Delete Subscriber",
+            "value": "delete_subscriber"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_subscriber",
+            "grant_entitlement",
+            "revoke_entitlement",
+            "delete_subscriber"
+          ]
+        },
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "grant_entitlement",
+            "revoke_entitlement"
+          ]
+        },
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "grant_entitlement"
+          ]
+        },
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.revenuecat"
   },
   "action.rippling": {
     "allow_error": true,
@@ -44678,6 +45817,225 @@
     ],
     "type": "action.slack"
   },
+  "action.sportmonks": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "sportmonks_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "SportMonks \u2014 football (soccer) live scores, fixtures, leagues.",
+    "dynamic_outputs_from": null,
+    "icon": "sportmonks",
+    "inputs": 1,
+    "name": "SportMonks",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "sportmonks_api_key",
+        "label": "SportMonks Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_leagues",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Leagues",
+            "value": "list_leagues"
+          },
+          {
+            "label": "Today's Fixtures",
+            "value": "list_fixtures_today"
+          },
+          {
+            "label": "Get Fixture",
+            "value": "get_fixture"
+          },
+          {
+            "label": "Live Scores",
+            "value": "livescores"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_fixture"
+          ]
+        },
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sportmonks"
+  },
   "action.spotify": {
     "allow_error": true,
     "category": "integration",
@@ -46112,6 +47470,244 @@
     "tools": null,
     "type": "action.supabase"
   },
+  "action.tailscale": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "tailscale_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Tailscale \u2014 devices, tags, ACLs for tailnets.",
+    "dynamic_outputs_from": null,
+    "icon": "tailscale",
+    "inputs": 1,
+    "name": "Tailscale",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "tailscale_api_key",
+        "label": "Tailscale Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_devices",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Devices",
+            "value": "list_devices"
+          },
+          {
+            "label": "Get Device",
+            "value": "get_device"
+          },
+          {
+            "label": "Delete Device",
+            "value": "delete_device"
+          },
+          {
+            "label": "Set Device Tags",
+            "value": "set_device_tags"
+          },
+          {
+            "label": "Get ACL",
+            "value": "get_acl"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_devices",
+            "get_acl"
+          ]
+        },
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_device",
+            "delete_device",
+            "set_device_tags"
+          ]
+        },
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_device_tags"
+          ]
+        },
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.tailscale"
+  },
   "action.tavily": {
     "allow_error": true,
     "category": "integration",
@@ -46787,6 +48383,231 @@
     "tools": null,
     "type": "action.temporal"
   },
+  "action.textract": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#232F3E",
+    "credential_type": "aws_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "AWS Textract \u2014 OCR + form/table extraction for documents.",
+    "dynamic_outputs_from": null,
+    "icon": "textract",
+    "inputs": 1,
+    "name": "AWS Textract",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "aws_credentials",
+        "label": "AWS Textract Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "detect_document_text",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Detect Document Text",
+            "value": "detect_document_text"
+          },
+          {
+            "label": "Analyze Document",
+            "value": "analyze_document"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "detect_document_text",
+            "analyze_document"
+          ]
+        },
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "detect_document_text",
+            "analyze_document"
+          ]
+        },
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "analyze_document"
+          ]
+        },
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.textract"
+  },
   "action.thinking": {
     "allow_error": true,
     "category": "ai",
@@ -47338,6 +49159,234 @@
     ],
     "tools": null,
     "type": "action.trello"
+  },
+  "action.trigger_dev": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "trigger_dev_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Trigger.dev \u2014 trigger background job runs, inspect runs.",
+    "dynamic_outputs_from": null,
+    "icon": "trigger_dev",
+    "inputs": 1,
+    "name": "Trigger.dev",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "trigger_dev_api_key",
+        "label": "Trigger.dev Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "trigger_task",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Trigger Task Run",
+            "value": "trigger_task"
+          },
+          {
+            "label": "Get Run",
+            "value": "get_run"
+          },
+          {
+            "label": "Cancel Run",
+            "value": "cancel_run"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "trigger_task"
+          ]
+        },
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_run",
+            "cancel_run"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "trigger_task"
+          ]
+        },
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.trigger_dev"
   },
   "action.tts": {
     "allow_error": true,
@@ -48214,6 +50263,231 @@
     ],
     "tools": null,
     "type": "action.upstash_redis"
+  },
+  "action.vanta": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "vanta_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Vanta \u2014 compliance controls, findings, security tests.",
+    "dynamic_outputs_from": null,
+    "icon": "vanta",
+    "inputs": 1,
+    "name": "Vanta",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "vanta_api_key",
+        "label": "Vanta Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_controls",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Controls",
+            "value": "list_controls"
+          },
+          {
+            "label": "List Findings",
+            "value": "list_findings"
+          },
+          {
+            "label": "List Tests",
+            "value": "list_tests"
+          },
+          {
+            "label": "Get Test",
+            "value": "get_test"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "-",
+        "label": "Tailnet",
+        "name": "tailnet",
+        "type": "string"
+      },
+      {
+        "label": "Device ID",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Tags (JSON array)",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "label": "S3 Bucket",
+        "name": "s3_bucket",
+        "type": "string"
+      },
+      {
+        "label": "S3 Key",
+        "name": "s3_key",
+        "type": "string"
+      },
+      {
+        "default": [
+          "TABLES",
+          "FORMS"
+        ],
+        "label": "Feature Types (JSON)",
+        "name": "feature_types",
+        "type": "json"
+      },
+      {
+        "label": "Pipeline Name",
+        "name": "pipeline_name",
+        "type": "string"
+      },
+      {
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Payload (JSON)",
+        "name": "payload",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_test"
+          ]
+        },
+        "label": "Test ID",
+        "name": "test_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_findings"
+          ]
+        },
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Event Ticker",
+        "name": "event_ticker",
+        "type": "string"
+      },
+      {
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "label": "Side (yes|no|buy|sell)",
+        "name": "side",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Count",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "default": 50,
+        "label": "Yes Price (\u00a2)",
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "label": "Condition ID",
+        "name": "condition_id",
+        "type": "string"
+      },
+      {
+        "label": "Token ID",
+        "name": "token_id",
+        "type": "string"
+      },
+      {
+        "label": "Fixture ID",
+        "name": "fixture_id",
+        "type": "string"
+      },
+      {
+        "label": "App User ID",
+        "name": "app_user_id",
+        "type": "string"
+      },
+      {
+        "label": "Entitlement ID",
+        "name": "entitlement_id",
+        "type": "string"
+      },
+      {
+        "default": "monthly",
+        "label": "Duration",
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.vanta"
   },
   "action.vercel": {
     "allow_error": true,

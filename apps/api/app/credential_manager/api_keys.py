@@ -2448,6 +2448,100 @@ PROVIDERS = {
             ),
         ],
     ),
+    "tailscale": APIKeyProvider(
+        id="tailscale_api_key",
+        name="Tailscale",
+        icon_slug="tailscale",
+        color="#1c1c1c",
+        description="Tailscale — devices, tags, ACLs for tailnets.",
+        hint="Tailscale API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Tailscale API key"
+            ),
+        ],
+    ),
+    "trigger_dev": APIKeyProvider(
+        id="trigger_dev_api_key",
+        name="Trigger.dev",
+        icon_slug="trigger_dev",
+        color="#1c1c1c",
+        description="Trigger.dev — trigger background job runs, inspect runs.",
+        hint="Trigger.dev API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Trigger.dev API key"
+            ),
+        ],
+    ),
+    "vanta": APIKeyProvider(
+        id="vanta_api_key",
+        name="Vanta",
+        icon_slug="vanta",
+        color="#1c1c1c",
+        description="Vanta — compliance controls, findings, security tests.",
+        hint="Vanta API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Vanta API key"
+            ),
+        ],
+    ),
+    "kalshi": APIKeyProvider(
+        id="kalshi_api_key",
+        name="Kalshi",
+        icon_slug="kalshi",
+        color="#1c1c1c",
+        description="Kalshi — prediction market events, markets, orders.",
+        hint="Kalshi API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Kalshi API key"
+            ),
+        ],
+    ),
+    "quiver": APIKeyProvider(
+        id="quiver_api_key",
+        name="Quiver Quantitative",
+        icon_slug="quiver",
+        color="#1c1c1c",
+        description="Quiver — congressional trades, lobbying, WSB, gov contracts.",
+        hint="Quiver Quantitative API key",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Quiver Quantitative API key",
+            ),
+        ],
+    ),
+    "sportmonks": APIKeyProvider(
+        id="sportmonks_api_key",
+        name="SportMonks",
+        icon_slug="sportmonks",
+        color="#1c1c1c",
+        description="SportMonks — football (soccer) live scores, fixtures, leagues.",
+        hint="SportMonks API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="SportMonks API key"
+            ),
+        ],
+    ),
+    "revenuecat": APIKeyProvider(
+        id="revenuecat_api_key",
+        name="RevenueCat",
+        icon_slug="revenuecat",
+        color="#F71768",
+        description="RevenueCat — subscribers, entitlements, offerings.",
+        hint="RevenueCat API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="RevenueCat API key"
+            ),
+        ],
+    ),
 }
 
 
