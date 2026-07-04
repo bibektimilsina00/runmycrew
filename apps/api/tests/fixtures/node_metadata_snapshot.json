@@ -18861,6 +18861,943 @@
     "tools": null,
     "type": "action.gong"
   },
+  "action.google_ads": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Ads \u2014 campaigns, ad groups, keyword performance.",
+    "dynamic_outputs_from": null,
+    "icon": "google_ads",
+    "inputs": 1,
+    "name": "Google Ads",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "Google Ads Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_customers",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Accessible Customers",
+            "value": "list_customers"
+          },
+          {
+            "label": "Search (GAQL)",
+            "value": "search"
+          },
+          {
+            "label": "Mutate Campaign (raw ops)",
+            "value": "mutate_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "mutate_campaign"
+          ]
+        },
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query / GAQL / SQL",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "mutate_campaign"
+          ]
+        },
+        "default": [],
+        "label": "Operations (JSON array)",
+        "name": "operations",
+        "type": "json"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Table ID",
+        "name": "table_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Rows (JSON array)",
+        "name": "rows",
+        "type": "json"
+      },
+      {
+        "default": false,
+        "label": "Use Legacy SQL",
+        "mode": "advanced",
+        "name": "use_legacy_sql",
+        "type": "boolean"
+      },
+      {
+        "label": "Address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "label": "Lat,Lng",
+        "name": "latlng",
+        "type": "string"
+      },
+      {
+        "label": "Place ID",
+        "name": "place_id",
+        "type": "string"
+      },
+      {
+        "label": "Origins",
+        "name": "origins",
+        "type": "string"
+      },
+      {
+        "label": "Destinations",
+        "name": "destinations",
+        "type": "string"
+      },
+      {
+        "default": "driving",
+        "label": "Mode",
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Target Language",
+        "name": "target",
+        "type": "string"
+      },
+      {
+        "label": "Source Language",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "default": "text",
+        "label": "Format (text|html)",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "label": "Matter ID",
+        "name": "matter_id",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_ads"
+  },
+  "action.google_bigquery": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google BigQuery \u2014 datasets, tables, and SQL queries.",
+    "dynamic_outputs_from": null,
+    "icon": "google_bigquery",
+    "inputs": 1,
+    "name": "Google BigQuery",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "Google BigQuery Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "run_query",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Run Query",
+            "value": "run_query"
+          },
+          {
+            "label": "List Datasets",
+            "value": "list_datasets"
+          },
+          {
+            "label": "List Tables",
+            "value": "list_tables"
+          },
+          {
+            "label": "Get Table Metadata",
+            "value": "get_table"
+          },
+          {
+            "label": "Streaming Insert Rows",
+            "value": "insert_all"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query"
+          ]
+        },
+        "label": "Query / GAQL / SQL",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Operations (JSON array)",
+        "name": "operations",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query",
+            "list_datasets",
+            "list_tables",
+            "get_table",
+            "insert_all"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_tables",
+            "get_table",
+            "insert_all"
+          ]
+        },
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_table",
+            "insert_all"
+          ]
+        },
+        "label": "Table ID",
+        "name": "table_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "insert_all"
+          ]
+        },
+        "default": [],
+        "label": "Rows (JSON array)",
+        "name": "rows",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "run_query"
+          ]
+        },
+        "default": false,
+        "label": "Use Legacy SQL",
+        "mode": "advanced",
+        "name": "use_legacy_sql",
+        "type": "boolean"
+      },
+      {
+        "label": "Address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "label": "Lat,Lng",
+        "name": "latlng",
+        "type": "string"
+      },
+      {
+        "label": "Place ID",
+        "name": "place_id",
+        "type": "string"
+      },
+      {
+        "label": "Origins",
+        "name": "origins",
+        "type": "string"
+      },
+      {
+        "label": "Destinations",
+        "name": "destinations",
+        "type": "string"
+      },
+      {
+        "default": "driving",
+        "label": "Mode",
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Target Language",
+        "name": "target",
+        "type": "string"
+      },
+      {
+        "label": "Source Language",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "default": "text",
+        "label": "Format (text|html)",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "label": "Matter ID",
+        "name": "matter_id",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_bigquery"
+  },
+  "action.google_maps": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "google_maps_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Maps \u2014 geocoding, places, distance matrix.",
+    "dynamic_outputs_from": null,
+    "icon": "google_maps",
+    "inputs": 1,
+    "name": "Google Maps",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_maps_api_key",
+        "label": "Google Maps Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "geocode",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Geocode Address",
+            "value": "geocode"
+          },
+          {
+            "label": "Reverse Geocode",
+            "value": "reverse_geocode"
+          },
+          {
+            "label": "Place Text Search",
+            "value": "place_search"
+          },
+          {
+            "label": "Place Details",
+            "value": "place_details"
+          },
+          {
+            "label": "Distance Matrix",
+            "value": "distance_matrix"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "place_search"
+          ]
+        },
+        "label": "Query / GAQL / SQL",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Operations (JSON array)",
+        "name": "operations",
+        "type": "json"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Table ID",
+        "name": "table_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Rows (JSON array)",
+        "name": "rows",
+        "type": "json"
+      },
+      {
+        "default": false,
+        "label": "Use Legacy SQL",
+        "mode": "advanced",
+        "name": "use_legacy_sql",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "geocode"
+          ]
+        },
+        "label": "Address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "reverse_geocode"
+          ]
+        },
+        "label": "Lat,Lng",
+        "name": "latlng",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "place_details"
+          ]
+        },
+        "label": "Place ID",
+        "name": "place_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "distance_matrix"
+          ]
+        },
+        "label": "Origins",
+        "name": "origins",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "distance_matrix"
+          ]
+        },
+        "label": "Destinations",
+        "name": "destinations",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "distance_matrix"
+          ]
+        },
+        "default": "driving",
+        "label": "Mode",
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Target Language",
+        "name": "target",
+        "type": "string"
+      },
+      {
+        "label": "Source Language",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "default": "text",
+        "label": "Format (text|html)",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "label": "Matter ID",
+        "name": "matter_id",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_maps"
+  },
+  "action.google_meet": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Meet \u2014 meeting spaces + conference records.",
+    "dynamic_outputs_from": null,
+    "icon": "google_meet",
+    "inputs": 1,
+    "name": "Google Meet",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "Google Meet Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_space",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Meeting Space",
+            "value": "create_space"
+          },
+          {
+            "label": "Get Meeting Space",
+            "value": "get_space"
+          },
+          {
+            "label": "End Active Conference",
+            "value": "end_active_conference"
+          },
+          {
+            "label": "List Conference Records",
+            "value": "list_conference_records"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "label": "Query / GAQL / SQL",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Operations (JSON array)",
+        "name": "operations",
+        "type": "json"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Table ID",
+        "name": "table_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Rows (JSON array)",
+        "name": "rows",
+        "type": "json"
+      },
+      {
+        "default": false,
+        "label": "Use Legacy SQL",
+        "mode": "advanced",
+        "name": "use_legacy_sql",
+        "type": "boolean"
+      },
+      {
+        "label": "Address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "label": "Lat,Lng",
+        "name": "latlng",
+        "type": "string"
+      },
+      {
+        "label": "Place ID",
+        "name": "place_id",
+        "type": "string"
+      },
+      {
+        "label": "Origins",
+        "name": "origins",
+        "type": "string"
+      },
+      {
+        "label": "Destinations",
+        "name": "destinations",
+        "type": "string"
+      },
+      {
+        "default": "driving",
+        "label": "Mode",
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_space",
+            "end_active_conference"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_conference_records"
+          ]
+        },
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Target Language",
+        "name": "target",
+        "type": "string"
+      },
+      {
+        "label": "Source Language",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "default": "text",
+        "label": "Format (text|html)",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "label": "Matter ID",
+        "name": "matter_id",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_meet"
+  },
   "action.google_sheets": {
     "allow_error": true,
     "category": "integration",
@@ -19499,6 +20436,460 @@
     ],
     "tools": null,
     "type": "action.google_sheets"
+  },
+  "action.google_translate": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "google_translate_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Translate \u2014 translate text between languages.",
+    "dynamic_outputs_from": null,
+    "icon": "google_translate",
+    "inputs": 1,
+    "name": "Google Translate",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_translate_api_key",
+        "label": "Google Translate Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "translate",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Translate",
+            "value": "translate"
+          },
+          {
+            "label": "Detect Language",
+            "value": "detect"
+          },
+          {
+            "label": "List Supported Languages",
+            "value": "list_languages"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "label": "Query / GAQL / SQL",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Operations (JSON array)",
+        "name": "operations",
+        "type": "json"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Table ID",
+        "name": "table_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Rows (JSON array)",
+        "name": "rows",
+        "type": "json"
+      },
+      {
+        "default": false,
+        "label": "Use Legacy SQL",
+        "mode": "advanced",
+        "name": "use_legacy_sql",
+        "type": "boolean"
+      },
+      {
+        "label": "Address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "label": "Lat,Lng",
+        "name": "latlng",
+        "type": "string"
+      },
+      {
+        "label": "Place ID",
+        "name": "place_id",
+        "type": "string"
+      },
+      {
+        "label": "Origins",
+        "name": "origins",
+        "type": "string"
+      },
+      {
+        "label": "Destinations",
+        "name": "destinations",
+        "type": "string"
+      },
+      {
+        "default": "driving",
+        "label": "Mode",
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "translate",
+            "detect"
+          ]
+        },
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "translate",
+            "list_languages"
+          ]
+        },
+        "label": "Target Language",
+        "name": "target",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "translate"
+          ]
+        },
+        "label": "Source Language",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "translate"
+          ]
+        },
+        "default": "text",
+        "label": "Format (text|html)",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "label": "Matter ID",
+        "name": "matter_id",
+        "type": "string"
+      },
+      {
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_translate"
+  },
+  "action.google_vault": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "google_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "Google Vault \u2014 eDiscovery matters, holds, exports.",
+    "dynamic_outputs_from": null,
+    "icon": "google_vault",
+    "inputs": 1,
+    "name": "Google Vault",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "google_oauth",
+        "label": "Google Vault Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_matters",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Matters",
+            "value": "list_matters"
+          },
+          {
+            "label": "Get Matter",
+            "value": "get_matter"
+          },
+          {
+            "label": "Create Matter",
+            "value": "create_matter"
+          },
+          {
+            "label": "List Holds on Matter",
+            "value": "list_holds"
+          },
+          {
+            "label": "List Exports on Matter",
+            "value": "list_exports"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "label": "Query / GAQL / SQL",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Operations (JSON array)",
+        "name": "operations",
+        "type": "json"
+      },
+      {
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "Dataset ID",
+        "name": "dataset_id",
+        "type": "string"
+      },
+      {
+        "label": "Table ID",
+        "name": "table_id",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Rows (JSON array)",
+        "name": "rows",
+        "type": "json"
+      },
+      {
+        "default": false,
+        "label": "Use Legacy SQL",
+        "mode": "advanced",
+        "name": "use_legacy_sql",
+        "type": "boolean"
+      },
+      {
+        "label": "Address",
+        "name": "address",
+        "type": "string"
+      },
+      {
+        "label": "Lat,Lng",
+        "name": "latlng",
+        "type": "string"
+      },
+      {
+        "label": "Place ID",
+        "name": "place_id",
+        "type": "string"
+      },
+      {
+        "label": "Origins",
+        "name": "origins",
+        "type": "string"
+      },
+      {
+        "label": "Destinations",
+        "name": "destinations",
+        "type": "string"
+      },
+      {
+        "default": "driving",
+        "label": "Mode",
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_matter"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Filter",
+        "name": "filter",
+        "type": "string"
+      },
+      {
+        "label": "Text",
+        "name": "text",
+        "type": "string"
+      },
+      {
+        "label": "Target Language",
+        "name": "target",
+        "type": "string"
+      },
+      {
+        "label": "Source Language",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "default": "text",
+        "label": "Format (text|html)",
+        "name": "format",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_matter",
+            "list_holds",
+            "list_exports"
+          ]
+        },
+        "label": "Matter ID",
+        "name": "matter_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_matter"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.google_vault"
   },
   "action.gpeople": {
     "allow_error": true,

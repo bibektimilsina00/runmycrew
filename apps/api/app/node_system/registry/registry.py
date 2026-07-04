@@ -138,10 +138,18 @@ from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
 from apps.api.app.node_system.nodes.gong.gong_node import GongNode
 from apps.api.app.node_system.nodes.gong.gong_webhook import GongWebhookTriggerNode
+from apps.api.app.node_system.nodes.google_ads.google_ads_node import GoogleAdsNode
+from apps.api.app.node_system.nodes.google_bigquery.google_bigquery_node import GoogleBigQueryNode
+from apps.api.app.node_system.nodes.google_maps.google_maps_node import GoogleMapsNode
+from apps.api.app.node_system.nodes.google_meet.google_meet_node import GoogleMeetNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
 )
+from apps.api.app.node_system.nodes.google_translate.google_translate_node import (
+    GoogleTranslateNode,
+)
+from apps.api.app.node_system.nodes.google_vault.google_vault_node import GoogleVaultNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
 from apps.api.app.node_system.nodes.grafana.grafana_node import GrafanaCloudNode
@@ -654,3 +662,12 @@ node_registry.register(ClerkNode)
 node_registry.register(OnePasswordConnectNode)
 node_registry.register(AWSIdentityCenterNode)
 node_registry.register(InfisicalNode)
+
+
+# Phase 4.26 — Google surface completion (part 1).
+node_registry.register(GoogleAdsNode)
+node_registry.register(GoogleBigQueryNode)
+node_registry.register(GoogleMapsNode)
+node_registry.register(GoogleMeetNode)
+node_registry.register(GoogleTranslateNode)
+node_registry.register(GoogleVaultNode)
