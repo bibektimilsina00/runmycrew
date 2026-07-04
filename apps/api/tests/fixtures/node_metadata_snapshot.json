@@ -981,6 +981,86 @@
           {
             "label": "Get Call Transcript",
             "value": "get_transcript"
+          },
+          {
+            "label": "Purchase Phone Number",
+            "value": "create_number"
+          },
+          {
+            "label": "List Phone Numbers",
+            "value": "list_numbers"
+          },
+          {
+            "label": "Release Phone Number",
+            "value": "release_number"
+          },
+          {
+            "label": "Get Number Messages",
+            "value": "get_number_messages"
+          },
+          {
+            "label": "Create Call",
+            "value": "create_call"
+          },
+          {
+            "label": "Get Call Transcript",
+            "value": "get_call_transcript"
+          },
+          {
+            "label": "List Conversations",
+            "value": "list_conversations"
+          },
+          {
+            "label": "Get Conversation",
+            "value": "get_conversation"
+          },
+          {
+            "label": "Update Conversation",
+            "value": "update_conversation"
+          },
+          {
+            "label": "Get Conversation Messages",
+            "value": "get_conversation_messages"
+          },
+          {
+            "label": "Send Message",
+            "value": "send_message"
+          },
+          {
+            "label": "React to Message",
+            "value": "react_to_message"
+          },
+          {
+            "label": "Create Contact",
+            "value": "create_contact"
+          },
+          {
+            "label": "List Contacts",
+            "value": "list_contacts"
+          },
+          {
+            "label": "Get Contact",
+            "value": "get_contact"
+          },
+          {
+            "label": "Update Contact",
+            "value": "update_contact"
+          },
+          {
+            "label": "Delete Contact",
+            "value": "delete_contact"
+          },
+          {
+            "label": "Get Usage",
+            "value": "get_usage"
+          },
+          {
+            "label": "Get Daily Usage",
+            "value": "get_usage_daily"
+          },
+          {
+            "label": "Get Monthly Usage",
+            "value": "get_usage_monthly"
           }
         ],
         "type": "options"
@@ -991,6 +1071,12 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "react_to_message"
+          ]
+        },
         "label": "Message ID",
         "name": "message_id",
         "type": "string"
@@ -1064,7 +1150,8 @@
           "field": "operation",
           "value": [
             "get_call",
-            "get_transcript"
+            "get_transcript",
+            "get_call_transcript"
           ]
         },
         "label": "Call ID",
@@ -1072,6 +1159,12 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_call"
+          ]
+        },
         "label": "Agent ID",
         "name": "agent_id",
         "type": "string"
@@ -1097,6 +1190,15 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_conversation",
+            "update_conversation",
+            "get_conversation_messages",
+            "send_message"
+          ]
+        },
         "label": "Conversation ID",
         "name": "conversation_id",
         "type": "string"
@@ -1193,6 +1295,111 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_number"
+          ]
+        },
+        "label": "Area Code",
+        "name": "area_code",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "release_number",
+            "get_number_messages"
+          ]
+        },
+        "label": "AgentPhone Number ID",
+        "name": "ap_number_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_call"
+          ]
+        },
+        "label": "From Number",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_call"
+          ]
+        },
+        "label": "To Number",
+        "name": "to_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_conversation"
+          ]
+        },
+        "default": {},
+        "label": "Conversation Body (JSON)",
+        "name": "conversation_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Message Body",
+        "name": "message_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "react_to_message"
+          ]
+        },
+        "label": "Emoji",
+        "name": "emoji",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_contact",
+            "update_contact",
+            "delete_contact"
+          ]
+        },
+        "label": "Contact ID",
+        "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact",
+            "update_contact"
+          ]
+        },
+        "default": {},
+        "label": "Contact Body (JSON)",
+        "name": "contact_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -2965,6 +3172,102 @@
           {
             "label": "Add Contact to Sequence",
             "value": "add_contact_to_sequence"
+          },
+          {
+            "label": "People Search",
+            "value": "people_search"
+          },
+          {
+            "label": "People Enrich",
+            "value": "people_enrich"
+          },
+          {
+            "label": "People Bulk Enrich",
+            "value": "people_bulk_enrich"
+          },
+          {
+            "label": "Organization Search",
+            "value": "organization_search"
+          },
+          {
+            "label": "Organization Enrich",
+            "value": "organization_enrich"
+          },
+          {
+            "label": "Organization Bulk Enrich",
+            "value": "organization_bulk_enrich"
+          },
+          {
+            "label": "Create Contact",
+            "value": "contact_create"
+          },
+          {
+            "label": "Update Contact",
+            "value": "contact_update"
+          },
+          {
+            "label": "Search Contacts",
+            "value": "contact_search"
+          },
+          {
+            "label": "Bulk Create Contacts",
+            "value": "contact_bulk_create"
+          },
+          {
+            "label": "Bulk Update Contacts",
+            "value": "contact_bulk_update"
+          },
+          {
+            "label": "Create Account",
+            "value": "account_create"
+          },
+          {
+            "label": "Update Account",
+            "value": "account_update"
+          },
+          {
+            "label": "Search Accounts",
+            "value": "account_search"
+          },
+          {
+            "label": "Bulk Create Accounts",
+            "value": "account_bulk_create"
+          },
+          {
+            "label": "Create Opportunity",
+            "value": "opportunity_create"
+          },
+          {
+            "label": "Search Opportunities",
+            "value": "opportunity_search"
+          },
+          {
+            "label": "Get Opportunity",
+            "value": "opportunity_get"
+          },
+          {
+            "label": "Update Opportunity",
+            "value": "opportunity_update"
+          },
+          {
+            "label": "Search Sequences",
+            "value": "sequence_search"
+          },
+          {
+            "label": "Add Contact to Sequence",
+            "value": "sequence_add"
+          },
+          {
+            "label": "Create Task",
+            "value": "task_create"
+          },
+          {
+            "label": "Search Tasks",
+            "value": "task_search"
+          },
+          {
+            "label": "List Email Accounts",
+            "value": "email_accounts"
           }
         ],
         "type": "options"
@@ -3058,7 +3361,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "match_person"
+            "match_person",
+            "people_enrich"
           ]
         },
         "label": "Email",
@@ -3070,7 +3374,8 @@
           "field": "operation",
           "value": [
             "match_person",
-            "enrich_organization"
+            "enrich_organization",
+            "organization_enrich"
           ]
         },
         "label": "Domain (for org enrich)",
@@ -3081,7 +3386,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_contact_to_sequence"
+            "add_contact_to_sequence",
+            "sequence_add"
           ]
         },
         "label": "Sequence ID",
@@ -3092,12 +3398,133 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_contact_to_sequence"
+            "add_contact_to_sequence",
+            "contact_update"
           ]
         },
         "label": "Contact ID",
         "name": "contact_id",
         "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "people_search",
+            "organization_search",
+            "contact_search",
+            "account_search",
+            "opportunity_search",
+            "sequence_search",
+            "task_search"
+          ]
+        },
+        "default": {},
+        "label": "Search Body (JSON)",
+        "name": "search_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "people_bulk_enrich",
+            "organization_bulk_enrich",
+            "contact_bulk_create",
+            "contact_bulk_update",
+            "account_bulk_create"
+          ]
+        },
+        "default": [],
+        "label": "Bulk Details (JSON array)",
+        "name": "bulk_details",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "contact_create",
+            "contact_update"
+          ]
+        },
+        "default": {},
+        "label": "Contact Body (JSON)",
+        "name": "contact_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "account_update"
+          ]
+        },
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "account_create",
+            "account_update"
+          ]
+        },
+        "default": {},
+        "label": "Account Body (JSON)",
+        "name": "account_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "opportunity_get",
+            "opportunity_update"
+          ]
+        },
+        "label": "Opportunity ID",
+        "name": "opportunity_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "opportunity_create",
+            "opportunity_update"
+          ]
+        },
+        "default": {},
+        "label": "Opportunity Body (JSON)",
+        "name": "opportunity_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "sequence_add"
+          ]
+        },
+        "default": [],
+        "label": "Contact IDs (JSON array)",
+        "name": "contact_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "task_create"
+          ]
+        },
+        "default": {},
+        "label": "Task Body (JSON)",
+        "name": "task_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -3663,6 +4090,86 @@
           {
             "label": "Get Job Info",
             "value": "get_job"
+          },
+          {
+            "label": "Search Candidates",
+            "value": "search_candidates"
+          },
+          {
+            "label": "Create Note on Candidate",
+            "value": "create_note"
+          },
+          {
+            "label": "List Notes on Candidate",
+            "value": "list_notes"
+          },
+          {
+            "label": "Create Application",
+            "value": "create_application"
+          },
+          {
+            "label": "List Offers",
+            "value": "list_offers"
+          },
+          {
+            "label": "Change Application Stage",
+            "value": "change_application_stage"
+          },
+          {
+            "label": "Add Tag to Candidate",
+            "value": "add_candidate_tag"
+          },
+          {
+            "label": "Remove Tag from Candidate",
+            "value": "remove_candidate_tag"
+          },
+          {
+            "label": "Get Offer",
+            "value": "get_offer"
+          },
+          {
+            "label": "List Sources",
+            "value": "list_sources"
+          },
+          {
+            "label": "List Candidate Tags",
+            "value": "list_candidate_tags"
+          },
+          {
+            "label": "List Archive Reasons",
+            "value": "list_archive_reasons"
+          },
+          {
+            "label": "List Custom Fields",
+            "value": "list_custom_fields"
+          },
+          {
+            "label": "List Departments",
+            "value": "list_departments"
+          },
+          {
+            "label": "List Locations",
+            "value": "list_locations"
+          },
+          {
+            "label": "List Job Postings",
+            "value": "list_job_postings"
+          },
+          {
+            "label": "Get Job Posting",
+            "value": "get_job_posting"
+          },
+          {
+            "label": "List Openings",
+            "value": "list_openings"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "List Interviews",
+            "value": "list_interviews"
           }
         ],
         "type": "options"
@@ -3672,7 +4179,11 @@
           "field": "operation",
           "value": [
             "get_candidate",
-            "update_candidate"
+            "update_candidate",
+            "create_note",
+            "list_notes",
+            "add_candidate_tag",
+            "remove_candidate_tag"
           ]
         },
         "label": "Candidate ID",
@@ -3683,7 +4194,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_application"
+            "get_application",
+            "change_application_stage"
           ]
         },
         "label": "Application ID",
@@ -3825,6 +4337,96 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "default": {},
+        "label": "Candidate Body (JSON)",
+        "name": "candidate_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_candidates"
+          ]
+        },
+        "label": "Candidate Query",
+        "name": "candidate_query",
+        "type": "string"
+      },
+      {
+        "label": "Job ID",
+        "name": "ashby_job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_note"
+          ]
+        },
+        "label": "Note Content",
+        "name": "note_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_application"
+          ]
+        },
+        "default": {},
+        "label": "Application Body (JSON)",
+        "name": "application_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "change_application_stage"
+          ]
+        },
+        "label": "Interview Stage ID",
+        "name": "interview_stage_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_tag",
+            "remove_candidate_tag"
+          ]
+        },
+        "label": "Tag ID",
+        "name": "tag_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_offer"
+          ]
+        },
+        "label": "Offer ID",
+        "name": "offer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job_posting"
+          ]
+        },
+        "label": "Job Posting ID",
+        "name": "job_posting_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -4482,6 +5084,86 @@
           {
             "label": "Start Deployment",
             "value": "start_deployment"
+          },
+          {
+            "label": "Get Configuration",
+            "value": "get_configuration"
+          },
+          {
+            "label": "Create Application",
+            "value": "create_application"
+          },
+          {
+            "label": "Get Application",
+            "value": "get_application"
+          },
+          {
+            "label": "Update Application",
+            "value": "update_application"
+          },
+          {
+            "label": "Delete Application",
+            "value": "delete_application"
+          },
+          {
+            "label": "Create Environment",
+            "value": "create_environment"
+          },
+          {
+            "label": "Get Environment",
+            "value": "get_environment"
+          },
+          {
+            "label": "Update Environment",
+            "value": "update_environment"
+          },
+          {
+            "label": "Delete Environment",
+            "value": "delete_environment"
+          },
+          {
+            "label": "Create Config Profile",
+            "value": "create_configuration_profile"
+          },
+          {
+            "label": "Get Config Profile",
+            "value": "get_configuration_profile"
+          },
+          {
+            "label": "Update Config Profile",
+            "value": "update_configuration_profile"
+          },
+          {
+            "label": "Delete Config Profile",
+            "value": "delete_configuration_profile"
+          },
+          {
+            "label": "Create Hosted Config Version",
+            "value": "create_hosted_configuration_version"
+          },
+          {
+            "label": "List Hosted Config Versions",
+            "value": "list_hosted_configuration_versions"
+          },
+          {
+            "label": "Delete Hosted Config Version",
+            "value": "delete_hosted_configuration_version"
+          },
+          {
+            "label": "List Deployment Strategies",
+            "value": "list_deployment_strategies"
+          },
+          {
+            "label": "Get Deployment",
+            "value": "get_deployment"
+          },
+          {
+            "label": "List Deployments",
+            "value": "list_deployments"
+          },
+          {
+            "label": "Stop Deployment",
+            "value": "stop_deployment"
           }
         ],
         "type": "options"
@@ -4734,7 +5416,25 @@
             "list_environments",
             "list_configuration_profiles",
             "get_hosted_configuration_version",
-            "start_deployment"
+            "start_deployment",
+            "get_configuration",
+            "get_application",
+            "update_application",
+            "delete_application",
+            "create_environment",
+            "get_environment",
+            "update_environment",
+            "delete_environment",
+            "create_configuration_profile",
+            "get_configuration_profile",
+            "update_configuration_profile",
+            "delete_configuration_profile",
+            "create_hosted_configuration_version",
+            "list_hosted_configuration_versions",
+            "delete_hosted_configuration_version",
+            "get_deployment",
+            "list_deployments",
+            "stop_deployment"
           ]
         },
         "label": "Application ID",
@@ -4745,7 +5445,14 @@
         "condition": {
           "field": "operation",
           "value": [
-            "start_deployment"
+            "start_deployment",
+            "get_configuration",
+            "get_environment",
+            "update_environment",
+            "delete_environment",
+            "get_deployment",
+            "list_deployments",
+            "stop_deployment"
           ]
         },
         "label": "Environment ID",
@@ -4757,7 +5464,14 @@
           "field": "operation",
           "value": [
             "get_hosted_configuration_version",
-            "start_deployment"
+            "start_deployment",
+            "get_configuration",
+            "get_configuration_profile",
+            "update_configuration_profile",
+            "delete_configuration_profile",
+            "create_hosted_configuration_version",
+            "list_hosted_configuration_versions",
+            "delete_hosted_configuration_version"
           ]
         },
         "label": "Configuration Profile ID",
@@ -4769,7 +5483,8 @@
           "field": "operation",
           "value": [
             "get_hosted_configuration_version",
-            "start_deployment"
+            "start_deployment",
+            "delete_hosted_configuration_version"
           ]
         },
         "label": "Version Number",
@@ -4828,6 +5543,124 @@
         "label": "Filter",
         "mode": "advanced",
         "name": "filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_application",
+            "update_application"
+          ]
+        },
+        "label": "Application Name",
+        "name": "application_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_application",
+            "update_application"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_environment",
+            "update_environment"
+          ]
+        },
+        "label": "Environment Name",
+        "name": "environment_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_configuration_profile",
+            "update_configuration_profile"
+          ]
+        },
+        "label": "Config Profile Name",
+        "name": "profile_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_configuration_profile"
+          ]
+        },
+        "default": "hosted",
+        "label": "Location URI",
+        "name": "location_uri",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_hosted_configuration_version"
+          ]
+        },
+        "default": {},
+        "label": "Content (JSON)",
+        "name": "content_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_hosted_configuration_version"
+          ]
+        },
+        "default": "application/json",
+        "label": "Content-Type",
+        "name": "content_type_field",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_configuration"
+          ]
+        },
+        "label": "Client ID",
+        "name": "client_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_configuration"
+          ]
+        },
+        "label": "Client Config Version",
+        "name": "client_configuration_version",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_deployment",
+            "stop_deployment"
+          ]
+        },
+        "label": "Deployment Number",
+        "name": "deployment_number",
         "type": "string"
       },
       {
@@ -7402,6 +8235,102 @@
           {
             "label": "List Budgets",
             "value": "list_budgets"
+          },
+          {
+            "label": "Update Expense",
+            "value": "update_expense"
+          },
+          {
+            "label": "Upload Receipt to Expense",
+            "value": "upload_receipt"
+          },
+          {
+            "label": "Match Receipt",
+            "value": "match_receipt"
+          },
+          {
+            "label": "List Card Transactions",
+            "value": "list_card_transactions"
+          },
+          {
+            "label": "List Cash Transactions",
+            "value": "list_cash_transactions"
+          },
+          {
+            "label": "List Card Accounts",
+            "value": "list_card_accounts"
+          },
+          {
+            "label": "List Cash Accounts",
+            "value": "list_cash_accounts"
+          },
+          {
+            "label": "Get Cash Account",
+            "value": "get_cash_account"
+          },
+          {
+            "label": "List Card Statements",
+            "value": "list_card_statements"
+          },
+          {
+            "label": "List Cash Statements",
+            "value": "list_cash_statements"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_current_user"
+          },
+          {
+            "label": "List Departments",
+            "value": "list_departments"
+          },
+          {
+            "label": "List Locations",
+            "value": "list_locations"
+          },
+          {
+            "label": "List Titles",
+            "value": "list_titles"
+          },
+          {
+            "label": "List Cards",
+            "value": "list_cards"
+          },
+          {
+            "label": "Get Company",
+            "value": "get_company"
+          },
+          {
+            "label": "Get Budget",
+            "value": "get_budget"
+          },
+          {
+            "label": "List Spend Limits",
+            "value": "list_spend_limits"
+          },
+          {
+            "label": "Get Spend Limit",
+            "value": "get_spend_limit"
+          },
+          {
+            "label": "List Vendors",
+            "value": "list_vendors"
+          },
+          {
+            "label": "Get Vendor",
+            "value": "get_vendor"
+          },
+          {
+            "label": "List Transfers",
+            "value": "list_transfers"
+          },
+          {
+            "label": "Get Transfer",
+            "value": "get_transfer"
           }
         ],
         "type": "options"
@@ -7417,6 +8346,12 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
         "label": "User ID",
         "name": "user_id",
         "type": "string"
@@ -7445,7 +8380,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_expense"
+            "get_expense",
+            "update_expense",
+            "upload_receipt"
           ]
         },
         "label": "Expense ID",
@@ -7494,6 +8431,85 @@
         "mode": "advanced",
         "name": "offset",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_expense"
+          ]
+        },
+        "default": {},
+        "label": "Expense Body (JSON)",
+        "name": "expense_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upload_receipt",
+            "match_receipt"
+          ]
+        },
+        "label": "Receipt URL",
+        "name": "receipt_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_cash_account"
+          ]
+        },
+        "label": "Account ID",
+        "name": "account_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_budget"
+          ]
+        },
+        "label": "Budget ID",
+        "name": "budget_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_spend_limit"
+          ]
+        },
+        "label": "Spend Limit ID",
+        "name": "spend_limit_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_vendor"
+          ]
+        },
+        "label": "Vendor ID",
+        "name": "vendor_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_transfer"
+          ]
+        },
+        "label": "Transfer ID",
+        "name": "transfer_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -10115,6 +11131,86 @@
           {
             "label": "Get Analytics",
             "value": "get_analytics"
+          },
+          {
+            "label": "Scrape URL as Markdown",
+            "value": "scrape_markdown"
+          },
+          {
+            "label": "Scrape URL as HTML",
+            "value": "scrape_html"
+          },
+          {
+            "label": "Scrape URL Images",
+            "value": "scrape_images"
+          },
+          {
+            "label": "URL Screenshot",
+            "value": "screenshot"
+          },
+          {
+            "label": "Crawl URL",
+            "value": "crawl"
+          },
+          {
+            "label": "Map URL (list links)",
+            "value": "map"
+          },
+          {
+            "label": "Search Web",
+            "value": "search"
+          },
+          {
+            "label": "Extract Structured Data",
+            "value": "extract"
+          },
+          {
+            "label": "Extract Product Data",
+            "value": "extract_product"
+          },
+          {
+            "label": "Extract Multiple Products",
+            "value": "extract_products"
+          },
+          {
+            "label": "Scrape Fonts",
+            "value": "scrape_fonts"
+          },
+          {
+            "label": "Scrape Style Guide",
+            "value": "scrape_styleguide"
+          },
+          {
+            "label": "Classify NAICS",
+            "value": "classify_naics"
+          },
+          {
+            "label": "Classify SIC",
+            "value": "classify_sic"
+          },
+          {
+            "label": "Get Brand by Domain",
+            "value": "get_brand"
+          },
+          {
+            "label": "Get Brand by Name",
+            "value": "get_brand_by_name"
+          },
+          {
+            "label": "Get Brand by Email",
+            "value": "get_brand_by_email"
+          },
+          {
+            "label": "Get Brand by Ticker",
+            "value": "get_brand_by_ticker"
+          },
+          {
+            "label": "Get Brand (simplified)",
+            "value": "get_brand_simplified"
+          },
+          {
+            "label": "Identify Transaction",
+            "value": "identify_transaction"
           }
         ],
         "type": "options"
@@ -10155,6 +11251,13 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_brand",
+            "get_brand_simplified"
+          ]
+        },
         "label": "Domain",
         "name": "domain",
         "type": "string"
@@ -10255,6 +11358,21 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "scrape_markdown",
+            "scrape_html",
+            "scrape_images",
+            "screenshot",
+            "crawl",
+            "map",
+            "extract",
+            "extract_product",
+            "scrape_fonts",
+            "scrape_styleguide"
+          ]
+        },
         "label": "URL",
         "name": "url",
         "type": "string"
@@ -10265,6 +11383,14 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search",
+            "classify_naics",
+            "classify_sic"
+          ]
+        },
         "label": "Query",
         "name": "query",
         "type": "string"
@@ -10320,6 +11446,87 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "crawl"
+          ]
+        },
+        "default": {},
+        "label": "Crawl Options (JSON)",
+        "name": "crawl_options",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "extract"
+          ]
+        },
+        "default": {},
+        "label": "Extract Schema (JSON)",
+        "name": "extract_schema",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "extract_products"
+          ]
+        },
+        "default": [],
+        "label": "URLs (JSON array)",
+        "name": "urls",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_brand_by_name"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_brand_by_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_brand_by_ticker"
+          ]
+        },
+        "label": "Ticker",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "identify_transaction"
+          ]
+        },
+        "default": {},
+        "label": "Transaction Body (JSON)",
+        "name": "transaction_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -11385,6 +12592,78 @@
           {
             "label": "Launch Run",
             "value": "launch_run"
+          },
+          {
+            "label": "Get Run",
+            "value": "get_run"
+          },
+          {
+            "label": "Get Run Logs",
+            "value": "get_run_logs"
+          },
+          {
+            "label": "List Runs",
+            "value": "list_runs"
+          },
+          {
+            "label": "List Jobs",
+            "value": "list_jobs"
+          },
+          {
+            "label": "Re-execute Run",
+            "value": "reexecute_run"
+          },
+          {
+            "label": "Terminate Run",
+            "value": "terminate_run"
+          },
+          {
+            "label": "Delete Run",
+            "value": "delete_run"
+          },
+          {
+            "label": "List Schedules",
+            "value": "list_schedules"
+          },
+          {
+            "label": "Start Schedule",
+            "value": "start_schedule"
+          },
+          {
+            "label": "Stop Schedule",
+            "value": "stop_schedule"
+          },
+          {
+            "label": "List Sensors",
+            "value": "list_sensors"
+          },
+          {
+            "label": "Start Sensor",
+            "value": "start_sensor"
+          },
+          {
+            "label": "Stop Sensor",
+            "value": "stop_sensor"
+          },
+          {
+            "label": "List Assets",
+            "value": "list_assets"
+          },
+          {
+            "label": "Get Asset",
+            "value": "get_asset"
+          },
+          {
+            "label": "Materialize Assets",
+            "value": "materialize_assets"
+          },
+          {
+            "label": "Report Asset Materialization",
+            "value": "report_asset_materialization"
+          },
+          {
+            "label": "Wipe Asset",
+            "value": "wipe_asset"
           }
         ],
         "type": "options"
@@ -11499,6 +12778,75 @@
         "mode": "advanced",
         "name": "page_size",
         "type": "number"
+      },
+      {
+        "label": "Job Name",
+        "name": "job_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_run",
+            "get_run_logs",
+            "reexecute_run",
+            "terminate_run",
+            "delete_run"
+          ]
+        },
+        "label": "Run ID",
+        "name": "run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_schedule",
+            "stop_schedule"
+          ]
+        },
+        "label": "Schedule Name",
+        "name": "schedule_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "start_sensor",
+            "stop_sensor"
+          ]
+        },
+        "label": "Sensor Name",
+        "name": "sensor_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_asset",
+            "report_asset_materialization",
+            "wipe_asset"
+          ]
+        },
+        "label": "Asset Key (slash-separated)",
+        "name": "asset_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "materialize_assets"
+          ]
+        },
+        "default": [],
+        "label": "Asset Keys (JSON array)",
+        "name": "asset_keys",
+        "type": "json"
       },
       {
         "default": 0,
@@ -27406,6 +28754,94 @@
           {
             "label": "List Alert Rules",
             "value": "list_alerts"
+          },
+          {
+            "label": "Create/Update Dashboard",
+            "value": "create_dashboard"
+          },
+          {
+            "label": "Update Dashboard",
+            "value": "update_dashboard"
+          },
+          {
+            "label": "Delete Dashboard",
+            "value": "delete_dashboard"
+          },
+          {
+            "label": "List Alert Rules",
+            "value": "list_alert_rules"
+          },
+          {
+            "label": "Get Alert Rule",
+            "value": "get_alert_rule"
+          },
+          {
+            "label": "Create Alert Rule",
+            "value": "create_alert_rule"
+          },
+          {
+            "label": "Update Alert Rule",
+            "value": "update_alert_rule"
+          },
+          {
+            "label": "Delete Alert Rule",
+            "value": "delete_alert_rule"
+          },
+          {
+            "label": "List Contact Points",
+            "value": "list_contact_points"
+          },
+          {
+            "label": "Create Contact Point",
+            "value": "create_contact_point"
+          },
+          {
+            "label": "List Annotations",
+            "value": "list_annotations"
+          },
+          {
+            "label": "Update Annotation",
+            "value": "update_annotation"
+          },
+          {
+            "label": "Delete Annotation",
+            "value": "delete_annotation"
+          },
+          {
+            "label": "List Data Sources",
+            "value": "list_data_sources"
+          },
+          {
+            "label": "Get Data Source",
+            "value": "get_data_source"
+          },
+          {
+            "label": "Check Data Source Health",
+            "value": "check_data_source_health"
+          },
+          {
+            "label": "List Folders",
+            "value": "list_folders"
+          },
+          {
+            "label": "Create Folder",
+            "value": "create_folder"
+          },
+          {
+            "label": "Get Folder",
+            "value": "get_folder"
+          },
+          {
+            "label": "Update Folder",
+            "value": "update_folder"
+          },
+          {
+            "label": "Delete Folder",
+            "value": "delete_folder"
+          },
+          {
+            "label": "Get Grafana Health",
+            "value": "get_health"
           }
         ],
         "type": "options"
@@ -27498,7 +28934,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_dashboard"
+            "get_dashboard",
+            "delete_dashboard"
           ]
         },
         "label": "Dashboard UID",
@@ -27567,6 +29004,134 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "label": "Search Query",
+        "name": "dashboard_query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dashboard",
+            "update_dashboard"
+          ]
+        },
+        "default": {},
+        "label": "Dashboard Body (JSON)",
+        "name": "dashboard_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_alert_rule",
+            "update_alert_rule",
+            "delete_alert_rule"
+          ]
+        },
+        "label": "Alert Rule UID",
+        "name": "alert_rule_uid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_alert_rule",
+            "update_alert_rule"
+          ]
+        },
+        "default": {},
+        "label": "Alert Rule Body (JSON)",
+        "name": "alert_rule_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_contact_point"
+          ]
+        },
+        "default": {},
+        "label": "Contact Point Body (JSON)",
+        "name": "contact_point_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_annotation",
+            "delete_annotation"
+          ]
+        },
+        "label": "Annotation ID",
+        "name": "annotation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_annotation"
+          ]
+        },
+        "default": {},
+        "label": "Annotation Body (JSON)",
+        "name": "annotation_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_data_source"
+          ]
+        },
+        "label": "Datasource ID",
+        "name": "datasource_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "check_data_source_health"
+          ]
+        },
+        "label": "Datasource UID",
+        "name": "datasource_uid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_folder",
+            "update_folder",
+            "delete_folder"
+          ]
+        },
+        "label": "Folder UID",
+        "name": "folder_uid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_folder",
+            "update_folder"
+          ]
+        },
+        "default": {},
+        "label": "Folder Body (JSON)",
+        "name": "folder_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -36452,6 +38017,74 @@
           {
             "label": "Place Order",
             "value": "place_order"
+          },
+          {
+            "label": "Get Portfolio Balance",
+            "value": "get_balance"
+          },
+          {
+            "label": "Get Positions",
+            "value": "get_positions"
+          },
+          {
+            "label": "Get Orders",
+            "value": "get_orders"
+          },
+          {
+            "label": "Get Order",
+            "value": "get_order"
+          },
+          {
+            "label": "Cancel Order",
+            "value": "cancel_order"
+          },
+          {
+            "label": "Amend Order",
+            "value": "amend_order"
+          },
+          {
+            "label": "Get Orderbook",
+            "value": "get_orderbook"
+          },
+          {
+            "label": "Get Trades",
+            "value": "get_trades"
+          },
+          {
+            "label": "Get Market Candlesticks",
+            "value": "get_candlesticks"
+          },
+          {
+            "label": "Get Event Candlesticks",
+            "value": "get_event_candlesticks"
+          },
+          {
+            "label": "Get Fills",
+            "value": "get_fills"
+          },
+          {
+            "label": "Get Settlements",
+            "value": "get_settlements"
+          },
+          {
+            "label": "Get Series by Ticker",
+            "value": "get_series_by_ticker"
+          },
+          {
+            "label": "List Series",
+            "value": "get_series_list"
+          },
+          {
+            "label": "Get Exchange Status",
+            "value": "get_exchange_status"
+          },
+          {
+            "label": "Get Exchange Schedule",
+            "value": "get_exchange_schedule"
+          },
+          {
+            "label": "Get Exchange Announcements",
+            "value": "get_exchange_announcements"
           }
         ],
         "type": "options"
@@ -36527,7 +38160,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_markets"
+            "list_markets",
+            "get_event_candlesticks"
           ]
         },
         "label": "Event Ticker",
@@ -36539,7 +38173,10 @@
           "field": "operation",
           "value": [
             "get_market",
-            "place_order"
+            "place_order",
+            "get_orderbook",
+            "get_trades",
+            "get_candlesticks"
           ]
         },
         "label": "Ticker",
@@ -36561,7 +38198,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "place_order"
+            "place_order",
+            "amend_order"
           ]
         },
         "default": 1,
@@ -36573,7 +38211,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "place_order"
+            "place_order",
+            "amend_order"
           ]
         },
         "default": 50,
@@ -36610,6 +38249,30 @@
         "default": "monthly",
         "label": "Duration",
         "name": "duration",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_order",
+            "cancel_order",
+            "amend_order"
+          ]
+        },
+        "label": "Order ID",
+        "name": "order_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_series_by_ticker"
+          ]
+        },
+        "label": "Series Ticker",
+        "name": "series_ticker",
         "type": "string"
       },
       {
@@ -49656,6 +51319,94 @@
           {
             "label": "Get Account",
             "value": "get_account"
+          },
+          {
+            "label": "Create Inquiry",
+            "value": "create_inquiry"
+          },
+          {
+            "label": "Update Inquiry",
+            "value": "update_inquiry"
+          },
+          {
+            "label": "Approve Inquiry",
+            "value": "approve_inquiry"
+          },
+          {
+            "label": "Decline Inquiry",
+            "value": "decline_inquiry"
+          },
+          {
+            "label": "Mark Inquiry for Review",
+            "value": "mark_inquiry_for_review"
+          },
+          {
+            "label": "Resume Inquiry",
+            "value": "resume_inquiry"
+          },
+          {
+            "label": "Expire Inquiry",
+            "value": "expire_inquiry"
+          },
+          {
+            "label": "Generate Inquiry Link",
+            "value": "generate_inquiry_link"
+          },
+          {
+            "label": "Print Inquiry PDF",
+            "value": "print_inquiry_pdf"
+          },
+          {
+            "label": "Redact Inquiry",
+            "value": "redact_inquiry"
+          },
+          {
+            "label": "Create Account",
+            "value": "create_account"
+          },
+          {
+            "label": "List Accounts",
+            "value": "list_accounts"
+          },
+          {
+            "label": "Update Account",
+            "value": "update_account"
+          },
+          {
+            "label": "Import Accounts",
+            "value": "import_accounts"
+          },
+          {
+            "label": "Redact Account",
+            "value": "redact_account"
+          },
+          {
+            "label": "List Cases",
+            "value": "list_cases"
+          },
+          {
+            "label": "Get Case",
+            "value": "get_case"
+          },
+          {
+            "label": "Create Report",
+            "value": "create_report"
+          },
+          {
+            "label": "Get Report",
+            "value": "get_report"
+          },
+          {
+            "label": "List Reports",
+            "value": "list_reports"
+          },
+          {
+            "label": "Get Document",
+            "value": "get_document"
+          },
+          {
+            "label": "List Inquiry Templates",
+            "value": "list_inquiry_templates"
           }
         ],
         "type": "options"
@@ -49740,7 +51491,16 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_inquiry"
+            "get_inquiry",
+            "update_inquiry",
+            "approve_inquiry",
+            "decline_inquiry",
+            "mark_inquiry_for_review",
+            "resume_inquiry",
+            "expire_inquiry",
+            "generate_inquiry_link",
+            "print_inquiry_pdf",
+            "redact_inquiry"
           ]
         },
         "label": "Inquiry ID",
@@ -49762,7 +51522,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_account"
+            "get_account",
+            "update_account",
+            "redact_account"
           ]
         },
         "label": "Account ID",
@@ -49782,6 +51544,89 @@
       {
         "label": "End Date (YYYY-MM)",
         "name": "end_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_inquiry",
+            "update_inquiry"
+          ]
+        },
+        "default": {},
+        "label": "Inquiry Attributes (JSON)",
+        "name": "inquiry_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_account",
+            "update_account"
+          ]
+        },
+        "default": {},
+        "label": "Account Attributes (JSON)",
+        "name": "account_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "import_accounts"
+          ]
+        },
+        "default": {},
+        "label": "Import Body (JSON)",
+        "name": "import_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_case"
+          ]
+        },
+        "label": "Case ID",
+        "name": "case_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_report"
+          ]
+        },
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_report"
+          ]
+        },
+        "default": {},
+        "label": "Report Attributes (JSON)",
+        "name": "report_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_document"
+          ]
+        },
+        "label": "Document ID",
+        "name": "document_id",
         "type": "string"
       },
       {
@@ -52033,6 +53878,102 @@
           {
             "label": "List AI Answers",
             "value": "list_answers"
+          },
+          {
+            "label": "List Categories",
+            "value": "list_categories"
+          },
+          {
+            "label": "List Regions",
+            "value": "list_regions"
+          },
+          {
+            "label": "List Models",
+            "value": "list_models"
+          },
+          {
+            "label": "List Domains",
+            "value": "list_domains"
+          },
+          {
+            "label": "List Assets",
+            "value": "list_assets"
+          },
+          {
+            "label": "List Personas",
+            "value": "list_personas"
+          },
+          {
+            "label": "Category Topics",
+            "value": "category_topics"
+          },
+          {
+            "label": "Category Tags",
+            "value": "category_tags"
+          },
+          {
+            "label": "Category Prompts",
+            "value": "category_prompts"
+          },
+          {
+            "label": "Category Assets",
+            "value": "category_assets"
+          },
+          {
+            "label": "Category Personas",
+            "value": "category_personas"
+          },
+          {
+            "label": "Visibility Report",
+            "value": "visibility_report"
+          },
+          {
+            "label": "Sentiment Report",
+            "value": "sentiment_report"
+          },
+          {
+            "label": "Citations Report",
+            "value": "citations_report"
+          },
+          {
+            "label": "Query Fanouts",
+            "value": "query_fanouts"
+          },
+          {
+            "label": "Prompt Answers",
+            "value": "prompt_answers"
+          },
+          {
+            "label": "Bots Report",
+            "value": "bots_report"
+          },
+          {
+            "label": "Referrals Report",
+            "value": "referrals_report"
+          },
+          {
+            "label": "Raw Logs",
+            "value": "raw_logs"
+          },
+          {
+            "label": "Bot Logs",
+            "value": "bot_logs"
+          },
+          {
+            "label": "List Optimizations",
+            "value": "list_optimizations"
+          },
+          {
+            "label": "Optimization Analysis",
+            "value": "optimization_analysis"
+          },
+          {
+            "label": "Prompt Volume",
+            "value": "prompt_volume"
+          },
+          {
+            "label": "Citation Prompts",
+            "value": "citation_prompts"
           }
         ],
         "type": "options"
@@ -52064,6 +54005,12 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query_fanouts"
+          ]
+        },
         "label": "Query Text",
         "name": "query_text",
         "type": "string"
@@ -52214,6 +54161,43 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "category_topics",
+            "category_tags",
+            "category_prompts",
+            "category_assets",
+            "category_personas"
+          ]
+        },
+        "label": "Category ID",
+        "name": "category_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "prompt_answers"
+          ]
+        },
+        "label": "Prompt ID",
+        "name": "prompt_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "optimization_analysis"
+          ]
+        },
+        "label": "Optimization ID",
+        "name": "optimization_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -53516,6 +55500,86 @@
           {
             "label": "GraphQL Query",
             "value": "gql"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          },
+          {
+            "label": "Get Project",
+            "value": "get_project"
+          },
+          {
+            "label": "Create Project",
+            "value": "create_project"
+          },
+          {
+            "label": "Delete Project",
+            "value": "delete_project"
+          },
+          {
+            "label": "Create Environment",
+            "value": "create_environment"
+          },
+          {
+            "label": "Delete Environment",
+            "value": "delete_environment"
+          },
+          {
+            "label": "Create Service",
+            "value": "create_service"
+          },
+          {
+            "label": "Delete Service",
+            "value": "delete_service"
+          },
+          {
+            "label": "List Deployments",
+            "value": "list_deployments"
+          },
+          {
+            "label": "Get Deployment",
+            "value": "get_deployment"
+          },
+          {
+            "label": "Deploy Service",
+            "value": "deploy_service"
+          },
+          {
+            "label": "Restart Deployment",
+            "value": "restart_deployment"
+          },
+          {
+            "label": "Rollback Deployment",
+            "value": "rollback_deployment"
+          },
+          {
+            "label": "Get Deployment Logs",
+            "value": "get_deployment_logs"
+          },
+          {
+            "label": "List Variables",
+            "value": "list_variables"
+          },
+          {
+            "label": "Upsert Variable",
+            "value": "upsert_variable"
+          },
+          {
+            "label": "Delete Variable",
+            "value": "delete_variable"
+          },
+          {
+            "label": "List Project Members",
+            "value": "list_project_members"
+          },
+          {
+            "label": "Transfer Project",
+            "value": "transfer_project"
+          },
+          {
+            "label": "Update Project",
+            "value": "update_project"
           }
         ],
         "type": "options"
@@ -53548,6 +55612,12 @@
         "type": "json"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "transfer_project"
+          ]
+        },
         "label": "Workspace ID",
         "name": "workspace_id",
         "type": "string"
@@ -53624,6 +55694,139 @@
         "mode": "advanced",
         "name": "page_size",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_projects"
+          ]
+        },
+        "label": "GraphQL Query",
+        "name": "gql_query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_project",
+            "delete_project",
+            "create_environment",
+            "create_service",
+            "list_variables",
+            "upsert_variable",
+            "delete_variable",
+            "list_project_members",
+            "transfer_project",
+            "update_project"
+          ]
+        },
+        "label": "Project ID",
+        "name": "project_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_project",
+            "update_project"
+          ]
+        },
+        "label": "Project Name",
+        "name": "project_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_environment",
+            "deploy_service",
+            "list_variables",
+            "upsert_variable",
+            "delete_variable"
+          ]
+        },
+        "label": "Environment ID",
+        "name": "environment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_environment"
+          ]
+        },
+        "label": "Environment Name",
+        "name": "environment_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_service",
+            "list_deployments",
+            "deploy_service",
+            "list_variables",
+            "upsert_variable",
+            "delete_variable"
+          ]
+        },
+        "label": "Service ID",
+        "name": "service_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_service"
+          ]
+        },
+        "label": "Service Name",
+        "name": "service_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_deployment",
+            "restart_deployment",
+            "rollback_deployment",
+            "get_deployment_logs"
+          ]
+        },
+        "label": "Deployment ID",
+        "name": "deployment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upsert_variable",
+            "delete_variable"
+          ]
+        },
+        "label": "Variable Name",
+        "name": "var_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upsert_variable"
+          ]
+        },
+        "label": "Variable Value",
+        "name": "var_value",
+        "type": "string"
       },
       {
         "default": 0,
@@ -62861,6 +65064,94 @@
           {
             "label": "Delete Rows",
             "value": "delete_rows"
+          },
+          {
+            "label": "Query Rows (Select)",
+            "value": "query"
+          },
+          {
+            "label": "Get Row by ID",
+            "value": "get_row"
+          },
+          {
+            "label": "Insert Row(s)",
+            "value": "insert"
+          },
+          {
+            "label": "Update Rows",
+            "value": "update"
+          },
+          {
+            "label": "Delete Rows",
+            "value": "delete"
+          },
+          {
+            "label": "Upsert Row(s)",
+            "value": "upsert"
+          },
+          {
+            "label": "Count Rows",
+            "value": "count"
+          },
+          {
+            "label": "Full-text Search",
+            "value": "text_search"
+          },
+          {
+            "label": "Call RPC Function",
+            "value": "rpc"
+          },
+          {
+            "label": "Invoke Edge Function",
+            "value": "invoke_function"
+          },
+          {
+            "label": "Introspect Schema (via OpenAPI)",
+            "value": "introspect"
+          },
+          {
+            "label": "Upload to Storage",
+            "value": "storage_upload"
+          },
+          {
+            "label": "Download from Storage",
+            "value": "storage_download"
+          },
+          {
+            "label": "List Storage Objects",
+            "value": "storage_list"
+          },
+          {
+            "label": "Delete Storage Object",
+            "value": "storage_delete"
+          },
+          {
+            "label": "Move Storage Object",
+            "value": "storage_move"
+          },
+          {
+            "label": "Copy Storage Object",
+            "value": "storage_copy"
+          },
+          {
+            "label": "Get Public Storage URL",
+            "value": "storage_get_public_url"
+          },
+          {
+            "label": "Create Signed URL",
+            "value": "storage_create_signed_url"
+          },
+          {
+            "label": "Create Storage Bucket",
+            "value": "storage_create_bucket"
+          },
+          {
+            "label": "List Storage Buckets",
+            "value": "storage_list_buckets"
+          },
+          {
+            "label": "Delete Storage Bucket",
+            "value": "storage_delete_bucket"
           }
         ],
         "type": "options"
@@ -62925,7 +65216,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "select_rows"
+            "select_rows",
+            "query"
           ]
         },
         "default": "*",
@@ -62958,6 +65250,228 @@
         "mode": "advanced",
         "name": "order",
         "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query",
+            "get_row",
+            "insert",
+            "update",
+            "delete",
+            "upsert",
+            "count",
+            "text_search"
+          ]
+        },
+        "label": "Table Name",
+        "name": "sb_table",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_row"
+          ]
+        },
+        "label": "Row ID",
+        "name": "row_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "insert",
+            "update",
+            "upsert"
+          ]
+        },
+        "default": {},
+        "label": "Row Body (JSON)",
+        "name": "row_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "select_rows",
+            "query"
+          ]
+        },
+        "default": "*",
+        "label": "Select Fields",
+        "name": "select",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query",
+            "update",
+            "delete"
+          ]
+        },
+        "label": "Filter (PostgREST syntax)",
+        "name": "sb_filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_search"
+          ]
+        },
+        "label": "Search Column",
+        "name": "search_column",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "text_search"
+          ]
+        },
+        "label": "Search Query",
+        "name": "search_query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "rpc",
+            "invoke_function"
+          ]
+        },
+        "label": "Function Name",
+        "name": "function_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "rpc"
+          ]
+        },
+        "default": {},
+        "label": "RPC Args (JSON)",
+        "name": "rpc_args",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "invoke_function"
+          ]
+        },
+        "default": {},
+        "label": "Invoke Body (JSON)",
+        "name": "invoke_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_upload",
+            "storage_download",
+            "storage_list",
+            "storage_delete",
+            "storage_move",
+            "storage_copy",
+            "storage_get_public_url",
+            "storage_create_signed_url",
+            "storage_create_bucket",
+            "storage_delete_bucket"
+          ]
+        },
+        "label": "Bucket Name",
+        "name": "bucket_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_upload",
+            "storage_download",
+            "storage_delete",
+            "storage_move",
+            "storage_copy",
+            "storage_get_public_url",
+            "storage_create_signed_url"
+          ]
+        },
+        "label": "Storage Path",
+        "name": "storage_path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_list"
+          ]
+        },
+        "label": "Storage Prefix",
+        "name": "storage_prefix",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_move",
+            "storage_copy"
+          ]
+        },
+        "label": "Storage Destination Key",
+        "name": "storage_destination",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_upload"
+          ]
+        },
+        "label": "File Content (base64/bytes)",
+        "name": "file_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_create_signed_url"
+          ]
+        },
+        "default": 3600,
+        "label": "Signed URL Expiry (seconds)",
+        "name": "expires_in",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "storage_create_bucket"
+          ]
+        },
+        "default": false,
+        "label": "Public Bucket",
+        "name": "bucket_public",
+        "type": "boolean"
       },
       {
         "default": 0,
@@ -69003,11 +71517,97 @@
           {
             "label": "List Pages",
             "value": "list_pages"
+          },
+          {
+            "label": "Create Page",
+            "value": "create_page"
+          },
+          {
+            "label": "Update Page",
+            "value": "update_page"
+          },
+          {
+            "label": "Delete Page",
+            "value": "delete_page"
+          },
+          {
+            "label": "Get Page",
+            "value": "get_page"
+          },
+          {
+            "label": "Upload Media (URL fetch)",
+            "value": "upload_media"
+          },
+          {
+            "label": "Get Media",
+            "value": "get_media"
+          },
+          {
+            "label": "List Media",
+            "value": "list_media"
+          },
+          {
+            "label": "Delete Media",
+            "value": "delete_media"
+          },
+          {
+            "label": "Create Comment",
+            "value": "create_comment"
+          },
+          {
+            "label": "List Comments",
+            "value": "list_comments"
+          },
+          {
+            "label": "Update Comment",
+            "value": "update_comment"
+          },
+          {
+            "label": "Delete Comment",
+            "value": "delete_comment"
+          },
+          {
+            "label": "Create Category",
+            "value": "create_category"
+          },
+          {
+            "label": "List Categories",
+            "value": "list_categories"
+          },
+          {
+            "label": "Create Tag",
+            "value": "create_tag"
+          },
+          {
+            "label": "List Tags",
+            "value": "list_tags"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_current_user"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "Search Content",
+            "value": "search_content"
           }
         ],
         "type": "options"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_content"
+          ]
+        },
         "label": "Query",
         "name": "query",
         "type": "string"
@@ -69045,7 +71645,9 @@
           "value": [
             "get_post",
             "update_post",
-            "delete_post"
+            "delete_post",
+            "create_comment",
+            "list_comments"
           ]
         },
         "label": "Post ID",
@@ -69057,7 +71659,10 @@
           "field": "operation",
           "value": [
             "create_post",
-            "update_post"
+            "update_post",
+            "create_page",
+            "update_page",
+            "upload_media"
           ]
         },
         "label": "Title",
@@ -69069,7 +71674,9 @@
           "field": "operation",
           "value": [
             "create_post",
-            "update_post"
+            "update_post",
+            "create_page",
+            "update_page"
           ]
         },
         "label": "Content (HTML)",
@@ -69082,7 +71689,9 @@
           "value": [
             "list_posts",
             "create_post",
-            "update_post"
+            "update_post",
+            "create_page",
+            "update_page"
           ]
         },
         "default": "draft",
@@ -69094,7 +71703,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_posts"
+            "list_posts",
+            "list_media"
           ]
         },
         "default": 10,
@@ -69163,6 +71773,12 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
         "label": "User ID",
         "name": "user_id",
         "type": "string"
@@ -69242,6 +71858,110 @@
       {
         "label": "Generation ID",
         "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_page",
+            "delete_page",
+            "get_page"
+          ]
+        },
+        "label": "Page ID",
+        "name": "page_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_media",
+            "delete_media"
+          ]
+        },
+        "label": "Media ID",
+        "name": "media_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upload_media"
+          ]
+        },
+        "label": "Media Source URL",
+        "name": "media_source_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_comment",
+            "delete_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_comment",
+            "update_comment"
+          ]
+        },
+        "label": "Comment Content",
+        "name": "comment_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_comment"
+          ]
+        },
+        "label": "Author Name",
+        "name": "author_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_comment"
+          ]
+        },
+        "label": "Author Email",
+        "name": "author_email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_category"
+          ]
+        },
+        "label": "Category Name",
+        "name": "category_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_tag"
+          ]
+        },
+        "label": "Tag Name",
+        "name": "tag_name",
         "type": "string"
       },
       {
