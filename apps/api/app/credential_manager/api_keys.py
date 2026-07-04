@@ -2282,6 +2282,35 @@ PROVIDERS = {
             ),
         ],
     ),
+    "google_pagespeed": APIKeyProvider(
+        id="google_pagespeed_api_key",
+        name="Google PageSpeed Insights",
+        icon_slug="google_pagespeed",
+        color="#4285F4",
+        description="PageSpeed Insights — Lighthouse audits for a URL.",
+        hint="Google PageSpeed Insights API key",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Google PageSpeed Insights API key",
+            ),
+        ],
+    ),
+    "google_books": APIKeyProvider(
+        id="google_books_api_key",
+        name="Google Books",
+        icon_slug="google_books",
+        color="#4285F4",
+        description="Google Books — search + fetch volume metadata.",
+        hint="Google Books API key",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Google Books API key"
+            ),
+        ],
+    ),
 }
 
 

@@ -140,8 +140,13 @@ from apps.api.app.node_system.nodes.gong.gong_node import GongNode
 from apps.api.app.node_system.nodes.gong.gong_webhook import GongWebhookTriggerNode
 from apps.api.app.node_system.nodes.google_ads.google_ads_node import GoogleAdsNode
 from apps.api.app.node_system.nodes.google_bigquery.google_bigquery_node import GoogleBigQueryNode
+from apps.api.app.node_system.nodes.google_books.google_books_node import GoogleBooksNode
+from apps.api.app.node_system.nodes.google_groups.google_groups_node import GoogleGroupsNode
 from apps.api.app.node_system.nodes.google_maps.google_maps_node import GoogleMapsNode
 from apps.api.app.node_system.nodes.google_meet.google_meet_node import GoogleMeetNode
+from apps.api.app.node_system.nodes.google_pagespeed.google_pagespeed_node import (
+    GooglePageSpeedNode,
+)
 from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
 from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
@@ -671,3 +676,9 @@ node_registry.register(GoogleMapsNode)
 node_registry.register(GoogleMeetNode)
 node_registry.register(GoogleTranslateNode)
 node_registry.register(GoogleVaultNode)
+
+
+# Phase 4.27 — Google surface (part 2).
+node_registry.register(GooglePageSpeedNode)
+node_registry.register(GoogleBooksNode)
+node_registry.register(GoogleGroupsNode)
