@@ -2542,6 +2542,19 @@ PROVIDERS = {
             ),
         ],
     ),
+    "whatsapp": APIKeyProvider(
+        id="whatsapp_api_key",
+        name="WhatsApp Business",
+        icon_slug="whatsapp",
+        color="#25D366",
+        description="WhatsApp Business Cloud API — send template + text messages.",
+        hint="Meta Cloud API access token",
+        fields=[
+            CredentialField(
+                id="api_key", label="Access Token", type="password", placeholder="EAAG..."
+            ),
+        ],
+    ),
 }
 
 

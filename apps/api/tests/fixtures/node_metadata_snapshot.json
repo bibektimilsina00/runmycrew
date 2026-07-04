@@ -2565,6 +2565,201 @@
     "tools": null,
     "type": "action.apollo"
   },
+  "action.arxiv": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#B31B1B",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "arXiv \u2014 search preprints (returns Atom XML in body).",
+    "dynamic_outputs_from": null,
+    "icon": "arxiv",
+    "inputs": 1,
+    "name": "arXiv",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "search",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Search arXiv",
+            "value": "search"
+          },
+          {
+            "label": "Get by arXiv ID(s)",
+            "value": "get_by_id"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Phone Number ID",
+        "name": "phone_number_id",
+        "type": "string"
+      },
+      {
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "Text Body",
+        "name": "text_body",
+        "type": "string"
+      },
+      {
+        "label": "Template Name",
+        "name": "template_name",
+        "type": "string"
+      },
+      {
+        "default": "en_US",
+        "label": "Language Code",
+        "name": "language_code",
+        "type": "string"
+      },
+      {
+        "default": "image",
+        "label": "Media Type (image|video|document|audio)",
+        "name": "media_type",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_link",
+        "type": "string"
+      },
+      {
+        "label": "Caption",
+        "name": "caption",
+        "type": "string"
+      },
+      {
+        "label": "From (E.164)",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "TwiML URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "Call SID",
+        "name": "call_sid",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": "relevance",
+        "label": "Sort By",
+        "name": "sort_by",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search"
+          ]
+        },
+        "default": "descending",
+        "label": "Sort Order",
+        "name": "sort_order",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_by_id"
+          ]
+        },
+        "default": [],
+        "label": "arXiv IDs (JSON array)",
+        "name": "arxiv_ids",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.arxiv"
+  },
   "action.asana": {
     "allow_error": true,
     "category": "integration",
@@ -49867,6 +50062,219 @@
     "tools": null,
     "type": "action.twilio"
   },
+  "action.twilio_voice": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#F22F46",
+    "credential_type": "twilio_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Twilio Voice \u2014 outbound calls + call log lookup.",
+    "dynamic_outputs_from": null,
+    "icon": "twilio_voice",
+    "inputs": 1,
+    "name": "Twilio Voice",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "twilio_credentials",
+        "label": "Twilio Voice Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_call",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Place Outbound Call",
+            "value": "create_call"
+          },
+          {
+            "label": "Get Call",
+            "value": "get_call"
+          },
+          {
+            "label": "List Recent Calls",
+            "value": "list_calls"
+          },
+          {
+            "label": "Update / Redirect Call",
+            "value": "update_call"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Phone Number ID",
+        "name": "phone_number_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_call"
+          ]
+        },
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "label": "Text Body",
+        "name": "text_body",
+        "type": "string"
+      },
+      {
+        "label": "Template Name",
+        "name": "template_name",
+        "type": "string"
+      },
+      {
+        "default": "en_US",
+        "label": "Language Code",
+        "name": "language_code",
+        "type": "string"
+      },
+      {
+        "default": "image",
+        "label": "Media Type (image|video|document|audio)",
+        "name": "media_type",
+        "type": "string"
+      },
+      {
+        "label": "Media URL",
+        "name": "media_link",
+        "type": "string"
+      },
+      {
+        "label": "Caption",
+        "name": "caption",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_call"
+          ]
+        },
+        "label": "From (E.164)",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_call",
+            "update_call"
+          ]
+        },
+        "label": "TwiML URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_call",
+            "update_call"
+          ]
+        },
+        "label": "Call SID",
+        "name": "call_sid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_calls",
+            "update_call"
+          ]
+        },
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "default": "relevance",
+        "label": "Sort By",
+        "name": "sort_by",
+        "type": "string"
+      },
+      {
+        "default": "descending",
+        "label": "Sort Order",
+        "name": "sort_order",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "arXiv IDs (JSON array)",
+        "name": "arxiv_ids",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.twilio_voice"
+  },
   "action.typeform": {
     "allow_error": true,
     "category": "integration",
@@ -51490,6 +51898,234 @@
     ],
     "tools": null,
     "type": "action.wealthbox"
+  },
+  "action.whatsapp": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#25D366",
+    "credential_type": "whatsapp_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "WhatsApp Business Cloud API \u2014 send template + text messages.",
+    "dynamic_outputs_from": null,
+    "icon": "whatsapp",
+    "inputs": 1,
+    "name": "WhatsApp Business",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "whatsapp_api_key",
+        "label": "WhatsApp Business Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "send_text",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Send Text Message",
+            "value": "send_text"
+          },
+          {
+            "label": "Send Template Message",
+            "value": "send_template"
+          },
+          {
+            "label": "Send Media Message",
+            "value": "send_media"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_text",
+            "send_template",
+            "send_media"
+          ]
+        },
+        "label": "Phone Number ID",
+        "name": "phone_number_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_text",
+            "send_template",
+            "send_media"
+          ]
+        },
+        "label": "To",
+        "name": "to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_text"
+          ]
+        },
+        "label": "Text Body",
+        "name": "text_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_template"
+          ]
+        },
+        "label": "Template Name",
+        "name": "template_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_template"
+          ]
+        },
+        "default": "en_US",
+        "label": "Language Code",
+        "name": "language_code",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_media"
+          ]
+        },
+        "default": "image",
+        "label": "Media Type (image|video|document|audio)",
+        "name": "media_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_media"
+          ]
+        },
+        "label": "Media URL",
+        "name": "media_link",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_media"
+          ]
+        },
+        "label": "Caption",
+        "name": "caption",
+        "type": "string"
+      },
+      {
+        "label": "From (E.164)",
+        "name": "from_number",
+        "type": "string"
+      },
+      {
+        "label": "TwiML URL",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "Call SID",
+        "name": "call_sid",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "default": 10,
+        "label": "Max Results",
+        "mode": "advanced",
+        "name": "max_results",
+        "type": "number"
+      },
+      {
+        "default": "relevance",
+        "label": "Sort By",
+        "name": "sort_by",
+        "type": "string"
+      },
+      {
+        "default": "descending",
+        "label": "Sort Order",
+        "name": "sort_order",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "arXiv IDs (JSON array)",
+        "name": "arxiv_ids",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.whatsapp"
   },
   "action.wikipedia": {
     "allow_error": true,
