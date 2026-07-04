@@ -68,6 +68,7 @@ from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
     ConfluenceWebhookTriggerNode,
 )
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
+from apps.api.app.node_system.nodes.datagma.datagma_node import DatagmaNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
 from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
@@ -84,6 +85,9 @@ from apps.api.app.node_system.nodes.emailbison.emailbison_trigger import Emailbi
 from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
     EmailbisonWebhookTriggerNode,
 )
+from apps.api.app.node_system.nodes.enrich.enrich_node import EnrichsoNode
+from apps.api.app.node_system.nodes.enrichment.enrichment_node import EnrichmentioNode
+from apps.api.app.node_system.nodes.enrow.enrow_node import EnrowNode
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
@@ -136,6 +140,7 @@ from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTriggerNode
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.hunter.hunter_node import HunterNode
+from apps.api.app.node_system.nodes.icypeas.icypeas_node import IcypeasNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
@@ -146,6 +151,7 @@ from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
+from apps.api.app.node_system.nodes.leadmagic.leadmagic_node import LeadMagicNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_trigger import LemlistTriggerNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_webhook import LemlistWebhookTriggerNode
@@ -507,3 +513,12 @@ node_registry.register(FindymailNode)
 node_registry.register(DropcontactNode)
 node_registry.register(PeopleDataLabsNode)
 node_registry.register(ClayNode)
+
+
+# Phase 4.15 — enrichment tier 2.
+node_registry.register(DatagmaNode)
+node_registry.register(EnrichsoNode)
+node_registry.register(EnrichmentioNode)
+node_registry.register(EnrowNode)
+node_registry.register(IcypeasNode)
+node_registry.register(LeadMagicNode)

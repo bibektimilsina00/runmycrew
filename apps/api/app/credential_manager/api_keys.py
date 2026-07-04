@@ -1407,6 +1407,102 @@ PROVIDERS = {
             ),
         ],
     ),
+    "datagma": APIKeyProvider(
+        id="datagma_api_key",
+        name="Datagma",
+        icon_slug="datagma",
+        color="#1c1c1c",
+        description="Datagma — French B2B contact + company enrichment.",
+        hint="API key from Datagma dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Datagma API key",
+            ),
+        ],
+    ),
+    "enrich": APIKeyProvider(
+        id="enrich_api_key",
+        name="Enrich.so",
+        icon_slug="enrich",
+        color="#1c1c1c",
+        description="Enrich.so — LinkedIn scraper + email finder.",
+        hint="API key from Enrich.so dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Enrich.so API key",
+            ),
+        ],
+    ),
+    "enrichment": APIKeyProvider(
+        id="enrichment_api_key",
+        name="Enrichment.io",
+        icon_slug="enrichment",
+        color="#1c1c1c",
+        description="Enrichment — contact + company data-as-a-service.",
+        hint="API key from Enrichment.io dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Enrichment.io API key",
+            ),
+        ],
+    ),
+    "enrow": APIKeyProvider(
+        id="enrow_api_key",
+        name="Enrow",
+        icon_slug="enrow",
+        color="#1c1c1c",
+        description="Enrow — waterfall B2B email finder + verifier.",
+        hint="API key from Enrow dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Enrow API key",
+            ),
+        ],
+    ),
+    "icypeas": APIKeyProvider(
+        id="icypeas_api_key",
+        name="Icypeas",
+        icon_slug="icypeas",
+        color="#1c1c1c",
+        description="Icypeas — email finder + LinkedIn enrichment.",
+        hint="API key from Icypeas dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Icypeas API key",
+            ),
+        ],
+    ),
+    "leadmagic": APIKeyProvider(
+        id="leadmagic_api_key",
+        name="LeadMagic",
+        icon_slug="leadmagic",
+        color="#1c1c1c",
+        description="LeadMagic — email finder + waterfall enrichment.",
+        hint="API key from LeadMagic dashboard",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="LeadMagic API key",
+            ),
+        ],
+    ),
 }
 
 
