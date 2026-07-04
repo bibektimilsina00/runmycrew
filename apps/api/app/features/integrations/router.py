@@ -43,6 +43,39 @@ async def list_github_repos(
     return await service.list_github_repos(credential, owner, current_user)
 
 
+@router.get("/github/branches", response_model=IntegrationResponse)
+async def list_github_branches(
+    credential: str | None = Query(None),
+    owner: str | None = Query(None),
+    repo: str | None = Query(None),
+    current_user: User = Depends(get_current_user),
+    service: IntegrationService = Depends(get_integration_service),
+):
+    return await service.list_github_branches(credential, owner, repo, current_user)
+
+
+@router.get("/github/issues", response_model=IntegrationResponse)
+async def list_github_issues(
+    credential: str | None = Query(None),
+    owner: str | None = Query(None),
+    repo: str | None = Query(None),
+    current_user: User = Depends(get_current_user),
+    service: IntegrationService = Depends(get_integration_service),
+):
+    return await service.list_github_issues(credential, owner, repo, current_user)
+
+
+@router.get("/github/prs", response_model=IntegrationResponse)
+async def list_github_prs(
+    credential: str | None = Query(None),
+    owner: str | None = Query(None),
+    repo: str | None = Query(None),
+    current_user: User = Depends(get_current_user),
+    service: IntegrationService = Depends(get_integration_service),
+):
+    return await service.list_github_prs(credential, owner, repo, current_user)
+
+
 @router.get("/notion/databases", response_model=IntegrationResponse)
 async def list_notion_databases(
     credential: str | None = Query(None),

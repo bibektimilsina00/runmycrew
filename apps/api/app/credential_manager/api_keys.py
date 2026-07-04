@@ -57,6 +57,25 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="bu-...")
         ],
     ),
+    "github_pat": APIKeyProvider(
+        id="github_pat",
+        name="GitHub Personal Access Token",
+        icon_slug="github",
+        color="#ffffff",
+        description=(
+            "GitHub via fine-grained or classic Personal Access Token. "
+            "Use this if you can't connect OAuth (e.g. self-host, server-to-server)."
+        ),
+        hint="ghp_... or github_pat_...",
+        fields=[
+            CredentialField(
+                id="access_token",
+                label="Personal Access Token",
+                type="password",
+                placeholder="ghp_... or github_pat_...",
+            )
+        ],
+    ),
     "airtable": APIKeyProvider(
         id="airtable_api_key",
         name="Airtable",

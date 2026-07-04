@@ -175,25 +175,42 @@ class TriggerService:
         if not workflow:
             raise HTTPException(status_code=404, detail="Workflow not found")
 
-        node_props = find_webhook_node_props(workflow, "")
+        # Find the GitHub webhook trigger node. Each workflow gets at most one
+        # `trigger.github_webhook` — its `secret` is the HMAC key and its
+        # `event` field gates which deliveries fan out into an execution.
+        node_props: dict | None = None
         for node in workflow.graph.get("nodes", []):
-            if node.get("type") == "trigger.webhook":
+            if node.get("type") == "trigger.github_webhook":
                 node_props = node.get("data", {}).get("properties", {})
                 break
+        if not node_props:
+            raise HTTPException(
+                status_code=404,
+                detail="No GitHub webhook trigger node found on this workflow",
+            )
 
         hub_sig = headers.get("x-hub-signature-256", headers.get("X-Hub-Signature-256", ""))
-        secret = (node_props or {}).get("secret", "") if node_props else ""
-
+        secret = str(node_props.get("secret") or "")
         if not secret:
             raise HTTPException(
                 status_code=401, detail="Webhook secret not configured on this workflow"
             )
-
         if not hub_sig:
             raise HTTPException(status_code=401, detail="Missing X-Hub-Signature-256 header")
-
         if not verify_signature(raw_body, secret, hub_sig):
             raise HTTPException(status_code=401, detail="Invalid signature")
+
+        # Event filter — short-circuit deliveries that don't match the
+        # node's `event` selector. "*" forwards every event.
+        wanted_event = str(node_props.get("event") or "*")
+        if wanted_event and wanted_event != "*" and wanted_event != event_type:
+            logger.info(
+                "GitHub webhook [%s] dropped by event filter (wanted=%s) workflow=%s",
+                event_type,
+                wanted_event,
+                workflow.id,
+            )
+            return WebhookGithubReceiveResponse(status="ignored", execution_id="", event=event_type)
 
         try:
             payload = json.loads(raw_body)
@@ -203,16 +220,21 @@ class TriggerService:
         trigger_data = {
             "event": event_type,
             "delivery": delivery_id,
+            "action": payload.get("action") if isinstance(payload, dict) else None,
             "body": payload,
             "headers": headers,
-            "repository": payload.get("repository", {}).get("full_name"),
-            "sender": payload.get("sender", {}).get("login"),
+            "repository": (payload.get("repository") or {}).get("full_name")
+            if isinstance(payload, dict)
+            else None,
+            "sender": (payload.get("sender") or {}).get("login")
+            if isinstance(payload, dict)
+            else None,
         }
 
         execution_id = await execution_engine.trigger_workflow(
             workflow_id=workflow.id,
             graph=workflow.graph,
-            trigger_type="trigger.webhook",
+            trigger_type="trigger.github_webhook",
             input_data=trigger_data,
         )
 
