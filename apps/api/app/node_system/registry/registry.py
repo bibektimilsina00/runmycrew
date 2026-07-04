@@ -60,6 +60,9 @@ from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNo
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
 from apps.api.app.node_system.nodes.calendly.calendly_trigger import CalendlyTriggerNode
 from apps.api.app.node_system.nodes.circleback.circleback_node import CirclebackNode
+from apps.api.app.node_system.nodes.circleback.circleback_webhook import (
+    CirclebackWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.clay.clay_node import ClayNode
 from apps.api.app.node_system.nodes.clerk.clerk_node import ClerkNode
 from apps.api.app.node_system.nodes.clickhouse.clickhouse_node import ClickHouseCloudNode
@@ -340,6 +343,9 @@ from apps.api.app.node_system.nodes.trigger_dev.trigger_dev_node import TriggerD
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
 from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_node import TwilioVoiceNode
+from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_webhook import (
+    TwilioVoiceWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.typeform.typeform_webhook import TypeformWebhookTriggerNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
@@ -350,6 +356,7 @@ from apps.api.app.node_system.nodes.video_generator.video_generator_node import 
 from apps.api.app.node_system.nodes.wealthbox.wealthbox_node import WealthboxNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.whatsapp.whatsapp_node import WhatsAppNode
+from apps.api.app.node_system.nodes.whatsapp.whatsapp_webhook import WhatsAppWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.wiza.wiza_node import WizaNode
 from apps.api.app.node_system.nodes.wordpress.wordpress_node import WordPressNode
@@ -788,3 +795,9 @@ node_registry.register(SmtpNode)
 node_registry.register(SftpNode)
 node_registry.register(SshNode)
 node_registry.register(McpNode)
+
+
+# Phase 4-close depth pass — webhook triggers for providers shipped as action-only.
+node_registry.register(CirclebackWebhookTriggerNode)
+node_registry.register(WhatsAppWebhookTriggerNode)
+node_registry.register(TwilioVoiceWebhookTriggerNode)
