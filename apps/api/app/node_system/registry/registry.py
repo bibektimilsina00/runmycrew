@@ -111,6 +111,7 @@ from apps.api.app.node_system.nodes.http.webhook.webhook import WebhookTriggerNo
 from apps.api.app.node_system.nodes.hubspot.hubspot_node import HubSpotNode
 from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTriggerNode
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
+from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
@@ -151,6 +152,7 @@ from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_webhook impo
 )
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
+from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
@@ -166,6 +168,7 @@ from apps.api.app.node_system.nodes.posthog.posthog_node import PostHogNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
+from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
@@ -335,6 +338,10 @@ node_registry.register(WebflowWebhookTriggerNode)
 node_registry.register(GongWebhookTriggerNode)
 node_registry.register(FathomWebhookTriggerNode)
 node_registry.register(FirefliesWebhookTriggerNode)
+# Phase 3.5 — completion (monday polling + generic RSS + IMAP).
+node_registry.register(MondayTriggerNode)
+node_registry.register(RSSTriggerNode)
+node_registry.register(IMAPTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

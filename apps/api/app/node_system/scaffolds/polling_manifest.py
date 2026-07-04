@@ -107,9 +107,12 @@ class PollingTriggerManifest(BaseModel):
     icon_slug: str | None = None
     color: str = "#1c1c1c"
 
-    # Auth (mirrors REST manifest).
+    # Auth (mirrors REST manifest). `credential_type=None` marks the
+    # trigger as unauthenticated (public URLs / RSS / arbitrary HTTP) —
+    # the factory skips the credential inspector row and the scheduler
+    # runs the poll with an empty token.
     base_url: str
-    credential_type: str | list[str]
+    credential_type: str | list[str] | None = None
     token_field: str | list[str] = Field(default_factory=lambda: ["access_token", "api_key"])
     auth: AuthScheme = "bearer"
     auth_header_name: str = "Authorization"

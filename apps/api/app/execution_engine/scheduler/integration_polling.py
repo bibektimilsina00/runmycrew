@@ -63,7 +63,11 @@ class PollerEntry:
         # only, which works for every OAuth provider — API-key providers
         # (GitLab, Trello, Klaviyo, PagerDuty) override with the field
         # their credential type actually persists.
-        self.token_fields = list(token_fields) if token_fields else ["access_token"]
+        # `token_fields=[]` (explicit empty list) marks the provider as
+        # unauthenticated — scheduler runs the poller with an empty
+        # token and skips the credential lookup entirely. `None` still
+        # falls through to the OAuth default.
+        self.token_fields = list(token_fields) if token_fields is not None else ["access_token"]
 
 
 _BY_NODE_TYPE: dict[str, PollerEntry] = {}
@@ -151,6 +155,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.hubspot import (
         hubspot_trigger as _hubspot_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.imap import (
+        imap_trigger as _imap_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.intercom import (
         intercom_trigger as _intercom_trigger,  # noqa: F401
     )
@@ -160,6 +167,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.linear import (
         linear_trigger as _linear_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.monday import (
+        monday_trigger as _monday_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.notion import (
         notion_trigger as _notion_trigger,  # noqa: F401
     )
@@ -168,6 +178,9 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.pagerduty import (
         pagerduty_trigger as _pagerduty_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.rss import (
+        rss_trigger as _rss_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.telegram import (
         telegram_trigger as _telegram_trigger,  # noqa: F401
@@ -272,29 +285,35 @@ async def _poll_due_rows() -> None:
 
             props = (node.get("data") or {}).get("properties") or {}
             credential_id = props.get("credential")
-            try:
-                token = await _resolve_access_token(
-                    cred_service,
-                    credential_id,
-                    state.workspace_id,
-                    token_fields=entry.token_fields,
-                )
-            except Exception as exc:  # noqa: BLE001
-                logger.warning(
-                    "Integration polling: cred resolve failed for %s/%s: %s",
-                    state.workflow_id,
-                    state.node_id,
-                    exc,
-                )
-                state.last_error = f"Credential resolve failed: {exc}"[:1024]
-                state.next_poll_at = _retry_after(props)
-                await db.commit()
-                continue
-            if not token:
-                state.last_error = "Credential missing access_token"
-                state.next_poll_at = _retry_after(props)
-                await db.commit()
-                continue
+            if not entry.token_fields:
+                # Unauthenticated provider (RSS) — registered with an
+                # empty token_fields list. Poller runs with an empty
+                # token and doesn't touch the cred service.
+                token = ""
+            else:
+                try:
+                    token = await _resolve_access_token(
+                        cred_service,
+                        credential_id,
+                        state.workspace_id,
+                        token_fields=entry.token_fields,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning(
+                        "Integration polling: cred resolve failed for %s/%s: %s",
+                        state.workflow_id,
+                        state.node_id,
+                        exc,
+                    )
+                    state.last_error = f"Credential resolve failed: {exc}"[:1024]
+                    state.next_poll_at = _retry_after(props)
+                    await db.commit()
+                    continue
+                if not token:
+                    state.last_error = "Credential missing access_token"
+                    state.next_poll_at = _retry_after(props)
+                    await db.commit()
+                    continue
 
             try:
                 matches, new_cursor = await entry.poller(token, state.cursor, props)

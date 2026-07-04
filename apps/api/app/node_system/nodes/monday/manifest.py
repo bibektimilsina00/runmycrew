@@ -47,9 +47,7 @@ async def _gql(
 
 async def _list_boards(node: Any, client: httpx.AsyncClient, headers: dict[str, str]) -> NodeResult:
     limit = int(getattr(node.props, "limit", 25) or 25)
-    query = (
-        "query ListBoards($limit: Int) {" " boards(limit: $limit) { id name state board_kind }" " }"
-    )
+    query = "query ListBoards($limit: Int) { boards(limit: $limit) { id name state board_kind } }"
     data = await _gql(client, headers, query, {"limit": limit})
     boards = data.get("boards") or []
     return NodeResult(success=True, output_data={"boards": boards, "count": len(boards)})

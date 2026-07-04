@@ -241,17 +241,26 @@ Scaffold gained 4 more capabilities during Phase 2:
 - Meetings: zoom, calendly, calcom
 - Docs: dropbox, box, docusign
 
-## Phase 3 — Trigger sweep (2 weeks)
+## Phase 3 — Trigger sweep — **SHIPPED**
 
-20 trigger-capable providers. With polling + webhook scaffolds, ~1–2 hrs each.
+20 trigger-capable providers. All spec items landed across 5 sub-PRs.
 
-Polling: gitlab, jira, linear, hubspot, asana, trello, monday, calendly,
-calcom, pagerduty, zendesk, telegram, outlook (mail), rss (generic).
+Polling (16): gitlab, jira, linear, hubspot, asana (3.1), trello, calendly,
+calcom, notion, intercom (3.2), zendesk, telegram, outlook_mail (3.3),
+monday, rss, imap (3.5).
 
-Webhook: gitlab, azure_devops, twilio (SMS), microsoft_teams, webflow,
-gong, fathom, fireflies.
+Webhook (7): azure_devops, twilio, microsoft_teams, webflow, gong, fathom,
+fireflies (3.4). Plus pre-existing gitlab_webhook.
 
-Plus a generic IMAP polling trigger — covers outlook + arbitrary email hosts.
+Scaffold work in Phase 3:
+- Scheduler token resolver widened to per-provider `token_fields` list —
+  fixed silent breakage for every api-key polling provider.
+- Verifier signature extended to accept `headers` + `url` — Twilio + Webflow
+  can't verify without them.
+- Polling scaffold `credential_type=None` branch — unauthenticated
+  pollers (RSS) skip cred lookup entirely.
+- 3 new signature schemes: `hmac_sha256_b64` (Teams), `twilio`, `webflow`.
+- New credentials: `telegram_bot`, `imap_creds`.
 
 ## Phase 4 — Long tail (ongoing)
 

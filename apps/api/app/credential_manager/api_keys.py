@@ -1119,6 +1119,46 @@ PROVIDERS = {
         chat_completions_url="https://api.fireworks.ai/inference/v1/chat/completions",
         models_url="https://api.fireworks.ai/inference/v1/models",
     ),
+    "imap": APIKeyProvider(
+        id="imap_creds",
+        name="IMAP Email",
+        icon_slug="mail",
+        color="#1c1c1c",
+        description="Generic IMAP mailbox — Gmail, Outlook, Yahoo, self-hosted. App-password for Gmail.",
+        hint="Host + port + username + password",
+        fields=[
+            CredentialField(
+                id="host",
+                label="IMAP Host",
+                type="string",
+                placeholder="imap.gmail.com",
+            ),
+            CredentialField(
+                id="port",
+                label="Port",
+                type="string",
+                placeholder="993 (IMAPS) or 143 (STARTTLS)",
+            ),
+            CredentialField(
+                id="username",
+                label="Username",
+                type="string",
+                placeholder="you@example.com",
+            ),
+            CredentialField(
+                id="password",
+                label="Password / App Password",
+                type="password",
+                placeholder="App-password (Gmail / Outlook 2FA)",
+            ),
+            CredentialField(
+                id="use_ssl",
+                label="Use SSL (true/false)",
+                type="string",
+                placeholder="true",
+            ),
+        ],
+    ),
     "telegram_bot": APIKeyProvider(
         id="telegram_bot",
         name="Telegram Bot",

@@ -94,17 +94,21 @@ def _synth_polling_props(manifest: PollingTriggerManifest) -> type[BaseModel]:
 
 def _build_polling_schema(manifest: PollingTriggerManifest) -> list[dict[str, Any]]:
     """Inspector schema = credential + event_type + common_fields +
-    advanced max_per_poll / poll_interval_seconds."""
+    advanced max_per_poll / poll_interval_seconds.
+
+    A `credential_type=None` manifest is unauthenticated (RSS-style
+    public URLs) — skip the credential row and the required=True gate."""
     schema: list[dict[str, Any]] = []
 
-    cred_row: dict[str, Any] = {
-        "name": "credential",
-        "label": f"{manifest.name} Account",
-        "type": "credential",
-        "credentialType": manifest.credential_type,
-        "required": True,
-    }
-    schema.append(cred_row)
+    if manifest.credential_type is not None:
+        cred_row: dict[str, Any] = {
+            "name": "credential",
+            "label": f"{manifest.name} Account",
+            "type": "credential",
+            "credentialType": manifest.credential_type,
+            "required": True,
+        }
+        schema.append(cred_row)
 
     schema.append(
         {
@@ -158,6 +162,10 @@ def _build_polling_schema(manifest: PollingTriggerManifest) -> list[dict[str, An
 
 
 def _resolve_token(node: Any, manifest: PollingTriggerManifest) -> str | None:
+    # No-auth provider (RSS): return an empty token so the caller
+    # doesn't bail on the required-credential check.
+    if manifest.credential_type is None:
+        return ""
     if not node.credential:
         return None
     candidates = manifest.token_field
@@ -378,8 +386,9 @@ def build_polling_trigger(manifest: PollingTriggerManifest) -> type[BaseNode]:
                 return NodeResult(success=True, output_data=input_data)
 
             token = _resolve_token(self, manifest)
-            if not token:
+            if not token and manifest.credential_type is not None:
                 return NodeResult(success=False, error=f"{manifest.name} credential required.")
+            token = token or ""
 
             wf_id = _safe_uuid(getattr(context, "workflow_id", None))
             ws_id = _safe_uuid(getattr(context, "workspace_id", None))
