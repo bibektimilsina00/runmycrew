@@ -77,6 +77,9 @@ MANIFEST = ProviderManifest(
             type="string",
             default="once",
         ),
+        FieldSpec(name="type_field", label="Payment Method Type", type="string", default="card"),
+        FieldSpec(name="setup_intent_id", label="Setup Intent ID", type="string"),
+        FieldSpec(name="destination", label="Destination Account ID", type="string"),
     ],
     operations=[
         # ─── legacy 8 ops (preserved) ──────────────────────────────
@@ -488,6 +491,128 @@ MANIFEST = ProviderManifest(
             method="DELETE",
             path="/coupons/{coupon_id}",
             visible_fields=["coupon_id"],
+        ),
+        OpSpec(
+            id="list_payment_methods",
+            label="List Customer Payment Methods",
+            method="GET",
+            path="/payment_methods",
+            visible_fields=["customer_id", "type_field"],
+            query_builder=lambda v: {
+                "customer": getattr(v, "customer_id", "") or "",
+                "type": getattr(v, "type_field", None) or "card",
+            },
+        ),
+        OpSpec(
+            id="attach_payment_method",
+            label="Attach Payment Method to Customer",
+            method="POST",
+            path="/payment_methods/{payment_method_id}/attach",
+            visible_fields=["payment_method_id", "customer_id"],
+            body_builder=lambda v: {"customer": getattr(v, "customer_id", "") or ""},
+        ),
+        OpSpec(
+            id="detach_payment_method",
+            label="Detach Payment Method",
+            method="POST",
+            path="/payment_methods/{payment_method_id}/detach",
+            visible_fields=["payment_method_id"],
+            body_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_setup_intents",
+            label="List Setup Intents",
+            method="GET",
+            path="/setup_intents",
+            visible_fields=["customer_id"],
+            query_builder=lambda v: {
+                k: val
+                for k, val in {"customer": getattr(v, "customer_id", None) or None}.items()
+                if val
+            },
+        ),
+        OpSpec(
+            id="create_setup_intent",
+            label="Create Setup Intent",
+            method="POST",
+            path="/setup_intents",
+            visible_fields=["customer_id"],
+            body_builder=lambda v: {
+                k: val
+                for k, val in {"customer": getattr(v, "customer_id", None) or None}.items()
+                if val
+            },
+        ),
+        OpSpec(
+            id="confirm_setup_intent",
+            label="Confirm Setup Intent",
+            method="POST",
+            path="/setup_intents/{setup_intent_id}/confirm",
+            visible_fields=["setup_intent_id"],
+            body_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="cancel_setup_intent",
+            label="Cancel Setup Intent",
+            method="POST",
+            path="/setup_intents/{setup_intent_id}/cancel",
+            visible_fields=["setup_intent_id"],
+            body_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_transfers",
+            label="List Transfers",
+            method="GET",
+            path="/transfers",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="create_transfer",
+            label="Create Transfer",
+            method="POST",
+            path="/transfers",
+            visible_fields=["amount", "currency", "destination"],
+            body_builder=lambda v: {
+                "amount": int(getattr(v, "amount", 0) or 0),
+                "currency": getattr(v, "currency", None) or "usd",
+                "destination": getattr(v, "destination", "") or "",
+            },
+        ),
+        OpSpec(
+            id="list_payouts",
+            label="List Payouts",
+            method="GET",
+            path="/payouts",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="create_payout",
+            label="Create Payout",
+            method="POST",
+            path="/payouts",
+            visible_fields=["amount", "currency"],
+            body_builder=lambda v: {
+                "amount": int(getattr(v, "amount", 0) or 0),
+                "currency": getattr(v, "currency", None) or "usd",
+            },
+        ),
+        OpSpec(
+            id="list_balance_transactions",
+            label="List Balance Transactions",
+            method="GET",
+            path="/balance_transactions",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="get_balance",
+            label="Get Balance",
+            method="GET",
+            path="/balance",
+            visible_fields=[],
+            query_builder=lambda v: {},
         ),
     ],
     outputs_schema=[

@@ -47,6 +47,7 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="reason", label="Reason", type="string"),
         FieldSpec(name="query_text", label="Query", type="string"),
         FieldSpec(name="insert_body", label="Insert Body (JSON rows)", type="json", default={}),
+        FieldSpec(name="query_id", label="Query ID", type="string"),
     ],
     operations=[
         OpSpec(
@@ -152,6 +153,134 @@ MANIFEST = ProviderManifest(
             path="/",
             visible_fields=[],
             query_builder=lambda v: {"query": "SELECT * FROM system.settings FORMAT JSON"},
+        ),
+        OpSpec(
+            id="show_create_table",
+            label="SHOW CREATE TABLE",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {
+                "query": "SHOW CREATE TABLE " + (getattr(v, "table", "") or "") + " FORMAT JSON"
+            },
+        ),
+        OpSpec(
+            id="create_database",
+            label="CREATE DATABASE",
+            method="POST",
+            path="/",
+            visible_fields=["database"],
+            query_builder=lambda v: {
+                "query": "CREATE DATABASE IF NOT EXISTS " + (getattr(v, "database", "") or "")
+            },
+        ),
+        OpSpec(
+            id="drop_database",
+            label="DROP DATABASE",
+            method="POST",
+            path="/",
+            visible_fields=["database"],
+            query_builder=lambda v: {
+                "query": "DROP DATABASE IF EXISTS " + (getattr(v, "database", "") or "")
+            },
+        ),
+        OpSpec(
+            id="show_processes",
+            label="SHOW PROCESSLIST",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SHOW PROCESSLIST FORMAT JSON"},
+        ),
+        OpSpec(
+            id="list_clusters",
+            label="List Clusters",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.clusters FORMAT JSON"},
+        ),
+        OpSpec(
+            id="list_replicas",
+            label="List Replicas",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.replicas FORMAT JSON"},
+        ),
+        OpSpec(
+            id="list_parts",
+            label="List Parts",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {
+                "query": "SELECT * FROM system.parts WHERE table = '"
+                + (getattr(v, "table", "") or "")
+                + "' FORMAT JSON"
+            },
+        ),
+        OpSpec(
+            id="list_mutations",
+            label="List Mutations",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.mutations FORMAT JSON"},
+        ),
+        OpSpec(
+            id="kill_query",
+            label="KILL QUERY",
+            method="POST",
+            path="/",
+            visible_fields=["query_id"],
+            query_builder=lambda v: {
+                "query": "KILL QUERY WHERE query_id = '" + (getattr(v, "query_id", "") or "") + "'"
+            },
+        ),
+        OpSpec(
+            id="check_health",
+            label="Health Check",
+            method="GET",
+            path="/ping",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_dictionaries",
+            label="List Dictionaries",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.dictionaries FORMAT JSON"},
+        ),
+        OpSpec(
+            id="list_functions",
+            label="List Functions",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.functions FORMAT JSON"},
+        ),
+        OpSpec(
+            id="list_columns",
+            label="List Columns",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {
+                "query": "SELECT * FROM system.columns WHERE table = '"
+                + (getattr(v, "table", "") or "")
+                + "' FORMAT JSON"
+            },
+        ),
+        OpSpec(
+            id="get_version",
+            label="Get Version",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT version() FORMAT JSON"},
         ),
     ],
     outputs_schema=[

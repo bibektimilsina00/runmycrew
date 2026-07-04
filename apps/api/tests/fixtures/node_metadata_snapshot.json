@@ -10603,6 +10603,62 @@
           {
             "label": "Get System Settings",
             "value": "get_settings"
+          },
+          {
+            "label": "SHOW CREATE TABLE",
+            "value": "show_create_table"
+          },
+          {
+            "label": "CREATE DATABASE",
+            "value": "create_database"
+          },
+          {
+            "label": "DROP DATABASE",
+            "value": "drop_database"
+          },
+          {
+            "label": "SHOW PROCESSLIST",
+            "value": "show_processes"
+          },
+          {
+            "label": "List Clusters",
+            "value": "list_clusters"
+          },
+          {
+            "label": "List Replicas",
+            "value": "list_replicas"
+          },
+          {
+            "label": "List Parts",
+            "value": "list_parts"
+          },
+          {
+            "label": "List Mutations",
+            "value": "list_mutations"
+          },
+          {
+            "label": "KILL QUERY",
+            "value": "kill_query"
+          },
+          {
+            "label": "Health Check",
+            "value": "check_health"
+          },
+          {
+            "label": "List Dictionaries",
+            "value": "list_dictionaries"
+          },
+          {
+            "label": "List Functions",
+            "value": "list_functions"
+          },
+          {
+            "label": "List Columns",
+            "value": "list_columns"
+          },
+          {
+            "label": "Get Version",
+            "value": "get_version"
           }
         ],
         "type": "options"
@@ -10665,7 +10721,9 @@
             "query",
             "insert",
             "show_tables",
-            "list_tables"
+            "list_tables",
+            "create_database",
+            "drop_database"
           ]
         },
         "label": "Database",
@@ -10681,7 +10739,10 @@
             "count",
             "truncate_table",
             "drop_table",
-            "optimize_table"
+            "optimize_table",
+            "show_create_table",
+            "list_parts",
+            "list_columns"
           ]
         },
         "label": "Table",
@@ -10780,6 +10841,17 @@
         "label": "Insert Body (JSON rows)",
         "name": "insert_body",
         "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "kill_query"
+          ]
+        },
+        "label": "Query ID",
+        "name": "query_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -25212,6 +25284,66 @@
           {
             "label": "Rich Call Data",
             "value": "list_extensive_calls"
+          },
+          {
+            "label": "Get Extensive Calls",
+            "value": "get_extensive_calls"
+          },
+          {
+            "label": "Aggregate Activity by Rep",
+            "value": "aggregate_activity"
+          },
+          {
+            "label": "Day-by-Day Activity",
+            "value": "day_by_day_activity"
+          },
+          {
+            "label": "Aggregate by Period",
+            "value": "aggregate_by_period"
+          },
+          {
+            "label": "Interaction Statistics",
+            "value": "interaction_stats"
+          },
+          {
+            "label": "List Answered Scorecards",
+            "value": "answered_scorecards"
+          },
+          {
+            "label": "List Library Folders",
+            "value": "list_library_folders"
+          },
+          {
+            "label": "Get Library Folder Content",
+            "value": "get_folder_content"
+          },
+          {
+            "label": "List Scorecards",
+            "value": "list_scorecards"
+          },
+          {
+            "label": "List Trackers (topics)",
+            "value": "list_trackers"
+          },
+          {
+            "label": "List Workspaces",
+            "value": "list_workspaces"
+          },
+          {
+            "label": "List Flows",
+            "value": "list_flows"
+          },
+          {
+            "label": "Get Coaching Data",
+            "value": "get_coaching"
+          },
+          {
+            "label": "Lookup Contact by Email",
+            "value": "lookup_email"
+          },
+          {
+            "label": "Lookup Contact by Phone",
+            "value": "lookup_phone"
           }
         ],
         "type": "options"
@@ -25279,6 +25411,58 @@
         "label": "Cursor",
         "mode": "advanced",
         "name": "cursor",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_extensive_calls",
+            "answered_scorecards",
+            "get_coaching"
+          ]
+        },
+        "default": {},
+        "label": "Filter (JSON)",
+        "name": "gong_filter",
+        "type": "json"
+      },
+      {
+        "label": "User ID",
+        "name": "gong_user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_folder_content"
+          ]
+        },
+        "label": "Library Folder ID",
+        "name": "folder_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "lookup_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "lookup_phone"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
         "type": "string"
       },
       {
@@ -56045,6 +56229,62 @@
           {
             "label": "Get Transcript",
             "value": "get_transcript"
+          },
+          {
+            "label": "List Companies",
+            "value": "list_companies"
+          },
+          {
+            "label": "Get Event Summary",
+            "value": "get_event_summary"
+          },
+          {
+            "label": "List Event Types",
+            "value": "list_event_types"
+          },
+          {
+            "label": "List Documents",
+            "value": "list_documents"
+          },
+          {
+            "label": "List Document Types",
+            "value": "list_document_types"
+          },
+          {
+            "label": "List Reports",
+            "value": "list_reports"
+          },
+          {
+            "label": "Get Report",
+            "value": "get_report"
+          },
+          {
+            "label": "List Slide Decks",
+            "value": "list_slide_decks"
+          },
+          {
+            "label": "Get Slide Deck",
+            "value": "get_slide_deck"
+          },
+          {
+            "label": "List Transcripts",
+            "value": "list_transcripts"
+          },
+          {
+            "label": "Get Transcript by ID",
+            "value": "get_transcript_by_id"
+          },
+          {
+            "label": "List Audio",
+            "value": "list_audio"
+          },
+          {
+            "label": "Get Audio",
+            "value": "get_audio"
+          },
+          {
+            "label": "List Live Events",
+            "value": "list_live_events"
           }
         ],
         "type": "options"
@@ -56180,7 +56420,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_transcript"
+            "get_transcript",
+            "get_event_summary"
           ]
         },
         "label": "Event ID",
@@ -56232,6 +56473,50 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_report"
+          ]
+        },
+        "label": "Report ID",
+        "name": "report_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_slide_deck"
+          ]
+        },
+        "label": "Slide Deck ID",
+        "name": "slide_deck_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_transcript_by_id"
+          ]
+        },
+        "label": "Transcript ID",
+        "name": "transcript_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_audio"
+          ]
+        },
+        "label": "Audio ID",
+        "name": "audio_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -59931,6 +60216,62 @@
           {
             "label": "Apex REST POST",
             "value": "apex_post"
+          },
+          {
+            "label": "Composite Upsert (batch records)",
+            "value": "upsert_composite"
+          },
+          {
+            "label": "Composite Create (batch records)",
+            "value": "composite_create"
+          },
+          {
+            "label": "Composite Update (batch records)",
+            "value": "composite_update"
+          },
+          {
+            "label": "Composite Delete (batch records)",
+            "value": "composite_delete"
+          },
+          {
+            "label": "Get Org Limits",
+            "value": "limits"
+          },
+          {
+            "label": "List Custom Metadata",
+            "value": "list_custom_metadata"
+          },
+          {
+            "label": "List API Versions",
+            "value": "versions"
+          },
+          {
+            "label": "List Resources",
+            "value": "list_resources"
+          },
+          {
+            "label": "Bulk API Query (create job)",
+            "value": "bulk_query"
+          },
+          {
+            "label": "Bulk API Query Results",
+            "value": "bulk_query_results"
+          },
+          {
+            "label": "Get Bulk API Job",
+            "value": "get_bulk_job"
+          },
+          {
+            "label": "Abort Bulk API Job",
+            "value": "abort_bulk_job"
+          },
+          {
+            "label": "Create Note",
+            "value": "create_note"
+          },
+          {
+            "label": "Attach File (ContentDocumentLink)",
+            "value": "attach_file"
           }
         ],
         "type": "options"
@@ -59946,7 +60287,8 @@
             "upsert_by_external_id",
             "describe_sobject",
             "sobject_basic",
-            "recent_records"
+            "recent_records",
+            "upsert_composite"
           ]
         },
         "label": "SObject (Lead|Contact|Account|Opportunity|Case|...)",
@@ -59977,7 +60319,9 @@
             "create_contact",
             "create_account",
             "create_opportunity",
-            "create_case"
+            "create_case",
+            "create_note",
+            "attach_file"
           ]
         },
         "default": {},
@@ -59990,7 +60334,9 @@
           "field": "operation",
           "value": [
             "query",
-            "query_all"
+            "query_all",
+            "list_custom_metadata",
+            "bulk_query"
           ]
         },
         "label": "SOQL",
@@ -60002,7 +60348,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "upsert_by_external_id"
+            "upsert_by_external_id",
+            "upsert_composite"
           ]
         },
         "label": "External ID Field",
@@ -60106,6 +60453,45 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upsert_composite",
+            "composite_create",
+            "composite_update"
+          ]
+        },
+        "default": [],
+        "label": "Records (JSON array)",
+        "name": "records_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "composite_delete"
+          ]
+        },
+        "default": [],
+        "label": "Record IDs (JSON array)",
+        "name": "record_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "bulk_query_results",
+            "get_bulk_job",
+            "abort_bulk_job"
+          ]
+        },
+        "label": "Bulk Job ID",
+        "name": "job_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -66261,6 +66647,58 @@
           {
             "label": "Delete Coupon",
             "value": "delete_coupon"
+          },
+          {
+            "label": "List Customer Payment Methods",
+            "value": "list_payment_methods"
+          },
+          {
+            "label": "Attach Payment Method to Customer",
+            "value": "attach_payment_method"
+          },
+          {
+            "label": "Detach Payment Method",
+            "value": "detach_payment_method"
+          },
+          {
+            "label": "List Setup Intents",
+            "value": "list_setup_intents"
+          },
+          {
+            "label": "Create Setup Intent",
+            "value": "create_setup_intent"
+          },
+          {
+            "label": "Confirm Setup Intent",
+            "value": "confirm_setup_intent"
+          },
+          {
+            "label": "Cancel Setup Intent",
+            "value": "cancel_setup_intent"
+          },
+          {
+            "label": "List Transfers",
+            "value": "list_transfers"
+          },
+          {
+            "label": "Create Transfer",
+            "value": "create_transfer"
+          },
+          {
+            "label": "List Payouts",
+            "value": "list_payouts"
+          },
+          {
+            "label": "Create Payout",
+            "value": "create_payout"
+          },
+          {
+            "label": "List Balance Transactions",
+            "value": "list_balance_transactions"
+          },
+          {
+            "label": "Get Balance",
+            "value": "get_balance"
           }
         ],
         "type": "options"
@@ -66269,7 +66707,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "create_payment_intent"
+            "create_payment_intent",
+            "create_transfer",
+            "create_payout"
           ]
         },
         "label": "Amount (cents)",
@@ -66281,7 +66721,9 @@
           "field": "operation",
           "value": [
             "create_payment_intent",
-            "create_price"
+            "create_price",
+            "create_transfer",
+            "create_payout"
           ]
         },
         "default": "usd",
@@ -66334,7 +66776,11 @@
             "create_subscription",
             "list_subscriptions",
             "create_checkout_session",
-            "create_billing_portal_session"
+            "create_billing_portal_session",
+            "list_payment_methods",
+            "attach_payment_method",
+            "list_setup_intents",
+            "create_setup_intent"
           ]
         },
         "label": "Customer ID",
@@ -66475,7 +66921,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "confirm_payment_intent"
+            "confirm_payment_intent",
+            "attach_payment_method",
+            "detach_payment_method"
           ]
         },
         "label": "Payment Method ID",
@@ -66604,6 +67052,41 @@
         "default": "once",
         "label": "Duration (once|forever|repeating)",
         "name": "duration",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_payment_methods"
+          ]
+        },
+        "default": "card",
+        "label": "Payment Method Type",
+        "name": "type_field",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "confirm_setup_intent",
+            "cancel_setup_intent"
+          ]
+        },
+        "label": "Setup Intent ID",
+        "name": "setup_intent_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_transfer"
+          ]
+        },
+        "label": "Destination Account ID",
+        "name": "destination",
         "type": "string"
       },
       {
@@ -67334,6 +67817,66 @@
           {
             "label": "Get ACL",
             "value": "get_acl"
+          },
+          {
+            "label": "Authorize Device",
+            "value": "authorize_device"
+          },
+          {
+            "label": "Get Device Routes",
+            "value": "get_device_routes"
+          },
+          {
+            "label": "Set Device Routes",
+            "value": "set_device_routes"
+          },
+          {
+            "label": "Update Device Key",
+            "value": "update_device_key"
+          },
+          {
+            "label": "List DNS Nameservers",
+            "value": "list_dns_nameservers"
+          },
+          {
+            "label": "Set DNS Nameservers",
+            "value": "set_dns_nameservers"
+          },
+          {
+            "label": "Get DNS Preferences",
+            "value": "get_dns_preferences"
+          },
+          {
+            "label": "Set DNS Preferences",
+            "value": "set_dns_preferences"
+          },
+          {
+            "label": "Get DNS Search Paths",
+            "value": "get_dns_searchpaths"
+          },
+          {
+            "label": "Set DNS Search Paths",
+            "value": "set_dns_searchpaths"
+          },
+          {
+            "label": "List Tailnet Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Create Auth Key",
+            "value": "create_auth_key"
+          },
+          {
+            "label": "List Auth Keys",
+            "value": "list_auth_keys"
+          },
+          {
+            "label": "Get Auth Key",
+            "value": "get_auth_key"
+          },
+          {
+            "label": "Delete Auth Key",
+            "value": "delete_auth_key"
           }
         ],
         "type": "options"
@@ -67343,7 +67886,18 @@
           "field": "operation",
           "value": [
             "list_devices",
-            "get_acl"
+            "get_acl",
+            "list_dns_nameservers",
+            "set_dns_nameservers",
+            "get_dns_preferences",
+            "set_dns_preferences",
+            "get_dns_searchpaths",
+            "set_dns_searchpaths",
+            "list_users",
+            "create_auth_key",
+            "list_auth_keys",
+            "get_auth_key",
+            "delete_auth_key"
           ]
         },
         "default": "-",
@@ -67357,7 +67911,11 @@
           "value": [
             "get_device",
             "delete_device",
-            "set_device_tags"
+            "set_device_tags",
+            "authorize_device",
+            "get_device_routes",
+            "set_device_routes",
+            "update_device_key"
           ]
         },
         "label": "Device ID",
@@ -67482,6 +68040,90 @@
         "default": "monthly",
         "label": "Duration",
         "name": "duration",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_device_routes"
+          ]
+        },
+        "default": [],
+        "label": "Routes (JSON array)",
+        "name": "routes",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_device_key"
+          ]
+        },
+        "default": {},
+        "label": "Key Body (JSON)",
+        "name": "key_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_dns_nameservers"
+          ]
+        },
+        "default": [],
+        "label": "DNS Addresses (JSON array)",
+        "name": "dns_addresses",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_dns_preferences"
+          ]
+        },
+        "default": true,
+        "label": "Magic DNS",
+        "name": "magic_dns",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_dns_searchpaths"
+          ]
+        },
+        "default": [],
+        "label": "Search Paths (JSON array)",
+        "name": "search_paths",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_auth_key"
+          ]
+        },
+        "default": {},
+        "label": "Auth Key Body (JSON)",
+        "name": "auth_key_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_auth_key",
+            "delete_auth_key"
+          ]
+        },
+        "label": "Key ID",
+        "name": "key_id",
         "type": "string"
       },
       {
@@ -67974,6 +68616,66 @@
           {
             "label": "Signal Workflow",
             "value": "signal_workflow"
+          },
+          {
+            "label": "Signal With Start",
+            "value": "signal_with_start"
+          },
+          {
+            "label": "Query Workflow",
+            "value": "query_workflow"
+          },
+          {
+            "label": "Update Workflow",
+            "value": "update_workflow"
+          },
+          {
+            "label": "Count Workflows",
+            "value": "count_workflows"
+          },
+          {
+            "label": "Get Workflow History",
+            "value": "get_workflow_history"
+          },
+          {
+            "label": "Cancel Workflow",
+            "value": "cancel_workflow"
+          },
+          {
+            "label": "Reset Workflow",
+            "value": "reset_workflow"
+          },
+          {
+            "label": "Describe Task Queue",
+            "value": "describe_task_queue"
+          },
+          {
+            "label": "Create Schedule",
+            "value": "create_schedule"
+          },
+          {
+            "label": "List Schedules",
+            "value": "list_schedules"
+          },
+          {
+            "label": "Describe Schedule",
+            "value": "describe_schedule"
+          },
+          {
+            "label": "Pause Schedule",
+            "value": "pause_schedule"
+          },
+          {
+            "label": "Unpause Schedule",
+            "value": "unpause_schedule"
+          },
+          {
+            "label": "Trigger Schedule",
+            "value": "trigger_schedule"
+          },
+          {
+            "label": "Delete Schedule",
+            "value": "delete_schedule"
           }
         ],
         "type": "options"
@@ -68082,7 +68784,22 @@
             "describe_workflow",
             "terminate_workflow",
             "list_workflows",
-            "signal_workflow"
+            "signal_workflow",
+            "signal_with_start",
+            "query_workflow",
+            "update_workflow",
+            "count_workflows",
+            "get_workflow_history",
+            "cancel_workflow",
+            "reset_workflow",
+            "describe_task_queue",
+            "create_schedule",
+            "list_schedules",
+            "describe_schedule",
+            "pause_schedule",
+            "unpause_schedule",
+            "trigger_schedule",
+            "delete_schedule"
           ]
         },
         "label": "Namespace",
@@ -68096,7 +68813,13 @@
             "start_workflow",
             "describe_workflow",
             "terminate_workflow",
-            "signal_workflow"
+            "signal_workflow",
+            "signal_with_start",
+            "query_workflow",
+            "update_workflow",
+            "get_workflow_history",
+            "cancel_workflow",
+            "reset_workflow"
           ]
         },
         "label": "Workflow ID",
@@ -68118,7 +68841,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "start_workflow"
+            "start_workflow",
+            "describe_task_queue"
           ]
         },
         "label": "Task Queue",
@@ -68141,7 +68865,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "signal_workflow"
+            "signal_workflow",
+            "signal_with_start"
           ]
         },
         "label": "Signal Name",
@@ -68158,6 +68883,68 @@
         "label": "Reason",
         "name": "reason",
         "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Workflow Input (JSON)",
+        "name": "workflow_input",
+        "type": "json"
+      },
+      {
+        "default": {},
+        "label": "Signal Input (JSON)",
+        "name": "signal_input",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "query_workflow"
+          ]
+        },
+        "label": "Query Type",
+        "name": "query_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_workflow"
+          ]
+        },
+        "label": "Update Name",
+        "name": "update_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_schedule",
+            "describe_schedule",
+            "pause_schedule",
+            "unpause_schedule",
+            "trigger_schedule",
+            "delete_schedule"
+          ]
+        },
+        "label": "Schedule ID",
+        "name": "schedule_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_schedule"
+          ]
+        },
+        "default": {},
+        "label": "Schedule Body (JSON)",
+        "name": "schedule_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -69124,6 +69911,54 @@
           {
             "label": "Get Alert",
             "value": "get_alert"
+          },
+          {
+            "label": "Cancel All Runs for Task",
+            "value": "cancel_all_runs"
+          },
+          {
+            "label": "Expire Run",
+            "value": "expire_run"
+          },
+          {
+            "label": "Update Run Metadata",
+            "value": "update_run_metadata"
+          },
+          {
+            "label": "Get Run Metadata",
+            "value": "get_run_metadata"
+          },
+          {
+            "label": "List Run Attempts",
+            "value": "list_run_attempts"
+          },
+          {
+            "label": "Get Current Run (from JWT)",
+            "value": "get_current_run"
+          },
+          {
+            "label": "List Batches",
+            "value": "list_batches"
+          },
+          {
+            "label": "Get Batch",
+            "value": "get_batch"
+          },
+          {
+            "label": "Cancel Batch",
+            "value": "cancel_batch"
+          },
+          {
+            "label": "List Run Tags (across all)",
+            "value": "list_run_tags_across"
+          },
+          {
+            "label": "Send Event (v3)",
+            "value": "send_event"
+          },
+          {
+            "label": "Get Event",
+            "value": "get_event"
           }
         ],
         "type": "options"
@@ -69176,7 +70011,8 @@
             "trigger_task",
             "trigger_with_context",
             "batch_trigger",
-            "get_task"
+            "get_task",
+            "cancel_all_runs"
           ]
         },
         "label": "Task ID",
@@ -69192,7 +70028,11 @@
             "replay_run",
             "reschedule_run",
             "get_run_stream",
-            "wait_for_run"
+            "wait_for_run",
+            "expire_run",
+            "update_run_metadata",
+            "get_run_metadata",
+            "list_run_attempts"
           ]
         },
         "label": "Run ID",
@@ -69419,6 +70259,64 @@
         },
         "label": "Alert ID",
         "name": "alert_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_run_metadata"
+          ]
+        },
+        "default": {},
+        "label": "Metadata (JSON)",
+        "name": "metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_batch",
+            "cancel_batch"
+          ]
+        },
+        "label": "Batch ID",
+        "name": "batch_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_event"
+          ]
+        },
+        "label": "Event Name",
+        "name": "event_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_event"
+          ]
+        },
+        "default": {},
+        "label": "Event Payload (JSON)",
+        "name": "event_payload",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_event"
+          ]
+        },
+        "label": "Event ID",
+        "name": "event_id",
         "type": "string"
       },
       {
@@ -70868,6 +71766,58 @@
           {
             "label": "EXISTS",
             "value": "exists"
+          },
+          {
+            "label": "HSET",
+            "value": "hset"
+          },
+          {
+            "label": "HGET",
+            "value": "hget"
+          },
+          {
+            "label": "HGETALL",
+            "value": "hgetall"
+          },
+          {
+            "label": "HDEL",
+            "value": "hdel"
+          },
+          {
+            "label": "SETNX",
+            "value": "setnx"
+          },
+          {
+            "label": "LPUSH",
+            "value": "lpush"
+          },
+          {
+            "label": "RPUSH",
+            "value": "rpush"
+          },
+          {
+            "label": "LPOP",
+            "value": "lpop"
+          },
+          {
+            "label": "RPOP",
+            "value": "rpop"
+          },
+          {
+            "label": "LLEN",
+            "value": "llen"
+          },
+          {
+            "label": "LRANGE",
+            "value": "lrange"
+          },
+          {
+            "label": "PERSIST",
+            "value": "persist"
+          },
+          {
+            "label": "Arbitrary Command",
+            "value": "command"
           }
         ],
         "type": "options"
@@ -70939,6 +71889,78 @@
         "mode": "advanced",
         "name": "increment",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "keys"
+          ]
+        },
+        "default": "*",
+        "label": "Pattern",
+        "name": "pattern",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "hset",
+            "hget",
+            "hdel"
+          ]
+        },
+        "label": "Hash Field",
+        "name": "hash_field",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "hset"
+          ]
+        },
+        "label": "Hash Value",
+        "name": "hash_value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "lrange"
+          ]
+        },
+        "default": 0,
+        "label": "Range Start",
+        "name": "range_start",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "lrange"
+          ]
+        },
+        "default": -1,
+        "label": "Range End",
+        "name": "range_end",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "command"
+          ]
+        },
+        "default": [],
+        "label": "Redis Command (JSON array)",
+        "name": "redis_command",
+        "type": "json"
       },
       {
         "default": 0,
@@ -74903,6 +75925,70 @@
           {
             "label": "Get Organization",
             "value": "get_organization"
+          },
+          {
+            "label": "List Tickets",
+            "value": "get_tickets"
+          },
+          {
+            "label": "Create Tickets (bulk)",
+            "value": "create_tickets_bulk"
+          },
+          {
+            "label": "Update Tickets (bulk)",
+            "value": "update_tickets_bulk"
+          },
+          {
+            "label": "Merge Tickets",
+            "value": "merge_tickets"
+          },
+          {
+            "label": "List Users",
+            "value": "get_users"
+          },
+          {
+            "label": "Get Current User",
+            "value": "get_current_user"
+          },
+          {
+            "label": "Search Users",
+            "value": "search_users"
+          },
+          {
+            "label": "Create Users (bulk)",
+            "value": "create_users_bulk"
+          },
+          {
+            "label": "Update Users (bulk)",
+            "value": "update_users_bulk"
+          },
+          {
+            "label": "Delete User",
+            "value": "delete_user"
+          },
+          {
+            "label": "List Organizations",
+            "value": "get_organizations"
+          },
+          {
+            "label": "Autocomplete Organizations",
+            "value": "autocomplete_organizations"
+          },
+          {
+            "label": "Create Organization",
+            "value": "create_organization"
+          },
+          {
+            "label": "Create Organizations (bulk)",
+            "value": "create_organizations_bulk"
+          },
+          {
+            "label": "Update Organization",
+            "value": "update_organization"
+          },
+          {
+            "label": "Delete Organization",
+            "value": "delete_organization"
           }
         ],
         "type": "options"
@@ -75108,6 +76194,125 @@
         "mode": "advanced",
         "name": "page",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "merge_tickets"
+          ]
+        },
+        "label": "Ticket ID",
+        "name": "zendesk_ticket_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_tickets_bulk",
+            "update_tickets_bulk"
+          ]
+        },
+        "default": [],
+        "label": "Tickets (JSON array)",
+        "name": "tickets_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "merge_tickets"
+          ]
+        },
+        "default": [],
+        "label": "Target Ticket IDs (JSON)",
+        "name": "target_ticket_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "zendesk_user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_users"
+          ]
+        },
+        "label": "User Search Query",
+        "name": "zendesk_user_query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_users_bulk",
+            "update_users_bulk"
+          ]
+        },
+        "default": [],
+        "label": "Users (JSON array)",
+        "name": "users_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_organization",
+            "delete_organization"
+          ]
+        },
+        "label": "Organization ID",
+        "name": "organization_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "autocomplete_organizations"
+          ]
+        },
+        "label": "Organization Name",
+        "name": "organization_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_organization",
+            "update_organization"
+          ]
+        },
+        "default": {},
+        "label": "Organization Body (JSON)",
+        "name": "organization_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_organizations_bulk"
+          ]
+        },
+        "default": [],
+        "label": "Organizations (JSON array)",
+        "name": "orgs_body",
+        "type": "json"
       },
       {
         "default": 0,
