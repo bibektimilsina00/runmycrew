@@ -120,11 +120,23 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.asana import (
         asana_trigger as _asana_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.ashby import (
+        ashby_trigger as _ashby_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.attio import (
+        attio_trigger as _attio_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.calcom import (
         calcom_trigger as _calcom_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.calendly import (
         calendly_trigger as _calendly_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.confluence import (
+        confluence_trigger as _confluence_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.emailbison import (
+        emailbison_trigger as _emailbison_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.gchat import (
@@ -146,6 +158,12 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.gpeople import (
         gpeople_trigger as _gpeople_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.grain import (
+        grain_trigger as _grain_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.greenhouse import (
+        greenhouse_trigger as _greenhouse_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gtasks import (
         gtasks_trigger as _gtasks_trigger,  # noqa: F401
     )
@@ -158,11 +176,17 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.imap import (
         imap_trigger as _imap_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.instantly import (
+        instantly_trigger as _instantly_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.intercom import (
         intercom_trigger as _intercom_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.jira import (
         jira_trigger as _jira_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.lemlist import (
+        lemlist_trigger as _lemlist_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.linear import (
         linear_trigger as _linear_trigger,  # noqa: F401
@@ -181,6 +205,12 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.rss import (
         rss_trigger as _rss_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.salesforce import (
+        salesforce_trigger as _salesforce_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.servicenow import (
+        servicenow_trigger as _servicenow_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.telegram import (
         telegram_trigger as _telegram_trigger,  # noqa: F401

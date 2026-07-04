@@ -20,7 +20,10 @@ from apps.api.app.node_system.nodes.algolia.algolia_node import AlgoliaNode
 from apps.api.app.node_system.nodes.apify.apify_node import ApifyNode
 from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
+from apps.api.app.node_system.nodes.ashby.ashby_node import AshbyNode
+from apps.api.app.node_system.nodes.ashby.ashby_trigger import AshbyTriggerNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
+from apps.api.app.node_system.nodes.attio.attio_trigger import AttioTriggerNode
 from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
 from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
     AWSCloudFormationNode,
@@ -50,12 +53,18 @@ from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import Cloudflare
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
+from apps.api.app.node_system.nodes.common.file.file_node import FileNode
 from apps.api.app.node_system.nodes.common.json_transform.json_transform import JsonTransformNode
 from apps.api.app.node_system.nodes.common.merge.merge import MergeNode
 from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetVariableNode
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
+from apps.api.app.node_system.nodes.confluence.confluence_node import ConfluenceNode
+from apps.api.app.node_system.nodes.confluence.confluence_trigger import ConfluenceTriggerNode
+from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
+    ConfluenceWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
@@ -67,6 +76,11 @@ from apps.api.app.node_system.nodes.docusign.docusign_node import DocuSignNode
 from apps.api.app.node_system.nodes.dropbox.dropbox_node import DropboxNode
 from apps.api.app.node_system.nodes.dub.dub_node import DubNode
 from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGoNode
+from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
+from apps.api.app.node_system.nodes.emailbison.emailbison_trigger import EmailbisonTriggerNode
+from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
+    EmailbisonWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.exa.exa_node import ExaNode
 from apps.api.app.node_system.nodes.fathom.fathom_node import FathomNode
 from apps.api.app.node_system.nodes.fathom.fathom_webhook import FathomWebhookTriggerNode
@@ -101,6 +115,10 @@ from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
 )
 from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
+from apps.api.app.node_system.nodes.grain.grain_node import GrainNode
+from apps.api.app.node_system.nodes.grain.grain_trigger import GrainTriggerNode
+from apps.api.app.node_system.nodes.greenhouse.greenhouse_node import GreenhouseNode
+from apps.api.app.node_system.nodes.greenhouse.greenhouse_trigger import GreenhouseTriggerNode
 from apps.api.app.node_system.nodes.gsc.gsc_node import GoogleSearchConsoleNode
 from apps.api.app.node_system.nodes.gslides.gslides_node import GoogleSlidesNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
@@ -115,13 +133,20 @@ from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTrigge
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
+from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
+from apps.api.app.node_system.nodes.instantly.instantly_webhook import InstantlyWebhookTriggerNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
+from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
+from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
+from apps.api.app.node_system.nodes.lemlist.lemlist_trigger import LemlistTriggerNode
+from apps.api.app.node_system.nodes.lemlist.lemlist_webhook import LemlistWebhookTriggerNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
+from apps.api.app.node_system.nodes.linear.linear_webhook import LinearWebhookTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
 from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
 from apps.api.app.node_system.nodes.logic.do_while.do_while import DoWhileNode
@@ -158,6 +183,7 @@ from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNo
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
+from apps.api.app.node_system.nodes.notion.notion_webhook import NotionWebhookTriggerNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
@@ -172,10 +198,13 @@ from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
+from apps.api.app.node_system.nodes.salesforce.salesforce_trigger import SalesforceTriggerNode
 from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
 from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
+from apps.api.app.node_system.nodes.servicenow.servicenow_node import ServiceNowNode
+from apps.api.app.node_system.nodes.servicenow.servicenow_trigger import ServiceNowTriggerNode
 from apps.api.app.node_system.nodes.sharepoint.sharepoint_node import SharePointNode
 from apps.api.app.node_system.nodes.shopify.shopify_node import ShopifyNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
@@ -192,8 +221,10 @@ from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNo
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
+from apps.api.app.node_system.nodes.typeform.typeform_webhook import TypeformWebhookTriggerNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
+from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTriggerNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
@@ -423,3 +454,32 @@ node_registry.register(SubWorkflowNode)
 
 # Load tool definitions (side-effect: registers all tools in tool_registry)
 import apps.api.app.node_system.tools.loader  # noqa: E402, F401
+
+# Phase 4 registrations (collapsed from #290-#301).
+node_registry.register(FileNode)
+node_registry.register(AttioTriggerNode)
+node_registry.register(SalesforceTriggerNode)
+node_registry.register(ConfluenceNode)
+node_registry.register(ConfluenceTriggerNode)
+node_registry.register(ServiceNowNode)
+node_registry.register(ServiceNowTriggerNode)
+node_registry.register(GreenhouseNode)
+node_registry.register(GreenhouseTriggerNode)
+node_registry.register(AshbyNode)
+node_registry.register(AshbyTriggerNode)
+node_registry.register(GrainNode)
+node_registry.register(GrainTriggerNode)
+node_registry.register(LemlistNode)
+node_registry.register(LemlistTriggerNode)
+node_registry.register(InstantlyTriggerNode)
+node_registry.register(EmailbisonNode)
+node_registry.register(EmailbisonTriggerNode)
+node_registry.register(InstantlyWebhookTriggerNode)
+node_registry.register(LemlistWebhookTriggerNode)
+node_registry.register(EmailbisonWebhookTriggerNode)
+node_registry.register(JiraWebhookTriggerNode)
+node_registry.register(LinearWebhookTriggerNode)
+node_registry.register(NotionWebhookTriggerNode)
+node_registry.register(ConfluenceWebhookTriggerNode)
+node_registry.register(VercelWebhookTriggerNode)
+node_registry.register(TypeformWebhookTriggerNode)

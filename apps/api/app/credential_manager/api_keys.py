@@ -740,6 +740,38 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
         ],
     ),
+    "lemlist": APIKeyProvider(
+        id="lemlist_api_key",
+        name="Lemlist",
+        icon_slug="lemlist",
+        color="#1c1c1c",
+        description="Lemlist — outbound email campaigns, leads, activities.",
+        hint="API key from Lemlist Settings → API",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Lemlist API key",
+            ),
+        ],
+    ),
+    "emailbison": APIKeyProvider(
+        id="emailbison_api_key",
+        name="Emailbison",
+        icon_slug="emailbison",
+        color="#1c1c1c",
+        description="Emailbison — outbound-email campaigns, leads, workspaces.",
+        hint="API key from Emailbison workspace settings",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Emailbison API key",
+            ),
+        ],
+    ),
     "instantly": APIKeyProvider(
         id="instantly_api_key",
         name="Instantly",
@@ -1077,6 +1109,110 @@ PROVIDERS = {
             CredentialField(
                 id="base_url",
                 label="Jira Base URL",
+                type="text",
+                placeholder="https://yoursite.atlassian.net",
+            ),
+        ],
+    ),
+    "ashby": APIKeyProvider(
+        id="ashby_api_key",
+        name="Ashby",
+        icon_slug="ashby",
+        color="#1c1c1c",
+        description="Ashby ATS — candidates, applications, jobs via POST-based JSON API.",
+        hint="API key from Admin → API keys",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="ashby_v1_...",
+            ),
+        ],
+    ),
+    "greenhouse": APIKeyProvider(
+        id="greenhouse_api_key",
+        name="Greenhouse",
+        icon_slug="greenhouse",
+        color="#1c1c1c",
+        description="Greenhouse ATS — jobs, candidates, applications via Harvest API v1.",
+        hint="Harvest API key (Basic auth as user, no password)",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Harvest API Key",
+                type="password",
+                placeholder="Harvest key from Greenhouse settings",
+            ),
+        ],
+    ),
+    "grain": APIKeyProvider(
+        id="grain_api_key",
+        name="Grain",
+        icon_slug="grain",
+        color="#1c1c1c",
+        description="Grain — meeting recorder, highlights, stories via public API v3.",
+        hint="Personal Access Token from Grain settings",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Access Token",
+                type="password",
+                placeholder="grain_pat_...",
+            ),
+        ],
+    ),
+    "servicenow": APIKeyProvider(
+        id="servicenow_api_key",
+        name="ServiceNow",
+        icon_slug="servicenow",
+        color="#1c1c1c",
+        description="ServiceNow — ITSM tickets, incidents, change requests via Table API.",
+        hint="Instance + username + password",
+        fields=[
+            CredentialField(
+                id="instance",
+                label="Instance",
+                type="string",
+                placeholder="mycompany (from mycompany.service-now.com)",
+            ),
+            CredentialField(
+                id="username",
+                label="Username",
+                type="string",
+                placeholder="you@company.com",
+            ),
+            CredentialField(
+                id="api_key",
+                label="Password / API Token",
+                type="password",
+                placeholder="Password (or scoped OAuth token)",
+            ),
+        ],
+    ),
+    "confluence": APIKeyProvider(
+        id="confluence_api_key",
+        name="Confluence",
+        icon_slug="confluence",
+        color="#ffffff",
+        description="Confluence Cloud — pages, spaces, blogs, comments via REST v2",
+        hint="https://yoursite.atlassian.net (same site as Jira)",
+        fields=[
+            CredentialField(
+                id="email",
+                label="Atlassian Email",
+                type="text",
+                placeholder="you@company.com",
+            ),
+            CredentialField(
+                id="api_key",
+                label="API Token",
+                type="password",
+                placeholder="ATATT3x...",
+            ),
+            CredentialField(
+                id="base_url",
+                label="Confluence Base URL",
                 type="text",
                 placeholder="https://yoursite.atlassian.net",
             ),
