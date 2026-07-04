@@ -45,6 +45,8 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="input", label="Input (JSON)", type="json"),
         FieldSpec(name="signal_name", label="Signal Name", type="string"),
         FieldSpec(name="reason", label="Reason", type="string"),
+        FieldSpec(name="query_text", label="Query", type="string"),
+        FieldSpec(name="insert_body", label="Insert Body (JSON rows)", type="json", default={}),
     ],
     operations=[
         OpSpec(
@@ -70,6 +72,86 @@ MANIFEST = ProviderManifest(
             path="/",
             visible_fields=["database"],
             body_builder=lambda v: "SHOW TABLES",
+        ),
+        OpSpec(
+            id="list_databases",
+            label="List Databases",
+            method="POST",
+            path="/",
+            visible_fields=["query_text"],
+            query_builder=lambda v: {"query": "SHOW DATABASES FORMAT JSON"},
+        ),
+        OpSpec(
+            id="list_tables",
+            label="List Tables",
+            method="POST",
+            path="/",
+            visible_fields=["database"],
+            query_builder=lambda v: {
+                "query": "SHOW TABLES FROM "
+                + (getattr(v, "database", "") or "default")
+                + " FORMAT JSON"
+            },
+        ),
+        OpSpec(
+            id="describe_table",
+            label="Describe Table",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {
+                "query": "DESCRIBE TABLE " + (getattr(v, "table", "") or "") + " FORMAT JSON"
+            },
+        ),
+        OpSpec(
+            id="count",
+            label="Row Count",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {
+                "query": "SELECT count() FROM " + (getattr(v, "table", "") or "") + " FORMAT JSON"
+            },
+        ),
+        OpSpec(
+            id="truncate_table",
+            label="Truncate Table",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {"query": "TRUNCATE TABLE " + (getattr(v, "table", "") or "")},
+        ),
+        OpSpec(
+            id="drop_table",
+            label="Drop Table",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {"query": "DROP TABLE " + (getattr(v, "table", "") or "")},
+        ),
+        OpSpec(
+            id="optimize_table",
+            label="Optimize Table",
+            method="POST",
+            path="/",
+            visible_fields=["table"],
+            query_builder=lambda v: {"query": "OPTIMIZE TABLE " + (getattr(v, "table", "") or "")},
+        ),
+        OpSpec(
+            id="list_users",
+            label="List Users",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.users FORMAT JSON"},
+        ),
+        OpSpec(
+            id="get_settings",
+            label="Get System Settings",
+            method="POST",
+            path="/",
+            visible_fields=[],
+            query_builder=lambda v: {"query": "SELECT * FROM system.settings FORMAT JSON"},
         ),
     ],
     outputs_schema=[

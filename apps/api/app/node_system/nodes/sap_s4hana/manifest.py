@@ -84,6 +84,8 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="sales_order", label="Sales Order ID", type="string"),
         FieldSpec(name="top", label="Top", type="number", default=20, mode="advanced"),
         FieldSpec(name="filter", label="Filter", type="string", mode="advanced"),
+        FieldSpec(name="product_id", label="Product ID", type="string"),
+        FieldSpec(name="purchase_order", label="Purchase Order ID", type="string"),
     ],
     operations=[
         OpSpec(
@@ -146,6 +148,100 @@ MANIFEST = ProviderManifest(
                 }.items()
                 if val is not None
             },
+        ),
+        OpSpec(
+            id="list_products",
+            label="List Products",
+            method="GET",
+            path="/API_PRODUCT_SRV/A_Product",
+            visible_fields=["top", "filter"],
+            query_builder=lambda v: {
+                k: val
+                for k, val in {
+                    "$top": int(getattr(v, "top", 20) or 20),
+                    "$filter": getattr(v, "filter", None) or None,
+                }.items()
+                if val is not None
+            },
+        ),
+        OpSpec(
+            id="get_product",
+            label="Get Product",
+            method="GET",
+            path="/API_PRODUCT_SRV/A_Product('{product_id}')",
+            visible_fields=["product_id"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_purchase_orders",
+            label="List Purchase Orders",
+            method="GET",
+            path="/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder",
+            visible_fields=["top", "filter"],
+            query_builder=lambda v: {
+                k: val
+                for k, val in {
+                    "$top": int(getattr(v, "top", 20) or 20),
+                    "$filter": getattr(v, "filter", None) or None,
+                }.items()
+                if val is not None
+            },
+        ),
+        OpSpec(
+            id="get_purchase_order",
+            label="Get Purchase Order",
+            method="GET",
+            path="/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder('{purchase_order}')",
+            visible_fields=["purchase_order"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_billing_documents",
+            label="List Billing Documents",
+            method="GET",
+            path="/API_BILLING_DOCUMENT_SRV/A_BillingDocument",
+            visible_fields=["top"],
+            query_builder=lambda v: {"$top": int(getattr(v, "top", 20) or 20)},
+        ),
+        OpSpec(
+            id="list_deliveries",
+            label="List Deliveries",
+            method="GET",
+            path="/API_OUTBOUND_DELIVERY_SRV/A_OutbDeliveryHeader",
+            visible_fields=["top"],
+            query_builder=lambda v: {"$top": int(getattr(v, "top", 20) or 20)},
+        ),
+        OpSpec(
+            id="list_material_movements",
+            label="List Material Movements",
+            method="GET",
+            path="/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader",
+            visible_fields=["top"],
+            query_builder=lambda v: {"$top": int(getattr(v, "top", 20) or 20)},
+        ),
+        OpSpec(
+            id="list_bank_accounts",
+            label="List Bank Accounts",
+            method="GET",
+            path="/API_BANKACCOUNT/BankAccount",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_cost_centers",
+            label="List Cost Centers",
+            method="GET",
+            path="/API_COSTCENTER_SRV/A_CostCenter",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_profit_centers",
+            label="List Profit Centers",
+            method="GET",
+            path="/API_PROFITCENTER_SRV/A_ProfitCenter",
+            visible_fields=[],
+            query_builder=lambda v: {},
         ),
     ],
     outputs_schema=[

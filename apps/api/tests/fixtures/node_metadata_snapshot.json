@@ -9049,6 +9049,42 @@
           {
             "label": "Show Tables",
             "value": "show_tables"
+          },
+          {
+            "label": "List Databases",
+            "value": "list_databases"
+          },
+          {
+            "label": "List Tables",
+            "value": "list_tables"
+          },
+          {
+            "label": "Describe Table",
+            "value": "describe_table"
+          },
+          {
+            "label": "Row Count",
+            "value": "count"
+          },
+          {
+            "label": "Truncate Table",
+            "value": "truncate_table"
+          },
+          {
+            "label": "Drop Table",
+            "value": "drop_table"
+          },
+          {
+            "label": "Optimize Table",
+            "value": "optimize_table"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get System Settings",
+            "value": "get_settings"
           }
         ],
         "type": "options"
@@ -9110,7 +9146,8 @@
           "value": [
             "query",
             "insert",
-            "show_tables"
+            "show_tables",
+            "list_tables"
           ]
         },
         "label": "Database",
@@ -9121,7 +9158,12 @@
         "condition": {
           "field": "operation",
           "value": [
-            "insert"
+            "insert",
+            "describe_table",
+            "count",
+            "truncate_table",
+            "drop_table",
+            "optimize_table"
           ]
         },
         "label": "Table",
@@ -9203,6 +9245,23 @@
         "label": "Reason",
         "name": "reason",
         "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_databases"
+          ]
+        },
+        "label": "Query",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "default": {},
+        "label": "Insert Body (JSON rows)",
+        "name": "insert_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -31539,6 +31598,62 @@
           {
             "label": "List Severities",
             "value": "list_severities"
+          },
+          {
+            "label": "Close Incident",
+            "value": "close_incident"
+          },
+          {
+            "label": "Create Action",
+            "value": "create_action"
+          },
+          {
+            "label": "List Actions",
+            "value": "list_actions"
+          },
+          {
+            "label": "Get Action",
+            "value": "get_action"
+          },
+          {
+            "label": "Update Action",
+            "value": "update_action"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "List Incident Types",
+            "value": "list_incident_types"
+          },
+          {
+            "label": "List Incident Roles",
+            "value": "list_incident_roles"
+          },
+          {
+            "label": "List Incident Updates",
+            "value": "list_incident_updates"
+          },
+          {
+            "label": "Create Incident Update",
+            "value": "create_incident_update"
+          },
+          {
+            "label": "List Follow-ups",
+            "value": "list_follow_ups"
+          },
+          {
+            "label": "Get Follow-up",
+            "value": "get_follow_up"
+          },
+          {
+            "label": "List Schedules",
+            "value": "list_schedules"
           }
         ],
         "type": "options"
@@ -31644,7 +31759,8 @@
           "field": "operation",
           "value": [
             "get_incident",
-            "update_incident"
+            "update_incident",
+            "close_incident"
           ]
         },
         "label": "Incident ID",
@@ -31673,6 +31789,71 @@
         "mode": "advanced",
         "name": "page_size",
         "type": "number"
+      },
+      {
+        "default": {},
+        "label": "Incident Body (JSON)",
+        "name": "incident_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_action",
+            "update_action"
+          ]
+        },
+        "label": "Action ID",
+        "name": "action_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_action",
+            "update_action"
+          ]
+        },
+        "default": {},
+        "label": "Action Body (JSON)",
+        "name": "action_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user"
+          ]
+        },
+        "label": "User ID",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_follow_up"
+          ]
+        },
+        "label": "Follow-up ID",
+        "name": "follow_up_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident_update"
+          ]
+        },
+        "default": {},
+        "label": "Incident Update Body (JSON)",
+        "name": "incident_update_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -33335,6 +33516,62 @@
           {
             "label": "Add Comment to Request",
             "value": "add_comment"
+          },
+          {
+            "label": "Get Request Status",
+            "value": "get_request_status"
+          },
+          {
+            "label": "List Request Comments",
+            "value": "list_comments"
+          },
+          {
+            "label": "Get Request Comment",
+            "value": "get_comment"
+          },
+          {
+            "label": "List Request Attachments",
+            "value": "list_attachments"
+          },
+          {
+            "label": "List Customers",
+            "value": "list_customers"
+          },
+          {
+            "label": "Add Customer to Service Desk",
+            "value": "add_customer"
+          },
+          {
+            "label": "List Organizations",
+            "value": "list_orgs"
+          },
+          {
+            "label": "Get Organization",
+            "value": "get_org"
+          },
+          {
+            "label": "Create Organization",
+            "value": "create_org"
+          },
+          {
+            "label": "List Users in Organization",
+            "value": "list_org_users"
+          },
+          {
+            "label": "List Service Desk Queues",
+            "value": "list_queues"
+          },
+          {
+            "label": "Get Queue Issues",
+            "value": "get_queue_issues"
+          },
+          {
+            "label": "Transition Request",
+            "value": "transition_request"
+          },
+          {
+            "label": "Get Available Transitions",
+            "value": "get_transitions"
           }
         ],
         "type": "options"
@@ -33412,7 +33649,11 @@
           "value": [
             "list_request_types",
             "create_request",
-            "list_requests"
+            "list_requests",
+            "list_customers",
+            "add_customer",
+            "list_queues",
+            "get_queue_issues"
           ]
         },
         "label": "Service Desk ID",
@@ -33457,7 +33698,13 @@
           "field": "operation",
           "value": [
             "get_request",
-            "add_comment"
+            "add_comment",
+            "get_request_status",
+            "list_comments",
+            "get_comment",
+            "list_attachments",
+            "transition_request",
+            "get_transitions"
           ]
         },
         "label": "Issue Key",
@@ -33480,7 +33727,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_comment"
+            "add_comment",
+            "transition_request"
           ]
         },
         "label": "Comment Body",
@@ -33527,6 +33775,73 @@
       {
         "label": "Shipment ID",
         "name": "shipment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_customer"
+          ]
+        },
+        "label": "Customer Username",
+        "name": "customer_username",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_org",
+            "list_org_users"
+          ]
+        },
+        "label": "Organization ID",
+        "name": "organization_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_org"
+          ]
+        },
+        "label": "Organization Name",
+        "name": "organization_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_queue_issues"
+          ]
+        },
+        "label": "Queue ID",
+        "name": "queue_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "transition_request"
+          ]
+        },
+        "label": "Transition ID",
+        "name": "transition_id",
         "type": "string"
       },
       {
@@ -37076,6 +37391,110 @@
           {
             "label": "Send Campaign",
             "value": "send_campaign"
+          },
+          {
+            "label": "Delete Audience",
+            "value": "delete_audience"
+          },
+          {
+            "label": "Update Audience",
+            "value": "update_audience"
+          },
+          {
+            "label": "Add or Update Member",
+            "value": "add_or_update_member"
+          },
+          {
+            "label": "Archive Member",
+            "value": "archive_member"
+          },
+          {
+            "label": "Unarchive Member",
+            "value": "unarchive_member"
+          },
+          {
+            "label": "Update Campaign",
+            "value": "update_campaign"
+          },
+          {
+            "label": "Delete Campaign",
+            "value": "delete_campaign"
+          },
+          {
+            "label": "Schedule Campaign",
+            "value": "schedule_campaign"
+          },
+          {
+            "label": "Unschedule Campaign",
+            "value": "unschedule_campaign"
+          },
+          {
+            "label": "Replicate Campaign",
+            "value": "replicate_campaign"
+          },
+          {
+            "label": "Get Campaign Content",
+            "value": "get_campaign_content"
+          },
+          {
+            "label": "Set Campaign Content",
+            "value": "set_campaign_content"
+          },
+          {
+            "label": "List Classic Automations",
+            "value": "get_automations"
+          },
+          {
+            "label": "Get Classic Automation",
+            "value": "get_automation"
+          },
+          {
+            "label": "Start Automation",
+            "value": "start_automation"
+          },
+          {
+            "label": "Pause Automation",
+            "value": "pause_automation"
+          },
+          {
+            "label": "List Templates",
+            "value": "get_templates"
+          },
+          {
+            "label": "Get Template",
+            "value": "get_template"
+          },
+          {
+            "label": "List Campaign Reports",
+            "value": "get_campaign_reports"
+          },
+          {
+            "label": "Get Campaign Report",
+            "value": "get_campaign_report"
+          },
+          {
+            "label": "List Segments",
+            "value": "get_segments"
+          },
+          {
+            "label": "Get Segment",
+            "value": "get_segment"
+          },
+          {
+            "label": "Create Segment",
+            "value": "create_segment"
+          },
+          {
+            "label": "Delete Segment",
+            "value": "delete_segment"
+          },
+          {
+            "label": "List Member Tags",
+            "value": "get_tags"
+          },
+          {
+            "label": "Update Member Tags",
+            "value": "update_member_tags"
           }
         ],
         "type": "options"
@@ -37089,7 +37508,18 @@
             "get_member",
             "add_member",
             "update_member",
-            "delete_member"
+            "delete_member",
+            "delete_audience",
+            "update_audience",
+            "add_or_update_member",
+            "archive_member",
+            "unarchive_member",
+            "get_segments",
+            "get_segment",
+            "create_segment",
+            "delete_segment",
+            "get_tags",
+            "update_member_tags"
           ]
         },
         "label": "List (Audience) ID",
@@ -37180,7 +37610,15 @@
         "condition": {
           "field": "operation",
           "value": [
-            "send_campaign"
+            "send_campaign",
+            "update_campaign",
+            "delete_campaign",
+            "schedule_campaign",
+            "unschedule_campaign",
+            "replicate_campaign",
+            "get_campaign_content",
+            "set_campaign_content",
+            "get_campaign_report"
           ]
         },
         "label": "Campaign ID",
@@ -37216,6 +37654,192 @@
         "mode": "advanced",
         "name": "offset",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_or_update_member",
+            "archive_member",
+            "unarchive_member",
+            "get_tags",
+            "update_member_tags"
+          ]
+        },
+        "label": "Subscriber Hash (MD5 of email)",
+        "name": "subscriber_hash",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_or_update_member"
+          ]
+        },
+        "label": "Email Address",
+        "name": "email_address",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_or_update_member"
+          ]
+        },
+        "label": "Status (subscribed|unsubscribed|cleaned|pending)",
+        "name": "status_field",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_audience"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_audience"
+          ]
+        },
+        "label": "From Name",
+        "name": "from_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_audience"
+          ]
+        },
+        "label": "Reply-To",
+        "name": "reply_to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_campaign"
+          ]
+        },
+        "default": {},
+        "label": "Campaign Settings (JSON)",
+        "name": "settings_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "schedule_campaign"
+          ]
+        },
+        "label": "Schedule Time (ISO)",
+        "name": "schedule_time",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_campaign_content"
+          ]
+        },
+        "label": "HTML",
+        "name": "html",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_campaign_content"
+          ]
+        },
+        "label": "Plain Text",
+        "name": "plain_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_automation",
+            "start_automation",
+            "pause_automation"
+          ]
+        },
+        "label": "Workflow ID",
+        "name": "workflow_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_template"
+          ]
+        },
+        "label": "Template ID",
+        "name": "template_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_segment",
+            "delete_segment"
+          ]
+        },
+        "label": "Segment ID",
+        "name": "segment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_segment"
+          ]
+        },
+        "label": "Segment Name",
+        "name": "segment_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_segment"
+          ]
+        },
+        "default": [],
+        "label": "Static Segment Emails (JSON array)",
+        "name": "static_segment",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_member_tags"
+          ]
+        },
+        "default": {},
+        "label": "Tags Body (JSON)",
+        "name": "tags_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -51682,6 +52306,70 @@
           {
             "label": "List Work Locations",
             "value": "list_work_locations"
+          },
+          {
+            "label": "List Compensations",
+            "value": "list_compensations"
+          },
+          {
+            "label": "Get Compensation",
+            "value": "get_compensation"
+          },
+          {
+            "label": "List Time Off Balances",
+            "value": "list_time_off_balances"
+          },
+          {
+            "label": "List Time Off Requests",
+            "value": "list_time_off_requests"
+          },
+          {
+            "label": "Get Time Off Request",
+            "value": "get_time_off_request"
+          },
+          {
+            "label": "List Employment Types",
+            "value": "list_employment_types"
+          },
+          {
+            "label": "List Pay Frequencies",
+            "value": "list_pay_frequencies"
+          },
+          {
+            "label": "List Pay Groups",
+            "value": "list_pay_groups"
+          },
+          {
+            "label": "List Pay Runs",
+            "value": "list_pay_runs"
+          },
+          {
+            "label": "Get Pay Run",
+            "value": "get_pay_run"
+          },
+          {
+            "label": "List Workers (contractors + employees)",
+            "value": "list_workers"
+          },
+          {
+            "label": "Get Worker",
+            "value": "get_worker"
+          },
+          {
+            "label": "List Pay Stubs",
+            "value": "list_pay_stubs"
+          },
+          {
+            "label": "Get Pay Stub",
+            "value": "get_pay_stub"
+          },
+          {
+            "label": "Get Company Info",
+            "value": "list_company"
+          },
+          {
+            "label": "List Leaves",
+            "value": "list_leaves"
           }
         ],
         "type": "options"
@@ -51698,6 +52386,12 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_worker"
+          ]
+        },
         "label": "Worker ID",
         "name": "worker_id",
         "type": "string"
@@ -51771,6 +52465,50 @@
         "mode": "advanced",
         "name": "offset",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_compensation"
+          ]
+        },
+        "label": "Compensation ID",
+        "name": "compensation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_time_off_request"
+          ]
+        },
+        "label": "Request ID",
+        "name": "request_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_pay_run"
+          ]
+        },
+        "label": "Pay Run ID",
+        "name": "pay_run_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_pay_stub"
+          ]
+        },
+        "label": "Pay Stub ID",
+        "name": "pay_stub_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -51860,6 +52598,66 @@
           {
             "label": "Update Incident",
             "value": "update_incident"
+          },
+          {
+            "label": "Resolve Incident",
+            "value": "resolve_incident"
+          },
+          {
+            "label": "Cancel Incident",
+            "value": "cancel_incident"
+          },
+          {
+            "label": "List Services",
+            "value": "list_services"
+          },
+          {
+            "label": "Get Service",
+            "value": "get_service"
+          },
+          {
+            "label": "List Teams",
+            "value": "list_teams"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "List Severities",
+            "value": "list_severities"
+          },
+          {
+            "label": "List Environments",
+            "value": "list_environments"
+          },
+          {
+            "label": "List Functionalities",
+            "value": "list_functionalities"
+          },
+          {
+            "label": "List Playbooks",
+            "value": "list_playbooks"
+          },
+          {
+            "label": "Get Playbook",
+            "value": "get_playbook"
+          },
+          {
+            "label": "List Action Items",
+            "value": "list_action_items"
+          },
+          {
+            "label": "Create Action Item",
+            "value": "create_action_item"
+          },
+          {
+            "label": "List Alerts",
+            "value": "list_alerts"
+          },
+          {
+            "label": "List Events",
+            "value": "list_events"
           }
         ],
         "type": "options"
@@ -51952,7 +52750,9 @@
           "field": "operation",
           "value": [
             "get_incident",
-            "update_incident"
+            "update_incident",
+            "resolve_incident",
+            "cancel_incident"
           ]
         },
         "label": "Incident ID",
@@ -51994,6 +52794,46 @@
         "mode": "advanced",
         "name": "page_size",
         "type": "number"
+      },
+      {
+        "default": {},
+        "label": "Incident Body (JSON)",
+        "name": "incident_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_service"
+          ]
+        },
+        "label": "Service ID",
+        "name": "service_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_playbook"
+          ]
+        },
+        "label": "Playbook ID",
+        "name": "playbook_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_action_item"
+          ]
+        },
+        "default": {},
+        "label": "Action Item Body (JSON)",
+        "name": "action_item_body",
+        "type": "json"
       },
       {
         "default": 0,
@@ -52252,6 +53092,50 @@
           {
             "label": "List Entries in Report",
             "value": "list_entries"
+          },
+          {
+            "label": "Get Report Details",
+            "value": "get_report_details"
+          },
+          {
+            "label": "List Expense Entries",
+            "value": "list_expenses"
+          },
+          {
+            "label": "Get Expense Entry",
+            "value": "get_expense"
+          },
+          {
+            "label": "List Receipt Images",
+            "value": "list_receipts"
+          },
+          {
+            "label": "List Users",
+            "value": "list_users"
+          },
+          {
+            "label": "Get User",
+            "value": "get_user"
+          },
+          {
+            "label": "List Travel Bookings",
+            "value": "list_travel_bookings"
+          },
+          {
+            "label": "Get Travel Booking",
+            "value": "get_travel_booking"
+          },
+          {
+            "label": "List Itemization Types",
+            "value": "list_itemization_types"
+          },
+          {
+            "label": "List Expense Types",
+            "value": "list_expense_types"
+          },
+          {
+            "label": "List Currency Codes",
+            "value": "list_currency_codes"
           }
         ],
         "type": "options"
@@ -52270,7 +53154,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_reports"
+            "list_reports",
+            "get_report_details",
+            "get_user"
           ]
         },
         "label": "User ID",
@@ -52297,7 +53183,9 @@
           "field": "operation",
           "value": [
             "get_report",
-            "list_entries"
+            "list_entries",
+            "get_report_details",
+            "list_expenses"
           ]
         },
         "label": "Report ID",
@@ -52342,6 +53230,39 @@
         "mode": "advanced",
         "name": "offset",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_report_details"
+          ]
+        },
+        "label": "Context (TRAVELER|APPROVER|PROCESSOR)",
+        "name": "context",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_expense"
+          ]
+        },
+        "label": "Entry ID",
+        "name": "entry_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_travel_booking"
+          ]
+        },
+        "label": "Booking ID",
+        "name": "booking_id",
+        "type": "string"
       },
       {
         "default": 0,
@@ -52431,6 +53352,46 @@
           {
             "label": "List Journal Entries",
             "value": "list_journal_entries"
+          },
+          {
+            "label": "List Products",
+            "value": "list_products"
+          },
+          {
+            "label": "Get Product",
+            "value": "get_product"
+          },
+          {
+            "label": "List Purchase Orders",
+            "value": "list_purchase_orders"
+          },
+          {
+            "label": "Get Purchase Order",
+            "value": "get_purchase_order"
+          },
+          {
+            "label": "List Billing Documents",
+            "value": "list_billing_documents"
+          },
+          {
+            "label": "List Deliveries",
+            "value": "list_deliveries"
+          },
+          {
+            "label": "List Material Movements",
+            "value": "list_material_movements"
+          },
+          {
+            "label": "List Bank Accounts",
+            "value": "list_bank_accounts"
+          },
+          {
+            "label": "List Cost Centers",
+            "value": "list_cost_centers"
+          },
+          {
+            "label": "List Profit Centers",
+            "value": "list_profit_centers"
           }
         ],
         "type": "options"
@@ -52749,7 +53710,12 @@
           "value": [
             "list_business_partners",
             "list_sales_orders",
-            "list_journal_entries"
+            "list_journal_entries",
+            "list_products",
+            "list_purchase_orders",
+            "list_billing_documents",
+            "list_deliveries",
+            "list_material_movements"
           ]
         },
         "default": 20,
@@ -52764,12 +53730,36 @@
           "value": [
             "list_business_partners",
             "list_sales_orders",
-            "list_journal_entries"
+            "list_journal_entries",
+            "list_products",
+            "list_purchase_orders"
           ]
         },
         "label": "Filter",
         "mode": "advanced",
         "name": "filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_product"
+          ]
+        },
+        "label": "Product ID",
+        "name": "product_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_purchase_order"
+          ]
+        },
+        "label": "Purchase Order ID",
+        "name": "purchase_order",
         "type": "string"
       },
       {
@@ -55904,6 +56894,102 @@
           {
             "label": "Add Tracks to Playlist",
             "value": "add_tracks_to_playlist"
+          },
+          {
+            "label": "Get Several Tracks",
+            "value": "get_tracks"
+          },
+          {
+            "label": "Get Album",
+            "value": "get_album"
+          },
+          {
+            "label": "Get Several Albums",
+            "value": "get_albums"
+          },
+          {
+            "label": "Get Album Tracks",
+            "value": "get_album_tracks"
+          },
+          {
+            "label": "Get Several Artists",
+            "value": "get_artists"
+          },
+          {
+            "label": "Get Artist Albums",
+            "value": "get_artist_albums"
+          },
+          {
+            "label": "Get Artist Top Tracks",
+            "value": "get_artist_top_tracks"
+          },
+          {
+            "label": "Follow Artists",
+            "value": "follow_artists"
+          },
+          {
+            "label": "Unfollow Artists",
+            "value": "unfollow_artists"
+          },
+          {
+            "label": "Get Followed Artists",
+            "value": "get_followed_artists"
+          },
+          {
+            "label": "Get Show",
+            "value": "get_show"
+          },
+          {
+            "label": "Get Show Episodes",
+            "value": "get_show_episodes"
+          },
+          {
+            "label": "Get Episode",
+            "value": "get_episode"
+          },
+          {
+            "label": "Get Saved Tracks",
+            "value": "get_saved_tracks"
+          },
+          {
+            "label": "Save Tracks",
+            "value": "save_tracks"
+          },
+          {
+            "label": "Remove Saved Tracks",
+            "value": "remove_saved_tracks"
+          },
+          {
+            "label": "Get Playlist",
+            "value": "get_playlist"
+          },
+          {
+            "label": "Get Playlist Tracks",
+            "value": "get_playlist_tracks"
+          },
+          {
+            "label": "Remove Playlist Tracks",
+            "value": "remove_playlist_tracks"
+          },
+          {
+            "label": "Start / Resume Playback",
+            "value": "play"
+          },
+          {
+            "label": "Pause Playback",
+            "value": "pause"
+          },
+          {
+            "label": "Skip to Next Track",
+            "value": "skip_next"
+          },
+          {
+            "label": "Skip to Previous Track",
+            "value": "skip_previous"
+          },
+          {
+            "label": "Get Currently Playing",
+            "value": "get_currently_playing"
           }
         ],
         "type": "options"
@@ -55951,7 +57037,10 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_tracks_to_playlist"
+            "add_tracks_to_playlist",
+            "get_playlist",
+            "get_playlist_tracks",
+            "remove_playlist_tracks"
           ]
         },
         "label": "Playlist ID",
@@ -56017,7 +57106,8 @@
           "field": "operation",
           "value": [
             "search",
-            "list_user_playlists"
+            "list_user_playlists",
+            "get_saved_tracks"
           ]
         },
         "default": 10,
@@ -56057,7 +57147,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_artist"
+            "get_artist",
+            "get_artist_albums",
+            "get_artist_top_tracks"
           ]
         },
         "label": "Artist ID",
@@ -56107,7 +57199,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_tracks_to_playlist"
+            "add_tracks_to_playlist",
+            "remove_playlist_tracks"
           ]
         },
         "default": [],
@@ -56168,6 +57261,85 @@
       {
         "label": "Generation ID",
         "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_tracks",
+            "get_albums",
+            "get_artists",
+            "follow_artists",
+            "unfollow_artists",
+            "save_tracks",
+            "remove_saved_tracks"
+          ]
+        },
+        "label": "Comma-separated IDs",
+        "name": "ids",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_album",
+            "get_album_tracks"
+          ]
+        },
+        "label": "Album ID",
+        "name": "album_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_show",
+            "get_show_episodes"
+          ]
+        },
+        "label": "Show ID",
+        "name": "show_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_episode"
+          ]
+        },
+        "label": "Episode ID",
+        "name": "episode_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_artist_top_tracks",
+            "get_show"
+          ]
+        },
+        "default": "US",
+        "label": "Market (ISO country)",
+        "name": "market",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "follow_artists",
+            "unfollow_artists",
+            "get_followed_artists"
+          ]
+        },
+        "default": "artist",
+        "label": "Type (artist|user)",
+        "name": "type_kind",
         "type": "string"
       },
       {
@@ -59258,6 +60430,66 @@
           {
             "label": "Cancel Run",
             "value": "cancel_run"
+          },
+          {
+            "label": "List Runs",
+            "value": "list_runs"
+          },
+          {
+            "label": "Replay Run",
+            "value": "replay_run"
+          },
+          {
+            "label": "Reschedule Run",
+            "value": "reschedule_run"
+          },
+          {
+            "label": "Trigger Task with Context",
+            "value": "trigger_with_context"
+          },
+          {
+            "label": "Batch Trigger Task",
+            "value": "batch_trigger"
+          },
+          {
+            "label": "List Schedules",
+            "value": "list_schedules"
+          },
+          {
+            "label": "Get Schedule",
+            "value": "get_schedule"
+          },
+          {
+            "label": "Create Schedule",
+            "value": "create_schedule"
+          },
+          {
+            "label": "Update Schedule",
+            "value": "update_schedule"
+          },
+          {
+            "label": "Delete Schedule",
+            "value": "delete_schedule"
+          },
+          {
+            "label": "Deactivate Schedule",
+            "value": "deactivate_schedule"
+          },
+          {
+            "label": "Activate Schedule",
+            "value": "activate_schedule"
+          },
+          {
+            "label": "List Env Vars",
+            "value": "list_env_vars"
+          },
+          {
+            "label": "Upsert Env Var",
+            "value": "upsert_env_var"
+          },
+          {
+            "label": "Delete Env Var",
+            "value": "delete_env_var"
           }
         ],
         "type": "options"
@@ -59307,7 +60539,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "trigger_task"
+            "trigger_task",
+            "trigger_with_context",
+            "batch_trigger"
           ]
         },
         "label": "Task ID",
@@ -59319,7 +60553,9 @@
           "field": "operation",
           "value": [
             "get_run",
-            "cancel_run"
+            "cancel_run",
+            "replay_run",
+            "reschedule_run"
           ]
         },
         "label": "Run ID",
@@ -59330,7 +60566,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "trigger_task"
+            "trigger_task",
+            "trigger_with_context"
           ]
         },
         "default": {},
@@ -59404,6 +60641,119 @@
         "default": "monthly",
         "label": "Duration",
         "name": "duration",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "reschedule_run"
+          ]
+        },
+        "default": 0,
+        "label": "Delay (seconds)",
+        "name": "delay_seconds",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "trigger_with_context"
+          ]
+        },
+        "default": {},
+        "label": "Run Options (JSON)",
+        "name": "run_options",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "batch_trigger"
+          ]
+        },
+        "default": [],
+        "label": "Batch Items (JSON)",
+        "name": "batch_items",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_schedule",
+            "update_schedule",
+            "delete_schedule",
+            "deactivate_schedule",
+            "activate_schedule"
+          ]
+        },
+        "label": "Schedule ID",
+        "name": "schedule_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_schedule",
+            "update_schedule"
+          ]
+        },
+        "default": {},
+        "label": "Schedule Body (JSON)",
+        "name": "schedule_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_env_vars",
+            "upsert_env_var",
+            "delete_env_var"
+          ]
+        },
+        "label": "Project Ref",
+        "name": "project_ref",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_env_vars",
+            "upsert_env_var",
+            "delete_env_var"
+          ]
+        },
+        "label": "Environment (dev|staging|prod)",
+        "name": "environment",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upsert_env_var",
+            "delete_env_var"
+          ]
+        },
+        "label": "Env Var Name",
+        "name": "env_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upsert_env_var"
+          ]
+        },
+        "label": "Env Var Value",
+        "name": "env_value",
         "type": "string"
       },
       {
