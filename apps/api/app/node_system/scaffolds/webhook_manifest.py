@@ -125,6 +125,20 @@ class WebhookTriggerManifest(BaseModel):
     # Verification.
     signature: SignatureSpec = Field(default_factory=SignatureSpec)
     event_header: str = "X-GitHub-Event"
+    # Optional body path — dotted key path (or list of paths joined
+    # with ".") into the parsed JSON body where the event kind lives.
+    # Used when the provider doesn't ship a dedicated event header
+    # (Jira's `webhookEvent`, Linear's `[type, action]`, Notion's `type`,
+    # instantly/lemlist/emailbison's `event_type`/`type`/`event`).
+    # Receiver tries `event_header` first, falls back to this path.
+    event_body_path: str | list[str] | None = None
+    # Optional URL-verification challenge: when the incoming body
+    # carries the key named here at the top level (any string value),
+    # the receiver short-circuits with a 200 echo of `{key: value}`,
+    # bypassing signature verification. Notion sends
+    # `{"verification_token": "..."}` on webhook setup and expects the
+    # server to echo the token — that's how Notion pins the secret.
+    challenge_body_key: str | None = None
 
     # Inspector.
     credential_type: str | list[str] | None = None

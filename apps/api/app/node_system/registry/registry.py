@@ -56,6 +56,9 @@ from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetV
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
+from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
+    ConfluenceWebhookTriggerNode,
+)
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
@@ -158,6 +161,7 @@ from apps.api.app.node_system.nodes.monday.monday_trigger import MondayTriggerNo
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
+from apps.api.app.node_system.nodes.notion.notion_webhook import NotionWebhookTriggerNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
@@ -342,6 +346,9 @@ node_registry.register(WebflowWebhookTriggerNode)
 node_registry.register(GongWebhookTriggerNode)
 node_registry.register(FathomWebhookTriggerNode)
 node_registry.register(FirefliesWebhookTriggerNode)
+# Phase 4.11 — notion + confluence webhook triggers.
+node_registry.register(NotionWebhookTriggerNode)
+node_registry.register(ConfluenceWebhookTriggerNode)
 # Phase 3.5 — completion (monday polling + generic RSS + IMAP).
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)

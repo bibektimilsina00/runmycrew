@@ -32126,6 +32126,201 @@
     "tools": null,
     "type": "trigger.calendly"
   },
+  "trigger.confluence_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Atlassian Cloud posts a Confluence webhook. Full sim event parity \u2014 pages/blogs/comments/attachments/labels/spaces create+update+remove+restore + permissions + user_created. HMAC-SHA256 verified in X-Hub-Signature.",
+    "dynamic_outputs_from": null,
+    "icon": "confluence",
+    "inputs": 0,
+    "name": "Confluence Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "page_id",
+        "type": "number"
+      },
+      {
+        "label": "page_title",
+        "type": "string"
+      },
+      {
+        "label": "space_key",
+        "type": "string"
+      },
+      {
+        "label": "comment_id",
+        "type": "number"
+      },
+      {
+        "label": "attachment_id",
+        "type": "number"
+      },
+      {
+        "label": "label_name",
+        "type": "string"
+      },
+      {
+        "label": "modified_by",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Atlassian-Webhook-Identifier` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Page Created",
+            "value": "page_created"
+          },
+          {
+            "label": "Page Updated",
+            "value": "page_updated"
+          },
+          {
+            "label": "Page Removed",
+            "value": "page_removed"
+          },
+          {
+            "label": "Page Restored",
+            "value": "page_restored"
+          },
+          {
+            "label": "Page Moved",
+            "value": "page_moved"
+          },
+          {
+            "label": "Page Permissions Updated",
+            "value": "page_permissions_updated"
+          },
+          {
+            "label": "Blog Post Created",
+            "value": "blog_created"
+          },
+          {
+            "label": "Blog Post Updated",
+            "value": "blog_updated"
+          },
+          {
+            "label": "Blog Post Removed",
+            "value": "blog_removed"
+          },
+          {
+            "label": "Blog Post Restored",
+            "value": "blog_restored"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment_created"
+          },
+          {
+            "label": "Comment Updated",
+            "value": "comment_updated"
+          },
+          {
+            "label": "Comment Removed",
+            "value": "comment_removed"
+          },
+          {
+            "label": "Attachment Created",
+            "value": "attachment_created"
+          },
+          {
+            "label": "Attachment Updated",
+            "value": "attachment_updated"
+          },
+          {
+            "label": "Attachment Removed",
+            "value": "attachment_removed"
+          },
+          {
+            "label": "Label Added",
+            "value": "label_added"
+          },
+          {
+            "label": "Label Removed",
+            "value": "label_removed"
+          },
+          {
+            "label": "Space Created",
+            "value": "space_created"
+          },
+          {
+            "label": "Space Updated",
+            "value": "space_updated"
+          },
+          {
+            "label": "Space Removed",
+            "value": "space_removed"
+          },
+          {
+            "label": "User Created",
+            "value": "user_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Confluence Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.confluence_webhook"
+  },
   "trigger.cron": {
     "allow_error": false,
     "category": "trigger",
@@ -36295,6 +36490,141 @@
     ],
     "tools": null,
     "type": "trigger.notion"
+  },
+  "trigger.notion_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Notion posts a webhook delivery \u2014 pages, databases, comments. Full sim event parity via body-path routing on `type`. First delivery is a URL-verification challenge; the scaffold echoes the token so Notion accepts the endpoint.",
+    "dynamic_outputs_from": null,
+    "icon": "notion",
+    "inputs": 0,
+    "name": "Notion Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "entity_id",
+        "type": "string"
+      },
+      {
+        "label": "entity_type",
+        "type": "string"
+      },
+      {
+        "label": "parent_id",
+        "type": "string"
+      },
+      {
+        "label": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "authors",
+        "type": "array"
+      },
+      {
+        "label": "updated_properties",
+        "type": "array"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Notion-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Page Created",
+            "value": "page.created"
+          },
+          {
+            "label": "Page Updated",
+            "value": "page.updated"
+          },
+          {
+            "label": "Page Content Updated",
+            "value": "page.content_updated"
+          },
+          {
+            "label": "Page Deleted",
+            "value": "page.deleted"
+          },
+          {
+            "label": "Database Created",
+            "value": "database.created"
+          },
+          {
+            "label": "Database Schema Updated",
+            "value": "database.schema_updated"
+          },
+          {
+            "label": "Database Deleted",
+            "value": "database.deleted"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment.created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Notion-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Notion Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.notion_webhook"
   },
   "trigger.outlook_mail": {
     "allow_error": true,
