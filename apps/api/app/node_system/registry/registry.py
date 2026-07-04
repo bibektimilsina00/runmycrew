@@ -50,6 +50,7 @@ from apps.api.app.node_system.nodes.azure_devops.azure_devops_webhook import (
 )
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
+from apps.api.app.node_system.nodes.brex.brex_node import BrexNode
 from apps.api.app.node_system.nodes.brightdata.brightdata_node import BrightDataNode
 from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
 from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNode
@@ -248,10 +249,12 @@ from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.railway.railway_node import RailwayNode
 from apps.api.app.node_system.nodes.reducto.reducto_node import ReductoNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
+from apps.api.app.node_system.nodes.rippling.rippling_node import RipplingNode
 from apps.api.app.node_system.nodes.rootly.rootly_node import RootlyNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_trigger import SalesforceTriggerNode
+from apps.api.app.node_system.nodes.sap_concur.sap_concur_node import SAPConcurNode
 from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
@@ -282,9 +285,11 @@ from apps.api.app.node_system.nodes.typeform.typeform_webhook import TypeformWeb
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTriggerNode
+from apps.api.app.node_system.nodes.wealthbox.wealthbox_node import WealthboxNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.wiza.wiza_node import WizaNode
+from apps.api.app.node_system.nodes.workday.workday_node import WorkdayNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_trigger import ZendeskTriggerNode
 from apps.api.app.node_system.nodes.zerobounce.zerobounce_node import ZeroBounceNode
@@ -626,3 +631,11 @@ node_registry.register(EvernoteNode)
 node_registry.register(ExtendNode)
 node_registry.register(LumaNode)
 node_registry.register(GranolaNode)
+
+
+# Phase 4.24 — HR / finance.
+node_registry.register(RipplingNode)
+node_registry.register(WorkdayNode)
+node_registry.register(SAPConcurNode)
+node_registry.register(WealthboxNode)
+node_registry.register(BrexNode)
