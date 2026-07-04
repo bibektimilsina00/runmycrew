@@ -3924,8 +3924,132 @@
             "value": "list_objects"
           },
           {
-            "label": "Add to List",
+            "label": "Get Object",
+            "value": "get_object"
+          },
+          {
+            "label": "Assert Record (upsert by matching_attribute)",
+            "value": "assert_record"
+          },
+          {
+            "label": "List Lists",
+            "value": "list_lists"
+          },
+          {
+            "label": "Get List",
+            "value": "get_list"
+          },
+          {
+            "label": "Create List",
+            "value": "create_list"
+          },
+          {
+            "label": "Update List",
+            "value": "update_list"
+          },
+          {
+            "label": "Add to List (Create Entry)",
             "value": "add_to_list"
+          },
+          {
+            "label": "Query List Entries",
+            "value": "query_list_entries"
+          },
+          {
+            "label": "Get List Entry",
+            "value": "get_list_entry"
+          },
+          {
+            "label": "Update List Entry",
+            "value": "update_list_entry"
+          },
+          {
+            "label": "Delete List Entry",
+            "value": "delete_list_entry"
+          },
+          {
+            "label": "List Notes",
+            "value": "list_notes"
+          },
+          {
+            "label": "Get Note",
+            "value": "get_note"
+          },
+          {
+            "label": "Create Note",
+            "value": "create_note"
+          },
+          {
+            "label": "Delete Note",
+            "value": "delete_note"
+          },
+          {
+            "label": "List Tasks",
+            "value": "list_tasks"
+          },
+          {
+            "label": "Get Task",
+            "value": "get_task"
+          },
+          {
+            "label": "Create Task",
+            "value": "create_task"
+          },
+          {
+            "label": "Update Task",
+            "value": "update_task"
+          },
+          {
+            "label": "Delete Task",
+            "value": "delete_task"
+          },
+          {
+            "label": "List Workspace Members",
+            "value": "list_members"
+          },
+          {
+            "label": "Get Workspace Member",
+            "value": "get_member"
+          },
+          {
+            "label": "List Threads",
+            "value": "list_threads"
+          },
+          {
+            "label": "Get Thread",
+            "value": "get_thread"
+          },
+          {
+            "label": "Create Comment",
+            "value": "create_comment"
+          },
+          {
+            "label": "Get Comment",
+            "value": "get_comment"
+          },
+          {
+            "label": "Delete Comment",
+            "value": "delete_comment"
+          },
+          {
+            "label": "List Webhooks",
+            "value": "list_webhooks"
+          },
+          {
+            "label": "Get Webhook",
+            "value": "get_webhook"
+          },
+          {
+            "label": "Create Webhook",
+            "value": "create_webhook"
+          },
+          {
+            "label": "Update Webhook",
+            "value": "update_webhook"
+          },
+          {
+            "label": "Delete Webhook",
+            "value": "delete_webhook"
           }
         ],
         "type": "options"
@@ -3938,7 +4062,9 @@
             "get_record",
             "update_record",
             "delete_record",
-            "list_records"
+            "list_records",
+            "get_object",
+            "assert_record"
           ]
         },
         "label": "Object",
@@ -3964,7 +4090,8 @@
           "field": "operation",
           "value": [
             "create_record",
-            "update_record"
+            "update_record",
+            "assert_record"
           ]
         },
         "label": "Record values (JSON)",
@@ -3975,7 +4102,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_records"
+            "list_records",
+            "query_list_entries"
           ]
         },
         "label": "Filter (JSON)",
@@ -3987,7 +4115,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_records"
+            "list_records",
+            "query_list_entries"
           ]
         },
         "label": "Sorts (JSON)",
@@ -3999,7 +4128,10 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_records"
+            "list_records",
+            "query_list_entries",
+            "list_notes",
+            "list_tasks"
           ]
         },
         "default": 25,
@@ -4012,7 +4144,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_records"
+            "list_records",
+            "query_list_entries"
           ]
         },
         "default": 0,
@@ -4025,7 +4158,13 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_to_list"
+            "get_list",
+            "update_list",
+            "add_to_list",
+            "query_list_entries",
+            "get_list_entry",
+            "update_list_entry",
+            "delete_list_entry"
           ]
         },
         "label": "List ID",
@@ -4036,11 +4175,223 @@
         "condition": {
           "field": "operation",
           "value": [
-            "add_to_list"
+            "add_to_list",
+            "update_list_entry"
           ]
         },
         "label": "Entry values (JSON)",
         "name": "entry_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_list_entry",
+            "update_list_entry",
+            "delete_list_entry"
+          ]
+        },
+        "label": "List Entry ID",
+        "name": "entry_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_note",
+            "delete_note"
+          ]
+        },
+        "label": "Note ID",
+        "name": "note_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_list",
+            "update_list",
+            "create_note"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_note",
+            "create_task",
+            "update_task",
+            "create_comment"
+          ]
+        },
+        "label": "Content (Markdown)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_list",
+            "list_notes",
+            "create_note"
+          ]
+        },
+        "label": "Parent Object",
+        "name": "parent_object",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_notes",
+            "create_note"
+          ]
+        },
+        "label": "Parent Record ID",
+        "name": "parent_record_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_task",
+            "update_task",
+            "delete_task"
+          ]
+        },
+        "label": "Task ID",
+        "name": "task_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "default": [],
+        "label": "Assignees (JSON array)",
+        "name": "assignees",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task",
+            "update_task"
+          ]
+        },
+        "label": "Deadline (ISO)",
+        "name": "deadline_at",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_task"
+          ]
+        },
+        "default": false,
+        "label": "Is Completed",
+        "name": "is_completed",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_task"
+          ]
+        },
+        "default": [],
+        "label": "Linked Records (JSON)",
+        "name": "linked_records",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_thread",
+            "create_comment"
+          ]
+        },
+        "label": "Thread ID",
+        "name": "thread_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_comment",
+            "delete_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_member"
+          ]
+        },
+        "label": "Workspace Member ID",
+        "name": "member_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_webhook",
+            "update_webhook",
+            "delete_webhook"
+          ]
+        },
+        "label": "Webhook ID",
+        "name": "webhook_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_webhook",
+            "update_webhook"
+          ]
+        },
+        "label": "Webhook URL",
+        "name": "webhook_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_webhook",
+            "update_webhook"
+          ]
+        },
+        "default": [],
+        "label": "Subscriptions (JSON)",
+        "name": "webhook_subscriptions",
         "type": "json"
       },
       {
@@ -31904,6 +32255,98 @@
           {
             "label": "List Segments",
             "value": "list_segments"
+          },
+          {
+            "label": "Delete Contact",
+            "value": "delete_contact"
+          },
+          {
+            "label": "Create Company",
+            "value": "create_company"
+          },
+          {
+            "label": "Get Company",
+            "value": "get_company"
+          },
+          {
+            "label": "List Companies",
+            "value": "list_companies"
+          },
+          {
+            "label": "Attach Contact to Company",
+            "value": "attach_contact_to_company"
+          },
+          {
+            "label": "Detach Contact from Company",
+            "value": "detach_contact_from_company"
+          },
+          {
+            "label": "Search Conversations",
+            "value": "search_conversations"
+          },
+          {
+            "label": "Get Conversation",
+            "value": "get_conversation"
+          },
+          {
+            "label": "List Conversations",
+            "value": "list_conversations"
+          },
+          {
+            "label": "Close Conversation",
+            "value": "close_conversation"
+          },
+          {
+            "label": "Reopen Conversation",
+            "value": "open_conversation"
+          },
+          {
+            "label": "Snooze Conversation",
+            "value": "snooze_conversation"
+          },
+          {
+            "label": "Assign Conversation",
+            "value": "assign_conversation"
+          },
+          {
+            "label": "Create Ticket",
+            "value": "create_ticket"
+          },
+          {
+            "label": "Get Ticket",
+            "value": "get_ticket"
+          },
+          {
+            "label": "Update Ticket",
+            "value": "update_ticket"
+          },
+          {
+            "label": "List Admins",
+            "value": "list_admins"
+          },
+          {
+            "label": "List Tags",
+            "value": "list_tags"
+          },
+          {
+            "label": "Create Tag",
+            "value": "create_tag"
+          },
+          {
+            "label": "Tag Contact",
+            "value": "tag_contact"
+          },
+          {
+            "label": "Untag Contact",
+            "value": "untag_contact"
+          },
+          {
+            "label": "Tag Conversation",
+            "value": "tag_conversation"
+          },
+          {
+            "label": "Create Event",
+            "value": "create_event"
           }
         ],
         "type": "options"
@@ -31913,7 +32356,14 @@
           "field": "operation",
           "value": [
             "get_contact",
-            "update_contact"
+            "update_contact",
+            "delete_contact",
+            "attach_contact_to_company",
+            "detach_contact_from_company",
+            "create_ticket",
+            "tag_contact",
+            "untag_contact",
+            "create_event"
           ]
         },
         "label": "Contact ID",
@@ -31950,7 +32400,8 @@
           "field": "operation",
           "value": [
             "create_contact",
-            "update_contact"
+            "update_contact",
+            "create_company"
           ]
         },
         "label": "Name",
@@ -32009,7 +32460,13 @@
         "condition": {
           "field": "operation",
           "value": [
-            "reply_conversation"
+            "reply_conversation",
+            "get_conversation",
+            "close_conversation",
+            "open_conversation",
+            "snooze_conversation",
+            "assign_conversation",
+            "tag_conversation"
           ]
         },
         "label": "Conversation ID",
@@ -32055,7 +32512,12 @@
           "field": "operation",
           "value": [
             "send_message",
-            "reply_conversation"
+            "reply_conversation",
+            "close_conversation",
+            "open_conversation",
+            "snooze_conversation",
+            "assign_conversation",
+            "tag_conversation"
           ]
         },
         "label": "Admin ID (sender)",
@@ -32090,7 +32552,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "search_contacts"
+            "search_contacts",
+            "search_conversations"
           ]
         },
         "label": "Search Query (JSON)",
@@ -32102,7 +32565,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_contacts"
+            "list_contacts",
+            "list_companies",
+            "list_conversations"
           ]
         },
         "default": 50,
@@ -32110,6 +32575,152 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_company",
+            "get_company",
+            "attach_contact_to_company",
+            "detach_contact_from_company"
+          ]
+        },
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "label": "Company Name",
+        "name": "company_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_company"
+          ]
+        },
+        "label": "Plan",
+        "name": "plan",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_ticket",
+            "update_ticket"
+          ]
+        },
+        "label": "Ticket ID",
+        "name": "ticket_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket"
+          ]
+        },
+        "label": "Ticket Type ID",
+        "name": "ticket_type_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assign_conversation"
+          ]
+        },
+        "label": "Assignee ID",
+        "name": "assignee_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "tag_contact",
+            "untag_contact",
+            "tag_conversation"
+          ]
+        },
+        "label": "Tag ID",
+        "name": "tag_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_tag"
+          ]
+        },
+        "label": "Tag Name",
+        "name": "tag_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_event"
+          ]
+        },
+        "label": "Event Name",
+        "name": "event_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_event"
+          ]
+        },
+        "default": {},
+        "label": "Event Metadata (JSON)",
+        "name": "event_metadata",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_event"
+          ]
+        },
+        "default": 0,
+        "label": "Created At (unix)",
+        "name": "created_at",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "snooze_conversation"
+          ]
+        },
+        "default": 0,
+        "label": "Snoozed Until (unix)",
+        "name": "snoozed_until",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_ticket"
+          ]
+        },
+        "label": "State",
+        "name": "state",
+        "type": "string"
       },
       {
         "default": 0,
@@ -47029,6 +47640,78 @@
           {
             "label": "Get Person",
             "value": "get_person"
+          },
+          {
+            "label": "Batch Capture Events",
+            "value": "batch_events"
+          },
+          {
+            "label": "Delete Person",
+            "value": "delete_person"
+          },
+          {
+            "label": "List Insights",
+            "value": "list_insights"
+          },
+          {
+            "label": "Get Insight",
+            "value": "get_insight"
+          },
+          {
+            "label": "Create Insight",
+            "value": "create_insight"
+          },
+          {
+            "label": "List Dashboards",
+            "value": "list_dashboards"
+          },
+          {
+            "label": "Get Dashboard",
+            "value": "get_dashboard"
+          },
+          {
+            "label": "List Actions",
+            "value": "list_actions"
+          },
+          {
+            "label": "List Cohorts",
+            "value": "list_cohorts"
+          },
+          {
+            "label": "Get Cohort",
+            "value": "get_cohort"
+          },
+          {
+            "label": "List Annotations",
+            "value": "list_annotations"
+          },
+          {
+            "label": "Create Annotation",
+            "value": "create_annotation"
+          },
+          {
+            "label": "Delete Feature Flag",
+            "value": "delete_feature_flag"
+          },
+          {
+            "label": "List Experiments",
+            "value": "list_experiments"
+          },
+          {
+            "label": "List Surveys",
+            "value": "list_surveys"
+          },
+          {
+            "label": "List Session Recordings",
+            "value": "list_session_recordings"
+          },
+          {
+            "label": "List Event Definitions",
+            "value": "list_event_definitions"
+          },
+          {
+            "label": "List Property Definitions",
+            "value": "list_property_definitions"
           }
         ],
         "type": "options"
@@ -47043,7 +47726,24 @@
             "create_feature_flag",
             "update_feature_flag",
             "list_persons",
-            "get_person"
+            "get_person",
+            "delete_person",
+            "list_insights",
+            "get_insight",
+            "create_insight",
+            "list_dashboards",
+            "get_dashboard",
+            "list_actions",
+            "list_cohorts",
+            "get_cohort",
+            "list_annotations",
+            "create_annotation",
+            "delete_feature_flag",
+            "list_experiments",
+            "list_surveys",
+            "list_session_recordings",
+            "list_event_definitions",
+            "list_property_definitions"
           ]
         },
         "label": "Project ID",
@@ -47057,7 +47757,8 @@
           "field": "operation",
           "value": [
             "get_feature_flag",
-            "update_feature_flag"
+            "update_feature_flag",
+            "delete_feature_flag"
           ]
         },
         "label": "Feature Flag ID",
@@ -47105,7 +47806,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_person"
+            "get_person",
+            "delete_person"
           ]
         },
         "label": "Person ID",
@@ -47148,6 +47850,96 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "batch_events"
+          ]
+        },
+        "default": [],
+        "label": "Batch (JSON array)",
+        "name": "batch",
+        "type": "json"
+      },
+      {
+        "default": {},
+        "label": "HogQL Query (JSON)",
+        "name": "posthog_query",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_insight"
+          ]
+        },
+        "label": "Insight ID",
+        "name": "insight_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_insight"
+          ]
+        },
+        "default": {},
+        "label": "Insight Body (JSON)",
+        "name": "insight_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_dashboard"
+          ]
+        },
+        "label": "Dashboard ID",
+        "name": "dashboard_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_cohort"
+          ]
+        },
+        "label": "Cohort ID",
+        "name": "cohort_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_annotation"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_annotation"
+          ]
+        },
+        "label": "Date Marker (ISO)",
+        "name": "date_marker",
+        "type": "string"
+      },
+      {
+        "label": "Feature Flag Name",
+        "name": "flag_name",
+        "type": "string"
       },
       {
         "default": 0,
@@ -49576,6 +50368,94 @@
           {
             "label": "Search Reddit",
             "value": "search"
+          },
+          {
+            "label": "Save (Post/Comment)",
+            "value": "save"
+          },
+          {
+            "label": "Unsave",
+            "value": "unsave"
+          },
+          {
+            "label": "Vote (Post/Comment)",
+            "value": "vote"
+          },
+          {
+            "label": "Get Current User",
+            "value": "me"
+          },
+          {
+            "label": "Get User Info",
+            "value": "get_user"
+          },
+          {
+            "label": "List User Posts",
+            "value": "list_user_posts"
+          },
+          {
+            "label": "List Saved (me)",
+            "value": "list_saved"
+          },
+          {
+            "label": "Subscribe / Unsubscribe",
+            "value": "subscribe"
+          },
+          {
+            "label": "Get Subreddit Info",
+            "value": "get_subreddit_info"
+          },
+          {
+            "label": "Get Hot Posts",
+            "value": "get_hot"
+          },
+          {
+            "label": "Get New Posts",
+            "value": "get_new"
+          },
+          {
+            "label": "Get Top Posts",
+            "value": "get_top"
+          },
+          {
+            "label": "Post Comment",
+            "value": "comment"
+          },
+          {
+            "label": "Delete Post/Comment",
+            "value": "delete_post"
+          },
+          {
+            "label": "Edit Post/Comment",
+            "value": "edit_post"
+          },
+          {
+            "label": "Get Inbox",
+            "value": "get_inbox"
+          },
+          {
+            "label": "Send Private Message",
+            "value": "send_message"
+          },
+          {
+            "label": "Search Subreddits by Query",
+            "value": "search_subreddits"
+          },
+          {
+            "label": "Trending Subreddits",
+            "value": "get_trending_subreddits"
+          },
+          {
+            "label": "Get Subreddit Moderators",
+            "value": "get_moderators"
+          },
+          {
+            "label": "Get Wiki Page",
+            "value": "get_wiki_page"
+          },
+          {
+            "label": "List My Multireddits",
+            "value": "list_multi"
           }
         ],
         "type": "options"
@@ -49656,7 +50536,9 @@
         "condition": {
           "field": "operation",
           "value": [
-            "submit"
+            "submit",
+            "comment",
+            "edit_post"
           ]
         },
         "label": "Text",
@@ -49669,6 +50551,15 @@
         "type": "string"
       },
       {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_user",
+            "list_user_posts",
+            "list_saved",
+            "send_message"
+          ]
+        },
         "label": "Username",
         "name": "username",
         "type": "string"
@@ -49678,7 +50569,14 @@
           "field": "operation",
           "value": [
             "list_subreddit",
-            "submit"
+            "submit",
+            "subscribe",
+            "get_subreddit_info",
+            "get_hot",
+            "get_new",
+            "get_top",
+            "get_moderators",
+            "get_wiki_page"
           ]
         },
         "label": "Subreddit",
@@ -49702,7 +50600,14 @@
           "field": "operation",
           "value": [
             "list_subreddit",
-            "search"
+            "search",
+            "list_user_posts",
+            "list_saved",
+            "get_hot",
+            "get_new",
+            "get_top",
+            "get_inbox",
+            "search_subreddits"
           ]
         },
         "default": 10,
@@ -49835,6 +50740,102 @@
       {
         "label": "Generation ID",
         "name": "generation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "save",
+            "unsave",
+            "vote",
+            "comment",
+            "delete_post",
+            "edit_post"
+          ]
+        },
+        "label": "Fullname (t3_xxx or t1_xxx)",
+        "name": "fullname",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "vote"
+          ]
+        },
+        "default": 0,
+        "label": "Direction (1|0|-1)",
+        "name": "direction",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "subscribe"
+          ]
+        },
+        "default": "sub",
+        "label": "Action (sub|unsub)",
+        "name": "action_kind",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_top"
+          ]
+        },
+        "default": "day",
+        "label": "Time Filter (hour|day|week|month|year|all)",
+        "name": "time_filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Subject",
+        "name": "subject",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_message"
+          ]
+        },
+        "label": "Message",
+        "name": "message",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_subreddits"
+          ]
+        },
+        "label": "Query Text",
+        "name": "query_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_wiki_page"
+          ]
+        },
+        "label": "Wiki Page Name",
+        "name": "wiki_page",
         "type": "string"
       },
       {
@@ -55301,6 +56302,70 @@
           {
             "label": "List Locations",
             "value": "list_locations"
+          },
+          {
+            "label": "Cancel Payment",
+            "value": "cancel_payment"
+          },
+          {
+            "label": "Complete Payment",
+            "value": "complete_payment"
+          },
+          {
+            "label": "Refund Payment",
+            "value": "refund_payment"
+          },
+          {
+            "label": "Get Refund",
+            "value": "get_refund"
+          },
+          {
+            "label": "List Refunds",
+            "value": "list_refunds"
+          },
+          {
+            "label": "Delete Customer",
+            "value": "delete_customer"
+          },
+          {
+            "label": "Pay Order",
+            "value": "pay_order"
+          },
+          {
+            "label": "Create Invoice",
+            "value": "create_invoice"
+          },
+          {
+            "label": "Get Invoice",
+            "value": "get_invoice"
+          },
+          {
+            "label": "List Invoices",
+            "value": "list_invoices"
+          },
+          {
+            "label": "Publish Invoice",
+            "value": "publish_invoice"
+          },
+          {
+            "label": "Cancel Invoice",
+            "value": "cancel_invoice"
+          },
+          {
+            "label": "Delete Invoice",
+            "value": "delete_invoice"
+          },
+          {
+            "label": "Upsert Catalog Object",
+            "value": "upsert_catalog_object"
+          },
+          {
+            "label": "Get Catalog Object",
+            "value": "get_catalog_object"
+          },
+          {
+            "label": "Delete Catalog Object",
+            "value": "delete_catalog_object"
           }
         ],
         "type": "options"
@@ -55309,7 +56374,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_customer"
+            "get_customer",
+            "delete_customer"
           ]
         },
         "label": "Customer ID",
@@ -55320,7 +56386,10 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_payment"
+            "get_payment",
+            "cancel_payment",
+            "complete_payment",
+            "refund_payment"
           ]
         },
         "label": "Payment ID",
@@ -55331,7 +56400,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_order"
+            "get_order",
+            "pay_order"
           ]
         },
         "label": "Order ID",
@@ -55428,11 +56498,106 @@
         "condition": {
           "field": "operation",
           "value": [
-            "list_payments"
+            "list_payments",
+            "list_invoices"
           ]
         },
         "label": "Location ID",
         "name": "location_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_refund"
+          ]
+        },
+        "label": "Refund ID",
+        "name": "refund_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "refund_payment",
+            "pay_order",
+            "publish_invoice",
+            "upsert_catalog_object"
+          ]
+        },
+        "label": "Idempotency Key",
+        "name": "idempotency_key",
+        "type": "string"
+      },
+      {
+        "default": [],
+        "label": "Location IDs (JSON)",
+        "name": "location_ids",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_invoice"
+          ]
+        },
+        "default": {},
+        "label": "Invoice Body (JSON)",
+        "name": "invoice_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_invoice",
+            "publish_invoice",
+            "cancel_invoice",
+            "delete_invoice"
+          ]
+        },
+        "label": "Invoice ID",
+        "name": "invoice_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "publish_invoice",
+            "cancel_invoice"
+          ]
+        },
+        "default": 0,
+        "label": "Invoice Version",
+        "name": "invoice_version",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upsert_catalog_object"
+          ]
+        },
+        "default": {},
+        "label": "Catalog Object Body (JSON)",
+        "name": "catalog_body",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_catalog_object",
+            "delete_catalog_object"
+          ]
+        },
+        "label": "Catalog Object ID",
+        "name": "catalog_object_id",
         "type": "string"
       },
       {
@@ -60113,6 +61278,70 @@
           {
             "label": "Create Env Var",
             "value": "create_env_var"
+          },
+          {
+            "label": "Delete Deployment",
+            "value": "delete_deployment"
+          },
+          {
+            "label": "Get Deployment Build Events",
+            "value": "get_deployment_events"
+          },
+          {
+            "label": "List Deployment Files",
+            "value": "list_deployment_files"
+          },
+          {
+            "label": "Promote Deployment",
+            "value": "promote_deployment"
+          },
+          {
+            "label": "Pause Project",
+            "value": "pause_project"
+          },
+          {
+            "label": "Unpause Project",
+            "value": "unpause_project"
+          },
+          {
+            "label": "Verify Project Domain",
+            "value": "verify_project_domain"
+          },
+          {
+            "label": "Delete Env Var",
+            "value": "delete_env_var"
+          },
+          {
+            "label": "Update Env Var",
+            "value": "update_env_var"
+          },
+          {
+            "label": "Get Domain",
+            "value": "get_domain"
+          },
+          {
+            "label": "Delete Domain",
+            "value": "delete_domain"
+          },
+          {
+            "label": "List DNS Records",
+            "value": "list_dns_records"
+          },
+          {
+            "label": "Create DNS Record",
+            "value": "create_dns_record"
+          },
+          {
+            "label": "Delete DNS Record",
+            "value": "delete_dns_record"
+          },
+          {
+            "label": "List Aliases",
+            "value": "list_aliases"
+          },
+          {
+            "label": "List Edge Configs",
+            "value": "list_edge_configs"
           }
         ],
         "type": "options"
@@ -60148,7 +61377,13 @@
             "add_domain",
             "remove_domain",
             "list_env_vars",
-            "create_env_var"
+            "create_env_var",
+            "promote_deployment",
+            "pause_project",
+            "unpause_project",
+            "verify_project_domain",
+            "delete_env_var",
+            "update_env_var"
           ]
         },
         "label": "Project ID or name",
@@ -60160,7 +61395,11 @@
           "field": "operation",
           "value": [
             "get_deployment",
-            "cancel_deployment"
+            "cancel_deployment",
+            "delete_deployment",
+            "get_deployment_events",
+            "list_deployment_files",
+            "promote_deployment"
           ]
         },
         "label": "Deployment ID",
@@ -60172,7 +61411,13 @@
           "field": "operation",
           "value": [
             "add_domain",
-            "remove_domain"
+            "remove_domain",
+            "verify_project_domain",
+            "get_domain",
+            "delete_domain",
+            "list_dns_records",
+            "create_dns_record",
+            "delete_dns_record"
           ]
         },
         "label": "Domain",
@@ -60208,7 +61453,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "create_env_var"
+            "create_env_var",
+            "update_env_var"
           ]
         },
         "label": "Env Var Value",
@@ -60259,6 +61505,62 @@
           }
         ],
         "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_env_var",
+            "update_env_var"
+          ]
+        },
+        "label": "Env Var ID",
+        "name": "env_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record"
+          ]
+        },
+        "label": "DNS Record Name",
+        "name": "dns_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record"
+          ]
+        },
+        "label": "DNS Record Type",
+        "name": "dns_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_dns_record"
+          ]
+        },
+        "label": "DNS Record Value",
+        "name": "dns_value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_dns_record"
+          ]
+        },
+        "label": "DNS Record ID",
+        "name": "dns_record_id",
+        "type": "string"
       },
       {
         "default": 0,
