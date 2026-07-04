@@ -1,0 +1,112 @@
+"""X (Twitter) action node — X (formerly Twitter) — tweets, users, timelines via API v2.
+
+REST at https://api.twitter.com/2. See sim-parity roadmap Phase 4.29.
+"""
+
+from __future__ import annotations
+
+from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+
+MANIFEST = ProviderManifest(
+    type="action.x_twitter",
+    name="X (Twitter)",
+    category="integration",
+    description="X (formerly Twitter) — tweets, users, timelines via API v2.",
+    icon_slug="twitter",
+    color="#000000",
+    base_url="https://api.twitter.com/2",
+    credential_type="x_twitter_api_key",
+    token_field=["api_key"],
+    auth="bearer",
+    fields=[
+        FieldSpec(name="query", label="Query", type="string"),
+        FieldSpec(
+            name="max_results", label="Max Results", type="number", default=10, mode="advanced"
+        ),
+        FieldSpec(name="type", label="Type", type="string"),
+        FieldSpec(name="video_id", label="Video ID", type="string"),
+        FieldSpec(name="channel_id", label="Channel ID", type="string"),
+        FieldSpec(name="playlist_id", label="Playlist ID", type="string"),
+        FieldSpec(name="post_id", label="Post ID", type="string"),
+        FieldSpec(name="title", label="Title", type="string"),
+        FieldSpec(name="content", label="Content (HTML)", type="string"),
+        FieldSpec(name="status", label="Status", type="string", default="draft"),
+        FieldSpec(name="per_page", label="Per Page", type="number", default=10, mode="advanced"),
+        FieldSpec(name="text", label="Text", type="string"),
+        FieldSpec(name="tweet_id", label="Tweet ID", type="string"),
+        FieldSpec(name="username", label="Username", type="string"),
+        FieldSpec(name="subreddit", label="Subreddit", type="string"),
+        FieldSpec(name="sort", label="Sort", type="string", default="hot"),
+        FieldSpec(name="limit", label="Limit", type="number", default=10, mode="advanced"),
+        FieldSpec(name="url", label="URL", type="string"),
+        FieldSpec(name="kind", label="Kind (self|link)", type="string", default="self"),
+        FieldSpec(name="article", label="Article ID", type="string"),
+        FieldSpec(name="track_id", label="Track ID", type="string"),
+        FieldSpec(name="artist_id", label="Artist ID", type="string"),
+        FieldSpec(name="user_id", label="User ID", type="string"),
+        FieldSpec(name="playlist_name", label="Playlist Name", type="string"),
+        FieldSpec(name="playlist_description", label="Playlist Description", type="string"),
+        FieldSpec(name="public", label="Public Playlist", type="boolean", default=False),
+        FieldSpec(name="track_uris", label="Track URIs (JSON)", type="json", default=[]),
+        FieldSpec(name="prompt_image", label="Prompt Image URL", type="string"),
+        FieldSpec(name="prompt_text", label="Prompt Text", type="string"),
+        FieldSpec(name="duration", label="Duration (sec)", type="number", default=5),
+        FieldSpec(name="ratio", label="Aspect Ratio", type="string", default="1280:768"),
+        FieldSpec(name="task_id", label="Task ID", type="string"),
+        FieldSpec(name="input_text", label="Input Text", type="string"),
+        FieldSpec(name="format", label="Format", type="string", default="presentation"),
+        FieldSpec(name="num_cards", label="Number of Cards", type="number", default=10),
+        FieldSpec(name="text_amount", label="Text Amount", type="string", default="detailed"),
+        FieldSpec(name="generation_id", label="Generation ID", type="string"),
+    ],
+    operations=[
+        OpSpec(
+            id="post_tweet",
+            label="Post Tweet",
+            method="POST",
+            path="/tweets",
+            visible_fields=["text"],
+            body_builder=lambda v: {"text": getattr(v, "text", "") or ""},
+        ),
+        OpSpec(
+            id="get_tweet",
+            label="Get Tweet",
+            method="GET",
+            path="/tweets/{tweet_id}",
+            visible_fields=["tweet_id"],
+            query_builder=lambda v: {"tweet.fields": "created_at,public_metrics,text"},
+        ),
+        OpSpec(
+            id="delete_tweet",
+            label="Delete Tweet",
+            method="DELETE",
+            path="/tweets/{tweet_id}",
+            visible_fields=["tweet_id"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="get_user_by_username",
+            label="Get User by Username",
+            method="GET",
+            path="/users/by/username/{username}",
+            visible_fields=["username"],
+            query_builder=lambda v: {"user.fields": "id,name,username,public_metrics"},
+        ),
+        OpSpec(
+            id="search_recent",
+            label="Search Recent Tweets",
+            method="GET",
+            path="/tweets/search/recent",
+            visible_fields=["query", "max_results"],
+            query_builder=lambda v: {
+                "query": getattr(v, "query", "") or "",
+                "max_results": int(getattr(v, "max_results", 10) or 10),
+            },
+        ),
+    ],
+    outputs_schema=[
+        {"label": "data", "type": "object"},
+        {"label": "id", "type": "string"},
+    ],
+    allow_error=True,
+)

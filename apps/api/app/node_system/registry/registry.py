@@ -119,6 +119,7 @@ from apps.api.app.node_system.nodes.fireflies.fireflies_webhook import (
     FirefliesWebhookTriggerNode,
 )
 from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
+from apps.api.app.node_system.nodes.gamma.gamma_node import GammaNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
 from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
 from apps.api.app.node_system.nodes.gchat.gchat_node import GoogleChatNode
@@ -275,6 +276,7 @@ from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
 from apps.api.app.node_system.nodes.prospeo.prospeo_node import ProspeoNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
 from apps.api.app.node_system.nodes.railway.railway_node import RailwayNode
+from apps.api.app.node_system.nodes.reddit.reddit_node import RedditNode
 from apps.api.app.node_system.nodes.reducto.reducto_node import ReductoNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
 from apps.api.app.node_system.nodes.rippling.rippling_node import RipplingNode
@@ -295,6 +297,7 @@ from apps.api.app.node_system.nodes.similarweb.similarweb_node import SimilarWeb
 from apps.api.app.node_system.nodes.sixtyfour.sixtyfour_node import SixtyFourNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
+from apps.api.app.node_system.nodes.spotify.spotify_node import SpotifyNode
 from apps.api.app.node_system.nodes.square.square_node import SquareNode
 from apps.api.app.node_system.nodes.stagehand.stagehand_node import StagehandNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
@@ -313,11 +316,15 @@ from apps.api.app.node_system.nodes.typeform.typeform_webhook import TypeformWeb
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTriggerNode
+from apps.api.app.node_system.nodes.video_generator.video_generator_node import VideoGeneratorNode
 from apps.api.app.node_system.nodes.wealthbox.wealthbox_node import WealthboxNode
 from apps.api.app.node_system.nodes.webflow.webflow_webhook import WebflowWebhookTriggerNode
 from apps.api.app.node_system.nodes.wikipedia.wikipedia_node import WikipediaNode
 from apps.api.app.node_system.nodes.wiza.wiza_node import WizaNode
+from apps.api.app.node_system.nodes.wordpress.wordpress_node import WordPressNode
 from apps.api.app.node_system.nodes.workday.workday_node import WorkdayNode
+from apps.api.app.node_system.nodes.x_twitter.x_twitter_node import XTwitterNode
+from apps.api.app.node_system.nodes.youtube.youtube_node import YouTubeNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_node import ZendeskNode
 from apps.api.app.node_system.nodes.zendesk.zendesk_trigger import ZendeskTriggerNode
 from apps.api.app.node_system.nodes.zerobounce.zerobounce_node import ZeroBounceNode
@@ -697,3 +704,13 @@ node_registry.register(MicrosoftEntraNode)
 node_registry.register(MicrosoftDataverseNode)
 node_registry.register(JiraServiceManagementNode)
 node_registry.register(MothershipNode)
+
+
+# Phase 4.29 — content / media.
+node_registry.register(YouTubeNode)
+node_registry.register(WordPressNode)
+node_registry.register(XTwitterNode)
+node_registry.register(RedditNode)
+node_registry.register(SpotifyNode)
+node_registry.register(VideoGeneratorNode)
+node_registry.register(GammaNode)
