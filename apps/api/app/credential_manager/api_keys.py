@@ -1960,6 +1960,90 @@ PROVIDERS = {
             ),
         ],
     ),
+    "railway": APIKeyProvider(
+        id="railway_api_key",
+        name="Railway",
+        icon_slug="railway",
+        color="#1c1c1c",
+        description="Railway — deploy + manage services.",
+        hint="Railway API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Railway API key"
+            ),
+        ],
+    ),
+    "dagster": APIKeyProvider(
+        id="dagster_api_key",
+        name="Dagster Cloud",
+        icon_slug="dagster",
+        color="#1c1c1c",
+        description="Dagster Cloud — asset pipelines, jobs, runs.",
+        hint="Dagster Cloud API access",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Cloud API Token",
+                type="password",
+                placeholder="Dagster Cloud token",
+            ),
+            CredentialField(
+                id="deployment", label="Deployment Slug", type="string", placeholder="prod"
+            ),
+        ],
+    ),
+    "daytona": APIKeyProvider(
+        id="daytona_api_key",
+        name="Daytona",
+        icon_slug="daytona",
+        color="#1c1c1c",
+        description="Daytona — cloud dev environments.",
+        hint="Daytona API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Daytona API key"
+            ),
+        ],
+    ),
+    "launchdarkly": APIKeyProvider(
+        id="launchdarkly_api_key",
+        name="LaunchDarkly",
+        icon_slug="launchdarkly",
+        color="#1c1c1c",
+        description="LaunchDarkly — feature flags + segments.",
+        hint="LaunchDarkly API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="LaunchDarkly API key"
+            ),
+        ],
+    ),
+    "incidentio": APIKeyProvider(
+        id="incidentio_api_key",
+        name="incident.io",
+        icon_slug="incidentio",
+        color="#1c1c1c",
+        description="incident.io — incident response + postmortems.",
+        hint="incident.io API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="incident.io API key"
+            ),
+        ],
+    ),
+    "rootly": APIKeyProvider(
+        id="rootly_api_key",
+        name="Rootly",
+        icon_slug="rootly",
+        color="#1c1c1c",
+        description="Rootly — incident response, retros, integrations.",
+        hint="Rootly API access",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Rootly API key"
+            ),
+        ],
+    ),
 }
 
 
