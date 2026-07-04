@@ -40,6 +40,7 @@ from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetV
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
+from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
 from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
@@ -90,7 +91,9 @@ from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingF
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
+from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
+from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
 from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
 from apps.api.app.node_system.nodes.logic.do_while.do_while import DoWhileNode
 from apps.api.app.node_system.nodes.logic.for_loop.for_loop import ForLoopNode
@@ -100,6 +103,8 @@ from apps.api.app.node_system.nodes.logic.loop.loop_node import LoopNode
 from apps.api.app.node_system.nodes.logic.sub_workflow.sub_workflow_node import SubWorkflowNode
 from apps.api.app.node_system.nodes.logic.while_loop.while_loop import WhileLoopNode
 from apps.api.app.node_system.nodes.loops.loops_node import LoopsNode
+from apps.api.app.node_system.nodes.mailchimp.mailchimp_node import MailchimpNode
+from apps.api.app.node_system.nodes.mailerlite.mailerlite_node import MailerLiteNode
 from apps.api.app.node_system.nodes.mailgun.mailgun_node import MailgunNode
 from apps.api.app.node_system.nodes.messagebird.messagebird_node import MessageBirdNode
 from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
@@ -257,6 +262,12 @@ node_registry.register(DocuSignNode)
 node_registry.register(FirefliesNode)
 node_registry.register(GongNode)
 node_registry.register(FathomNode)
+# Phase 2.5 — social + marketing.
+node_registry.register(LinkedInNode)
+node_registry.register(MailchimpNode)
+node_registry.register(KlaviyoNode)
+node_registry.register(CustomerIONode)
+node_registry.register(MailerLiteNode)
 node_registry.register(StripeNode)
 node_registry.register(HubSpotNode)
 node_registry.register(TelegramNode)

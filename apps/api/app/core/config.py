@@ -97,6 +97,8 @@ class Settings(BaseSettings):
     # DocuSign auth host — `account-d.docusign.com` on the demo/dev
     # tier, `account.docusign.com` in production. Default is prod.
     DOCUSIGN_AUTH_HOST: str = "account.docusign.com"
+    LINKEDIN_CLIENT_ID: str = ""
+    LINKEDIN_CLIENT_SECRET: str = ""
 
     # Google Picker SDK keys (separate from OAuth client). The
     # `developer key` is a browser-restricted API key for the Picker

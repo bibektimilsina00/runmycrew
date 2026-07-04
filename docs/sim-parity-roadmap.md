@@ -185,7 +185,31 @@ Targets (priority order, may reshuffle by demand):
   pinecone, qdrant, tinybird, convex
 - Misc: posthog, sentry, dub, typeform, shopify, square, wordpress, reddit, x
 
-## Phase 2 — OAuth majors (3–4 weeks)
+## Phase 2 — OAuth majors — **SHIPPED**
+
+24/20 integrations landed across 5 sub-PRs. Total nodes now 147 (up
+from 123 post-Phase-1). Sim parity ~55%.
+
+| PR | Batch | Nodes |
+|---|---|---|
+| #275 | 2.1 Microsoft 365 | outlook, teams, onedrive, sharepoint, excel |
+| #276 | 2.2 CRM/meetings OAuth | asana, calendly, zoom, box (+ hubspot OAuth) |
+| #278 | 2.3 AWS family | s3, ses, sqs, secrets_manager, athena |
+| #279 | 2.4 Meetings + docs | dropbox, docusign, fireflies, gong, fathom |
+| #280 | 2.5 Social + marketing | linkedin, mailchimp, klaviyo, customer_io, mailerlite |
+
+New OAuth providers: microsoft, asana, hubspot, calendly, zoom, box,
+dropbox, docusign, linkedin. **15 OAuth providers total** (up from 6
+pre-Phase-2).
+
+Scaffold gained 4 more capabilities during Phase 2:
+- SigV4 signing (aws_signing.py) + aws_sigv4 auth scheme
+- Per-op extra_headers (JSON-protocol AWS services)
+- HEAD method support
+- `_SimpleOAuthProvider` base class — ~80 LOC → ~25 LOC per new
+  OAuth provider
+
+### Original Phase 2 plan
 
 ~20 integrations. Hardest per-node, highest user value.
 

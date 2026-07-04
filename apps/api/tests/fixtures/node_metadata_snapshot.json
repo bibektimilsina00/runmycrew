@@ -3879,6 +3879,187 @@
     "tools": null,
     "type": "action.cloudflare"
   },
+  "action.customer_io": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "customer_io_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Customer.io \u2014 track identifies, events, and attributes.",
+    "dynamic_outputs_from": null,
+    "icon": "customer-io",
+    "inputs": 1,
+    "name": "Customer.io",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "meta",
+        "type": "object"
+      },
+      {
+        "label": "customer",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "customer_io_api_key",
+        "label": "Customer.io Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "identify",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Identify Customer",
+            "value": "identify"
+          },
+          {
+            "label": "Delete Customer",
+            "value": "delete_customer"
+          },
+          {
+            "label": "Track Event",
+            "value": "track_event"
+          },
+          {
+            "label": "Track Anonymous Event",
+            "value": "track_anonymous_event"
+          },
+          {
+            "label": "Add Device",
+            "value": "add_device"
+          },
+          {
+            "label": "Delete Device",
+            "value": "delete_device"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "identify",
+            "delete_customer",
+            "track_event",
+            "add_device",
+            "delete_device"
+          ]
+        },
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "identify"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "identify",
+            "add_device"
+          ]
+        },
+        "label": "Attributes (JSON)",
+        "name": "attributes",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "track_event",
+            "track_anonymous_event"
+          ]
+        },
+        "label": "Event Name",
+        "name": "event_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "track_event",
+            "track_anonymous_event"
+          ]
+        },
+        "label": "Event Data (JSON)",
+        "name": "event_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "track_anonymous_event"
+          ]
+        },
+        "label": "Anonymous ID",
+        "mode": "advanced",
+        "name": "anonymous_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_device"
+          ]
+        },
+        "label": "Delivery ID",
+        "name": "delivery_id",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.customer_io"
+  },
   "action.delay": {
     "allow_error": false,
     "category": "action",
@@ -15420,6 +15601,249 @@
     "tools": null,
     "type": "action.jira"
   },
+  "action.klaviyo": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "klaviyo_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Klaviyo \u2014 email + SMS marketing, profiles, events, lists.",
+    "dynamic_outputs_from": null,
+    "icon": "klaviyo",
+    "inputs": 1,
+    "name": "Klaviyo",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "attributes",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "links",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "klaviyo_api_key",
+        "label": "Klaviyo Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_profiles",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Profiles",
+            "value": "list_profiles"
+          },
+          {
+            "label": "Get Profile",
+            "value": "get_profile"
+          },
+          {
+            "label": "Create Profile",
+            "value": "create_profile"
+          },
+          {
+            "label": "Update Profile",
+            "value": "update_profile"
+          },
+          {
+            "label": "Track Event",
+            "value": "create_event"
+          },
+          {
+            "label": "List Lists",
+            "value": "list_lists"
+          },
+          {
+            "label": "Get List",
+            "value": "get_list"
+          },
+          {
+            "label": "Add Profile to List",
+            "value": "add_profile_to_list"
+          },
+          {
+            "label": "List Segments",
+            "value": "list_segments"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_profile",
+            "update_profile",
+            "add_profile_to_list"
+          ]
+        },
+        "label": "Profile ID",
+        "name": "profile_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_profile",
+            "update_profile",
+            "create_event"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_profile"
+          ]
+        },
+        "label": "Phone Number",
+        "mode": "advanced",
+        "name": "phone_number",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_profile"
+          ]
+        },
+        "label": "First Name",
+        "mode": "advanced",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_profile"
+          ]
+        },
+        "label": "Last Name",
+        "mode": "advanced",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_profile",
+            "update_profile"
+          ]
+        },
+        "label": "Properties (JSON)",
+        "mode": "advanced",
+        "name": "properties",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_event"
+          ]
+        },
+        "label": "Event Metric Name",
+        "name": "event_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_event"
+          ]
+        },
+        "label": "Event Properties (JSON)",
+        "name": "event_properties",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_list",
+            "add_profile_to_list"
+          ]
+        },
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "Segment ID",
+        "name": "segment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_profiles"
+          ]
+        },
+        "default": 20,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.klaviyo"
+  },
   "action.knowledge": {
     "allow_error": true,
     "category": "ai",
@@ -15703,6 +16127,168 @@
     ],
     "tools": null,
     "type": "action.linear"
+  },
+  "action.linkedin": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "linkedin_oauth",
+    "default_height": null,
+    "default_width": null,
+    "description": "LinkedIn \u2014 profile info + post updates as your member account.",
+    "dynamic_outputs_from": null,
+    "icon": "linkedin",
+    "inputs": 1,
+    "name": "LinkedIn",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sub",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "x-restli-id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "linkedin_oauth",
+        "label": "LinkedIn Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_userinfo",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Userinfo (OIDC)",
+            "value": "get_userinfo"
+          },
+          {
+            "label": "Get Member Profile",
+            "value": "get_me"
+          },
+          {
+            "label": "Create Post",
+            "value": "create_post"
+          },
+          {
+            "label": "Delete Post",
+            "value": "delete_post"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_post"
+          ]
+        },
+        "description": "Your LinkedIn member URN. Fetch once via Get Userinfo, then paste here.",
+        "label": "Author URN",
+        "name": "author_urn",
+        "placeholder": "urn:li:person:abc123",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_post"
+          ]
+        },
+        "label": "Post ID (URN)",
+        "name": "post_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_post"
+          ]
+        },
+        "label": "Post commentary",
+        "name": "commentary",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_post"
+          ]
+        },
+        "default": "PUBLIC",
+        "label": "Visibility",
+        "mode": "advanced",
+        "name": "visibility",
+        "options": [
+          {
+            "label": "Public",
+            "value": "PUBLIC"
+          },
+          {
+            "label": "Connections",
+            "value": "CONNECTIONS"
+          },
+          {
+            "label": "Logged-in members",
+            "value": "LOGGED_IN"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.linkedin"
   },
   "action.llm": {
     "allow_error": true,
@@ -16076,6 +16662,526 @@
     ],
     "tools": null,
     "type": "action.loops"
+  },
+  "action.mailchimp": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "mailchimp_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Mailchimp \u2014 lists, members, campaigns, tags.",
+    "dynamic_outputs_from": null,
+    "icon": "mailchimp",
+    "inputs": 1,
+    "name": "Mailchimp",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email_address",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "members",
+        "type": "array"
+      },
+      {
+        "label": "lists",
+        "type": "array"
+      },
+      {
+        "label": "campaigns",
+        "type": "array"
+      },
+      {
+        "label": "total_items",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "mailchimp_api_key",
+        "label": "Mailchimp Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_lists",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Audiences",
+            "value": "list_lists"
+          },
+          {
+            "label": "Get Audience",
+            "value": "get_list"
+          },
+          {
+            "label": "List Members",
+            "value": "list_members"
+          },
+          {
+            "label": "Get Member",
+            "value": "get_member"
+          },
+          {
+            "label": "Add Member",
+            "value": "add_member"
+          },
+          {
+            "label": "Update Member",
+            "value": "update_member"
+          },
+          {
+            "label": "Archive Member",
+            "value": "delete_member"
+          },
+          {
+            "label": "List Campaigns",
+            "value": "list_campaigns"
+          },
+          {
+            "label": "Send Campaign",
+            "value": "send_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_list",
+            "list_members",
+            "get_member",
+            "add_member",
+            "update_member",
+            "delete_member"
+          ]
+        },
+        "label": "List (Audience) ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_member",
+            "update_member",
+            "delete_member"
+          ]
+        },
+        "label": "Member Hash (MD5 of lowercased email)",
+        "name": "member_hash",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_member"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_member",
+            "update_member"
+          ]
+        },
+        "default": "subscribed",
+        "label": "Subscription Status",
+        "name": "status",
+        "options": [
+          {
+            "label": "Subscribed",
+            "value": "subscribed"
+          },
+          {
+            "label": "Unsubscribed",
+            "value": "unsubscribed"
+          },
+          {
+            "label": "Cleaned",
+            "value": "cleaned"
+          },
+          {
+            "label": "Pending",
+            "value": "pending"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_member",
+            "update_member"
+          ]
+        },
+        "label": "Merge Fields (JSON)",
+        "mode": "advanced",
+        "name": "merge_fields",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_member"
+          ]
+        },
+        "label": "Tags (JSON array)",
+        "mode": "advanced",
+        "name": "tags",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_campaign"
+          ]
+        },
+        "label": "Campaign ID",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_lists",
+            "list_members",
+            "list_campaigns"
+          ]
+        },
+        "default": 50,
+        "label": "Count",
+        "mode": "advanced",
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_lists",
+            "list_members",
+            "list_campaigns"
+          ]
+        },
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.mailchimp"
+  },
+  "action.mailerlite": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "mailerlite_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "MailerLite \u2014 subscribers, groups, campaigns, automations.",
+    "dynamic_outputs_from": null,
+    "icon": "mailerlite",
+    "inputs": 1,
+    "name": "MailerLite",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "meta",
+        "type": "object"
+      },
+      {
+        "label": "links",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "mailerlite_api_key",
+        "label": "MailerLite Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_subscribers",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Subscribers",
+            "value": "list_subscribers"
+          },
+          {
+            "label": "Get Subscriber",
+            "value": "get_subscriber"
+          },
+          {
+            "label": "Create / Upsert Subscriber",
+            "value": "create_subscriber"
+          },
+          {
+            "label": "Update Subscriber",
+            "value": "update_subscriber"
+          },
+          {
+            "label": "Delete Subscriber",
+            "value": "delete_subscriber"
+          },
+          {
+            "label": "List Groups",
+            "value": "list_groups"
+          },
+          {
+            "label": "Create Group",
+            "value": "create_group"
+          },
+          {
+            "label": "Assign Subscriber to Group",
+            "value": "assign_subscriber_to_group"
+          },
+          {
+            "label": "List Campaigns",
+            "value": "list_campaigns"
+          },
+          {
+            "label": "Get Campaign",
+            "value": "get_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_subscriber",
+            "update_subscriber",
+            "delete_subscriber",
+            "assign_subscriber_to_group"
+          ]
+        },
+        "label": "Subscriber ID or Email",
+        "name": "subscriber_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_subscriber"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_subscriber",
+            "update_subscriber"
+          ]
+        },
+        "label": "Fields (JSON)",
+        "mode": "advanced",
+        "name": "fields",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_subscriber",
+            "update_subscriber"
+          ]
+        },
+        "label": "Group IDs (JSON array)",
+        "mode": "advanced",
+        "name": "groups",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "assign_subscriber_to_group"
+          ]
+        },
+        "label": "Group ID",
+        "name": "group_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_group"
+          ]
+        },
+        "label": "Group Name",
+        "name": "group_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_campaign"
+          ]
+        },
+        "label": "Campaign ID",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_subscribers"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_subscribers"
+          ]
+        },
+        "label": "Status Filter",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "Active",
+            "value": "active"
+          },
+          {
+            "label": "Unsubscribed",
+            "value": "unsubscribed"
+          },
+          {
+            "label": "Junk",
+            "value": "junk"
+          },
+          {
+            "label": "Bounced",
+            "value": "bounced"
+          },
+          {
+            "label": "Unconfirmed",
+            "value": "unconfirmed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.mailerlite"
   },
   "action.mailgun": {
     "allow_error": true,

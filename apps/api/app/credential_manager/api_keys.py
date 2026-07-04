@@ -68,6 +68,74 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="fc-...")
         ],
     ),
+    "mailchimp": APIKeyProvider(
+        id="mailchimp_api_key",
+        name="Mailchimp",
+        icon_slug="mailchimp",
+        color="#1c1c1c",
+        description="Mailchimp — audiences, campaigns, transactional.",
+        hint="API Key (ends in -us14) + data-center suffix from the key",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="abc123-us14",
+            ),
+            CredentialField(
+                id="dc",
+                label="Data Center",
+                type="string",
+                placeholder="us14 (the suffix after the dash in your API key)",
+            ),
+        ],
+    ),
+    "klaviyo": APIKeyProvider(
+        id="klaviyo_api_key",
+        name="Klaviyo",
+        icon_slug="klaviyo",
+        color="#1c1c1c",
+        description="Klaviyo — email + SMS marketing, profiles, events.",
+        hint="Private API Key (pk_...)",
+        fields=[
+            CredentialField(
+                id="api_key", label="Private API Key", type="password", placeholder="pk_..."
+            )
+        ],
+    ),
+    "customer_io": APIKeyProvider(
+        id="customer_io_api_key",
+        name="Customer.io",
+        icon_slug="customer-io",
+        color="#1c1c1c",
+        description="Customer.io — behavioral messaging + broadcasts.",
+        hint="Track site ID + track API key",
+        fields=[
+            CredentialField(
+                id="site_id",
+                label="Site ID",
+                type="string",
+                placeholder="Site ID",
+            ),
+            CredentialField(
+                id="api_key",
+                label="Track API Key",
+                type="password",
+                placeholder="Track API Key",
+            ),
+        ],
+    ),
+    "mailerlite": APIKeyProvider(
+        id="mailerlite_api_key",
+        name="MailerLite",
+        icon_slug="mailerlite",
+        color="#1c1c1c",
+        description="MailerLite — subscribers, campaigns, automations.",
+        hint="API Token",
+        fields=[
+            CredentialField(id="api_key", label="API Token", type="password", placeholder="Token")
+        ],
+    ),
     "fireflies": APIKeyProvider(
         id="fireflies_api_key",
         name="Fireflies",
