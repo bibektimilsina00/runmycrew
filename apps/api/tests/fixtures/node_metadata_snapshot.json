@@ -34979,6 +34979,177 @@
     "tools": null,
     "type": "trigger.jira"
   },
+  "trigger.jira_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Atlassian Cloud posts a Jira webhook. Full sim event parity \u2014 issue/comment/worklog/sprint create+update+delete, version_released, project_created. HMAC-SHA256 verified against the shared secret.",
+    "dynamic_outputs_from": null,
+    "icon": "jira",
+    "inputs": 0,
+    "name": "Jira Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "issue_key",
+        "type": "string"
+      },
+      {
+        "label": "issue_id",
+        "type": "string"
+      },
+      {
+        "label": "summary",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "assignee",
+        "type": "string"
+      },
+      {
+        "label": "comment_body",
+        "type": "string"
+      },
+      {
+        "label": "worklog_time_spent",
+        "type": "string"
+      },
+      {
+        "label": "sprint_name",
+        "type": "string"
+      },
+      {
+        "label": "user_email",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Atlassian-Webhook-Identifier` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Issue Created",
+            "value": "jira:issue_created"
+          },
+          {
+            "label": "Issue Updated",
+            "value": "jira:issue_updated"
+          },
+          {
+            "label": "Issue Deleted",
+            "value": "jira:issue_deleted"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment_created"
+          },
+          {
+            "label": "Comment Updated",
+            "value": "comment_updated"
+          },
+          {
+            "label": "Comment Deleted",
+            "value": "comment_deleted"
+          },
+          {
+            "label": "Worklog Created",
+            "value": "worklog_created"
+          },
+          {
+            "label": "Worklog Updated",
+            "value": "worklog_updated"
+          },
+          {
+            "label": "Worklog Deleted",
+            "value": "worklog_deleted"
+          },
+          {
+            "label": "Sprint Created",
+            "value": "sprint_created"
+          },
+          {
+            "label": "Sprint Started",
+            "value": "sprint_started"
+          },
+          {
+            "label": "Sprint Closed",
+            "value": "sprint_closed"
+          },
+          {
+            "label": "Version Released",
+            "value": "jira:version_released"
+          },
+          {
+            "label": "Project Created",
+            "value": "project_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Jira Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.jira_webhook"
+  },
   "trigger.linear": {
     "allow_error": true,
     "category": "trigger",
@@ -35099,6 +35270,169 @@
     ],
     "tools": null,
     "type": "trigger.linear"
+  },
+  "trigger.linear_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Linear posts a webhook delivery. Full sim parity including delete/remove events (unlocks the events the Phase 4.2 poller couldn't observe). HMAC-SHA256 verified via `Linear-Signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "linear",
+    "inputs": 0,
+    "name": "Linear Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "action",
+        "type": "string"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "identifier",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "state_name",
+        "type": "string"
+      },
+      {
+        "label": "assignee_name",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `Linear-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Issue Created",
+            "value": "Issue.create"
+          },
+          {
+            "label": "Issue Updated",
+            "value": "Issue.update"
+          },
+          {
+            "label": "Issue Removed",
+            "value": "Issue.remove"
+          },
+          {
+            "label": "Comment Created",
+            "value": "Comment.create"
+          },
+          {
+            "label": "Comment Updated",
+            "value": "Comment.update"
+          },
+          {
+            "label": "Cycle Created",
+            "value": "Cycle.create"
+          },
+          {
+            "label": "Cycle Updated",
+            "value": "Cycle.update"
+          },
+          {
+            "label": "Project Created",
+            "value": "Project.create"
+          },
+          {
+            "label": "Project Update Created",
+            "value": "ProjectUpdate.create"
+          },
+          {
+            "label": "Label Created",
+            "value": "IssueLabel.create"
+          },
+          {
+            "label": "Label Updated",
+            "value": "IssueLabel.update"
+          },
+          {
+            "label": "Customer Request Created",
+            "value": "CustomerRequest.create"
+          },
+          {
+            "label": "Customer Request Updated",
+            "value": "CustomerRequest.update"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `Linear-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Linear Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.linear_webhook"
   },
   "trigger.manual": {
     "allow_error": false,

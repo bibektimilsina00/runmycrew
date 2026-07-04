@@ -135,8 +135,24 @@ class WebhookService:
             ):
                 raise HTTPException(status_code=401, detail="Invalid signature")
 
+        # ── parse body first — some providers put the event kind in
+        # the JSON body rather than a header, so we need the parsed
+        # body to resolve event_type before applying the event filter.
+        try:
+            payload = json.loads(raw_body)
+        except Exception:
+            payload = {"raw": raw_body.decode("utf-8", errors="replace")}
+
         # ── event filter ────────────────────────────────────────────
-        event_type = _lookup_header(headers, manifest.event_header) or "unknown"
+        event_type = _lookup_header(headers, manifest.event_header)
+        if not event_type and manifest.event_body_path and isinstance(payload, dict):
+            path = manifest.event_body_path
+            if isinstance(path, list):
+                parts = [_extract_body_path(payload, p) for p in path]
+                event_type = ".".join(p for p in parts if p)
+            else:
+                event_type = _extract_body_path(payload, path) or ""
+        event_type = event_type or "unknown"
         delivery_id = (
             _lookup_header(headers, "X-Hub-Delivery")
             or _lookup_header(headers, f"X-{provider.title()}-Delivery")
@@ -153,12 +169,6 @@ class WebhookService:
                 event_type,
             )
             return {"status": "ignored", "event": event_type}
-
-        # ── parse + shape + dispatch ────────────────────────────────
-        try:
-            payload = json.loads(raw_body)
-        except Exception:
-            payload = {"raw": raw_body.decode("utf-8", errors="replace")}
 
         shape_fn = manifest.payload_shape or _default_shape
         trigger_data = shape_fn(payload, event_type, delivery_id)
@@ -205,6 +215,23 @@ def _find_trigger_node_props(workflow: Any, node_type: str, node_id: str) -> dic
         props = data.get("properties") or {}
         return props if isinstance(props, dict) else {}
     return None
+
+
+def _extract_body_path(payload: dict[str, Any], path: str) -> str:
+    """Walk a dotted key path into a parsed JSON body. Simple path
+    only — no array indexing. Returns "" on any miss.
+
+    Used by manifests that put the event kind in the body rather than
+    a header (Jira's `webhookEvent`, Linear/Notion's `type`).
+    Container values (dict/list) resolve to empty so the receiver
+    doesn't route on a structure.
+    """
+    cur: Any = payload
+    for part in path.split("."):
+        if not isinstance(cur, dict):
+            return ""
+        cur = cur.get(part)
+    return str(cur) if cur is not None and not isinstance(cur, dict | list) else ""
 
 
 def _lookup_header(headers: dict[str, str], name: str) -> str:

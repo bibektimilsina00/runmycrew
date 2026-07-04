@@ -119,9 +119,11 @@ from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
+from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
+from apps.api.app.node_system.nodes.linear.linear_webhook import LinearWebhookTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
 from apps.api.app.node_system.nodes.logic.code.code_node import CodeNode
 from apps.api.app.node_system.nodes.logic.do_while.do_while import DoWhileNode
@@ -342,6 +344,9 @@ node_registry.register(WebflowWebhookTriggerNode)
 node_registry.register(GongWebhookTriggerNode)
 node_registry.register(FathomWebhookTriggerNode)
 node_registry.register(FirefliesWebhookTriggerNode)
+# Phase 4.10 — jira + linear webhook triggers.
+node_registry.register(JiraWebhookTriggerNode)
+node_registry.register(LinearWebhookTriggerNode)
 # Phase 3.5 — completion (monday polling + generic RSS + IMAP).
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)

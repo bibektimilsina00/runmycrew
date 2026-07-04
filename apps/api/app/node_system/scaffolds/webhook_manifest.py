@@ -125,6 +125,17 @@ class WebhookTriggerManifest(BaseModel):
     # Verification.
     signature: SignatureSpec = Field(default_factory=SignatureSpec)
     event_header: str = "X-GitHub-Event"
+    # Optional body path — either a dotted key path or a list of paths
+    # joined with "." for providers with composite event kinds. Used
+    # when the provider doesn't ship a dedicated event header (Jira's
+    # `webhookEvent`, Linear's `type` + `action`, Notion's `type`).
+    # Receiver tries `event_header` first, falls back to this path.
+    #
+    # Examples:
+    #   "event_type"                        → single field
+    #   "meta.event"                        → nested
+    #   ["type", "action"]                  → Linear: `Issue.create`
+    event_body_path: str | list[str] | None = None
 
     # Inspector.
     credential_type: str | list[str] | None = None
