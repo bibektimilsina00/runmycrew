@@ -126,6 +126,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.calendly import (
         calendly_trigger as _calendly_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.confluence import (
+        confluence_trigger as _confluence_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
     from apps.api.app.node_system.nodes.gchat import (
         gchat_trigger as _gchat_trigger,  # noqa: F401

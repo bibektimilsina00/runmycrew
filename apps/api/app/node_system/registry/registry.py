@@ -56,6 +56,8 @@ from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetV
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
+from apps.api.app.node_system.nodes.confluence.confluence_node import ConfluenceNode
+from apps.api.app.node_system.nodes.confluence.confluence_trigger import ConfluenceTriggerNode
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
@@ -346,6 +348,9 @@ node_registry.register(FirefliesWebhookTriggerNode)
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
 node_registry.register(IMAPTriggerNode)
+# Phase 4.4 — Confluence.
+node_registry.register(ConfluenceNode)
+node_registry.register(ConfluenceTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

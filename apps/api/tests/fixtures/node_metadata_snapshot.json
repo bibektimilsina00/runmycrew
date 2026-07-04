@@ -5239,6 +5239,274 @@
     "tools": null,
     "type": "action.cloudflare"
   },
+  "action.confluence": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "confluence_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Confluence Cloud \u2014 pages, spaces, blogs, comments.",
+    "dynamic_outputs_from": null,
+    "icon": "confluence",
+    "inputs": 1,
+    "name": "Confluence",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "spaceId",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "parentId",
+        "type": "string"
+      },
+      {
+        "label": "version",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "confluence_api_key",
+        "label": "Confluence Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_pages",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Pages",
+            "value": "list_pages"
+          },
+          {
+            "label": "Get Page",
+            "value": "get_page"
+          },
+          {
+            "label": "Create Page",
+            "value": "create_page"
+          },
+          {
+            "label": "Update Page",
+            "value": "update_page"
+          },
+          {
+            "label": "Delete Page",
+            "value": "delete_page"
+          },
+          {
+            "label": "List Spaces",
+            "value": "list_spaces"
+          },
+          {
+            "label": "Get Space",
+            "value": "get_space"
+          },
+          {
+            "label": "List Blog Posts",
+            "value": "list_blog_posts"
+          },
+          {
+            "label": "Create Blog Post",
+            "value": "create_blog_post"
+          },
+          {
+            "label": "List Comments on Page",
+            "value": "list_comments"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_page",
+            "update_page",
+            "delete_page",
+            "list_comments"
+          ]
+        },
+        "label": "Page ID",
+        "name": "page_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_pages",
+            "create_page",
+            "get_space",
+            "list_blog_posts",
+            "create_blog_post"
+          ]
+        },
+        "label": "Space ID",
+        "name": "space_id",
+        "type": "string"
+      },
+      {
+        "label": "Space Key",
+        "name": "space_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_page",
+            "update_page",
+            "create_blog_post"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_page",
+            "update_page",
+            "create_blog_post"
+          ]
+        },
+        "label": "Body (HTML/storage)",
+        "name": "body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_page"
+          ]
+        },
+        "label": "Parent Page ID",
+        "name": "parent_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_pages"
+          ]
+        },
+        "default": "current",
+        "label": "Status",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "Current",
+            "value": "current"
+          },
+          {
+            "label": "Draft",
+            "value": "draft"
+          },
+          {
+            "label": "Archived",
+            "value": "archived"
+          },
+          {
+            "label": "Trashed",
+            "value": "trashed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_page"
+          ]
+        },
+        "label": "Version number (for updates)",
+        "mode": "advanced",
+        "name": "version",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_pages",
+            "list_spaces",
+            "list_blog_posts",
+            "list_comments"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.confluence"
+  },
   "action.customer_io": {
     "allow_error": true,
     "category": "integration",
@@ -32125,6 +32393,167 @@
     ],
     "tools": null,
     "type": "trigger.calendly"
+  },
+  "trigger.confluence": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "confluence_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Confluence Cloud for new / updated pages + blog posts, new comments on a target page, or new spaces.",
+    "dynamic_outputs_from": null,
+    "icon": "confluence",
+    "inputs": 0,
+    "name": "Confluence",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "space_id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      },
+      {
+        "label": "version_number",
+        "type": "number"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "web_url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "confluence_api_key",
+        "label": "Confluence Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "page_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Page Created",
+            "value": "page_created"
+          },
+          {
+            "label": "Page Updated",
+            "value": "page_updated"
+          },
+          {
+            "label": "Blog Post Created",
+            "value": "blog_created"
+          },
+          {
+            "label": "Blog Post Updated",
+            "value": "blog_updated"
+          },
+          {
+            "label": "Comment Created on Page",
+            "value": "comment_created"
+          },
+          {
+            "label": "Space Created",
+            "value": "space_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "page_created",
+            "page_updated",
+            "blog_created",
+            "blog_updated"
+          ]
+        },
+        "label": "Space ID (optional; blank = all spaces)",
+        "mode": "advanced",
+        "name": "space_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "comment_created"
+          ]
+        },
+        "label": "Page ID (for comment_created event)",
+        "name": "page_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.confluence"
   },
   "trigger.cron": {
     "allow_error": false,
