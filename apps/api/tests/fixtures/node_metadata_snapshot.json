@@ -30547,14 +30547,14 @@
   "action.hubspot": {
     "allow_error": true,
     "category": "integration",
-    "color": "#1c1c1c",
+    "color": "#FF7A59",
     "credential_type": [
       "hubspot_oauth",
       "hubspot_api_key"
     ],
     "default_height": null,
     "default_width": null,
-    "description": "Manage contacts, deals, and companies in HubSpot CRM.",
+    "description": "HubSpot \u2014 contacts, companies, deals, tickets, engagements, lists.",
     "dynamic_outputs_from": null,
     "icon": "hubspot",
     "inputs": 1,
@@ -30563,20 +30563,12 @@
     "outputs": 1,
     "outputs_schema": [
       {
-        "label": "results",
-        "type": "array"
+        "label": "data",
+        "type": "object"
       },
       {
         "label": "id",
         "type": "string"
-      },
-      {
-        "label": "properties",
-        "type": "object"
-      },
-      {
-        "label": "total",
-        "type": "number"
       }
     ],
     "properties": [
@@ -30616,6 +30608,10 @@
             "value": "search_contacts"
           },
           {
+            "label": "Delete Contact",
+            "value": "delete_contact"
+          },
+          {
             "label": "Create Deal",
             "value": "create_deal"
           },
@@ -30628,12 +30624,120 @@
             "value": "list_deals"
           },
           {
+            "label": "Update Deal",
+            "value": "update_deal"
+          },
+          {
+            "label": "Delete Deal",
+            "value": "delete_deal"
+          },
+          {
+            "label": "Search Deals",
+            "value": "search_deals"
+          },
+          {
             "label": "Create Company",
             "value": "create_company"
           },
           {
             "label": "List Companies",
             "value": "list_companies"
+          },
+          {
+            "label": "Get Company",
+            "value": "get_company"
+          },
+          {
+            "label": "Update Company",
+            "value": "update_company"
+          },
+          {
+            "label": "Delete Company",
+            "value": "delete_company"
+          },
+          {
+            "label": "Search Companies",
+            "value": "search_companies"
+          },
+          {
+            "label": "Create Ticket",
+            "value": "create_ticket"
+          },
+          {
+            "label": "Get Ticket",
+            "value": "get_ticket"
+          },
+          {
+            "label": "List Tickets",
+            "value": "list_tickets"
+          },
+          {
+            "label": "Update Ticket",
+            "value": "update_ticket"
+          },
+          {
+            "label": "Delete Ticket",
+            "value": "delete_ticket"
+          },
+          {
+            "label": "Create Engagement",
+            "value": "create_engagement"
+          },
+          {
+            "label": "Get Engagement",
+            "value": "get_engagement"
+          },
+          {
+            "label": "Delete Engagement",
+            "value": "delete_engagement"
+          },
+          {
+            "label": "Associate Objects",
+            "value": "associate"
+          },
+          {
+            "label": "List Contact Lists",
+            "value": "list_lists"
+          },
+          {
+            "label": "Get Contact List",
+            "value": "get_list"
+          },
+          {
+            "label": "Get Contacts in List",
+            "value": "get_list_contacts"
+          },
+          {
+            "label": "List Owners",
+            "value": "list_owners"
+          },
+          {
+            "label": "Get Owner",
+            "value": "get_owner"
+          },
+          {
+            "label": "List Deal Pipelines",
+            "value": "list_deal_pipelines"
+          },
+          {
+            "label": "List Ticket Pipelines",
+            "value": "list_ticket_pipelines"
+          },
+          {
+            "label": "List Forms",
+            "value": "list_forms"
+          },
+          {
+            "label": "Submit Form (public)",
+            "value": "submit_form"
+          },
+          {
+            "label": "List Contact Properties",
+            "value": "list_contact_properties"
+          },
+          {
+            "label": "List Deal Properties",
+            "value": "list_deal_properties"
           }
         ],
         "type": "options"
@@ -30643,11 +30747,87 @@
           "field": "operation",
           "value": [
             "get_contact",
-            "update_contact"
+            "update_contact",
+            "delete_contact",
+            "create_engagement"
           ]
         },
         "label": "Contact ID",
         "name": "contact_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_deal",
+            "update_deal",
+            "delete_deal"
+          ]
+        },
+        "label": "Deal ID",
+        "name": "deal_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_company",
+            "update_company",
+            "delete_company"
+          ]
+        },
+        "label": "Company ID",
+        "name": "company_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_ticket",
+            "update_ticket",
+            "delete_ticket"
+          ]
+        },
+        "label": "Ticket ID",
+        "name": "ticket_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_engagement",
+            "delete_engagement"
+          ]
+        },
+        "label": "Engagement ID",
+        "name": "engagement_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_list",
+            "get_list_contacts"
+          ]
+        },
+        "label": "List ID",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_owner"
+          ]
+        },
+        "label": "Owner ID",
+        "name": "owner_id",
         "type": "string"
       },
       {
@@ -30671,7 +30851,7 @@
           ]
         },
         "label": "First Name",
-        "name": "firstname",
+        "name": "first_name",
         "type": "string"
       },
       {
@@ -30683,7 +30863,7 @@
           ]
         },
         "label": "Last Name",
-        "name": "lastname",
+        "name": "last_name",
         "type": "string"
       },
       {
@@ -30695,33 +30875,41 @@
           ]
         },
         "label": "Phone",
-        "mode": "advanced",
         "name": "phone",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "search_contacts"
+          "value": [
+            "create_contact",
+            "create_company",
+            "update_company"
+          ]
         },
-        "label": "Search Query",
-        "name": "search_query",
-        "placeholder": "John Doe",
+        "label": "Company Name",
+        "name": "company_name",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "get_deal"
+          "value": [
+            "create_company",
+            "update_company"
+          ]
         },
-        "label": "Deal ID",
-        "name": "deal_id",
+        "label": "Domain",
+        "name": "domain",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "create_deal"
+          "value": [
+            "create_deal",
+            "update_deal"
+          ]
         },
         "label": "Deal Name",
         "name": "deal_name",
@@ -30730,9 +30918,11 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_deal"
+          "value": [
+            "create_deal",
+            "update_deal"
+          ]
         },
-        "default": "appointmentscheduled",
         "label": "Deal Stage",
         "name": "deal_stage",
         "type": "string"
@@ -30740,38 +30930,195 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_deal"
+          "value": [
+            "create_deal",
+            "update_deal"
+          ]
         },
-        "label": "Amount",
-        "mode": "advanced",
-        "name": "amount",
+        "label": "Deal Amount",
+        "name": "deal_amount",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_deal"
+          ]
+        },
+        "label": "Pipeline",
+        "name": "pipeline",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "create_company"
+          "value": [
+            "create_ticket"
+          ]
         },
+        "label": "Ticket Name",
+        "name": "ticket_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket"
+          ]
+        },
+        "label": "Ticket Pipeline",
+        "name": "ticket_pipeline",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket",
+            "update_ticket"
+          ]
+        },
+        "label": "Ticket Stage",
+        "name": "ticket_stage",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket",
+            "update_ticket"
+          ]
+        },
+        "label": "Ticket Content",
+        "name": "ticket_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_ticket"
+          ]
+        },
+        "label": "Ticket Priority",
+        "name": "ticket_priority",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_engagement"
+          ]
+        },
+        "default": "NOTE",
+        "label": "Engagement Type (NOTE|EMAIL|CALL|MEETING|TASK)",
+        "name": "engagement_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_engagement"
+          ]
+        },
+        "label": "Engagement Body",
+        "name": "engagement_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_contacts",
+            "search_deals",
+            "search_companies"
+          ]
+        },
+        "label": "Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "submit_form"
+          ]
+        },
+        "default": {},
         "label": "Properties (JSON)",
-        "mode": "advanced",
-        "name": "properties",
-        "placeholder": "{\"name\": \"Acme Corp\", \"domain\": \"acme.com\"}",
+        "name": "properties_body",
+        "type": "json"
+      },
+      {
+        "default": [],
+        "label": "Associations (JSON)",
+        "name": "associations_body",
         "type": "json"
       },
       {
         "condition": {
           "field": "operation",
           "value": [
-            "list_contacts",
-            "list_deals",
-            "list_companies"
+            "associate"
           ]
         },
-        "default": 10,
+        "label": "From Object ID",
+        "name": "from_object_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "associate"
+          ]
+        },
+        "label": "To Object ID",
+        "name": "to_object_id",
+        "type": "string"
+      },
+      {
+        "label": "Association Type",
+        "name": "association_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_contacts",
+            "search_contacts",
+            "list_deals",
+            "search_deals",
+            "list_companies",
+            "search_companies",
+            "list_tickets",
+            "list_lists"
+          ]
+        },
+        "default": 20,
         "label": "Limit",
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_contacts"
+          ]
+        },
+        "label": "After (paging cursor)",
+        "mode": "advanced",
+        "name": "after",
+        "type": "string"
       },
       {
         "default": 0,
@@ -58710,11 +59057,11 @@
   "action.stripe": {
     "allow_error": true,
     "category": "integration",
-    "color": "#ffffff",
+    "color": "#635BFF",
     "credential_type": "stripe_api_key",
     "default_height": null,
     "default_width": null,
-    "description": "Create payments, manage customers, and retrieve billing data from Stripe.",
+    "description": "Stripe \u2014 payments, customers, subscriptions, invoices, refunds.",
     "dynamic_outputs_from": null,
     "icon": "stripe",
     "inputs": 1,
@@ -58723,32 +59070,24 @@
     "outputs": 1,
     "outputs_schema": [
       {
+        "label": "data",
+        "type": "object"
+      },
+      {
         "label": "id",
         "type": "string"
-      },
-      {
-        "label": "status",
-        "type": "string"
-      },
-      {
-        "label": "data",
-        "type": "array"
-      },
-      {
-        "label": "object",
-        "type": "object"
       }
     ],
     "properties": [
       {
         "credentialType": "stripe_api_key",
-        "label": "Stripe Secret Key",
+        "label": "Stripe Account",
         "name": "credential",
         "required": true,
         "type": "credential"
       },
       {
-        "default": "list_payments",
+        "default": "create_payment_intent",
         "label": "Operation",
         "name": "operation",
         "options": [
@@ -58783,6 +59122,122 @@
           {
             "label": "List Invoices",
             "value": "list_invoices"
+          },
+          {
+            "label": "Update Customer",
+            "value": "update_customer"
+          },
+          {
+            "label": "Delete Customer",
+            "value": "delete_customer"
+          },
+          {
+            "label": "Confirm Payment Intent",
+            "value": "confirm_payment_intent"
+          },
+          {
+            "label": "Capture Payment Intent",
+            "value": "capture_payment_intent"
+          },
+          {
+            "label": "Cancel Payment Intent",
+            "value": "cancel_payment_intent"
+          },
+          {
+            "label": "Get Charge",
+            "value": "get_charge"
+          },
+          {
+            "label": "List Charges",
+            "value": "list_charges"
+          },
+          {
+            "label": "Get Invoice",
+            "value": "get_invoice"
+          },
+          {
+            "label": "Create Invoice (draft)",
+            "value": "create_invoice"
+          },
+          {
+            "label": "Finalize Invoice",
+            "value": "finalize_invoice"
+          },
+          {
+            "label": "Pay Invoice",
+            "value": "pay_invoice"
+          },
+          {
+            "label": "Send Invoice",
+            "value": "send_invoice"
+          },
+          {
+            "label": "Void Invoice",
+            "value": "void_invoice"
+          },
+          {
+            "label": "Create Subscription",
+            "value": "create_subscription"
+          },
+          {
+            "label": "Get Subscription",
+            "value": "get_subscription"
+          },
+          {
+            "label": "List Subscriptions",
+            "value": "list_subscriptions"
+          },
+          {
+            "label": "Cancel Subscription",
+            "value": "cancel_subscription"
+          },
+          {
+            "label": "Create Product",
+            "value": "create_product"
+          },
+          {
+            "label": "List Products",
+            "value": "list_products"
+          },
+          {
+            "label": "Create Price",
+            "value": "create_price"
+          },
+          {
+            "label": "Create Checkout Session",
+            "value": "create_checkout_session"
+          },
+          {
+            "label": "Create Billing Portal Session",
+            "value": "create_billing_portal_session"
+          },
+          {
+            "label": "Get Event",
+            "value": "get_event"
+          },
+          {
+            "label": "List Events",
+            "value": "list_events"
+          },
+          {
+            "label": "Get Dispute",
+            "value": "get_dispute"
+          },
+          {
+            "label": "List Disputes",
+            "value": "list_disputes"
+          },
+          {
+            "label": "Create Coupon",
+            "value": "create_coupon"
+          },
+          {
+            "label": "List Coupons",
+            "value": "list_coupons"
+          },
+          {
+            "label": "Delete Coupon",
+            "value": "delete_coupon"
           }
         ],
         "type": "options"
@@ -58790,18 +59245,21 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_payment_intent"
+          "value": [
+            "create_payment_intent"
+          ]
         },
-        "description": "Amount in smallest currency unit (e.g. 1000 = $10.00)",
         "label": "Amount (cents)",
         "name": "amount",
-        "required": true,
         "type": "number"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "create_payment_intent"
+          "value": [
+            "create_payment_intent",
+            "create_price"
+          ]
         },
         "default": "usd",
         "label": "Currency",
@@ -58812,8 +59270,26 @@
         "condition": {
           "field": "operation",
           "value": [
+            "create_payment_intent",
+            "create_customer",
+            "update_customer",
+            "create_invoice",
+            "create_product"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
             "get_payment_intent",
-            "create_refund"
+            "create_refund",
+            "confirm_payment_intent",
+            "capture_payment_intent",
+            "cancel_payment_intent"
           ]
         },
         "label": "Payment Intent ID",
@@ -58824,8 +59300,18 @@
         "condition": {
           "field": "operation",
           "value": [
+            "create_payment_intent",
+            "list_payments",
             "get_customer",
-            "create_payment_intent"
+            "list_invoices",
+            "update_customer",
+            "delete_customer",
+            "list_charges",
+            "create_invoice",
+            "create_subscription",
+            "list_subscriptions",
+            "create_checkout_session",
+            "create_billing_portal_session"
           ]
         },
         "label": "Customer ID",
@@ -58835,7 +59321,11 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_customer"
+          "value": [
+            "create_customer",
+            "list_customers",
+            "update_customer"
+          ]
         },
         "label": "Email",
         "name": "email",
@@ -58844,7 +59334,10 @@
       {
         "condition": {
           "field": "operation",
-          "value": "create_customer"
+          "value": [
+            "create_customer",
+            "update_customer"
+          ]
         },
         "label": "Name",
         "name": "name",
@@ -58854,13 +59347,151 @@
         "condition": {
           "field": "operation",
           "value": [
-            "create_payment_intent",
-            "create_customer"
+            "create_refund"
           ]
         },
-        "label": "Description",
-        "mode": "advanced",
-        "name": "description",
+        "label": "Refund Amount (cents)",
+        "name": "refund_amount",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_invoice",
+            "finalize_invoice",
+            "pay_invoice",
+            "send_invoice",
+            "void_invoice"
+          ]
+        },
+        "label": "Invoice ID",
+        "name": "invoice_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_charge"
+          ]
+        },
+        "label": "Charge ID",
+        "name": "charge_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_subscription",
+            "cancel_subscription"
+          ]
+        },
+        "label": "Subscription ID",
+        "name": "subscription_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_subscription",
+            "create_checkout_session"
+          ]
+        },
+        "label": "Price ID",
+        "name": "price_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_price"
+          ]
+        },
+        "label": "Product ID",
+        "name": "product_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_product"
+          ]
+        },
+        "label": "Product Name",
+        "name": "product_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_price"
+          ]
+        },
+        "label": "Price Amount (cents)",
+        "name": "price_amount",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_price"
+          ]
+        },
+        "label": "Recurring Interval (month|year|week|day)",
+        "name": "recurring_interval",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "confirm_payment_intent"
+          ]
+        },
+        "label": "Payment Method ID",
+        "name": "payment_method_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_checkout_session",
+            "create_billing_portal_session"
+          ]
+        },
+        "label": "Checkout Success URL",
+        "name": "checkout_success_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_checkout_session"
+          ]
+        },
+        "label": "Checkout Cancel URL",
+        "name": "checkout_cancel_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_checkout_session"
+          ]
+        },
+        "default": "payment",
+        "label": "Checkout Mode (payment|subscription|setup)",
+        "name": "checkout_mode",
         "type": "string"
       },
       {
@@ -58869,7 +59500,13 @@
           "value": [
             "list_payments",
             "list_customers",
-            "list_invoices"
+            "list_invoices",
+            "list_charges",
+            "list_subscriptions",
+            "list_products",
+            "list_events",
+            "list_disputes",
+            "list_coupons"
           ]
         },
         "default": 10,
@@ -58877,6 +59514,74 @@
         "mode": "advanced",
         "name": "limit",
         "type": "number"
+      },
+      {
+        "label": "Starting After (cursor)",
+        "mode": "advanced",
+        "name": "starting_after",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_event"
+          ]
+        },
+        "label": "Event ID",
+        "name": "event_id",
+        "type": "string"
+      },
+      {
+        "label": "Balance Transaction ID",
+        "name": "balance_transaction_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_dispute"
+          ]
+        },
+        "label": "Dispute ID",
+        "name": "dispute_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_coupon",
+            "delete_coupon"
+          ]
+        },
+        "label": "Coupon ID",
+        "name": "coupon_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_coupon"
+          ]
+        },
+        "label": "Percent Off",
+        "name": "percent_off",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_coupon"
+          ]
+        },
+        "default": "once",
+        "label": "Duration (once|forever|repeating)",
+        "name": "duration",
+        "type": "string"
       },
       {
         "default": 0,
