@@ -176,6 +176,8 @@ from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
 from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
+from apps.api.app.node_system.nodes.servicenow.servicenow_node import ServiceNowNode
+from apps.api.app.node_system.nodes.servicenow.servicenow_trigger import ServiceNowTriggerNode
 from apps.api.app.node_system.nodes.sharepoint.sharepoint_node import SharePointNode
 from apps.api.app.node_system.nodes.shopify.shopify_node import ShopifyNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
@@ -346,6 +348,9 @@ node_registry.register(FirefliesWebhookTriggerNode)
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
 node_registry.register(IMAPTriggerNode)
+# Phase 4.5 — ServiceNow.
+node_registry.register(ServiceNowNode)
+node_registry.register(ServiceNowTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)

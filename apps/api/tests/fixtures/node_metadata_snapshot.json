@@ -25655,6 +25655,351 @@
     "tools": null,
     "type": "action.serper"
   },
+  "action.servicenow": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "servicenow_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "ServiceNow \u2014 ITSM records via Table API (incidents, changes, custom tables).",
+    "dynamic_outputs_from": null,
+    "icon": "servicenow",
+    "inputs": 1,
+    "name": "ServiceNow",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "sys_id",
+        "type": "string"
+      },
+      {
+        "label": "number",
+        "type": "string"
+      },
+      {
+        "label": "state",
+        "type": "string"
+      },
+      {
+        "label": "priority",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "servicenow_api_key",
+        "label": "ServiceNow Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_record",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Record",
+            "value": "get_record"
+          },
+          {
+            "label": "List Records",
+            "value": "list_records"
+          },
+          {
+            "label": "Create Record",
+            "value": "create_record"
+          },
+          {
+            "label": "Update Record",
+            "value": "update_record"
+          },
+          {
+            "label": "Delete Record",
+            "value": "delete_record"
+          },
+          {
+            "label": "Create Incident",
+            "value": "create_incident"
+          },
+          {
+            "label": "Update Incident",
+            "value": "update_incident"
+          },
+          {
+            "label": "Get Incident",
+            "value": "get_incident"
+          },
+          {
+            "label": "List Incidents",
+            "value": "list_incidents"
+          },
+          {
+            "label": "Create Change Request",
+            "value": "create_change_request"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "list_records",
+            "create_record",
+            "update_record",
+            "delete_record"
+          ]
+        },
+        "label": "Table",
+        "name": "table_name",
+        "placeholder": "incident | change_request | problem | sc_task | ...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "update_record",
+            "delete_record",
+            "update_incident",
+            "get_incident"
+          ]
+        },
+        "label": "Record sys_id",
+        "name": "sys_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records",
+            "list_incidents"
+          ]
+        },
+        "label": "Encoded Query (sysparm_query)",
+        "mode": "advanced",
+        "name": "query",
+        "placeholder": "active=true^priority=1",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Short Description",
+        "name": "short_description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "label": "Caller ID",
+        "name": "caller_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Assignment Group",
+        "name": "assignment_group",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Assigned To",
+        "name": "assigned_to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Priority",
+        "mode": "advanced",
+        "name": "priority",
+        "options": [
+          {
+            "label": "1 - Critical",
+            "value": "1"
+          },
+          {
+            "label": "2 - High",
+            "value": "2"
+          },
+          {
+            "label": "3 - Moderate",
+            "value": "3"
+          },
+          {
+            "label": "4 - Low",
+            "value": "4"
+          },
+          {
+            "label": "5 - Planning",
+            "value": "5"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_incident"
+          ]
+        },
+        "label": "State",
+        "mode": "advanced",
+        "name": "state",
+        "placeholder": "1 = New, 6 = Resolved, etc.",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Category",
+        "mode": "advanced",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_record",
+            "update_record",
+            "update_incident"
+          ]
+        },
+        "label": "Record fields (JSON)",
+        "name": "record_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "list_records"
+          ]
+        },
+        "label": "Return fields (comma-separated)",
+        "mode": "advanced",
+        "name": "fields",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records",
+            "list_incidents"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records"
+          ]
+        },
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.servicenow"
+  },
   "action.sharepoint": {
     "allow_error": true,
     "category": "integration",
@@ -36659,6 +37004,140 @@
     ],
     "tools": null,
     "type": "trigger.rss"
+  },
+  "trigger.servicenow": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "servicenow_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll ServiceNow for new / updated incidents or change requests. Basic auth via username + password/token.",
+    "dynamic_outputs_from": null,
+    "icon": "servicenow",
+    "inputs": 0,
+    "name": "ServiceNow",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sys_id",
+        "type": "string"
+      },
+      {
+        "label": "number",
+        "type": "string"
+      },
+      {
+        "label": "short_description",
+        "type": "string"
+      },
+      {
+        "label": "state",
+        "type": "string"
+      },
+      {
+        "label": "priority",
+        "type": "string"
+      },
+      {
+        "label": "assigned_to",
+        "type": "string"
+      },
+      {
+        "label": "sys_created_on",
+        "type": "string"
+      },
+      {
+        "label": "sys_updated_on",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "servicenow_api_key",
+        "label": "ServiceNow Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "incident_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Incident Created",
+            "value": "incident_created"
+          },
+          {
+            "label": "Incident Updated",
+            "value": "incident_updated"
+          },
+          {
+            "label": "Change Request Created",
+            "value": "change_request_created"
+          },
+          {
+            "label": "Change Request Updated",
+            "value": "change_request_updated"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Extra encoded query (prepended; blank = watch everything)",
+        "mode": "advanced",
+        "name": "query",
+        "placeholder": "active=true^priority=1",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 60,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.servicenow"
   },
   "trigger.slack": {
     "allow_error": false,

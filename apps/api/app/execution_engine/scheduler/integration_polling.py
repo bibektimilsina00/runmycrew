@@ -182,6 +182,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.rss import (
         rss_trigger as _rss_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.servicenow import (
+        servicenow_trigger as _servicenow_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.telegram import (
         telegram_trigger as _telegram_trigger,  # noqa: F401
     )
