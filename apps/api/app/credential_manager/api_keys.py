@@ -1779,6 +1779,99 @@ PROVIDERS = {
             ),
         ],
     ),
+    "datadog": APIKeyProvider(
+        id="datadog_api_key",
+        name="Datadog",
+        icon_slug="datadog",
+        color="#1c1c1c",
+        description="Datadog — metrics, logs, events, monitors.",
+        hint="From Datadog settings",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Datadog API key"
+            ),
+            CredentialField(
+                id="app_key",
+                label="Application Key",
+                type="password",
+                placeholder="Datadog application key",
+            ),
+        ],
+    ),
+    "new_relic": APIKeyProvider(
+        id="new_relic_api_key",
+        name="New Relic",
+        icon_slug="new_relic",
+        color="#1c1c1c",
+        description="New Relic — APM, logs, metrics via NRQL + events.",
+        hint="From New Relic settings",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="New Relic API key"
+            ),
+        ],
+    ),
+    "amplitude": APIKeyProvider(
+        id="amplitude_api_key",
+        name="Amplitude",
+        icon_slug="amplitude",
+        color="#1c1c1c",
+        description="Amplitude — product analytics event ingestion.",
+        hint="From Amplitude settings",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Amplitude API key"
+            ),
+            CredentialField(
+                id="secret_key",
+                label="Secret Key (for chart export)",
+                type="password",
+                placeholder="Amplitude secret key",
+            ),
+        ],
+    ),
+    "grafana": APIKeyProvider(
+        id="grafana_api_key",
+        name="Grafana Cloud",
+        icon_slug="grafana",
+        color="#1c1c1c",
+        description="Grafana Cloud — dashboards, alerts, annotations, folders.",
+        hint="From Grafana Cloud settings",
+        fields=[
+            CredentialField(
+                id="api_key", label="Service Account Token", type="password", placeholder="glsa_..."
+            ),
+            CredentialField(
+                id="stack", label="Stack subdomain", type="string", placeholder="mycompany"
+            ),
+        ],
+    ),
+    "langsmith": APIKeyProvider(
+        id="langsmith_api_key",
+        name="LangSmith",
+        icon_slug="langsmith",
+        color="#1c1c1c",
+        description="LangSmith — LLM trace + evaluation platform.",
+        hint="From LangSmith settings",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="LangSmith API key"
+            ),
+        ],
+    ),
+    "hex": APIKeyProvider(
+        id="hex_api_key",
+        name="Hex",
+        icon_slug="hex",
+        color="#1c1c1c",
+        description="Hex — collaborative data notebooks + apps.",
+        hint="From Hex settings",
+        fields=[
+            CredentialField(
+                id="api_key", label="API Key", type="password", placeholder="Hex API key"
+            ),
+        ],
+    ),
 }
 
 
