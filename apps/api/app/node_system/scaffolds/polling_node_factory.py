@@ -473,10 +473,16 @@ def build_polling_trigger(manifest: PollingTriggerManifest) -> type[BaseNode]:
             register_poller,
         )
 
+        _token_fields = (
+            manifest.token_field
+            if isinstance(manifest.token_field, list)
+            else [manifest.token_field]
+        )
         register_poller(
             node_type=manifest.type,
             provider=manifest.provider,
             poller=_poll_for_scheduler,
+            token_fields=_token_fields,
         )
     except Exception:  # noqa: BLE001
         # Scheduler module unavailable (tests that don't import the

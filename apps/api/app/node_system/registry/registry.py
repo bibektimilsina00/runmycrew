@@ -40,7 +40,9 @@ from apps.api.app.node_system.nodes.aws_sts.aws_sts_node import AWSSTSNode
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.calcom.calcom_node import CalcomNode
+from apps.api.app.node_system.nodes.calcom.calcom_trigger import CalcomTriggerNode
 from apps.api.app.node_system.nodes.calendly.calendly_node import CalendlyNode
+from apps.api.app.node_system.nodes.calendly.calendly_trigger import CalendlyTriggerNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
@@ -103,6 +105,7 @@ from apps.api.app.node_system.nodes.hubspot.hubspot_trigger import HubSpotTrigge
 from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingFaceNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
+from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
@@ -138,6 +141,7 @@ from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
 from apps.api.app.node_system.nodes.monday.monday_node import MondayNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
+from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
 from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
 from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
@@ -165,6 +169,7 @@ from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
 from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
+from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
@@ -294,6 +299,12 @@ node_registry.register(JiraTriggerNode)
 node_registry.register(HubSpotTriggerNode)
 node_registry.register(AsanaTriggerNode)
 node_registry.register(PagerDutyTriggerNode)
+# Phase 3.2 — task/support polling triggers.
+node_registry.register(TrelloTriggerNode)
+node_registry.register(CalendlyTriggerNode)
+node_registry.register(CalcomTriggerNode)
+node_registry.register(NotionTriggerNode)
+node_registry.register(IntercomTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)
