@@ -12835,6 +12835,188 @@
     "tools": null,
     "type": "action.gpeople"
   },
+  "action.grain": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "grain_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Grain \u2014 meetings, recordings, highlights, stories.",
+    "dynamic_outputs_from": null,
+    "icon": "grain",
+    "inputs": 1,
+    "name": "Grain",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "start_datetime",
+        "type": "string"
+      },
+      {
+        "label": "end_datetime",
+        "type": "string"
+      },
+      {
+        "label": "recordings",
+        "type": "array"
+      },
+      {
+        "label": "highlights",
+        "type": "array"
+      },
+      {
+        "label": "stories",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "grain_api_key",
+        "label": "Grain Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_recordings",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Recordings",
+            "value": "list_recordings"
+          },
+          {
+            "label": "Get Recording",
+            "value": "get_recording"
+          },
+          {
+            "label": "List Highlights",
+            "value": "list_highlights"
+          },
+          {
+            "label": "Get Highlight",
+            "value": "get_highlight"
+          },
+          {
+            "label": "List Stories",
+            "value": "list_stories"
+          },
+          {
+            "label": "Get Story",
+            "value": "get_story"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_recording"
+          ]
+        },
+        "label": "Recording ID",
+        "name": "recording_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_highlight"
+          ]
+        },
+        "label": "Highlight ID",
+        "name": "highlight_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_story"
+          ]
+        },
+        "label": "Story ID",
+        "name": "story_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_recordings",
+            "list_highlights",
+            "list_stories"
+          ]
+        },
+        "label": "Pagination Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_recordings",
+            "list_highlights",
+            "list_stories"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.grain"
+  },
   "action.gsc": {
     "allow_error": true,
     "category": "integration",
@@ -17293,6 +17475,261 @@
     ],
     "tools": null,
     "type": "action.knowledge"
+  },
+  "action.lemlist": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "lemlist_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Lemlist \u2014 outbound email campaigns, leads, activities.",
+    "dynamic_outputs_from": null,
+    "icon": "lemlist",
+    "inputs": 1,
+    "name": "Lemlist",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "_id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaigns",
+        "type": "array"
+      },
+      {
+        "label": "leads",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "lemlist_api_key",
+        "label": "Lemlist Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_campaigns",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Campaigns",
+            "value": "list_campaigns"
+          },
+          {
+            "label": "Get Campaign",
+            "value": "get_campaign"
+          },
+          {
+            "label": "List Leads in Campaign",
+            "value": "list_leads_in_campaign"
+          },
+          {
+            "label": "Add Lead to Campaign",
+            "value": "add_lead_to_campaign"
+          },
+          {
+            "label": "Delete Lead from Campaign",
+            "value": "delete_lead_from_campaign"
+          },
+          {
+            "label": "Pause Lead in Campaign",
+            "value": "pause_lead"
+          },
+          {
+            "label": "List Team Activities",
+            "value": "list_activities"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_campaign",
+            "list_leads_in_campaign",
+            "add_lead_to_campaign",
+            "delete_lead_from_campaign",
+            "pause_lead",
+            "list_activities"
+          ]
+        },
+        "label": "Campaign ID",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign",
+            "delete_lead_from_campaign",
+            "pause_lead"
+          ]
+        },
+        "label": "Lead Email",
+        "name": "lead_email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Icebreaker",
+        "mode": "advanced",
+        "name": "icebreaker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Phone",
+        "mode": "advanced",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "mode": "advanced",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "default": true,
+        "label": "Deduplicate (skip if lead exists)",
+        "mode": "advanced",
+        "name": "deduplicate",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_activities"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_activities"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.lemlist"
   },
   "action.linear": {
     "allow_error": true,
@@ -34184,6 +34621,133 @@
     "tools": null,
     "type": "trigger.gpeople_change"
   },
+  "trigger.grain": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "grain_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Grain for new / updated recordings, highlights, or new stories.",
+    "dynamic_outputs_from": null,
+    "icon": "grain",
+    "inputs": 0,
+    "name": "Grain",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "recording_id",
+        "type": "string"
+      },
+      {
+        "label": "created_datetime",
+        "type": "string"
+      },
+      {
+        "label": "updated_datetime",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "grain_api_key",
+        "label": "Grain Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "recording_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Recording Created",
+            "value": "recording_created"
+          },
+          {
+            "label": "Recording Updated",
+            "value": "recording_updated"
+          },
+          {
+            "label": "Highlight Created",
+            "value": "highlight_created"
+          },
+          {
+            "label": "Highlight Updated",
+            "value": "highlight_updated"
+          },
+          {
+            "label": "Story Created",
+            "value": "story_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.grain"
+  },
   "trigger.gtasks_change": {
     "allow_error": true,
     "category": "trigger",
@@ -34978,6 +35542,128 @@
     ],
     "tools": null,
     "type": "trigger.jira"
+  },
+  "trigger.lemlist": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "lemlist_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Lemlist for new activities (email events at coarse cadence) or new leads added to a campaign. For real-time email events, attach a Lemlist webhook instead.",
+    "dynamic_outputs_from": null,
+    "icon": "lemlist",
+    "inputs": 0,
+    "name": "Lemlist",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "date",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "lemlist_api_key",
+        "label": "Lemlist Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "activity_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New Activity",
+            "value": "activity_created"
+          },
+          {
+            "label": "New Lead Added to Campaign",
+            "value": "new_lead_in_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_lead_in_campaign"
+          ]
+        },
+        "label": "Campaign ID (required for lead events; optional for activities)",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.lemlist"
   },
   "trigger.linear": {
     "allow_error": true,

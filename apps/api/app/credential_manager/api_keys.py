@@ -740,6 +740,38 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key")
         ],
     ),
+    "grain": APIKeyProvider(
+        id="grain_api_key",
+        name="Grain",
+        icon_slug="grain",
+        color="#1c1c1c",
+        description="Grain — meeting recorder, highlights, stories via public API v3.",
+        hint="Personal Access Token from Grain settings",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="Access Token",
+                type="password",
+                placeholder="grain_pat_...",
+            ),
+        ],
+    ),
+    "lemlist": APIKeyProvider(
+        id="lemlist_api_key",
+        name="Lemlist",
+        icon_slug="lemlist",
+        color="#1c1c1c",
+        description="Lemlist — outbound email campaigns, leads, activities.",
+        hint="API key from Lemlist Settings → API",
+        fields=[
+            CredentialField(
+                id="api_key",
+                label="API Key",
+                type="password",
+                placeholder="Lemlist API key",
+            ),
+        ],
+    ),
     "instantly": APIKeyProvider(
         id="instantly_api_key",
         name="Instantly",

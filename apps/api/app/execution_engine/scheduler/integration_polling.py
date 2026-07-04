@@ -146,6 +146,9 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.gpeople import (
         gpeople_trigger as _gpeople_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.grain import (
+        grain_trigger as _grain_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.gtasks import (
         gtasks_trigger as _gtasks_trigger,  # noqa: F401
     )
@@ -163,6 +166,9 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.jira import (
         jira_trigger as _jira_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.lemlist import (
+        lemlist_trigger as _lemlist_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.linear import (
         linear_trigger as _linear_trigger,  # noqa: F401

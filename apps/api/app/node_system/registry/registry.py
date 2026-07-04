@@ -101,6 +101,8 @@ from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
 )
 from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
 from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
+from apps.api.app.node_system.nodes.grain.grain_node import GrainNode
+from apps.api.app.node_system.nodes.grain.grain_trigger import GrainTriggerNode
 from apps.api.app.node_system.nodes.gsc.gsc_node import GoogleSearchConsoleNode
 from apps.api.app.node_system.nodes.gslides.gslides_node import GoogleSlidesNode
 from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
@@ -120,6 +122,8 @@ from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTri
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
 from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
+from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
+from apps.api.app.node_system.nodes.lemlist.lemlist_trigger import LemlistTriggerNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
 from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
@@ -346,6 +350,11 @@ node_registry.register(FirefliesWebhookTriggerNode)
 node_registry.register(MondayTriggerNode)
 node_registry.register(RSSTriggerNode)
 node_registry.register(IMAPTriggerNode)
+# Phase 4.7 — meeting-intel + outbound long-tail.
+node_registry.register(GrainNode)
+node_registry.register(GrainTriggerNode)
+node_registry.register(LemlistNode)
+node_registry.register(LemlistTriggerNode)
 # Phase 2.4 — meetings + docs.
 node_registry.register(DropboxNode)
 node_registry.register(DocuSignNode)
