@@ -61,6 +61,7 @@ from apps.api.app.node_system.nodes.clay.clay_node import ClayNode
 from apps.api.app.node_system.nodes.clerk.clerk_node import ClerkNode
 from apps.api.app.node_system.nodes.clickhouse.clickhouse_node import ClickHouseCloudNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
+from apps.api.app.node_system.nodes.codepipeline.codepipeline_node import AWSCodePipelineNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
@@ -197,6 +198,7 @@ from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerN
 from apps.api.app.node_system.nodes.jira_service_management.jira_service_management_node import (
     JiraServiceManagementNode,
 )
+from apps.api.app.node_system.nodes.kalshi.kalshi_node import KalshiNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.langsmith.langsmith_node import LangSmithNode
 from apps.api.app.node_system.nodes.launchdarkly.launchdarkly_node import LaunchDarklyNode
@@ -268,6 +270,7 @@ from apps.api.app.node_system.nodes.persona.persona_node import PersonaNode
 from apps.api.app.node_system.nodes.pinecone.pinecone_node import PineconeNode
 from apps.api.app.node_system.nodes.pipedrive.pipedrive_node import PipedriveNode
 from apps.api.app.node_system.nodes.plivo.plivo_node import PlivoNode
+from apps.api.app.node_system.nodes.polymarket.polymarket_node import PolymarketNode
 from apps.api.app.node_system.nodes.posthog.posthog_node import PostHogNode
 from apps.api.app.node_system.nodes.postmark.postmark_node import PostmarkNode
 from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
@@ -275,10 +278,12 @@ from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
 )
 from apps.api.app.node_system.nodes.prospeo.prospeo_node import ProspeoNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
+from apps.api.app.node_system.nodes.quiver.quiver_node import QuiverNode
 from apps.api.app.node_system.nodes.railway.railway_node import RailwayNode
 from apps.api.app.node_system.nodes.reddit.reddit_node import RedditNode
 from apps.api.app.node_system.nodes.reducto.reducto_node import ReductoNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
+from apps.api.app.node_system.nodes.revenuecat.revenuecat_node import RevenueCatNode
 from apps.api.app.node_system.nodes.rippling.rippling_node import RipplingNode
 from apps.api.app.node_system.nodes.rootly.rootly_node import RootlyNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
@@ -297,23 +302,28 @@ from apps.api.app.node_system.nodes.similarweb.similarweb_node import SimilarWeb
 from apps.api.app.node_system.nodes.sixtyfour.sixtyfour_node import SixtyFourNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
+from apps.api.app.node_system.nodes.sportmonks.sportmonks_node import SportMonksNode
 from apps.api.app.node_system.nodes.spotify.spotify_node import SpotifyNode
 from apps.api.app.node_system.nodes.square.square_node import SquareNode
 from apps.api.app.node_system.nodes.stagehand.stagehand_node import StagehandNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
+from apps.api.app.node_system.nodes.tailscale.tailscale_node import TailscaleNode
 from apps.api.app.node_system.nodes.tavily.tavily_node import TavilyNode
 from apps.api.app.node_system.nodes.telegram.telegram_node import TelegramNode
 from apps.api.app.node_system.nodes.telegram.telegram_trigger import TelegramTriggerNode
 from apps.api.app.node_system.nodes.temporal.temporal_node import TemporalCloudNode
+from apps.api.app.node_system.nodes.textract.textract_node import AWSTextractNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
 from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
 from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNode
+from apps.api.app.node_system.nodes.trigger_dev.trigger_dev_node import TriggerDevNode
 from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
 from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
 from apps.api.app.node_system.nodes.typeform.typeform_webhook import TypeformWebhookTriggerNode
 from apps.api.app.node_system.nodes.upstash_redis.upstash_redis_node import UpstashRedisNode
+from apps.api.app.node_system.nodes.vanta.vanta_node import VantaNode
 from apps.api.app.node_system.nodes.vercel.vercel_node import VercelNode
 from apps.api.app.node_system.nodes.vercel.vercel_webhook import VercelWebhookTriggerNode
 from apps.api.app.node_system.nodes.video_generator.video_generator_node import VideoGeneratorNode
@@ -714,3 +724,16 @@ node_registry.register(RedditNode)
 node_registry.register(SpotifyNode)
 node_registry.register(VideoGeneratorNode)
 node_registry.register(GammaNode)
+
+
+# Phase 4.30 — long-tail (fin, ops, compliance).
+node_registry.register(TailscaleNode)
+node_registry.register(AWSTextractNode)
+node_registry.register(AWSCodePipelineNode)
+node_registry.register(TriggerDevNode)
+node_registry.register(VantaNode)
+node_registry.register(KalshiNode)
+node_registry.register(PolymarketNode)
+node_registry.register(QuiverNode)
+node_registry.register(SportMonksNode)
+node_registry.register(RevenueCatNode)
