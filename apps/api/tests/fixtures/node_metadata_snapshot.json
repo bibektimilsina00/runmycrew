@@ -8664,6 +8664,201 @@
     "tools": null,
     "type": "action.customer_io"
   },
+  "action.dagster": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "dagster_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Dagster Cloud \u2014 asset pipelines, jobs, runs.",
+    "dynamic_outputs_from": null,
+    "icon": "dagster",
+    "inputs": 1,
+    "name": "Dagster Cloud",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "dagster_api_key",
+        "label": "Dagster Cloud Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "gql",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "GraphQL Query",
+            "value": "gql"
+          },
+          {
+            "label": "Launch Run",
+            "value": "launch_run"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "gql"
+          ]
+        },
+        "label": "GraphQL Query / Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "gql"
+          ]
+        },
+        "label": "Variables (JSON)",
+        "name": "variables",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "launch_run"
+          ]
+        },
+        "label": "Run Config (JSON)",
+        "name": "run_config",
+        "type": "json"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Repository URL",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "label": "Project Key",
+        "name": "project_key",
+        "type": "string"
+      },
+      {
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "label": "Environment Key",
+        "name": "environment_key",
+        "type": "string"
+      },
+      {
+        "label": "Enabled (true/false)",
+        "name": "enabled",
+        "type": "string"
+      },
+      {
+        "label": "Severity ID",
+        "name": "severity_id",
+        "type": "string"
+      },
+      {
+        "label": "Severity (slug)",
+        "name": "severity",
+        "type": "string"
+      },
+      {
+        "label": "Summary",
+        "name": "summary",
+        "type": "string"
+      },
+      {
+        "default": "public",
+        "label": "Visibility",
+        "name": "visibility",
+        "type": "string"
+      },
+      {
+        "label": "Incident ID",
+        "name": "incident_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.dagster"
+  },
   "action.databricks": {
     "allow_error": true,
     "category": "integration",
@@ -9336,6 +9531,215 @@
     ],
     "tools": null,
     "type": "action.datagma"
+  },
+  "action.daytona": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "daytona_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Daytona \u2014 cloud dev environments.",
+    "dynamic_outputs_from": null,
+    "icon": "daytona",
+    "inputs": 1,
+    "name": "Daytona",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "daytona_api_key",
+        "label": "Daytona Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_workspaces",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Workspaces",
+            "value": "list_workspaces"
+          },
+          {
+            "label": "Get Workspace",
+            "value": "get_workspace"
+          },
+          {
+            "label": "Create Workspace",
+            "value": "create_workspace"
+          },
+          {
+            "label": "Delete Workspace",
+            "value": "delete_workspace"
+          },
+          {
+            "label": "Start Workspace",
+            "value": "start_workspace"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "GraphQL Query / Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Variables (JSON)",
+        "name": "variables",
+        "type": "json"
+      },
+      {
+        "label": "Run Config (JSON)",
+        "name": "run_config",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_workspace",
+            "delete_workspace",
+            "start_workspace"
+          ]
+        },
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_workspace"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_workspace"
+          ]
+        },
+        "label": "Repository URL",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "label": "Project Key",
+        "name": "project_key",
+        "type": "string"
+      },
+      {
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "label": "Environment Key",
+        "name": "environment_key",
+        "type": "string"
+      },
+      {
+        "label": "Enabled (true/false)",
+        "name": "enabled",
+        "type": "string"
+      },
+      {
+        "label": "Severity ID",
+        "name": "severity_id",
+        "type": "string"
+      },
+      {
+        "label": "Severity (slug)",
+        "name": "severity",
+        "type": "string"
+      },
+      {
+        "label": "Summary",
+        "name": "summary",
+        "type": "string"
+      },
+      {
+        "default": "public",
+        "label": "Visibility",
+        "name": "visibility",
+        "type": "string"
+      },
+      {
+        "label": "Incident ID",
+        "name": "incident_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.daytona"
   },
   "action.delay": {
     "allow_error": false,
@@ -23207,6 +23611,233 @@
     "tools": null,
     "type": "action.image_gen"
   },
+  "action.incidentio": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "incidentio_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "incident.io \u2014 incident response + postmortems.",
+    "dynamic_outputs_from": null,
+    "icon": "incidentio",
+    "inputs": 1,
+    "name": "incident.io",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "incidentio_api_key",
+        "label": "incident.io Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_incident",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Incident",
+            "value": "create_incident"
+          },
+          {
+            "label": "List Incidents",
+            "value": "list_incidents"
+          },
+          {
+            "label": "Get Incident",
+            "value": "get_incident"
+          },
+          {
+            "label": "Update Incident",
+            "value": "update_incident"
+          },
+          {
+            "label": "List Severities",
+            "value": "list_severities"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "GraphQL Query / Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Variables (JSON)",
+        "name": "variables",
+        "type": "json"
+      },
+      {
+        "label": "Run Config (JSON)",
+        "name": "run_config",
+        "type": "json"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Repository URL",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "label": "Project Key",
+        "name": "project_key",
+        "type": "string"
+      },
+      {
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "label": "Environment Key",
+        "name": "environment_key",
+        "type": "string"
+      },
+      {
+        "label": "Enabled (true/false)",
+        "name": "enabled",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "label": "Severity ID",
+        "name": "severity_id",
+        "type": "string"
+      },
+      {
+        "label": "Severity (slug)",
+        "name": "severity",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident"
+          ]
+        },
+        "label": "Summary",
+        "name": "summary",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "default": "public",
+        "label": "Visibility",
+        "name": "visibility",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_incident",
+            "update_incident"
+          ]
+        },
+        "label": "Incident ID",
+        "name": "incident_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_incidents"
+          ]
+        },
+        "default": 25,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.incidentio"
+  },
   "action.instantly": {
     "allow_error": true,
     "category": "integration",
@@ -24897,6 +25528,218 @@
     ],
     "tools": null,
     "type": "action.langsmith"
+  },
+  "action.launchdarkly": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "launchdarkly_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "LaunchDarkly \u2014 feature flags + segments.",
+    "dynamic_outputs_from": null,
+    "icon": "launchdarkly",
+    "inputs": 1,
+    "name": "LaunchDarkly",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "launchdarkly_api_key",
+        "label": "LaunchDarkly Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_flags",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Feature Flags",
+            "value": "list_flags"
+          },
+          {
+            "label": "Get Feature Flag",
+            "value": "get_flag"
+          },
+          {
+            "label": "Toggle Flag (patch)",
+            "value": "toggle_flag"
+          },
+          {
+            "label": "List Projects",
+            "value": "list_projects"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "GraphQL Query / Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Variables (JSON)",
+        "name": "variables",
+        "type": "json"
+      },
+      {
+        "label": "Run Config (JSON)",
+        "name": "run_config",
+        "type": "json"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Repository URL",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_flags",
+            "get_flag",
+            "toggle_flag"
+          ]
+        },
+        "label": "Project Key",
+        "name": "project_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_flag",
+            "toggle_flag"
+          ]
+        },
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "toggle_flag"
+          ]
+        },
+        "label": "Environment Key",
+        "name": "environment_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "toggle_flag"
+          ]
+        },
+        "label": "Enabled (true/false)",
+        "name": "enabled",
+        "type": "string"
+      },
+      {
+        "label": "Severity ID",
+        "name": "severity_id",
+        "type": "string"
+      },
+      {
+        "label": "Severity (slug)",
+        "name": "severity",
+        "type": "string"
+      },
+      {
+        "label": "Summary",
+        "name": "summary",
+        "type": "string"
+      },
+      {
+        "default": "public",
+        "label": "Visibility",
+        "name": "visibility",
+        "type": "string"
+      },
+      {
+        "label": "Incident ID",
+        "name": "incident_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.launchdarkly"
   },
   "action.leadmagic": {
     "allow_error": true,
@@ -33978,6 +34821,191 @@
     "tools": null,
     "type": "action.qdrant"
   },
+  "action.railway": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "railway_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Railway \u2014 deploy + manage services.",
+    "dynamic_outputs_from": null,
+    "icon": "railway",
+    "inputs": 1,
+    "name": "Railway",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "railway_api_key",
+        "label": "Railway Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "gql",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "GraphQL Query",
+            "value": "gql"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "gql"
+          ]
+        },
+        "label": "GraphQL Query / Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "gql"
+          ]
+        },
+        "label": "Variables (JSON)",
+        "name": "variables",
+        "type": "json"
+      },
+      {
+        "label": "Run Config (JSON)",
+        "name": "run_config",
+        "type": "json"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Repository URL",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "label": "Project Key",
+        "name": "project_key",
+        "type": "string"
+      },
+      {
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "label": "Environment Key",
+        "name": "environment_key",
+        "type": "string"
+      },
+      {
+        "label": "Enabled (true/false)",
+        "name": "enabled",
+        "type": "string"
+      },
+      {
+        "label": "Severity ID",
+        "name": "severity_id",
+        "type": "string"
+      },
+      {
+        "label": "Severity (slug)",
+        "name": "severity",
+        "type": "string"
+      },
+      {
+        "label": "Summary",
+        "name": "summary",
+        "type": "string"
+      },
+      {
+        "default": "public",
+        "label": "Visibility",
+        "name": "visibility",
+        "type": "string"
+      },
+      {
+        "label": "Incident ID",
+        "name": "incident_id",
+        "type": "string"
+      },
+      {
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.railway"
+  },
   "action.reducto": {
     "allow_error": true,
     "category": "integration",
@@ -34498,6 +35526,229 @@
     ],
     "tools": null,
     "type": "action.resend"
+  },
+  "action.rootly": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "rootly_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Rootly \u2014 incident response, retros, integrations.",
+    "dynamic_outputs_from": null,
+    "icon": "rootly",
+    "inputs": 1,
+    "name": "Rootly",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "data",
+        "type": "object"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "rootly_api_key",
+        "label": "Rootly Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "create_incident",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Create Incident",
+            "value": "create_incident"
+          },
+          {
+            "label": "List Incidents",
+            "value": "list_incidents"
+          },
+          {
+            "label": "Get Incident",
+            "value": "get_incident"
+          },
+          {
+            "label": "Update Incident",
+            "value": "update_incident"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "GraphQL Query / Search Query",
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "label": "Variables (JSON)",
+        "name": "variables",
+        "type": "json"
+      },
+      {
+        "label": "Run Config (JSON)",
+        "name": "run_config",
+        "type": "json"
+      },
+      {
+        "label": "Workspace ID",
+        "name": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "Name",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "label": "Repository URL",
+        "name": "repository",
+        "type": "string"
+      },
+      {
+        "label": "Project Key",
+        "name": "project_key",
+        "type": "string"
+      },
+      {
+        "label": "Feature Flag Key",
+        "name": "flag_key",
+        "type": "string"
+      },
+      {
+        "label": "Environment Key",
+        "name": "environment_key",
+        "type": "string"
+      },
+      {
+        "label": "Enabled (true/false)",
+        "name": "enabled",
+        "type": "string"
+      },
+      {
+        "label": "Severity ID",
+        "name": "severity_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "label": "Severity (slug)",
+        "name": "severity",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "label": "Summary",
+        "name": "summary",
+        "type": "string"
+      },
+      {
+        "default": "public",
+        "label": "Visibility",
+        "name": "visibility",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_incident",
+            "update_incident"
+          ]
+        },
+        "label": "Incident ID",
+        "name": "incident_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_incident"
+          ]
+        },
+        "label": "Status",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_incidents"
+          ]
+        },
+        "default": 25,
+        "label": "Page Size",
+        "mode": "advanced",
+        "name": "page_size",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.rootly"
   },
   "action.salesforce": {
     "allow_error": true,

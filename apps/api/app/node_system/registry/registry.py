@@ -77,9 +77,11 @@ from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextN
 from apps.api.app.node_system.nodes.convex.convex_node import ConvexNode
 from apps.api.app.node_system.nodes.cursor.cursor_node import CursorNode
 from apps.api.app.node_system.nodes.customer_io.customer_io_node import CustomerIONode
+from apps.api.app.node_system.nodes.dagster.dagster_node import DagsterCloudNode
 from apps.api.app.node_system.nodes.databricks.databricks_node import DatabricksNode
 from apps.api.app.node_system.nodes.datadog.datadog_node import DatadogNode
 from apps.api.app.node_system.nodes.datagma.datagma_node import DatagmaNode
+from apps.api.app.node_system.nodes.daytona.daytona_node import DaytonaNode
 from apps.api.app.node_system.nodes.db.dynamodb.dynamodb import DynamoDBNode
 from apps.api.app.node_system.nodes.db.mongodb.mongodb import MongoDBNode
 from apps.api.app.node_system.nodes.db.mysql.mysql import MySQLNode
@@ -158,6 +160,7 @@ from apps.api.app.node_system.nodes.huggingface.huggingface_node import HuggingF
 from apps.api.app.node_system.nodes.hunter.hunter_node import HunterNode
 from apps.api.app.node_system.nodes.icypeas.icypeas_node import IcypeasNode
 from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
+from apps.api.app.node_system.nodes.incidentio.incidentio_node import IncidentIONode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
 from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_webhook import InstantlyWebhookTriggerNode
@@ -169,6 +172,7 @@ from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
 from apps.api.app.node_system.nodes.langsmith.langsmith_node import LangSmithNode
+from apps.api.app.node_system.nodes.launchdarkly.launchdarkly_node import LaunchDarklyNode
 from apps.api.app.node_system.nodes.leadmagic.leadmagic_node import LeadMagicNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_trigger import LemlistTriggerNode
@@ -236,8 +240,10 @@ from apps.api.app.node_system.nodes.postmark.postmark_webhook import (
 )
 from apps.api.app.node_system.nodes.prospeo.prospeo_node import ProspeoNode
 from apps.api.app.node_system.nodes.qdrant.qdrant_node import QdrantNode
+from apps.api.app.node_system.nodes.railway.railway_node import RailwayNode
 from apps.api.app.node_system.nodes.reducto.reducto_node import ReductoNode
 from apps.api.app.node_system.nodes.resend.resend_node import ResendNode
+from apps.api.app.node_system.nodes.rootly.rootly_node import RootlyNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_trigger import SalesforceTriggerNode
@@ -598,3 +604,12 @@ node_registry.register(ClickHouseCloudNode)
 node_registry.register(ElasticsearchNode)
 node_registry.register(ConvexNode)
 node_registry.register(TemporalCloudNode)
+
+
+# Phase 4.22 — dev tooling.
+node_registry.register(RailwayNode)
+node_registry.register(DagsterCloudNode)
+node_registry.register(DaytonaNode)
+node_registry.register(LaunchDarklyNode)
+node_registry.register(IncidentIONode)
+node_registry.register(RootlyNode)
