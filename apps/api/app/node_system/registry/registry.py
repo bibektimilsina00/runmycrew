@@ -235,6 +235,7 @@ from apps.api.app.node_system.nodes.mailchimp.mailchimp_node import MailchimpNod
 from apps.api.app.node_system.nodes.mailerlite.mailerlite_node import MailerLiteNode
 from apps.api.app.node_system.nodes.mailgun.mailgun_node import MailgunNode
 from apps.api.app.node_system.nodes.mailgun.mailgun_webhook import MailgunWebhookTriggerNode
+from apps.api.app.node_system.nodes.mcp.mcp_node import McpNode
 from apps.api.app.node_system.nodes.messagebird.messagebird_node import MessageBirdNode
 from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
 from apps.api.app.node_system.nodes.meta.facebook_trigger import FacebookTriggerNode
@@ -311,15 +312,18 @@ from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
 from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
 from apps.api.app.node_system.nodes.servicenow.servicenow_node import ServiceNowNode
 from apps.api.app.node_system.nodes.servicenow.servicenow_trigger import ServiceNowTriggerNode
+from apps.api.app.node_system.nodes.sftp.sftp_node import SftpNode
 from apps.api.app.node_system.nodes.sharepoint.sharepoint_node import SharePointNode
 from apps.api.app.node_system.nodes.shopify.shopify_node import ShopifyNode
 from apps.api.app.node_system.nodes.similarweb.similarweb_node import SimilarWebNode
 from apps.api.app.node_system.nodes.sixtyfour.sixtyfour_node import SixtyFourNode
 from apps.api.app.node_system.nodes.slack.slack_node import SlackNode
 from apps.api.app.node_system.nodes.slack.slack_trigger import SlackTriggerNode
+from apps.api.app.node_system.nodes.smtp.smtp_node import SmtpNode
 from apps.api.app.node_system.nodes.sportmonks.sportmonks_node import SportMonksNode
 from apps.api.app.node_system.nodes.spotify.spotify_node import SpotifyNode
 from apps.api.app.node_system.nodes.square.square_node import SquareNode
+from apps.api.app.node_system.nodes.ssh.ssh_node import SshNode
 from apps.api.app.node_system.nodes.stagehand.stagehand_node import StagehandNode
 from apps.api.app.node_system.nodes.stripe.stripe_node import StripeNode
 from apps.api.app.node_system.nodes.supabase.supabase_node import SupabaseNode
@@ -777,3 +781,10 @@ node_registry.register(QuartrNode)
 node_registry.register(GreptileNode)
 node_registry.register(GuardrailsNode)
 node_registry.register(CrowdStrikeNode)
+
+
+# Phase 4.31b — protocol nodes (custom BaseNode, not REST).
+node_registry.register(SmtpNode)
+node_registry.register(SftpNode)
+node_registry.register(SshNode)
+node_registry.register(McpNode)

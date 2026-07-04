@@ -5,7 +5,7 @@ class CredentialField(BaseModel):
     id: str
     label: str
     type: str
-    placeholder: str
+    placeholder: str = ""
 
 
 class APIKeyProvider:
@@ -149,7 +149,7 @@ PROVIDERS = {
             ),
             CredentialField(
                 id="base_url",
-                label="Base URL (self-hosted; leave blank for gitlab.com)",
+                label="Base URL (self-hosted; leave blank for gitlab.com, placeholder=)",
                 type="string",
                 placeholder="https://gitlab.example.com",
             ),
@@ -304,7 +304,7 @@ PROVIDERS = {
             ),
             CredentialField(
                 id="session_token",
-                label="Session Token (optional, STS)",
+                label="Session Token (optional, STS, placeholder=)",
                 type="password",
                 placeholder="STS token",
             ),
@@ -588,7 +588,7 @@ PROVIDERS = {
             CredentialField(id="api_key", label="API Key", type="password", placeholder="API Key"),
             CredentialField(
                 id="index_host",
-                label="Index Host (optional, data-plane ops)",
+                label="Index Host (optional, data-plane ops, placeholder=)",
                 type="string",
                 placeholder="abc-123456.svc.us-east-1.aws.pinecone.io",
             ),
@@ -1289,7 +1289,7 @@ PROVIDERS = {
             ),
             CredentialField(
                 id="use_ssl",
-                label="Use SSL (true/false)",
+                label="Use SSL (true/false, placeholder=)",
                 type="string",
                 placeholder="true",
             ),
@@ -1401,7 +1401,7 @@ PROVIDERS = {
             ),
             CredentialField(
                 id="api_key",
-                label="Auth Token (optional; some workspaces require)",
+                label="Auth Token (optional; some workspaces require, placeholder=)",
                 type="password",
                 placeholder="Optional",
             ),
@@ -1824,7 +1824,7 @@ PROVIDERS = {
             ),
             CredentialField(
                 id="secret_key",
-                label="Secret Key (for chart export)",
+                label="Secret Key (for chart export, placeholder=)",
                 type="password",
                 placeholder="Amplitude secret key",
             ),
@@ -2196,7 +2196,7 @@ PROVIDERS = {
         fields=[
             CredentialField(
                 id="api_key",
-                label="Okta API Token (prefix with SSWS )",
+                label="Okta API Token (prefix with SSWS , placeholder=)",
                 type="password",
                 placeholder="SSWS 00xxx...",
             ),
@@ -2727,6 +2727,90 @@ PROVIDERS = {
                 label="API Key",
                 type="password",
                 placeholder="CrowdStrike Falcon API key",
+            ),
+        ],
+    ),
+    "smtp": APIKeyProvider(
+        id="smtp_credentials",
+        name="SMTP",
+        icon_slug="smtp",
+        color="#1c1c1c",
+        description="Send email via any SMTP server (STARTTLS / SSL / plain).",
+        hint="SMTP host, port, credentials",
+        fields=[
+            CredentialField(id="host", label="Host", type="string", placeholder="smtp.example.com"),
+            CredentialField(id="port", label="Port", type="number", placeholder="587"),
+            CredentialField(
+                id="username", label="Username", type="string", placeholder="user@example.com"
+            ),
+            CredentialField(
+                id="password", label="Password", type="password", placeholder="app password"
+            ),
+            CredentialField(
+                id="encryption",
+                label="Encryption (starttls|ssl|none, placeholder=)",
+                type="string",
+                placeholder="starttls",
+            ),
+            CredentialField(
+                id="from_address",
+                label="Default From Address",
+                type="string",
+                placeholder="noreply@example.com",
+            ),
+        ],
+    ),
+    "ssh": APIKeyProvider(
+        id="ssh_credentials",
+        name="SSH / SFTP",
+        icon_slug="ssh",
+        color="#1c1c1c",
+        description="Remote shell + file transfer over SSH (asyncssh).",
+        hint="Password or PEM private key",
+        fields=[
+            CredentialField(
+                id="host", label="Host", type="string", placeholder="1.2.3.4 or host.example.com"
+            ),
+            CredentialField(id="port", label="Port", type="number", placeholder="22"),
+            CredentialField(id="username", label="Username", type="string", placeholder="ubuntu"),
+            CredentialField(
+                id="password",
+                label="Password (or leave blank if using key, placeholder=)",
+                type="password",
+            ),
+            CredentialField(
+                id="private_key",
+                label="Private Key (PEM, placeholder=)",
+                type="password",
+                placeholder="-----BEGIN OPENSSH PRIVATE KEY-----...",
+            ),
+            CredentialField(
+                id="passphrase", label="Key Passphrase (optional, placeholder=)", type="password"
+            ),
+            CredentialField(
+                id="known_hosts_policy",
+                label="Known Hosts Policy (strict|accept_new|ignore, placeholder=)",
+                type="string",
+                placeholder="strict",
+            ),
+        ],
+    ),
+    "mcp": APIKeyProvider(
+        id="mcp_credentials",
+        name="MCP Server",
+        icon_slug="mcp",
+        color="#1c1c1c",
+        description="Call a Model Context Protocol tool via HTTP transport.",
+        hint="MCP HTTP endpoint + optional bearer",
+        fields=[
+            CredentialField(
+                id="endpoint",
+                label="MCP Endpoint URL",
+                type="string",
+                placeholder="https://mcp.example.com/mcp",
+            ),
+            CredentialField(
+                id="bearer_token", label="Bearer Token (optional, placeholder=)", type="password"
             ),
         ],
     ),

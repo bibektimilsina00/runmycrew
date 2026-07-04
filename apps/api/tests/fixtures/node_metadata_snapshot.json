@@ -34976,6 +34976,110 @@
     "tools": null,
     "type": "action.mailgun"
   },
+  "action.mcp": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "mcp_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Call a Model Context Protocol tool via HTTP transport.",
+    "dynamic_outputs_from": null,
+    "icon": "mcp",
+    "inputs": 1,
+    "name": "MCP",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "operation",
+        "type": "string"
+      },
+      {
+        "label": "tools",
+        "type": "array"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "content",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "default": "call_tool",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Call Tool",
+            "value": "call_tool"
+          },
+          {
+            "label": "List Tools",
+            "value": "list_tools"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "call_tool"
+          ]
+        },
+        "label": "Tool Name",
+        "name": "tool_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "call_tool"
+          ]
+        },
+        "default": {},
+        "label": "Arguments (JSON)",
+        "name": "arguments",
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.mcp"
+  },
   "action.memory": {
     "allow_error": true,
     "category": "ai",
@@ -48355,6 +48459,155 @@
     "tools": null,
     "type": "action.servicenow"
   },
+  "action.sftp": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "ssh_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Transfer files + browse directories over SFTP (asyncssh).",
+    "dynamic_outputs_from": null,
+    "icon": "sftp",
+    "inputs": 1,
+    "name": "SFTP",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "operation",
+        "type": "string"
+      },
+      {
+        "label": "path",
+        "type": "string"
+      },
+      {
+        "label": "entries",
+        "type": "array"
+      },
+      {
+        "label": "content",
+        "type": "string"
+      },
+      {
+        "label": "stat",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "list_dir",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Directory",
+            "value": "list_dir"
+          },
+          {
+            "label": "Read File",
+            "value": "read_file"
+          },
+          {
+            "label": "Write File",
+            "value": "write_file"
+          },
+          {
+            "label": "Delete File",
+            "value": "delete_file"
+          },
+          {
+            "label": "Move / Rename",
+            "value": "move_file"
+          },
+          {
+            "label": "Make Directory",
+            "value": "mkdir"
+          },
+          {
+            "label": "Stat",
+            "value": "stat"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Remote Path",
+        "name": "path",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "move_file"
+          ]
+        },
+        "label": "Destination (for move)",
+        "name": "dest_path",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write_file"
+          ]
+        },
+        "label": "Content (for write)",
+        "name": "content",
+        "type": "string"
+      },
+      {
+        "default": "utf-8",
+        "label": "Encoding",
+        "name": "encoding",
+        "options": [
+          {
+            "label": "UTF-8 text",
+            "value": "utf-8"
+          },
+          {
+            "label": "Base64 binary",
+            "value": "base64"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.sftp"
+  },
   "action.sharepoint": {
     "allow_error": true,
     "category": "integration",
@@ -49776,6 +50029,107 @@
     ],
     "type": "action.slack"
   },
+  "action.smtp": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "smtp_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Send email via SMTP (STARTTLS, implicit SSL, or plain).",
+    "dynamic_outputs_from": null,
+    "icon": "smtp",
+    "inputs": 1,
+    "name": "SMTP Send",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sent",
+        "type": "boolean"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "recipients",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "label": "To",
+        "name": "to",
+        "placeholder": "recipient@example.com, another@example.com",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "label": "CC",
+        "name": "cc",
+        "type": "string"
+      },
+      {
+        "label": "BCC",
+        "name": "bcc",
+        "type": "string"
+      },
+      {
+        "label": "Subject",
+        "name": "subject",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Body",
+        "name": "body",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "default": false,
+        "label": "Send as HTML",
+        "name": "html",
+        "type": "boolean"
+      },
+      {
+        "label": "From (overrides credential)",
+        "name": "from_address",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.smtp"
+  },
   "action.sportmonks": {
     "allow_error": true,
     "category": "integration",
@@ -50618,6 +50972,84 @@
     ],
     "tools": null,
     "type": "action.square"
+  },
+  "action.ssh": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "ssh_credentials",
+    "default_height": null,
+    "default_width": null,
+    "description": "Execute a remote command over SSH (asyncssh).",
+    "dynamic_outputs_from": null,
+    "icon": "ssh",
+    "inputs": 1,
+    "name": "SSH Command",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "ok",
+        "type": "boolean"
+      },
+      {
+        "label": "exit_status",
+        "type": "number"
+      },
+      {
+        "label": "stdout",
+        "type": "string"
+      },
+      {
+        "label": "stderr",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "label": "Command",
+        "name": "command",
+        "placeholder": "uname -a",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "default": 60,
+        "label": "Timeout (seconds)",
+        "name": "timeout_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.ssh"
   },
   "action.stagehand": {
     "allow_error": true,
