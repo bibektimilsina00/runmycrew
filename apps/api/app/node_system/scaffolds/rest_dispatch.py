@@ -92,6 +92,15 @@ def build_auth(
             )
         encoded = base64.b64encode(f"{username}:{token}".encode()).decode()
         return {header_name: f"Basic {encoded}"}, {}
+    if scheme == "basic_token_only":
+        # Token as username, empty password: `Basic base64(token:)`.
+        # Greenhouse's Harvest API uses this; treating it as `basic`
+        # would double the token when basic_username also resolves to
+        # the api_key.
+        import base64
+
+        encoded = base64.b64encode(f"{token}:".encode()).decode()
+        return {header_name: f"Basic {encoded}"}, {}
     if scheme == "query_token":
         return {}, {query_param: token}
 

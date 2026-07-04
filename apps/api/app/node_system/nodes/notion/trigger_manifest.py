@@ -1,13 +1,22 @@
 """Notion polling trigger — manifest form.
 
-Watches a Notion database for new / updated pages. The database
-`/query` endpoint is POST-only (Notion's REST idiom), so we drop
-down to a custom paginate_fn that issues the POST with the right
-`Notion-Version` header + Bearer auth.
+Notion's REST idiom: `/query` endpoints are POST-only, and the
+search API is a separate top-level POST. Custom paginate_fn routes
+by event id.
 
-Notion's `filter`/`sorts` bodies would let us bound the poll to
-`last_edited_time` server-side, but the general shape works client-side
-too via `since_timestamp` on the sorted list.
+Events (poll-observable subset of sim's 8):
+  - `new_page`               — new pages in a target database
+  - `page_updated`           — pages with fresh last_edited_time
+  - `page_content_updated`   — alias for page_updated (semantic clarity)
+  - `new_comment`            — comments on a specific page
+  - `new_database`           — new databases created in the workspace
+
+Not in polling (need webhook):
+  page_deleted, database_deleted, database_schema_updated (Notion's
+  API surfaces "archived" but not schema-history events).
+
+Notion's `filter`/`sorts` on `/databases/{id}/query` sort by
+last_edited_time desc so new + updated pages both come in at the top.
 """
 
 from __future__ import annotations
@@ -29,8 +38,7 @@ _NOTION_VERSION = "2022-06-28"
 
 def _title_from_page(page: dict) -> str:
     """Notion pages have a `properties` map — the title property
-    varies per DB but there is exactly one type=title entry. Pull it
-    out for a friendlier flattened payload."""
+    varies per DB but there is exactly one type=title entry."""
     props = page.get("properties") or {}
     for _name, spec in props.items():
         if isinstance(spec, dict) and spec.get("type") == "title":
@@ -39,6 +47,17 @@ def _title_from_page(page: dict) -> str:
             if text:
                 return text
     return ""
+
+
+def _title_from_database(db: dict) -> str:
+    """Databases carry title as an array of rich_text items."""
+    parts = db.get("title") or []
+    return "".join((p.get("plain_text") or "") for p in parts if isinstance(p, dict))
+
+
+def _text_from_comment(comment: dict) -> str:
+    parts = comment.get("rich_text") or []
+    return "".join((p.get("plain_text") or "") for p in parts if isinstance(p, dict))
 
 
 def _flatten_page(item):
@@ -54,7 +73,35 @@ def _flatten_page(item):
     }
 
 
+def _flatten_comment(item):
+    parent = item.get("parent") or {}
+    author = item.get("created_by") or {}
+    return {
+        "id": item.get("id"),
+        "text": _text_from_comment(item),
+        "created_time": item.get("created_time"),
+        "last_edited_time": item.get("last_edited_time"),
+        "page_id": parent.get("page_id") or parent.get("block_id"),
+        "author_id": author.get("id"),
+        "discussion_id": item.get("discussion_id"),
+    }
+
+
+def _flatten_database(item):
+    return {
+        "id": item.get("id"),
+        "title": _title_from_database(item),
+        "url": item.get("url"),
+        "created_time": item.get("created_time"),
+        "last_edited_time": item.get("last_edited_time"),
+        "archived": item.get("archived"),
+        "properties": item.get("properties"),
+    }
+
+
 register_flatten("notion.page", _flatten_page)
+register_flatten("notion.comment", _flatten_comment)
+register_flatten("notion.database", _flatten_database)
 
 
 async def _walk_notion(
@@ -65,13 +112,12 @@ async def _walk_notion(
     token: str | None,
     props: Any,
 ) -> list[dict[str, Any]]:
-    """POST to /databases/{database_id}/query with sort by last_edited_time
-    descending. One page (page_size items) is enough for polling — new
-    pages come in at the top."""
-    database_id = resolve_template("{database_id}", props) or ""
-    if not database_id:
-        return []
-    url = f"{manifest.base_url}/databases/{database_id}/query"
+    """Route by event id. Notion's endpoints:
+
+    - database pages: POST /databases/{id}/query
+    - comments on page: GET /comments?block_id={page_id}
+    - new databases: POST /search with {filter: {value: 'database'}}
+    """
     headers = {
         "Authorization": f"Bearer {token or ''}",
         "Notion-Version": _NOTION_VERSION,
@@ -83,21 +129,57 @@ async def _walk_notion(
         page_size = max(1, min(int(page_size_raw or 25), 100))
     except (TypeError, ValueError):
         page_size = 25
-    body = {
-        "sorts": [{"timestamp": "last_edited_time", "direction": "descending"}],
-        "page_size": page_size,
-    }
-    resp = await client.post(url, headers=headers, json=body, timeout=30)
-    resp.raise_for_status()
-    payload = resp.json() or {}
-    results = payload.get("results")
-    return results if isinstance(results, list) else []
+
+    if event.id in ("new_page", "page_updated", "page_content_updated"):
+        database_id = resolve_template("{database_id}", props) or ""
+        if not database_id:
+            return []
+        url = f"{manifest.base_url}/databases/{database_id}/query"
+        body = {
+            "sorts": [{"timestamp": "last_edited_time", "direction": "descending"}],
+            "page_size": page_size,
+        }
+        resp = await client.post(url, headers=headers, json=body, timeout=30)
+        resp.raise_for_status()
+        payload = resp.json() or {}
+        results = payload.get("results")
+        return results if isinstance(results, list) else []
+
+    if event.id == "new_comment":
+        page_id = resolve_template("{page_id}", props) or ""
+        if not page_id:
+            return []
+        url = f"{manifest.base_url}/comments"
+        params = {"block_id": page_id, "page_size": page_size}
+        resp = await client.get(url, headers=headers, params=params, timeout=30)
+        resp.raise_for_status()
+        payload = resp.json() or {}
+        results = payload.get("results")
+        return results if isinstance(results, list) else []
+
+    if event.id == "new_database":
+        url = f"{manifest.base_url}/search"
+        body = {
+            "filter": {"property": "object", "value": "database"},
+            "sort": {"direction": "descending", "timestamp": "last_edited_time"},
+            "page_size": page_size,
+        }
+        resp = await client.post(url, headers=headers, json=body, timeout=30)
+        resp.raise_for_status()
+        payload = resp.json() or {}
+        results = payload.get("results")
+        return results if isinstance(results, list) else []
+
+    return []
 
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.notion",
     name="Notion",
-    description="Poll a Notion database for new or updated pages.",
+    description=(
+        "Poll a Notion database for new / updated pages, a page for new "
+        "comments, or the workspace for new databases."
+    ),
     icon_slug="notion",
     color="#1c1c1c",
     base_url="https://api.notion.com/v1",
@@ -110,9 +192,13 @@ MANIFEST = PollingTriggerManifest(
     common_fields=[
         FieldSpec(
             name="database_id",
-            label="Database ID",
+            label="Database ID (for page events / new_database ignored)",
             type="string",
-            required=True,
+        ),
+        FieldSpec(
+            name="page_id",
+            label="Page ID (for new_comment event)",
+            type="string",
         ),
         FieldSpec(
             name="page_size",
@@ -126,18 +212,46 @@ MANIFEST = PollingTriggerManifest(
         PollingEvent(
             id="new_page",
             label="Page Added to Database",
-            list_path="/databases/{database_id}/query",
+            list_path="",
             strategy="known_ids",
             id_field="id",
             flatten="notion.page",
+            extra_fields=["database_id"],
         ),
         PollingEvent(
             id="page_updated",
             label="Page Updated",
-            list_path="/databases/{database_id}/query",
+            list_path="",
             strategy="since_timestamp",
             timestamp_field="last_edited_time",
             flatten="notion.page",
+            extra_fields=["database_id"],
+        ),
+        PollingEvent(
+            id="page_content_updated",
+            label="Page Content Updated",
+            list_path="",
+            strategy="since_timestamp",
+            timestamp_field="last_edited_time",
+            flatten="notion.page",
+            extra_fields=["database_id"],
+        ),
+        PollingEvent(
+            id="new_comment",
+            label="New Comment on Page",
+            list_path="",
+            strategy="known_ids",
+            id_field="id",
+            flatten="notion.comment",
+            extra_fields=["page_id"],
+        ),
+        PollingEvent(
+            id="new_database",
+            label="New Database Created",
+            list_path="",
+            strategy="known_ids",
+            id_field="id",
+            flatten="notion.database",
         ),
     ],
     outputs_schema=[
@@ -146,6 +260,8 @@ MANIFEST = PollingTriggerManifest(
         {"label": "url", "type": "string"},
         {"label": "last_edited_time", "type": "string"},
         {"label": "created_time", "type": "string"},
+        {"label": "text", "type": "string"},
+        {"label": "page_id", "type": "string"},
     ],
     paginate_fn=_walk_notion,
 )

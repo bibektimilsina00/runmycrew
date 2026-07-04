@@ -1536,6 +1536,281 @@
     "tools": null,
     "type": "action.asana"
   },
+  "action.ashby": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "ashby_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Ashby ATS \u2014 candidates, applications, jobs, feedback via POST RPC.",
+    "dynamic_outputs_from": null,
+    "icon": "ashby",
+    "inputs": 1,
+    "name": "Ashby",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "success",
+        "type": "boolean"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "moreDataAvailable",
+        "type": "boolean"
+      },
+      {
+        "label": "nextCursor",
+        "type": "string"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "ashby_api_key",
+        "label": "Ashby Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_candidates",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Candidates",
+            "value": "list_candidates"
+          },
+          {
+            "label": "Get Candidate Info",
+            "value": "get_candidate"
+          },
+          {
+            "label": "Create Candidate",
+            "value": "create_candidate"
+          },
+          {
+            "label": "Update Candidate",
+            "value": "update_candidate"
+          },
+          {
+            "label": "List Applications",
+            "value": "list_applications"
+          },
+          {
+            "label": "Get Application Info",
+            "value": "get_application"
+          },
+          {
+            "label": "List Jobs",
+            "value": "list_jobs"
+          },
+          {
+            "label": "Get Job Info",
+            "value": "get_job"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Candidate ID",
+        "name": "candidate_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_application"
+          ]
+        },
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Company",
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "Location",
+        "name": "location",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate",
+            "update_candidate"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_candidates",
+            "list_applications",
+            "list_jobs"
+          ]
+        },
+        "label": "Pagination Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_candidates",
+            "list_applications",
+            "list_jobs"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.ashby"
+  },
   "action.attio": {
     "allow_error": true,
     "category": "integration",
@@ -5239,6 +5514,274 @@
     "tools": null,
     "type": "action.cloudflare"
   },
+  "action.confluence": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "confluence_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Confluence Cloud \u2014 pages, spaces, blogs, comments.",
+    "dynamic_outputs_from": null,
+    "icon": "confluence",
+    "inputs": 1,
+    "name": "Confluence",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "spaceId",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "parentId",
+        "type": "string"
+      },
+      {
+        "label": "version",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "confluence_api_key",
+        "label": "Confluence Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_pages",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Pages",
+            "value": "list_pages"
+          },
+          {
+            "label": "Get Page",
+            "value": "get_page"
+          },
+          {
+            "label": "Create Page",
+            "value": "create_page"
+          },
+          {
+            "label": "Update Page",
+            "value": "update_page"
+          },
+          {
+            "label": "Delete Page",
+            "value": "delete_page"
+          },
+          {
+            "label": "List Spaces",
+            "value": "list_spaces"
+          },
+          {
+            "label": "Get Space",
+            "value": "get_space"
+          },
+          {
+            "label": "List Blog Posts",
+            "value": "list_blog_posts"
+          },
+          {
+            "label": "Create Blog Post",
+            "value": "create_blog_post"
+          },
+          {
+            "label": "List Comments on Page",
+            "value": "list_comments"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_page",
+            "update_page",
+            "delete_page",
+            "list_comments"
+          ]
+        },
+        "label": "Page ID",
+        "name": "page_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_pages",
+            "create_page",
+            "get_space",
+            "list_blog_posts",
+            "create_blog_post"
+          ]
+        },
+        "label": "Space ID",
+        "name": "space_id",
+        "type": "string"
+      },
+      {
+        "label": "Space Key",
+        "name": "space_key",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_page",
+            "update_page",
+            "create_blog_post"
+          ]
+        },
+        "label": "Title",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_page",
+            "update_page",
+            "create_blog_post"
+          ]
+        },
+        "label": "Body (HTML/storage)",
+        "name": "body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_page"
+          ]
+        },
+        "label": "Parent Page ID",
+        "name": "parent_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_pages"
+          ]
+        },
+        "default": "current",
+        "label": "Status",
+        "mode": "advanced",
+        "name": "status",
+        "options": [
+          {
+            "label": "Current",
+            "value": "current"
+          },
+          {
+            "label": "Draft",
+            "value": "draft"
+          },
+          {
+            "label": "Archived",
+            "value": "archived"
+          },
+          {
+            "label": "Trashed",
+            "value": "trashed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_page"
+          ]
+        },
+        "label": "Version number (for updates)",
+        "mode": "advanced",
+        "name": "version",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_pages",
+            "list_spaces",
+            "list_blog_posts",
+            "list_comments"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "label": "Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.confluence"
+  },
   "action.customer_io": {
     "allow_error": true,
     "category": "integration",
@@ -6747,6 +7290,240 @@
     ],
     "tools": null,
     "type": "action.dynamodb"
+  },
+  "action.emailbison": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "emailbison_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Emailbison \u2014 outbound-email campaigns, leads, workspaces.",
+    "dynamic_outputs_from": null,
+    "icon": "emailbison",
+    "inputs": 1,
+    "name": "Emailbison",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaigns",
+        "type": "array"
+      },
+      {
+        "label": "leads",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "emailbison_api_key",
+        "label": "Emailbison Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_campaigns",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Campaigns",
+            "value": "list_campaigns"
+          },
+          {
+            "label": "Get Campaign",
+            "value": "get_campaign"
+          },
+          {
+            "label": "List Leads",
+            "value": "list_leads"
+          },
+          {
+            "label": "Create Lead",
+            "value": "create_lead"
+          },
+          {
+            "label": "Update Lead",
+            "value": "update_lead"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_campaign",
+            "list_leads",
+            "create_lead"
+          ]
+        },
+        "label": "Campaign ID",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_lead"
+          ]
+        },
+        "label": "Lead ID",
+        "name": "lead_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Job Title",
+        "mode": "advanced",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_lead",
+            "update_lead"
+          ]
+        },
+        "label": "Custom Fields (JSON)",
+        "mode": "advanced",
+        "name": "custom_fields",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_leads"
+          ]
+        },
+        "default": 25,
+        "label": "Per page",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_leads"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.emailbison"
   },
   "action.embeddings": {
     "allow_error": true,
@@ -12835,6 +13612,479 @@
     "tools": null,
     "type": "action.gpeople"
   },
+  "action.grain": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "grain_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Grain \u2014 meetings, recordings, highlights, stories.",
+    "dynamic_outputs_from": null,
+    "icon": "grain",
+    "inputs": 1,
+    "name": "Grain",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "start_datetime",
+        "type": "string"
+      },
+      {
+        "label": "end_datetime",
+        "type": "string"
+      },
+      {
+        "label": "recordings",
+        "type": "array"
+      },
+      {
+        "label": "highlights",
+        "type": "array"
+      },
+      {
+        "label": "stories",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "grain_api_key",
+        "label": "Grain Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_recordings",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Recordings",
+            "value": "list_recordings"
+          },
+          {
+            "label": "Get Recording",
+            "value": "get_recording"
+          },
+          {
+            "label": "List Highlights",
+            "value": "list_highlights"
+          },
+          {
+            "label": "Get Highlight",
+            "value": "get_highlight"
+          },
+          {
+            "label": "List Stories",
+            "value": "list_stories"
+          },
+          {
+            "label": "Get Story",
+            "value": "get_story"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_recording"
+          ]
+        },
+        "label": "Recording ID",
+        "name": "recording_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_highlight"
+          ]
+        },
+        "label": "Highlight ID",
+        "name": "highlight_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_story"
+          ]
+        },
+        "label": "Story ID",
+        "name": "story_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_recordings",
+            "list_highlights",
+            "list_stories"
+          ]
+        },
+        "label": "Pagination Cursor",
+        "mode": "advanced",
+        "name": "cursor",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_recordings",
+            "list_highlights",
+            "list_stories"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.grain"
+  },
+  "action.greenhouse": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "greenhouse_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Greenhouse ATS \u2014 jobs, candidates, applications, offers.",
+    "dynamic_outputs_from": null,
+    "icon": "greenhouse",
+    "inputs": 1,
+    "name": "Greenhouse",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "candidate",
+        "type": "object"
+      },
+      {
+        "label": "job",
+        "type": "object"
+      },
+      {
+        "label": "results",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "greenhouse_api_key",
+        "label": "Greenhouse Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_jobs",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Jobs",
+            "value": "list_jobs"
+          },
+          {
+            "label": "Get Job",
+            "value": "get_job"
+          },
+          {
+            "label": "List Candidates",
+            "value": "list_candidates"
+          },
+          {
+            "label": "Get Candidate",
+            "value": "get_candidate"
+          },
+          {
+            "label": "Create Candidate",
+            "value": "create_candidate"
+          },
+          {
+            "label": "List Applications",
+            "value": "list_applications"
+          },
+          {
+            "label": "Get Application",
+            "value": "get_application"
+          },
+          {
+            "label": "Add Note to Candidate",
+            "value": "add_candidate_note"
+          },
+          {
+            "label": "List Offers",
+            "value": "list_offers"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_job",
+            "list_applications"
+          ]
+        },
+        "label": "Job ID",
+        "name": "job_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_candidate",
+            "list_applications",
+            "add_candidate_note"
+          ]
+        },
+        "label": "Candidate ID",
+        "name": "candidate_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_application"
+          ]
+        },
+        "label": "Application ID",
+        "name": "application_id",
+        "type": "string"
+      },
+      {
+        "label": "Offer ID",
+        "name": "offer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_note"
+          ]
+        },
+        "label": "User ID (for note authoring)",
+        "mode": "advanced",
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_candidate"
+          ]
+        },
+        "label": "Phone",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_note"
+          ]
+        },
+        "label": "Note Body",
+        "name": "note_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_candidate_note"
+          ]
+        },
+        "default": "admin_only",
+        "label": "Note Visibility",
+        "mode": "advanced",
+        "name": "visibility",
+        "options": [
+          {
+            "label": "Admin only",
+            "value": "admin_only"
+          },
+          {
+            "label": "Public",
+            "value": "public"
+          },
+          {
+            "label": "Private",
+            "value": "private"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_jobs",
+            "list_candidates",
+            "list_applications",
+            "list_offers"
+          ]
+        },
+        "default": 100,
+        "label": "Per page (max 500)",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_jobs",
+            "list_candidates",
+            "list_applications",
+            "list_offers"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.greenhouse"
+  },
   "action.gsc": {
     "allow_error": true,
     "category": "integration",
@@ -17293,6 +18543,261 @@
     ],
     "tools": null,
     "type": "action.knowledge"
+  },
+  "action.lemlist": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "lemlist_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Lemlist \u2014 outbound email campaigns, leads, activities.",
+    "dynamic_outputs_from": null,
+    "icon": "lemlist",
+    "inputs": 1,
+    "name": "Lemlist",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "_id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaigns",
+        "type": "array"
+      },
+      {
+        "label": "leads",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "lemlist_api_key",
+        "label": "Lemlist Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "list_campaigns",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "List Campaigns",
+            "value": "list_campaigns"
+          },
+          {
+            "label": "Get Campaign",
+            "value": "get_campaign"
+          },
+          {
+            "label": "List Leads in Campaign",
+            "value": "list_leads_in_campaign"
+          },
+          {
+            "label": "Add Lead to Campaign",
+            "value": "add_lead_to_campaign"
+          },
+          {
+            "label": "Delete Lead from Campaign",
+            "value": "delete_lead_from_campaign"
+          },
+          {
+            "label": "Pause Lead in Campaign",
+            "value": "pause_lead"
+          },
+          {
+            "label": "List Team Activities",
+            "value": "list_activities"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_campaign",
+            "list_leads_in_campaign",
+            "add_lead_to_campaign",
+            "delete_lead_from_campaign",
+            "pause_lead",
+            "list_activities"
+          ]
+        },
+        "label": "Campaign ID",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign",
+            "delete_lead_from_campaign",
+            "pause_lead"
+          ]
+        },
+        "label": "Lead Email",
+        "name": "lead_email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "First Name",
+        "name": "first_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Last Name",
+        "name": "last_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Company Name",
+        "name": "company_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Icebreaker",
+        "mode": "advanced",
+        "name": "icebreaker",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "Phone",
+        "mode": "advanced",
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "mode": "advanced",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "add_lead_to_campaign"
+          ]
+        },
+        "default": true,
+        "label": "Deduplicate (skip if lead exists)",
+        "mode": "advanced",
+        "name": "deduplicate",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_activities"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_campaigns",
+            "list_activities"
+          ]
+        },
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.lemlist"
   },
   "action.linear": {
     "allow_error": true,
@@ -25655,6 +27160,351 @@
     "tools": null,
     "type": "action.serper"
   },
+  "action.servicenow": {
+    "allow_error": true,
+    "category": "integration",
+    "color": "#1c1c1c",
+    "credential_type": "servicenow_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "ServiceNow \u2014 ITSM records via Table API (incidents, changes, custom tables).",
+    "dynamic_outputs_from": null,
+    "icon": "servicenow",
+    "inputs": 1,
+    "name": "ServiceNow",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "sys_id",
+        "type": "string"
+      },
+      {
+        "label": "number",
+        "type": "string"
+      },
+      {
+        "label": "state",
+        "type": "string"
+      },
+      {
+        "label": "priority",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "servicenow_api_key",
+        "label": "ServiceNow Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "get_record",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Get Record",
+            "value": "get_record"
+          },
+          {
+            "label": "List Records",
+            "value": "list_records"
+          },
+          {
+            "label": "Create Record",
+            "value": "create_record"
+          },
+          {
+            "label": "Update Record",
+            "value": "update_record"
+          },
+          {
+            "label": "Delete Record",
+            "value": "delete_record"
+          },
+          {
+            "label": "Create Incident",
+            "value": "create_incident"
+          },
+          {
+            "label": "Update Incident",
+            "value": "update_incident"
+          },
+          {
+            "label": "Get Incident",
+            "value": "get_incident"
+          },
+          {
+            "label": "List Incidents",
+            "value": "list_incidents"
+          },
+          {
+            "label": "Create Change Request",
+            "value": "create_change_request"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "list_records",
+            "create_record",
+            "update_record",
+            "delete_record"
+          ]
+        },
+        "label": "Table",
+        "name": "table_name",
+        "placeholder": "incident | change_request | problem | sc_task | ...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "update_record",
+            "delete_record",
+            "update_incident",
+            "get_incident"
+          ]
+        },
+        "label": "Record sys_id",
+        "name": "sys_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records",
+            "list_incidents"
+          ]
+        },
+        "label": "Encoded Query (sysparm_query)",
+        "mode": "advanced",
+        "name": "query",
+        "placeholder": "active=true^priority=1",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Short Description",
+        "name": "short_description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Description",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident"
+          ]
+        },
+        "label": "Caller ID",
+        "name": "caller_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Assignment Group",
+        "name": "assignment_group",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Assigned To",
+        "name": "assigned_to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "update_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Priority",
+        "mode": "advanced",
+        "name": "priority",
+        "options": [
+          {
+            "label": "1 - Critical",
+            "value": "1"
+          },
+          {
+            "label": "2 - High",
+            "value": "2"
+          },
+          {
+            "label": "3 - Moderate",
+            "value": "3"
+          },
+          {
+            "label": "4 - Low",
+            "value": "4"
+          },
+          {
+            "label": "5 - Planning",
+            "value": "5"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_incident"
+          ]
+        },
+        "label": "State",
+        "mode": "advanced",
+        "name": "state",
+        "placeholder": "1 = New, 6 = Resolved, etc.",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_incident",
+            "create_change_request"
+          ]
+        },
+        "label": "Category",
+        "mode": "advanced",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_record",
+            "update_record",
+            "update_incident"
+          ]
+        },
+        "label": "Record fields (JSON)",
+        "name": "record_data",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_record",
+            "list_records"
+          ]
+        },
+        "label": "Return fields (comma-separated)",
+        "mode": "advanced",
+        "name": "fields",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records",
+            "list_incidents"
+          ]
+        },
+        "default": 25,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_records"
+          ]
+        },
+        "default": 0,
+        "label": "Offset",
+        "mode": "advanced",
+        "name": "offset",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "action.servicenow"
+  },
   "action.sharepoint": {
     "allow_error": true,
     "category": "integration",
@@ -30553,6 +32403,205 @@
     "tools": null,
     "type": "action.zoom"
   },
+  "common.file": {
+    "allow_error": true,
+    "category": "logic",
+    "color": "#f59e0b",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Read a URL, write / append text to a per-execution file, or parse a text file (JSON / CSV / plain text).",
+    "dynamic_outputs_from": null,
+    "icon": "File",
+    "inputs": 1,
+    "name": "File",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "operation",
+        "type": "string"
+      },
+      {
+        "label": "path",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "content",
+        "type": "string"
+      },
+      {
+        "label": "size_bytes",
+        "type": "number"
+      },
+      {
+        "label": "content_type",
+        "type": "string"
+      },
+      {
+        "label": "parsed",
+        "type": "object"
+      },
+      {
+        "label": "format",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "default": "read_url",
+        "label": "Operation",
+        "name": "operation",
+        "options": [
+          {
+            "label": "Read from URL",
+            "value": "read_url"
+          },
+          {
+            "label": "Write file",
+            "value": "write"
+          },
+          {
+            "label": "Append to file",
+            "value": "append"
+          },
+          {
+            "label": "Parse text file",
+            "value": "parse_text"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": "read_url"
+        },
+        "label": "URL",
+        "name": "url",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": "read_url"
+        },
+        "default": 10485760,
+        "label": "Max download bytes",
+        "mode": "advanced",
+        "name": "max_bytes",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write",
+            "append",
+            "parse_text"
+          ]
+        },
+        "label": "Path (relative to execution root)",
+        "name": "path",
+        "placeholder": "output.json",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write",
+            "append"
+          ]
+        },
+        "label": "Content",
+        "name": "content",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "write",
+            "append",
+            "parse_text",
+            "read_url"
+          ]
+        },
+        "default": "utf-8",
+        "label": "Encoding",
+        "mode": "advanced",
+        "name": "encoding",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": "parse_text"
+        },
+        "default": null,
+        "label": "Format (blank = auto-detect)",
+        "mode": "advanced",
+        "name": "format",
+        "options": [
+          {
+            "label": "Auto-detect",
+            "value": ""
+          },
+          {
+            "label": "JSON",
+            "value": "json"
+          },
+          {
+            "label": "CSV",
+            "value": "csv"
+          },
+          {
+            "label": "Plain text",
+            "value": "text"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "common.file"
+  },
   "logic.code": {
     "allow_error": false,
     "category": "logic",
@@ -31731,6 +33780,321 @@
     "tools": null,
     "type": "trigger.asana"
   },
+  "trigger.ashby": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "ashby_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Ashby ATS for new candidates, offers, application stage changes, or hires.",
+    "dynamic_outputs_from": null,
+    "icon": "ashby",
+    "inputs": 0,
+    "name": "Ashby",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "current_interview_stage",
+        "type": "string"
+      },
+      {
+        "label": "change",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "ashby_api_key",
+        "label": "Ashby Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "candidate_new",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Candidate Created",
+            "value": "candidate_new"
+          },
+          {
+            "label": "Candidate Hired",
+            "value": "candidate_hired"
+          },
+          {
+            "label": "Offer Created",
+            "value": "offer_created"
+          },
+          {
+            "label": "Application Stage Changed",
+            "value": "application_stage_change"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.ashby"
+  },
+  "trigger.attio": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "attio_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Attio for new records, list entries, notes, tasks, comments, or workspace members. Attio hosts custom object schemas \u2014 pick which object_slug or list_id to watch per event.",
+    "dynamic_outputs_from": null,
+    "icon": "attio",
+    "inputs": 0,
+    "name": "Attio",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "object_slug",
+        "type": "string"
+      },
+      {
+        "label": "list_id",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      },
+      {
+        "label": "updated_at",
+        "type": "string"
+      },
+      {
+        "label": "values",
+        "type": "object"
+      },
+      {
+        "label": "content_plaintext",
+        "type": "string"
+      },
+      {
+        "label": "web_url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "attio_api_key",
+        "label": "Attio Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "record_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Record Created",
+            "value": "record_created"
+          },
+          {
+            "label": "Record Updated",
+            "value": "record_updated"
+          },
+          {
+            "label": "List Entry Created",
+            "value": "list_entry_created"
+          },
+          {
+            "label": "List Entry Updated",
+            "value": "list_entry_updated"
+          },
+          {
+            "label": "Note Created",
+            "value": "note_created"
+          },
+          {
+            "label": "Task Created",
+            "value": "task_created"
+          },
+          {
+            "label": "Task Updated",
+            "value": "task_updated"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment_created"
+          },
+          {
+            "label": "Workspace Member Added",
+            "value": "workspace_member_added"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "record_created",
+            "record_updated"
+          ]
+        },
+        "label": "Object slug (for record events)",
+        "name": "object_slug",
+        "placeholder": "people | companies | deals | ...",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "list_entry_created",
+            "list_entry_updated"
+          ]
+        },
+        "label": "List ID (for list entry events)",
+        "name": "list_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "note_created"
+          ]
+        },
+        "label": "Record ID (optional; for note_created scope)",
+        "mode": "advanced",
+        "name": "record_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "comment_created"
+          ]
+        },
+        "label": "Thread ID (optional; for comment_created scope)",
+        "mode": "advanced",
+        "name": "thread_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 60,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.attio"
+  },
   "trigger.azure_devops_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -32126,6 +34490,362 @@
     "tools": null,
     "type": "trigger.calendly"
   },
+  "trigger.confluence": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "confluence_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Confluence Cloud for new / updated pages + blog posts, new comments on a target page, or new spaces.",
+    "dynamic_outputs_from": null,
+    "icon": "confluence",
+    "inputs": 0,
+    "name": "Confluence",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "space_id",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      },
+      {
+        "label": "version_number",
+        "type": "number"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "web_url",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "confluence_api_key",
+        "label": "Confluence Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "page_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Page Created",
+            "value": "page_created"
+          },
+          {
+            "label": "Page Updated",
+            "value": "page_updated"
+          },
+          {
+            "label": "Blog Post Created",
+            "value": "blog_created"
+          },
+          {
+            "label": "Blog Post Updated",
+            "value": "blog_updated"
+          },
+          {
+            "label": "Comment Created on Page",
+            "value": "comment_created"
+          },
+          {
+            "label": "Space Created",
+            "value": "space_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "page_created",
+            "page_updated",
+            "blog_created",
+            "blog_updated"
+          ]
+        },
+        "label": "Space ID (optional; blank = all spaces)",
+        "mode": "advanced",
+        "name": "space_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "comment_created"
+          ]
+        },
+        "label": "Page ID (for comment_created event)",
+        "name": "page_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.confluence"
+  },
+  "trigger.confluence_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Atlassian Cloud posts a Confluence webhook. Full sim event parity \u2014 pages/blogs/comments/attachments/labels/spaces create+update+remove+restore + permissions + user_created. HMAC-SHA256 verified in X-Hub-Signature.",
+    "dynamic_outputs_from": null,
+    "icon": "confluence",
+    "inputs": 0,
+    "name": "Confluence Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "page_id",
+        "type": "number"
+      },
+      {
+        "label": "page_title",
+        "type": "string"
+      },
+      {
+        "label": "space_key",
+        "type": "string"
+      },
+      {
+        "label": "comment_id",
+        "type": "number"
+      },
+      {
+        "label": "attachment_id",
+        "type": "number"
+      },
+      {
+        "label": "label_name",
+        "type": "string"
+      },
+      {
+        "label": "modified_by",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Atlassian-Webhook-Identifier` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Page Created",
+            "value": "page_created"
+          },
+          {
+            "label": "Page Updated",
+            "value": "page_updated"
+          },
+          {
+            "label": "Page Removed",
+            "value": "page_removed"
+          },
+          {
+            "label": "Page Restored",
+            "value": "page_restored"
+          },
+          {
+            "label": "Page Moved",
+            "value": "page_moved"
+          },
+          {
+            "label": "Page Permissions Updated",
+            "value": "page_permissions_updated"
+          },
+          {
+            "label": "Blog Post Created",
+            "value": "blog_created"
+          },
+          {
+            "label": "Blog Post Updated",
+            "value": "blog_updated"
+          },
+          {
+            "label": "Blog Post Removed",
+            "value": "blog_removed"
+          },
+          {
+            "label": "Blog Post Restored",
+            "value": "blog_restored"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment_created"
+          },
+          {
+            "label": "Comment Updated",
+            "value": "comment_updated"
+          },
+          {
+            "label": "Comment Removed",
+            "value": "comment_removed"
+          },
+          {
+            "label": "Attachment Created",
+            "value": "attachment_created"
+          },
+          {
+            "label": "Attachment Updated",
+            "value": "attachment_updated"
+          },
+          {
+            "label": "Attachment Removed",
+            "value": "attachment_removed"
+          },
+          {
+            "label": "Label Added",
+            "value": "label_added"
+          },
+          {
+            "label": "Label Removed",
+            "value": "label_removed"
+          },
+          {
+            "label": "Space Created",
+            "value": "space_created"
+          },
+          {
+            "label": "Space Updated",
+            "value": "space_updated"
+          },
+          {
+            "label": "Space Removed",
+            "value": "space_removed"
+          },
+          {
+            "label": "User Created",
+            "value": "user_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Confluence Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.confluence_webhook"
+  },
   "trigger.cron": {
     "allow_error": false,
     "category": "trigger",
@@ -32204,6 +34924,269 @@
     ],
     "tools": null,
     "type": "trigger.cron"
+  },
+  "trigger.emailbison": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "emailbison_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Emailbison for new leads (workspace-wide or per-campaign) and new campaigns. Per-delivery email events require a webhook.",
+    "dynamic_outputs_from": null,
+    "icon": "emailbison",
+    "inputs": 0,
+    "name": "Emailbison",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "emailbison_api_key",
+        "label": "Emailbison Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "new_lead",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New Lead",
+            "value": "new_lead"
+          },
+          {
+            "label": "New Campaign",
+            "value": "new_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Campaign ID (optional; blank = workspace-wide leads)",
+        "mode": "advanced",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "default": 50,
+        "label": "Per page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.emailbison"
+  },
+  "trigger.emailbison_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Emailbison posts a per-email event (sent, opened, clicked, bounced, reply, lead status). Verified via HMAC-SHA256 in `x-emailbison-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "emailbison",
+    "inputs": 0,
+    "name": "Emailbison Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "reply_body",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-emailbison-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Sent",
+            "value": "email_sent"
+          },
+          {
+            "label": "Email Opened",
+            "value": "email_opened"
+          },
+          {
+            "label": "Link Clicked",
+            "value": "email_clicked"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "email_bounced"
+          },
+          {
+            "label": "Reply Received",
+            "value": "email_replied"
+          },
+          {
+            "label": "Lead Interested",
+            "value": "lead_interested"
+          },
+          {
+            "label": "Lead Not Interested",
+            "value": "lead_not_interested"
+          },
+          {
+            "label": "Lead Unsubscribed",
+            "value": "lead_unsubscribed"
+          },
+          {
+            "label": "Meeting Booked",
+            "value": "lead_meeting_booked"
+          },
+          {
+            "label": "Campaign Completed",
+            "value": "campaign_completed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `x-emailbison-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Emailbison Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.emailbison_webhook"
   },
   "trigger.fathom_webhook": {
     "allow_error": true,
@@ -34184,6 +37167,271 @@
     "tools": null,
     "type": "trigger.gpeople_change"
   },
+  "trigger.grain": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "grain_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Grain for new / updated recordings, highlights, or new stories.",
+    "dynamic_outputs_from": null,
+    "icon": "grain",
+    "inputs": 0,
+    "name": "Grain",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "recording_id",
+        "type": "string"
+      },
+      {
+        "label": "created_datetime",
+        "type": "string"
+      },
+      {
+        "label": "updated_datetime",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "grain_api_key",
+        "label": "Grain Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "recording_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Recording Created",
+            "value": "recording_created"
+          },
+          {
+            "label": "Recording Updated",
+            "value": "recording_updated"
+          },
+          {
+            "label": "Highlight Created",
+            "value": "highlight_created"
+          },
+          {
+            "label": "Highlight Updated",
+            "value": "highlight_updated"
+          },
+          {
+            "label": "Story Created",
+            "value": "story_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.grain"
+  },
+  "trigger.greenhouse": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "greenhouse_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Greenhouse ATS for new / updated candidates, applications, jobs, or offers.",
+    "dynamic_outputs_from": null,
+    "icon": "greenhouse",
+    "inputs": 0,
+    "name": "Greenhouse",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "number"
+      },
+      {
+        "label": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "last_name",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "created_at",
+        "type": "string"
+      },
+      {
+        "label": "updated_at",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "greenhouse_api_key",
+        "label": "Greenhouse Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "candidate_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Candidate Created",
+            "value": "candidate_created"
+          },
+          {
+            "label": "Candidate Updated",
+            "value": "candidate_updated"
+          },
+          {
+            "label": "Application Created",
+            "value": "application_created"
+          },
+          {
+            "label": "Application Updated",
+            "value": "application_updated"
+          },
+          {
+            "label": "Job Created",
+            "value": "job_created"
+          },
+          {
+            "label": "Offer Created",
+            "value": "offer_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 100,
+        "label": "Per page (max 500)",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.greenhouse"
+  },
   "trigger.gtasks_change": {
     "allow_error": true,
     "category": "trigger",
@@ -34736,6 +37984,298 @@
     "tools": null,
     "type": "trigger.imap"
   },
+  "trigger.instantly": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "instantly_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Instantly for new leads, lead status changes (interested / meeting_booked / unsubscribed / \u2026), or completed campaigns. For per-delivery email events attach an Instantly webhook.",
+    "dynamic_outputs_from": null,
+    "icon": "instantly",
+    "inputs": 0,
+    "name": "Instantly",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "email",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "change",
+        "type": "object"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "instantly_api_key",
+        "label": "Instantly Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "new_lead",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New Lead",
+            "value": "new_lead"
+          },
+          {
+            "label": "Lead Status Changed",
+            "value": "lead_status_changed"
+          },
+          {
+            "label": "Campaign Completed",
+            "value": "campaign_completed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Campaign ID (optional; blank = all campaigns)",
+        "mode": "advanced",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.instantly"
+  },
+  "trigger.instantly_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Instantly posts a per-email event (opens, clicks, replies, bounces, lead status changes). Verified via HMAC-SHA256 in `x-instantly-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "instantly",
+    "inputs": 0,
+    "name": "Instantly Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "message_id",
+        "type": "string"
+      },
+      {
+        "label": "reply_content",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-instantly-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Sent",
+            "value": "email_sent"
+          },
+          {
+            "label": "Email Opened",
+            "value": "email_opened"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "email_bounced"
+          },
+          {
+            "label": "Link Clicked",
+            "value": "link_clicked"
+          },
+          {
+            "label": "Reply Received",
+            "value": "reply_received"
+          },
+          {
+            "label": "Auto-Reply Received",
+            "value": "auto_reply_received"
+          },
+          {
+            "label": "Lead Interested",
+            "value": "lead_interested"
+          },
+          {
+            "label": "Meeting Booked",
+            "value": "lead_meeting_booked"
+          },
+          {
+            "label": "Meeting Completed",
+            "value": "lead_meeting_completed"
+          },
+          {
+            "label": "Lead Neutral",
+            "value": "lead_neutral"
+          },
+          {
+            "label": "Lead No Show",
+            "value": "lead_no_show"
+          },
+          {
+            "label": "Lead Not Interested",
+            "value": "lead_not_interested"
+          },
+          {
+            "label": "Lead Out of Office",
+            "value": "lead_out_of_office"
+          },
+          {
+            "label": "Lead Unsubscribed",
+            "value": "lead_unsubscribed"
+          },
+          {
+            "label": "Lead Wrong Person",
+            "value": "lead_wrong_person"
+          },
+          {
+            "label": "Lead Closed",
+            "value": "lead_closed"
+          },
+          {
+            "label": "Campaign Completed",
+            "value": "campaign_completed"
+          },
+          {
+            "label": "Account Error",
+            "value": "account_error"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `x-instantly-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Instantly Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.instantly_webhook"
+  },
   "trigger.intercom": {
     "allow_error": true,
     "category": "trigger",
@@ -34861,7 +38401,7 @@
     "credential_type": "jira_api_key",
     "default_height": null,
     "default_width": null,
-    "description": "Poll Jira for new / recently-updated issues matching a JQL query.",
+    "description": "Poll Jira for new issues, updates, comments, worklogs, sprints, or projects. Basic auth via email + API token.",
     "dynamic_outputs_from": null,
     "icon": "jira",
     "inputs": 0,
@@ -34886,11 +38426,23 @@
         "type": "string"
       },
       {
-        "label": "assignee",
+        "label": "updated",
         "type": "string"
       },
       {
-        "label": "updated",
+        "label": "body",
+        "type": "string"
+      },
+      {
+        "label": "issue_key",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "state",
         "type": "string"
       }
     ],
@@ -34914,23 +38466,87 @@
           {
             "label": "Issue Updated",
             "value": "issue_updated"
+          },
+          {
+            "label": "New Comment on Issue",
+            "value": "new_comment"
+          },
+          {
+            "label": "New Worklog on Issue",
+            "value": "new_worklog"
+          },
+          {
+            "label": "New Sprint on Board",
+            "value": "new_sprint"
+          },
+          {
+            "label": "Sprint Started",
+            "value": "sprint_started"
+          },
+          {
+            "label": "Sprint Closed",
+            "value": "sprint_closed"
+          },
+          {
+            "label": "New Project",
+            "value": "new_project"
           }
         ],
         "type": "options"
       },
       {
-        "label": "JQL",
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_issue",
+            "issue_updated"
+          ]
+        },
+        "label": "JQL (for issue events)",
         "name": "jql",
         "placeholder": "project = \"ABC\" AND status = \"To Do\"",
-        "required": true,
         "type": "string"
       },
       {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_issue",
+            "issue_updated"
+          ]
+        },
         "default": 50,
         "label": "Max Results",
         "mode": "advanced",
         "name": "max_results",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_comment",
+            "new_worklog"
+          ]
+        },
+        "label": "Issue Key (for comment/worklog events)",
+        "name": "issue_key",
+        "placeholder": "ABC-123",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_sprint",
+            "sprint_started",
+            "sprint_closed"
+          ]
+        },
+        "label": "Board ID (for sprint events)",
+        "name": "board_id",
+        "placeholder": "12",
+        "type": "string"
       },
       {
         "default": 25,
@@ -34978,6 +38594,430 @@
     ],
     "tools": null,
     "type": "trigger.jira"
+  },
+  "trigger.jira_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Atlassian Cloud posts a Jira webhook. Full sim event parity \u2014 issue/comment/worklog/sprint create+update+delete, version_released, project_created. HMAC-SHA256 verified against the shared secret.",
+    "dynamic_outputs_from": null,
+    "icon": "jira",
+    "inputs": 0,
+    "name": "Jira Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "issue_key",
+        "type": "string"
+      },
+      {
+        "label": "issue_id",
+        "type": "string"
+      },
+      {
+        "label": "summary",
+        "type": "string"
+      },
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "assignee",
+        "type": "string"
+      },
+      {
+        "label": "comment_body",
+        "type": "string"
+      },
+      {
+        "label": "worklog_time_spent",
+        "type": "string"
+      },
+      {
+        "label": "sprint_name",
+        "type": "string"
+      },
+      {
+        "label": "user_email",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Atlassian-Webhook-Identifier` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Issue Created",
+            "value": "jira:issue_created"
+          },
+          {
+            "label": "Issue Updated",
+            "value": "jira:issue_updated"
+          },
+          {
+            "label": "Issue Deleted",
+            "value": "jira:issue_deleted"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment_created"
+          },
+          {
+            "label": "Comment Updated",
+            "value": "comment_updated"
+          },
+          {
+            "label": "Comment Deleted",
+            "value": "comment_deleted"
+          },
+          {
+            "label": "Worklog Created",
+            "value": "worklog_created"
+          },
+          {
+            "label": "Worklog Updated",
+            "value": "worklog_updated"
+          },
+          {
+            "label": "Worklog Deleted",
+            "value": "worklog_deleted"
+          },
+          {
+            "label": "Sprint Created",
+            "value": "sprint_created"
+          },
+          {
+            "label": "Sprint Started",
+            "value": "sprint_started"
+          },
+          {
+            "label": "Sprint Closed",
+            "value": "sprint_closed"
+          },
+          {
+            "label": "Version Released",
+            "value": "jira:version_released"
+          },
+          {
+            "label": "Project Created",
+            "value": "project_created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Jira Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.jira_webhook"
+  },
+  "trigger.lemlist": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "lemlist_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Lemlist for new activities (email events at coarse cadence) or new leads added to a campaign. For real-time email events, attach a Lemlist webhook instead.",
+    "dynamic_outputs_from": null,
+    "icon": "lemlist",
+    "inputs": 0,
+    "name": "Lemlist",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "first_name",
+        "type": "string"
+      },
+      {
+        "label": "date",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "lemlist_api_key",
+        "label": "Lemlist Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "activity_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "New Activity",
+            "value": "activity_created"
+          },
+          {
+            "label": "New Lead Added to Campaign",
+            "value": "new_lead_in_campaign"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_lead_in_campaign"
+          ]
+        },
+        "label": "Campaign ID (required for lead events; optional for activities)",
+        "name": "campaign_id",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 90,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.lemlist"
+  },
+  "trigger.lemlist_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Lemlist posts a per-email event (bounced, clicked, opened, replied, sent, interested, linkedin_replied, not_interested). Verified via bare-secret compare against `x-webhook-token`.",
+    "dynamic_outputs_from": null,
+    "icon": "lemlist",
+    "inputs": 0,
+    "name": "Lemlist Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "campaign_id",
+        "type": "string"
+      },
+      {
+        "label": "lead_email",
+        "type": "string"
+      },
+      {
+        "label": "reply_body",
+        "type": "string"
+      },
+      {
+        "label": "date",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-lemlist-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Email Bounced",
+            "value": "emailsBounced"
+          },
+          {
+            "label": "Email Clicked",
+            "value": "emailsClicked"
+          },
+          {
+            "label": "Email Opened",
+            "value": "emailsOpened"
+          },
+          {
+            "label": "Email Replied",
+            "value": "emailsReplied"
+          },
+          {
+            "label": "Email Sent",
+            "value": "emailsSent"
+          },
+          {
+            "label": "Lead Interested",
+            "value": "emailsInterested"
+          },
+          {
+            "label": "Lead Not Interested",
+            "value": "emailsNotInterested"
+          },
+          {
+            "label": "LinkedIn Replied",
+            "value": "linkedinReplied"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "GITLAB_TOKEN secret. Deliveries without a valid `x-webhook-token` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Lemlist Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.lemlist_webhook"
   },
   "trigger.linear": {
     "allow_error": true,
@@ -35043,6 +39083,26 @@
           {
             "label": "New Comment",
             "value": "new_comment"
+          },
+          {
+            "label": "New Cycle",
+            "value": "new_cycle"
+          },
+          {
+            "label": "Cycle Updated",
+            "value": "cycle_updated"
+          },
+          {
+            "label": "New Project",
+            "value": "new_project"
+          },
+          {
+            "label": "New Project Update",
+            "value": "new_project_update"
+          },
+          {
+            "label": "New Label",
+            "value": "new_label"
           }
         ],
         "type": "options"
@@ -35099,6 +39159,169 @@
     ],
     "tools": null,
     "type": "trigger.linear"
+  },
+  "trigger.linear_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Linear posts a webhook delivery. Full sim parity including delete/remove events (unlocks the events the Phase 4.2 poller couldn't observe). HMAC-SHA256 verified via `Linear-Signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "linear",
+    "inputs": 0,
+    "name": "Linear Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "action",
+        "type": "string"
+      },
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "identifier",
+        "type": "string"
+      },
+      {
+        "label": "title",
+        "type": "string"
+      },
+      {
+        "label": "url",
+        "type": "string"
+      },
+      {
+        "label": "state_name",
+        "type": "string"
+      },
+      {
+        "label": "assignee_name",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `Linear-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Issue Created",
+            "value": "Issue.create"
+          },
+          {
+            "label": "Issue Updated",
+            "value": "Issue.update"
+          },
+          {
+            "label": "Issue Removed",
+            "value": "Issue.remove"
+          },
+          {
+            "label": "Comment Created",
+            "value": "Comment.create"
+          },
+          {
+            "label": "Comment Updated",
+            "value": "Comment.update"
+          },
+          {
+            "label": "Cycle Created",
+            "value": "Cycle.create"
+          },
+          {
+            "label": "Cycle Updated",
+            "value": "Cycle.update"
+          },
+          {
+            "label": "Project Created",
+            "value": "Project.create"
+          },
+          {
+            "label": "Project Update Created",
+            "value": "ProjectUpdate.create"
+          },
+          {
+            "label": "Label Created",
+            "value": "IssueLabel.create"
+          },
+          {
+            "label": "Label Updated",
+            "value": "IssueLabel.update"
+          },
+          {
+            "label": "Customer Request Created",
+            "value": "CustomerRequest.create"
+          },
+          {
+            "label": "Customer Request Updated",
+            "value": "CustomerRequest.update"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `Linear-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Linear Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.linear_webhook"
   },
   "trigger.manual": {
     "allow_error": false,
@@ -36180,7 +40403,7 @@
     ],
     "default_height": null,
     "default_width": null,
-    "description": "Poll a Notion database for new or updated pages.",
+    "description": "Poll a Notion database for new / updated pages, a page for new comments, or the workspace for new databases.",
     "dynamic_outputs_from": null,
     "icon": "notion",
     "inputs": 0,
@@ -36207,6 +40430,14 @@
       {
         "label": "created_time",
         "type": "string"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "page_id",
+        "type": "string"
       }
     ],
     "properties": [
@@ -36232,14 +40463,44 @@
           {
             "label": "Page Updated",
             "value": "page_updated"
+          },
+          {
+            "label": "Page Content Updated",
+            "value": "page_content_updated"
+          },
+          {
+            "label": "New Comment on Page",
+            "value": "new_comment"
+          },
+          {
+            "label": "New Database Created",
+            "value": "new_database"
           }
         ],
         "type": "options"
       },
       {
-        "label": "Database ID",
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_page",
+            "page_updated",
+            "page_content_updated"
+          ]
+        },
+        "label": "Database ID (for page events / new_database ignored)",
         "name": "database_id",
-        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_comment"
+          ]
+        },
+        "label": "Page ID (for new_comment event)",
+        "name": "page_id",
         "type": "string"
       },
       {
@@ -36295,6 +40556,141 @@
     ],
     "tools": null,
     "type": "trigger.notion"
+  },
+  "trigger.notion_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Notion posts a webhook delivery \u2014 pages, databases, comments. Full sim event parity via body-path routing on `type`. First delivery is a URL-verification challenge; the scaffold echoes the token so Notion accepts the endpoint.",
+    "dynamic_outputs_from": null,
+    "icon": "notion",
+    "inputs": 0,
+    "name": "Notion Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "entity_id",
+        "type": "string"
+      },
+      {
+        "label": "entity_type",
+        "type": "string"
+      },
+      {
+        "label": "parent_id",
+        "type": "string"
+      },
+      {
+        "label": "workspace_id",
+        "type": "string"
+      },
+      {
+        "label": "authors",
+        "type": "array"
+      },
+      {
+        "label": "updated_properties",
+        "type": "array"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `X-Notion-Event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Page Created",
+            "value": "page.created"
+          },
+          {
+            "label": "Page Updated",
+            "value": "page.updated"
+          },
+          {
+            "label": "Page Content Updated",
+            "value": "page.content_updated"
+          },
+          {
+            "label": "Page Deleted",
+            "value": "page.deleted"
+          },
+          {
+            "label": "Database Created",
+            "value": "database.created"
+          },
+          {
+            "label": "Database Schema Updated",
+            "value": "database.schema_updated"
+          },
+          {
+            "label": "Database Deleted",
+            "value": "database.deleted"
+          },
+          {
+            "label": "Comment Created",
+            "value": "comment.created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Notion-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Notion Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.notion_webhook"
   },
   "trigger.outlook_mail": {
     "allow_error": true,
@@ -36659,6 +41055,277 @@
     ],
     "tools": null,
     "type": "trigger.rss"
+  },
+  "trigger.salesforce": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "salesforce_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll Salesforce for new / updated records or opportunity stage changes on any SObject. Uses Connected App access token + instance URL from the credential.",
+    "dynamic_outputs_from": null,
+    "icon": "salesforce",
+    "inputs": 0,
+    "name": "Salesforce",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "id",
+        "type": "string"
+      },
+      {
+        "label": "type",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "stage",
+        "type": "string"
+      },
+      {
+        "label": "amount",
+        "type": "number"
+      },
+      {
+        "label": "created_date",
+        "type": "string"
+      },
+      {
+        "label": "last_modified_date",
+        "type": "string"
+      },
+      {
+        "label": "change",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "salesforce_api_key",
+        "label": "Salesforce Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "record_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Record Created",
+            "value": "record_created"
+          },
+          {
+            "label": "Record Updated",
+            "value": "record_updated"
+          },
+          {
+            "label": "Opportunity Stage Changed",
+            "value": "opportunity_stage_changed"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": "Account",
+        "label": "SObject",
+        "name": "object_type",
+        "placeholder": "Account | Contact | Lead | Opportunity | Case | ...",
+        "type": "string"
+      },
+      {
+        "label": "SOQL SELECT fields (comma-separated; blank = defaults)",
+        "mode": "advanced",
+        "name": "fields",
+        "placeholder": "Id, Name, Amount, StageName",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 60,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.salesforce"
+  },
+  "trigger.servicenow": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": "servicenow_api_key",
+    "default_height": null,
+    "default_width": null,
+    "description": "Poll ServiceNow for new / updated incidents or change requests. Basic auth via username + password/token.",
+    "dynamic_outputs_from": null,
+    "icon": "servicenow",
+    "inputs": 0,
+    "name": "ServiceNow",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sys_id",
+        "type": "string"
+      },
+      {
+        "label": "number",
+        "type": "string"
+      },
+      {
+        "label": "short_description",
+        "type": "string"
+      },
+      {
+        "label": "state",
+        "type": "string"
+      },
+      {
+        "label": "priority",
+        "type": "string"
+      },
+      {
+        "label": "assigned_to",
+        "type": "string"
+      },
+      {
+        "label": "sys_created_on",
+        "type": "string"
+      },
+      {
+        "label": "sys_updated_on",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "credentialType": "servicenow_api_key",
+        "label": "ServiceNow Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "default": "incident_created",
+        "label": "Event",
+        "name": "event_type",
+        "options": [
+          {
+            "label": "Incident Created",
+            "value": "incident_created"
+          },
+          {
+            "label": "Incident Updated",
+            "value": "incident_updated"
+          },
+          {
+            "label": "Change Request Created",
+            "value": "change_request_created"
+          },
+          {
+            "label": "Change Request Updated",
+            "value": "change_request_updated"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "label": "Extra encoded query (prepended; blank = watch everything)",
+        "mode": "advanced",
+        "name": "query",
+        "placeholder": "active=true^priority=1",
+        "type": "string"
+      },
+      {
+        "default": 25,
+        "label": "Max events per poll",
+        "mode": "advanced",
+        "name": "max_per_poll",
+        "type": "number"
+      },
+      {
+        "default": 60,
+        "description": "Min 30s, max 3600s.",
+        "label": "Poll interval (seconds)",
+        "mode": "advanced",
+        "name": "poll_interval_seconds",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.servicenow"
   },
   "trigger.slack": {
     "allow_error": false,
@@ -37223,6 +41890,252 @@
     ],
     "tools": null,
     "type": "trigger.twilio_webhook"
+  },
+  "trigger.typeform_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when a Typeform is submitted. Verified via HMAC-SHA256 base64 in `Typeform-Signature`. Answers are flattened into `answers[]` + a `by_ref` map keyed on field ref for stable access.",
+    "dynamic_outputs_from": null,
+    "icon": "typeform",
+    "inputs": 0,
+    "name": "Typeform Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "form_id",
+        "type": "string"
+      },
+      {
+        "label": "form_title",
+        "type": "string"
+      },
+      {
+        "label": "response_id",
+        "type": "string"
+      },
+      {
+        "label": "submitted_at",
+        "type": "string"
+      },
+      {
+        "label": "answers",
+        "type": "array"
+      },
+      {
+        "label": "by_ref",
+        "type": "object"
+      },
+      {
+        "label": "hidden",
+        "type": "object"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-typeform-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Form Submitted",
+            "value": "form_response"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA256_B64 secret. Deliveries without a valid `Typeform-Signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Typeform Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.typeform_webhook"
+  },
+  "trigger.vercel_webhook": {
+    "allow_error": true,
+    "category": "trigger",
+    "color": "#1c1c1c",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Fires when Vercel posts a webhook delivery \u2014 deployment lifecycle, project creation. HMAC-SHA1 verified via `x-vercel-signature`.",
+    "dynamic_outputs_from": null,
+    "icon": "vercel",
+    "inputs": 0,
+    "name": "Vercel Webhook",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "event",
+        "type": "string"
+      },
+      {
+        "label": "deployment_id",
+        "type": "string"
+      },
+      {
+        "label": "deployment_url",
+        "type": "string"
+      },
+      {
+        "label": "deployment_state",
+        "type": "string"
+      },
+      {
+        "label": "project_id",
+        "type": "string"
+      },
+      {
+        "label": "project_name",
+        "type": "string"
+      },
+      {
+        "label": "commit_sha",
+        "type": "string"
+      },
+      {
+        "label": "commit_message",
+        "type": "string"
+      },
+      {
+        "label": "body",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "*",
+        "description": "Filter applied to the `x-vercel-event` header. Pick \"Any event\" to forward every delivery.",
+        "label": "Event",
+        "name": "event",
+        "options": [
+          {
+            "label": "Any event",
+            "value": "*"
+          },
+          {
+            "label": "Deployment Created",
+            "value": "deployment.created"
+          },
+          {
+            "label": "Deployment Succeeded",
+            "value": "deployment.succeeded"
+          },
+          {
+            "label": "Deployment Ready",
+            "value": "deployment.ready"
+          },
+          {
+            "label": "Deployment Canceled",
+            "value": "deployment.canceled"
+          },
+          {
+            "label": "Deployment Error",
+            "value": "deployment.error"
+          },
+          {
+            "label": "Deployment Promoted",
+            "value": "deployment.promoted"
+          },
+          {
+            "label": "Project Created",
+            "value": "project.created"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "description": "HMAC_SHA1 secret. Deliveries without a valid `x-vercel-signature` header are rejected.",
+        "label": "Webhook Secret",
+        "name": "secret",
+        "placeholder": "Set the same value in Vercel Webhook webhook settings",
+        "required": true,
+        "secret": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.vercel_webhook"
   },
   "trigger.webflow_webhook": {
     "allow_error": true,

@@ -163,6 +163,11 @@ AuthScheme = Literal[
     "bearer",
     "header_token",
     "basic",
+    # Basic auth with the token as username + empty password —
+    # `Basic base64(token:)`. Greenhouse's Harvest API uses this.
+    # `basic` doesn't fit: it always encodes `username:token`, doubling
+    # the api_key if you also put it in `basic_username`.
+    "basic_token_only",
     "query_token",
     # AWS Signature V4 — service + region rides on the manifest via
     # `aws_service` + `aws_default_region`; access_key + secret_access_key
