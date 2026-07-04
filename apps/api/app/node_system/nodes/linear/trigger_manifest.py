@@ -64,6 +64,51 @@ query NewComments($first: Int!) {
 }
 """
 
+_CYCLES_QUERY = """
+query Cycles($first: Int!) {
+  cycles(first: $first, orderBy: createdAt) {
+    nodes {
+      id name number description startsAt endsAt completedAt createdAt updatedAt
+      team { id name key }
+    }
+  }
+}
+"""
+
+_PROJECTS_QUERY = """
+query Projects($first: Int!) {
+  projects(first: $first, orderBy: createdAt) {
+    nodes {
+      id name description slugId state startDate targetDate createdAt updatedAt url
+      lead { id name email }
+    }
+  }
+}
+"""
+
+_PROJECT_UPDATES_QUERY = """
+query ProjectUpdates($first: Int!) {
+  projectUpdates(first: $first, orderBy: createdAt) {
+    nodes {
+      id body createdAt updatedAt url health
+      user { id name email }
+      project { id name url }
+    }
+  }
+}
+"""
+
+_LABELS_QUERY = """
+query Labels($first: Int!) {
+  issueLabels(first: $first, orderBy: createdAt) {
+    nodes {
+      id name description color createdAt updatedAt
+      team { id name key }
+    }
+  }
+}
+"""
+
 
 def _flatten_issue(item):
     state = item.get("state") or {}
@@ -101,8 +146,73 @@ def _flatten_comment(item):
     }
 
 
+def _flatten_cycle(item):
+    team = item.get("team") or {}
+    return {
+        "id": item.get("id"),
+        "name": item.get("name"),
+        "number": item.get("number"),
+        "description": item.get("description"),
+        "starts_at": item.get("startsAt"),
+        "ends_at": item.get("endsAt"),
+        "completed_at": item.get("completedAt"),
+        "createdAt": item.get("createdAt"),
+        "updatedAt": item.get("updatedAt"),
+        "team_key": team.get("key"),
+    }
+
+
+def _flatten_project(item):
+    lead = item.get("lead") or {}
+    return {
+        "id": item.get("id"),
+        "name": item.get("name"),
+        "description": item.get("description"),
+        "slug": item.get("slugId"),
+        "state": item.get("state"),
+        "start_date": item.get("startDate"),
+        "target_date": item.get("targetDate"),
+        "url": item.get("url"),
+        "createdAt": item.get("createdAt"),
+        "updatedAt": item.get("updatedAt"),
+        "lead_name": lead.get("name"),
+    }
+
+
+def _flatten_project_update(item):
+    user = item.get("user") or {}
+    project = item.get("project") or {}
+    return {
+        "id": item.get("id"),
+        "body": item.get("body"),
+        "health": item.get("health"),
+        "url": item.get("url"),
+        "createdAt": item.get("createdAt"),
+        "user_name": user.get("name"),
+        "project_id": project.get("id"),
+        "project_name": project.get("name"),
+    }
+
+
+def _flatten_label(item):
+    team = item.get("team") or {}
+    return {
+        "id": item.get("id"),
+        "name": item.get("name"),
+        "description": item.get("description"),
+        "color": item.get("color"),
+        "createdAt": item.get("createdAt"),
+        "updatedAt": item.get("updatedAt"),
+        "team_key": team.get("key"),
+    }
+
+
 register_flatten("linear.issue", _flatten_issue)
 register_flatten("linear.comment", _flatten_comment)
+register_flatten("linear.cycle", _flatten_cycle)
+register_flatten("linear.project", _flatten_project)
+register_flatten("linear.project_update", _flatten_project_update)
+register_flatten("linear.label", _flatten_label)
 
 
 async def _walk_linear(
@@ -127,10 +237,22 @@ async def _walk_linear(
     except (TypeError, ValueError):
         first = 25
 
+    variables: dict[str, Any] = {"first": first}
     if event.id == "new_comment":
         query = _COMMENTS_QUERY
-        variables: dict[str, Any] = {"first": first}
         pick = "comments"
+    elif event.id in ("new_cycle", "cycle_updated"):
+        query = _CYCLES_QUERY
+        pick = "cycles"
+    elif event.id == "new_project":
+        query = _PROJECTS_QUERY
+        pick = "projects"
+    elif event.id == "new_project_update":
+        query = _PROJECT_UPDATES_QUERY
+        pick = "projectUpdates"
+    elif event.id == "new_label":
+        query = _LABELS_QUERY
+        pick = "issueLabels"
     else:
         team_id = getattr(props, "team_id", None) or None
         filter_ = {"team": {"id": {"eq": team_id}}} if team_id else None
@@ -197,6 +319,46 @@ MANIFEST = PollingTriggerManifest(
             strategy="known_ids",
             id_field="id",
             flatten="linear.comment",
+        ),
+        PollingEvent(
+            id="new_cycle",
+            label="New Cycle",
+            list_path="",
+            strategy="known_ids",
+            id_field="id",
+            flatten="linear.cycle",
+        ),
+        PollingEvent(
+            id="cycle_updated",
+            label="Cycle Updated",
+            list_path="",
+            strategy="since_timestamp",
+            timestamp_field="updatedAt",
+            flatten="linear.cycle",
+        ),
+        PollingEvent(
+            id="new_project",
+            label="New Project",
+            list_path="",
+            strategy="known_ids",
+            id_field="id",
+            flatten="linear.project",
+        ),
+        PollingEvent(
+            id="new_project_update",
+            label="New Project Update",
+            list_path="",
+            strategy="known_ids",
+            id_field="id",
+            flatten="linear.project_update",
+        ),
+        PollingEvent(
+            id="new_label",
+            label="New Label",
+            list_path="",
+            strategy="known_ids",
+            id_field="id",
+            flatten="linear.label",
         ),
     ],
     outputs_schema=[

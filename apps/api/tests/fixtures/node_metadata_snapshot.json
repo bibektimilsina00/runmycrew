@@ -34861,7 +34861,7 @@
     "credential_type": "jira_api_key",
     "default_height": null,
     "default_width": null,
-    "description": "Poll Jira for new / recently-updated issues matching a JQL query.",
+    "description": "Poll Jira for new issues, updates, comments, worklogs, sprints, or projects. Basic auth via email + API token.",
     "dynamic_outputs_from": null,
     "icon": "jira",
     "inputs": 0,
@@ -34886,11 +34886,23 @@
         "type": "string"
       },
       {
-        "label": "assignee",
+        "label": "updated",
         "type": "string"
       },
       {
-        "label": "updated",
+        "label": "body",
+        "type": "string"
+      },
+      {
+        "label": "issue_key",
+        "type": "string"
+      },
+      {
+        "label": "name",
+        "type": "string"
+      },
+      {
+        "label": "state",
         "type": "string"
       }
     ],
@@ -34914,23 +34926,87 @@
           {
             "label": "Issue Updated",
             "value": "issue_updated"
+          },
+          {
+            "label": "New Comment on Issue",
+            "value": "new_comment"
+          },
+          {
+            "label": "New Worklog on Issue",
+            "value": "new_worklog"
+          },
+          {
+            "label": "New Sprint on Board",
+            "value": "new_sprint"
+          },
+          {
+            "label": "Sprint Started",
+            "value": "sprint_started"
+          },
+          {
+            "label": "Sprint Closed",
+            "value": "sprint_closed"
+          },
+          {
+            "label": "New Project",
+            "value": "new_project"
           }
         ],
         "type": "options"
       },
       {
-        "label": "JQL",
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_issue",
+            "issue_updated"
+          ]
+        },
+        "label": "JQL (for issue events)",
         "name": "jql",
         "placeholder": "project = \"ABC\" AND status = \"To Do\"",
-        "required": true,
         "type": "string"
       },
       {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_issue",
+            "issue_updated"
+          ]
+        },
         "default": 50,
         "label": "Max Results",
         "mode": "advanced",
         "name": "max_results",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_comment",
+            "new_worklog"
+          ]
+        },
+        "label": "Issue Key (for comment/worklog events)",
+        "name": "issue_key",
+        "placeholder": "ABC-123",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_sprint",
+            "sprint_started",
+            "sprint_closed"
+          ]
+        },
+        "label": "Board ID (for sprint events)",
+        "name": "board_id",
+        "placeholder": "12",
+        "type": "string"
       },
       {
         "default": 25,
@@ -35043,6 +35119,26 @@
           {
             "label": "New Comment",
             "value": "new_comment"
+          },
+          {
+            "label": "New Cycle",
+            "value": "new_cycle"
+          },
+          {
+            "label": "Cycle Updated",
+            "value": "cycle_updated"
+          },
+          {
+            "label": "New Project",
+            "value": "new_project"
+          },
+          {
+            "label": "New Project Update",
+            "value": "new_project_update"
+          },
+          {
+            "label": "New Label",
+            "value": "new_label"
           }
         ],
         "type": "options"
@@ -36180,7 +36276,7 @@
     ],
     "default_height": null,
     "default_width": null,
-    "description": "Poll a Notion database for new or updated pages.",
+    "description": "Poll a Notion database for new / updated pages, a page for new comments, or the workspace for new databases.",
     "dynamic_outputs_from": null,
     "icon": "notion",
     "inputs": 0,
@@ -36207,6 +36303,14 @@
       {
         "label": "created_time",
         "type": "string"
+      },
+      {
+        "label": "text",
+        "type": "string"
+      },
+      {
+        "label": "page_id",
+        "type": "string"
       }
     ],
     "properties": [
@@ -36232,14 +36336,44 @@
           {
             "label": "Page Updated",
             "value": "page_updated"
+          },
+          {
+            "label": "Page Content Updated",
+            "value": "page_content_updated"
+          },
+          {
+            "label": "New Comment on Page",
+            "value": "new_comment"
+          },
+          {
+            "label": "New Database Created",
+            "value": "new_database"
           }
         ],
         "type": "options"
       },
       {
-        "label": "Database ID",
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_page",
+            "page_updated",
+            "page_content_updated"
+          ]
+        },
+        "label": "Database ID (for page events / new_database ignored)",
         "name": "database_id",
-        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "event_type",
+          "value": [
+            "new_comment"
+          ]
+        },
+        "label": "Page ID (for new_comment event)",
+        "name": "page_id",
         "type": "string"
       },
       {
