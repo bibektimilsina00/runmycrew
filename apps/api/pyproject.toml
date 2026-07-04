@@ -30,6 +30,8 @@ dependencies = [
     # for captions/transcripts. No API key + no OAuth required — both
     # scrape the public response.
     "youtube-transcript-api>=0.6.2",
+    "aiosmtplib>=5.1.2",
+    "asyncssh>=2.24.0",
 ]
 
 [tool.uv]
