@@ -65513,158 +65513,1274 @@
         "type": "credential"
       },
       {
-        "default": "list_leagues",
+        "default": "expected_by_player",
         "label": "Operation",
         "name": "operation",
         "options": [
           {
-            "label": "List Leagues",
-            "value": "list_leagues"
+            "label": "Football Expected By Player",
+            "value": "expected_by_player"
           },
           {
-            "label": "Today's Fixtures",
-            "value": "list_fixtures_today"
+            "label": "Football Expected By Team",
+            "value": "expected_by_team"
           },
           {
-            "label": "Get Fixture",
+            "label": "Football Get All Commentaries",
+            "value": "get_all_commentaries"
+          },
+          {
+            "label": "Football Get All Fixtures",
+            "value": "get_all_fixtures"
+          },
+          {
+            "label": "Football Get All Players",
+            "value": "get_all_players"
+          },
+          {
+            "label": "Football Get All Rivals",
+            "value": "get_all_rivals"
+          },
+          {
+            "label": "Football Get All Teams",
+            "value": "get_all_teams"
+          },
+          {
+            "label": "Football Get All Transfer Rumours",
+            "value": "get_all_transfer_rumours"
+          },
+          {
+            "label": "Football Get All Transfers",
+            "value": "get_all_transfers"
+          },
+          {
+            "label": "Football Get Brackets By Season",
+            "value": "get_brackets_by_season"
+          },
+          {
+            "label": "Football Get Coach",
+            "value": "get_coach"
+          },
+          {
+            "label": "Football Get Coaches",
+            "value": "get_coaches"
+          },
+          {
+            "label": "Football Get Coaches By Country",
+            "value": "get_coaches_by_country"
+          },
+          {
+            "label": "Football Get Commentaries By Fixture",
+            "value": "get_commentaries_by_fixture"
+          },
+          {
+            "label": "Football Get Current Leagues By Team",
+            "value": "get_current_leagues_by_team"
+          },
+          {
+            "label": "Football Get Expected Lineups By Player",
+            "value": "get_expected_lineups_by_player"
+          },
+          {
+            "label": "Football Get Expected Lineups By Team",
+            "value": "get_expected_lineups_by_team"
+          },
+          {
+            "label": "Football Get Extended Team Squad",
+            "value": "get_extended_team_squad"
+          },
+          {
+            "label": "Football Get Fixture",
             "value": "get_fixture"
           },
           {
-            "label": "Live Scores",
-            "value": "livescores"
+            "label": "Football Get Fixtures By Date",
+            "value": "get_fixtures_by_date"
+          },
+          {
+            "label": "Football Get Fixtures By Date Range",
+            "value": "get_fixtures_by_date_range"
+          },
+          {
+            "label": "Football Get Fixtures By Date Range For Team",
+            "value": "get_fixtures_by_date_range_for_team"
+          },
+          {
+            "label": "Football Get Fixtures By Ids",
+            "value": "get_fixtures_by_ids"
+          },
+          {
+            "label": "Football Get Grouped Standings By Round",
+            "value": "get_grouped_standings_by_round"
+          },
+          {
+            "label": "Football Get Head To Head",
+            "value": "get_head_to_head"
+          },
+          {
+            "label": "Football Get Inplay Livescores",
+            "value": "get_inplay_livescores"
+          },
+          {
+            "label": "Football Get Latest Coaches",
+            "value": "get_latest_coaches"
+          },
+          {
+            "label": "Football Get Latest Fixtures",
+            "value": "get_latest_fixtures"
+          },
+          {
+            "label": "Football Get Latest Livescores",
+            "value": "get_latest_livescores"
+          },
+          {
+            "label": "Football Get Latest Players",
+            "value": "get_latest_players"
+          },
+          {
+            "label": "Football Get Latest Totw",
+            "value": "get_latest_totw"
+          },
+          {
+            "label": "Football Get Latest Transfers",
+            "value": "get_latest_transfers"
+          },
+          {
+            "label": "Football Get League",
+            "value": "get_league"
+          },
+          {
+            "label": "Football Get Leagues",
+            "value": "get_leagues"
+          },
+          {
+            "label": "Football Get Leagues By Country",
+            "value": "get_leagues_by_country"
+          },
+          {
+            "label": "Football Get Leagues By Date",
+            "value": "get_leagues_by_date"
+          },
+          {
+            "label": "Football Get Leagues By Team",
+            "value": "get_leagues_by_team"
+          },
+          {
+            "label": "Football Get Live Leagues",
+            "value": "get_live_leagues"
+          },
+          {
+            "label": "Football Get Live Probabilities",
+            "value": "get_live_probabilities"
+          },
+          {
+            "label": "Football Get Live Probabilities By Fixture",
+            "value": "get_live_probabilities_by_fixture"
+          },
+          {
+            "label": "Football Get Live Standings By League",
+            "value": "get_live_standings_by_league"
+          },
+          {
+            "label": "Football Get Livescores",
+            "value": "get_livescores"
+          },
+          {
+            "label": "Football Get Match Facts",
+            "value": "get_match_facts"
+          },
+          {
+            "label": "Football Get Match Facts By Date Range",
+            "value": "get_match_facts_by_date_range"
+          },
+          {
+            "label": "Football Get Match Facts By Fixture",
+            "value": "get_match_facts_by_fixture"
+          },
+          {
+            "label": "Football Get Match Facts By League",
+            "value": "get_match_facts_by_league"
+          },
+          {
+            "label": "Football Get Past Fixtures By Tv Station",
+            "value": "get_past_fixtures_by_tv_station"
+          },
+          {
+            "label": "Football Get Player",
+            "value": "get_player"
+          },
+          {
+            "label": "Football Get Players By Country",
+            "value": "get_players_by_country"
+          },
+          {
+            "label": "Football Get Postmatch News",
+            "value": "get_postmatch_news"
+          },
+          {
+            "label": "Football Get Postmatch News By Season",
+            "value": "get_postmatch_news_by_season"
+          },
+          {
+            "label": "Football Get Predictability By League",
+            "value": "get_predictability_by_league"
+          },
+          {
+            "label": "Football Get Prematch News",
+            "value": "get_prematch_news"
+          },
+          {
+            "label": "Football Get Prematch News By Season",
+            "value": "get_prematch_news_by_season"
+          },
+          {
+            "label": "Football Get Prematch News Upcoming",
+            "value": "get_prematch_news_upcoming"
+          },
+          {
+            "label": "Football Get Probabilities",
+            "value": "get_probabilities"
+          },
+          {
+            "label": "Football Get Probabilities By Fixture",
+            "value": "get_probabilities_by_fixture"
+          },
+          {
+            "label": "Football Get Referee",
+            "value": "get_referee"
+          },
+          {
+            "label": "Football Get Referees",
+            "value": "get_referees"
+          },
+          {
+            "label": "Football Get Referees By Country",
+            "value": "get_referees_by_country"
+          },
+          {
+            "label": "Football Get Referees By Season",
+            "value": "get_referees_by_season"
+          },
+          {
+            "label": "Football Get Rivals By Team",
+            "value": "get_rivals_by_team"
+          },
+          {
+            "label": "Football Get Round",
+            "value": "get_round"
+          },
+          {
+            "label": "Football Get Round Statistics",
+            "value": "get_round_statistics"
+          },
+          {
+            "label": "Football Get Rounds",
+            "value": "get_rounds"
+          },
+          {
+            "label": "Football Get Rounds By Season",
+            "value": "get_rounds_by_season"
+          },
+          {
+            "label": "Football Get Schedules By Season",
+            "value": "get_schedules_by_season"
+          },
+          {
+            "label": "Football Get Schedules By Season And Team",
+            "value": "get_schedules_by_season_and_team"
+          },
+          {
+            "label": "Football Get Schedules By Team",
+            "value": "get_schedules_by_team"
+          },
+          {
+            "label": "Football Get Season",
+            "value": "get_season"
+          },
+          {
+            "label": "Football Get Seasons",
+            "value": "get_seasons"
+          },
+          {
+            "label": "Football Get Seasons By Team",
+            "value": "get_seasons_by_team"
+          },
+          {
+            "label": "Football Get Stage",
+            "value": "get_stage"
+          },
+          {
+            "label": "Football Get Stage Statistics",
+            "value": "get_stage_statistics"
+          },
+          {
+            "label": "Football Get Stages",
+            "value": "get_stages"
+          },
+          {
+            "label": "Football Get Stages By Season",
+            "value": "get_stages_by_season"
+          },
+          {
+            "label": "Football Get Standing Corrections By Season",
+            "value": "get_standing_corrections_by_season"
+          },
+          {
+            "label": "Football Get Standings",
+            "value": "get_standings"
+          },
+          {
+            "label": "Football Get Standings By Round",
+            "value": "get_standings_by_round"
+          },
+          {
+            "label": "Football Get Standings By Season",
+            "value": "get_standings_by_season"
+          },
+          {
+            "label": "Football Get State",
+            "value": "get_state"
+          },
+          {
+            "label": "Football Get States",
+            "value": "get_states"
+          },
+          {
+            "label": "Football Get Team",
+            "value": "get_team"
+          },
+          {
+            "label": "Football Get Team Rankings",
+            "value": "get_team_rankings"
+          },
+          {
+            "label": "Football Get Team Rankings By Date",
+            "value": "get_team_rankings_by_date"
+          },
+          {
+            "label": "Football Get Team Rankings By Team",
+            "value": "get_team_rankings_by_team"
+          },
+          {
+            "label": "Football Get Team Squad",
+            "value": "get_team_squad"
+          },
+          {
+            "label": "Football Get Team Squad By Season",
+            "value": "get_team_squad_by_season"
+          },
+          {
+            "label": "Football Get Teams By Country",
+            "value": "get_teams_by_country"
+          },
+          {
+            "label": "Football Get Teams By Season",
+            "value": "get_teams_by_season"
+          },
+          {
+            "label": "Football Get Topscorers By Season",
+            "value": "get_topscorers_by_season"
+          },
+          {
+            "label": "Football Get Topscorers By Stage",
+            "value": "get_topscorers_by_stage"
+          },
+          {
+            "label": "Football Get Totw",
+            "value": "get_totw"
+          },
+          {
+            "label": "Football Get Totw By Round",
+            "value": "get_totw_by_round"
+          },
+          {
+            "label": "Football Get Transfer",
+            "value": "get_transfer"
+          },
+          {
+            "label": "Football Get Transfer Rumour",
+            "value": "get_transfer_rumour"
+          },
+          {
+            "label": "Football Get Transfer Rumours Between Dates",
+            "value": "get_transfer_rumours_between_dates"
+          },
+          {
+            "label": "Football Get Transfer Rumours By Player",
+            "value": "get_transfer_rumours_by_player"
+          },
+          {
+            "label": "Football Get Transfer Rumours By Team",
+            "value": "get_transfer_rumours_by_team"
+          },
+          {
+            "label": "Football Get Transfers Between Dates",
+            "value": "get_transfers_between_dates"
+          },
+          {
+            "label": "Football Get Transfers By Player",
+            "value": "get_transfers_by_player"
+          },
+          {
+            "label": "Football Get Transfers By Team",
+            "value": "get_transfers_by_team"
+          },
+          {
+            "label": "Football Get Tv Station",
+            "value": "get_tv_station"
+          },
+          {
+            "label": "Football Get Tv Stations",
+            "value": "get_tv_stations"
+          },
+          {
+            "label": "Football Get Tv Stations By Fixture",
+            "value": "get_tv_stations_by_fixture"
+          },
+          {
+            "label": "Football Get Upcoming Fixtures By Market",
+            "value": "get_upcoming_fixtures_by_market"
+          },
+          {
+            "label": "Football Get Upcoming Fixtures By Tv Station",
+            "value": "get_upcoming_fixtures_by_tv_station"
+          },
+          {
+            "label": "Football Get Value Bets",
+            "value": "get_value_bets"
+          },
+          {
+            "label": "Football Get Value Bets By Fixture",
+            "value": "get_value_bets_by_fixture"
+          },
+          {
+            "label": "Football Get Venue",
+            "value": "get_venue"
+          },
+          {
+            "label": "Football Get Venues",
+            "value": "get_venues"
+          },
+          {
+            "label": "Football Get Venues By Season",
+            "value": "get_venues_by_season"
+          },
+          {
+            "label": "Football Search Coaches",
+            "value": "search_coaches"
+          },
+          {
+            "label": "Football Search Fixtures",
+            "value": "search_fixtures"
+          },
+          {
+            "label": "Football Search Leagues",
+            "value": "search_leagues"
+          },
+          {
+            "label": "Football Search Players",
+            "value": "search_players"
+          },
+          {
+            "label": "Football Search Referees",
+            "value": "search_referees"
+          },
+          {
+            "label": "Football Search Rounds",
+            "value": "search_rounds"
+          },
+          {
+            "label": "Football Search Seasons",
+            "value": "search_seasons"
+          },
+          {
+            "label": "Football Search Stages",
+            "value": "search_stages"
+          },
+          {
+            "label": "Football Search Teams",
+            "value": "search_teams"
+          },
+          {
+            "label": "Football Search Venues",
+            "value": "search_venues"
+          },
+          {
+            "label": "Motorsport Get All Fixtures",
+            "value": "motorsport_get_all_fixtures"
+          },
+          {
+            "label": "Motorsport Get Current Leagues By Team",
+            "value": "motorsport_get_current_leagues_by_team"
+          },
+          {
+            "label": "Motorsport Get Driver",
+            "value": "motorsport_get_driver"
+          },
+          {
+            "label": "Motorsport Get Driver Standings",
+            "value": "motorsport_get_driver_standings"
+          },
+          {
+            "label": "Motorsport Get Driver Standings By Season",
+            "value": "motorsport_get_driver_standings_by_season"
+          },
+          {
+            "label": "Motorsport Get Drivers",
+            "value": "motorsport_get_drivers"
+          },
+          {
+            "label": "Motorsport Get Drivers By Country",
+            "value": "motorsport_get_drivers_by_country"
+          },
+          {
+            "label": "Motorsport Get Drivers By Season",
+            "value": "motorsport_get_drivers_by_season"
+          },
+          {
+            "label": "Motorsport Get Fixture",
+            "value": "motorsport_get_fixture"
+          },
+          {
+            "label": "Motorsport Get Fixtures By Date",
+            "value": "motorsport_get_fixtures_by_date"
+          },
+          {
+            "label": "Motorsport Get Fixtures By Date Range",
+            "value": "motorsport_get_fixtures_by_date_range"
+          },
+          {
+            "label": "Motorsport Get Fixtures By Ids",
+            "value": "motorsport_get_fixtures_by_ids"
+          },
+          {
+            "label": "Motorsport Get Laps By Fixture",
+            "value": "motorsport_get_laps_by_fixture"
+          },
+          {
+            "label": "Motorsport Get Laps By Fixture And Driver",
+            "value": "motorsport_get_laps_by_fixture_and_driver"
+          },
+          {
+            "label": "Motorsport Get Laps By Fixture And Lap",
+            "value": "motorsport_get_laps_by_fixture_and_lap"
+          },
+          {
+            "label": "Motorsport Get Latest Laps By Fixture",
+            "value": "motorsport_get_latest_laps_by_fixture"
+          },
+          {
+            "label": "Motorsport Get Latest Pitstops By Fixture",
+            "value": "motorsport_get_latest_pitstops_by_fixture"
+          },
+          {
+            "label": "Motorsport Get Latest Stints By Fixture",
+            "value": "motorsport_get_latest_stints_by_fixture"
+          },
+          {
+            "label": "Motorsport Get Latest Updated Drivers",
+            "value": "motorsport_get_latest_updated_drivers"
+          },
+          {
+            "label": "Motorsport Get Latest Updated Fixtures",
+            "value": "motorsport_get_latest_updated_fixtures"
+          },
+          {
+            "label": "Motorsport Get League",
+            "value": "motorsport_get_league"
+          },
+          {
+            "label": "Motorsport Get Leagues",
+            "value": "motorsport_get_leagues"
+          },
+          {
+            "label": "Motorsport Get Leagues By Country",
+            "value": "motorsport_get_leagues_by_country"
+          },
+          {
+            "label": "Motorsport Get Leagues By Date",
+            "value": "motorsport_get_leagues_by_date"
+          },
+          {
+            "label": "Motorsport Get Leagues By Live",
+            "value": "motorsport_get_leagues_by_live"
+          },
+          {
+            "label": "Motorsport Get Leagues By Team",
+            "value": "motorsport_get_leagues_by_team"
+          },
+          {
+            "label": "Motorsport Get Livescores",
+            "value": "motorsport_get_livescores"
+          },
+          {
+            "label": "Motorsport Get Pitstops By Fixture",
+            "value": "motorsport_get_pitstops_by_fixture"
+          },
+          {
+            "label": "Motorsport Get Pitstops By Fixture And Driver",
+            "value": "motorsport_get_pitstops_by_fixture_and_driver"
+          },
+          {
+            "label": "Motorsport Get Pitstops By Fixture And Lap",
+            "value": "motorsport_get_pitstops_by_fixture_and_lap"
+          },
+          {
+            "label": "Motorsport Get Race Results By Season And Driver",
+            "value": "motorsport_get_race_results_by_season_and_driver"
+          },
+          {
+            "label": "Motorsport Get Race Results By Season And Team",
+            "value": "motorsport_get_race_results_by_season_and_team"
+          },
+          {
+            "label": "Motorsport Get Schedules By Season",
+            "value": "motorsport_get_schedules_by_season"
+          },
+          {
+            "label": "Motorsport Get Season",
+            "value": "motorsport_get_season"
+          },
+          {
+            "label": "Motorsport Get Seasons",
+            "value": "motorsport_get_seasons"
+          },
+          {
+            "label": "Motorsport Get Stage",
+            "value": "motorsport_get_stage"
+          },
+          {
+            "label": "Motorsport Get Stages",
+            "value": "motorsport_get_stages"
+          },
+          {
+            "label": "Motorsport Get Stages By Season",
+            "value": "motorsport_get_stages_by_season"
+          },
+          {
+            "label": "Motorsport Get State",
+            "value": "motorsport_get_state"
+          },
+          {
+            "label": "Motorsport Get States",
+            "value": "motorsport_get_states"
+          },
+          {
+            "label": "Motorsport Get Stints By Fixture",
+            "value": "motorsport_get_stints_by_fixture"
+          },
+          {
+            "label": "Motorsport Get Stints By Fixture And Driver",
+            "value": "motorsport_get_stints_by_fixture_and_driver"
+          },
+          {
+            "label": "Motorsport Get Stints By Fixture And Stint",
+            "value": "motorsport_get_stints_by_fixture_and_stint"
+          },
+          {
+            "label": "Motorsport Get Team",
+            "value": "motorsport_get_team"
+          },
+          {
+            "label": "Motorsport Get Team Standings",
+            "value": "motorsport_get_team_standings"
+          },
+          {
+            "label": "Motorsport Get Team Standings By Season",
+            "value": "motorsport_get_team_standings_by_season"
+          },
+          {
+            "label": "Motorsport Get Teams",
+            "value": "motorsport_get_teams"
+          },
+          {
+            "label": "Motorsport Get Teams By Country",
+            "value": "motorsport_get_teams_by_country"
+          },
+          {
+            "label": "Motorsport Get Teams By Season",
+            "value": "motorsport_get_teams_by_season"
+          },
+          {
+            "label": "Motorsport Get Venue",
+            "value": "motorsport_get_venue"
+          },
+          {
+            "label": "Motorsport Get Venues",
+            "value": "motorsport_get_venues"
+          },
+          {
+            "label": "Motorsport Get Venues By Season",
+            "value": "motorsport_get_venues_by_season"
+          },
+          {
+            "label": "Motorsport Search Drivers",
+            "value": "motorsport_search_drivers"
+          },
+          {
+            "label": "Motorsport Search Leagues",
+            "value": "motorsport_search_leagues"
+          },
+          {
+            "label": "Motorsport Search Stages",
+            "value": "motorsport_search_stages"
+          },
+          {
+            "label": "Motorsport Search Teams",
+            "value": "motorsport_search_teams"
+          },
+          {
+            "label": "Motorsport Search Venues",
+            "value": "motorsport_search_venues"
+          },
+          {
+            "label": "Odds Get All Historical Odds",
+            "value": "odds_get_all_historical_odds"
+          },
+          {
+            "label": "Odds Get All Inplay Odds",
+            "value": "odds_get_all_inplay_odds"
+          },
+          {
+            "label": "Odds Get All Pre Match Odds",
+            "value": "odds_get_all_pre_match_odds"
+          },
+          {
+            "label": "Odds Get All Premium Odds",
+            "value": "odds_get_all_premium_odds"
+          },
+          {
+            "label": "Odds Get Bookmaker",
+            "value": "odds_get_bookmaker"
+          },
+          {
+            "label": "Odds Get Bookmaker Event Ids By Fixture",
+            "value": "odds_get_bookmaker_event_ids_by_fixture"
+          },
+          {
+            "label": "Odds Get Bookmakers",
+            "value": "odds_get_bookmakers"
+          },
+          {
+            "label": "Odds Get Bookmakers By Fixture",
+            "value": "odds_get_bookmakers_by_fixture"
+          },
+          {
+            "label": "Odds Get Inplay Odds By Fixture",
+            "value": "odds_get_inplay_odds_by_fixture"
+          },
+          {
+            "label": "Odds Get Inplay Odds By Fixture And Bookmaker",
+            "value": "odds_get_inplay_odds_by_fixture_and_bookmaker"
+          },
+          {
+            "label": "Odds Get Inplay Odds By Fixture And Market",
+            "value": "odds_get_inplay_odds_by_fixture_and_market"
+          },
+          {
+            "label": "Odds Get Last Updated Inplay Odds",
+            "value": "odds_get_last_updated_inplay_odds"
+          },
+          {
+            "label": "Odds Get Last Updated Pre Match Odds",
+            "value": "odds_get_last_updated_pre_match_odds"
+          },
+          {
+            "label": "Odds Get Market",
+            "value": "odds_get_market"
+          },
+          {
+            "label": "Odds Get Markets",
+            "value": "odds_get_markets"
+          },
+          {
+            "label": "Odds Get Pre Match Odds By Fixture",
+            "value": "odds_get_pre_match_odds_by_fixture"
+          },
+          {
+            "label": "Odds Get Pre Match Odds By Fixture And Bookmaker",
+            "value": "odds_get_pre_match_odds_by_fixture_and_bookmaker"
+          },
+          {
+            "label": "Odds Get Pre Match Odds By Fixture And Market",
+            "value": "odds_get_pre_match_odds_by_fixture_and_market"
+          },
+          {
+            "label": "Odds Get Premium Odds By Fixture",
+            "value": "odds_get_premium_odds_by_fixture"
+          },
+          {
+            "label": "Odds Get Premium Odds By Fixture And Bookmaker",
+            "value": "odds_get_premium_odds_by_fixture_and_bookmaker"
+          },
+          {
+            "label": "Odds Get Premium Odds By Fixture And Market",
+            "value": "odds_get_premium_odds_by_fixture_and_market"
+          },
+          {
+            "label": "Odds Get Updated Historical Odds Between",
+            "value": "odds_get_updated_historical_odds_between"
+          },
+          {
+            "label": "Odds Get Updated Premium Odds Between",
+            "value": "odds_get_updated_premium_odds_between"
+          },
+          {
+            "label": "Odds Search Bookmakers",
+            "value": "odds_search_bookmakers"
+          },
+          {
+            "label": "Odds Search Markets",
+            "value": "odds_search_markets"
+          },
+          {
+            "label": "Core Get Cities",
+            "value": "core_get_cities"
+          },
+          {
+            "label": "Core Get City",
+            "value": "core_get_city"
+          },
+          {
+            "label": "Core Get Continent",
+            "value": "core_get_continent"
+          },
+          {
+            "label": "Core Get Continents",
+            "value": "core_get_continents"
+          },
+          {
+            "label": "Core Get Countries",
+            "value": "core_get_countries"
+          },
+          {
+            "label": "Core Get Country",
+            "value": "core_get_country"
+          },
+          {
+            "label": "Core Get Entity Filters",
+            "value": "core_get_entity_filters"
+          },
+          {
+            "label": "Core Get My Usage",
+            "value": "core_get_my_usage"
+          },
+          {
+            "label": "Core Get Region",
+            "value": "core_get_region"
+          },
+          {
+            "label": "Core Get Regions",
+            "value": "core_get_regions"
+          },
+          {
+            "label": "Core Get Timezones",
+            "value": "core_get_timezones"
+          },
+          {
+            "label": "Core Get Type",
+            "value": "core_get_type"
+          },
+          {
+            "label": "Core Get Type By Entity",
+            "value": "core_get_type_by_entity"
+          },
+          {
+            "label": "Core Get Types",
+            "value": "core_get_types"
+          },
+          {
+            "label": "Core Search Cities",
+            "value": "core_search_cities"
+          },
+          {
+            "label": "Core Search Countries",
+            "value": "core_search_countries"
+          },
+          {
+            "label": "Core Search Regions",
+            "value": "core_search_regions"
           }
         ],
         "type": "options"
       },
       {
-        "default": "-",
-        "label": "Tailnet",
-        "name": "tailnet",
-        "type": "string"
-      },
-      {
-        "label": "Device ID",
-        "name": "device_id",
-        "type": "string"
-      },
-      {
-        "default": [],
-        "label": "Tags (JSON array)",
-        "name": "tags",
-        "type": "json"
-      },
-      {
-        "label": "S3 Bucket",
-        "name": "s3_bucket",
-        "type": "string"
-      },
-      {
-        "label": "S3 Key",
-        "name": "s3_key",
-        "type": "string"
-      },
-      {
-        "default": [
-          "TABLES",
-          "FORMS"
-        ],
-        "label": "Feature Types (JSON)",
-        "name": "feature_types",
-        "type": "json"
-      },
-      {
-        "label": "Pipeline Name",
-        "name": "pipeline_name",
-        "type": "string"
-      },
-      {
-        "label": "Task ID",
-        "name": "task_id",
-        "type": "string"
-      },
-      {
-        "label": "Run ID",
-        "name": "run_id",
-        "type": "string"
-      },
-      {
-        "default": {},
-        "label": "Payload (JSON)",
-        "name": "payload",
-        "type": "json"
-      },
-      {
-        "label": "Test ID",
-        "name": "test_id",
-        "type": "string"
-      },
-      {
-        "label": "Status",
-        "name": "status",
-        "type": "string"
-      },
-      {
-        "label": "Event Ticker",
-        "name": "event_ticker",
-        "type": "string"
-      },
-      {
-        "label": "Ticker",
-        "name": "ticker",
-        "type": "string"
-      },
-      {
-        "label": "Side (yes|no|buy|sell)",
-        "name": "side",
-        "type": "string"
-      },
-      {
-        "default": 1,
-        "label": "Count",
-        "name": "count",
-        "type": "number"
-      },
-      {
-        "default": 50,
-        "label": "Yes Price (\u00a2)",
-        "name": "price",
-        "type": "number"
-      },
-      {
-        "label": "Condition ID",
-        "name": "condition_id",
-        "type": "string"
-      },
-      {
-        "label": "Token ID",
-        "name": "token_id",
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_coach"
+          ]
+        },
+        "label": "Coach Id",
+        "name": "coach_id",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
           "value": [
-            "get_fixture"
+            "get_coaches_by_country",
+            "get_leagues_by_country",
+            "get_players_by_country",
+            "get_referees_by_country",
+            "get_teams_by_country"
           ]
         },
-        "label": "Fixture ID",
+        "label": "Country Id",
+        "name": "country_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_fixtures_by_date",
+            "get_leagues_by_date",
+            "get_team_rankings_by_date"
+          ]
+        },
+        "label": "Date",
+        "name": "date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_fixtures_by_date_range",
+            "get_fixtures_by_date_range_for_team",
+            "get_match_facts_by_date_range"
+          ]
+        },
+        "label": "Date From",
+        "name": "date_from",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_fixtures_by_date_range",
+            "get_fixtures_by_date_range_for_team",
+            "get_match_facts_by_date_range"
+          ]
+        },
+        "label": "Date To",
+        "name": "date_to",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_commentaries_by_fixture",
+            "get_fixture",
+            "get_live_probabilities_by_fixture",
+            "get_match_facts_by_fixture",
+            "get_probabilities_by_fixture",
+            "get_tv_stations_by_fixture",
+            "get_value_bets_by_fixture"
+          ]
+        },
+        "label": "Fixture Id",
         "name": "fixture_id",
         "type": "string"
       },
       {
-        "label": "App User ID",
-        "name": "app_user_id",
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_fixtures_by_ids"
+          ]
+        },
+        "label": "Fixtures Ids",
+        "name": "fixtures_ids",
         "type": "string"
       },
       {
-        "label": "Entitlement ID",
-        "name": "entitlement_id",
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_league",
+            "get_live_standings_by_league",
+            "get_match_facts_by_league",
+            "get_predictability_by_league"
+          ]
+        },
+        "label": "League Id",
+        "name": "league_id",
         "type": "string"
       },
       {
-        "default": "monthly",
-        "label": "Duration",
-        "name": "duration",
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_upcoming_fixtures_by_market"
+          ]
+        },
+        "label": "Market Id",
+        "name": "market_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "expected_by_player",
+            "get_expected_lineups_by_player",
+            "get_player",
+            "get_transfer_rumours_by_player",
+            "get_transfers_by_player"
+          ]
+        },
+        "label": "Player Id",
+        "name": "player_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_prematch_news_upcoming"
+          ]
+        },
+        "label": "Prematch News Upcoming Id",
+        "name": "prematch_news_upcoming_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_referee"
+          ]
+        },
+        "label": "Referee Id",
+        "name": "referee_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_grouped_standings_by_round",
+            "get_round",
+            "get_standings_by_round",
+            "get_totw_by_round"
+          ]
+        },
+        "label": "Round Id",
+        "name": "round_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "search_coaches",
+            "search_fixtures",
+            "search_leagues",
+            "search_players",
+            "search_referees",
+            "search_rounds",
+            "search_seasons",
+            "search_stages",
+            "search_teams",
+            "search_venues"
+          ]
+        },
+        "label": "Search Query",
+        "name": "search_query",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_schedules_by_season_and_team"
+          ]
+        },
+        "label": "Season And Team Id",
+        "name": "season_and_team_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_brackets_by_season",
+            "get_postmatch_news_by_season",
+            "get_prematch_news_by_season",
+            "get_referees_by_season",
+            "get_rounds_by_season",
+            "get_schedules_by_season",
+            "get_season",
+            "get_stages_by_season",
+            "get_standing_corrections_by_season",
+            "get_standings_by_season",
+            "get_team_squad_by_season",
+            "get_teams_by_season",
+            "get_topscorers_by_season",
+            "get_venues_by_season"
+          ]
+        },
+        "label": "Season Id",
+        "name": "season_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_stage",
+            "get_topscorers_by_stage"
+          ]
+        },
+        "label": "Stage Id",
+        "name": "stage_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_state"
+          ]
+        },
+        "label": "State Id",
+        "name": "state_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_head_to_head"
+          ]
+        },
+        "label": "Team1 Id",
+        "name": "team1_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_head_to_head"
+          ]
+        },
+        "label": "Team2 Id",
+        "name": "team2_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "expected_by_team",
+            "get_current_leagues_by_team",
+            "get_expected_lineups_by_team",
+            "get_extended_team_squad",
+            "get_leagues_by_team",
+            "get_rivals_by_team",
+            "get_schedules_by_team",
+            "get_seasons_by_team",
+            "get_team",
+            "get_team_rankings_by_team",
+            "get_transfer_rumours_by_team",
+            "get_transfers_by_team"
+          ]
+        },
+        "label": "Team Id",
+        "name": "team_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_team_squad"
+          ]
+        },
+        "label": "Team Squad Id",
+        "name": "team_squad_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_totw"
+          ]
+        },
+        "label": "Totw Id",
+        "name": "totw_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_transfer"
+          ]
+        },
+        "label": "Transfer Id",
+        "name": "transfer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_transfer_rumour"
+          ]
+        },
+        "label": "Transfer Rumour Id",
+        "name": "transfer_rumour_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_past_fixtures_by_tv_station",
+            "get_tv_station",
+            "get_upcoming_fixtures_by_tv_station"
+          ]
+        },
+        "label": "Tv Station Id",
+        "name": "tv_station_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_venue"
+          ]
+        },
+        "label": "Venue Id",
+        "name": "venue_id",
+        "type": "string"
+      },
+      {
+        "default": 1,
+        "label": "Page",
+        "mode": "advanced",
+        "name": "page",
+        "type": "number"
+      },
+      {
+        "default": 25,
+        "label": "Per Page",
+        "mode": "advanced",
+        "name": "per_page",
+        "type": "number"
+      },
+      {
+        "label": "Include (comma-separated relations)",
+        "mode": "advanced",
+        "name": "include",
         "type": "string"
       },
       {
