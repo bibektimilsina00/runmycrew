@@ -41053,6 +41053,238 @@
           {
             "label": "Remove Label from Issue",
             "value": "remove_label_from_issue"
+          },
+          {
+            "label": "Unarchive Issue",
+            "value": "unarchive_issue"
+          },
+          {
+            "label": "Update Comment",
+            "value": "update_comment"
+          },
+          {
+            "label": "Delete Comment",
+            "value": "delete_comment"
+          },
+          {
+            "label": "Update Project",
+            "value": "update_project"
+          },
+          {
+            "label": "Archive Project",
+            "value": "archive_project"
+          },
+          {
+            "label": "Delete Project",
+            "value": "delete_project"
+          },
+          {
+            "label": "Create Label",
+            "value": "create_label"
+          },
+          {
+            "label": "Update Label",
+            "value": "update_label"
+          },
+          {
+            "label": "Archive Label",
+            "value": "archive_label"
+          },
+          {
+            "label": "Create Workflow State",
+            "value": "create_workflow_state"
+          },
+          {
+            "label": "Update Workflow State",
+            "value": "update_workflow_state"
+          },
+          {
+            "label": "Get Cycle",
+            "value": "get_cycle"
+          },
+          {
+            "label": "Create Cycle",
+            "value": "create_cycle"
+          },
+          {
+            "label": "Get Active Cycle (team)",
+            "value": "get_active_cycle"
+          },
+          {
+            "label": "Create Attachment",
+            "value": "create_attachment"
+          },
+          {
+            "label": "List Issue Attachments",
+            "value": "list_attachments"
+          },
+          {
+            "label": "Update Attachment",
+            "value": "update_attachment"
+          },
+          {
+            "label": "Delete Attachment",
+            "value": "delete_attachment"
+          },
+          {
+            "label": "Create Issue Relation",
+            "value": "create_issue_relation"
+          },
+          {
+            "label": "List Issue Relations",
+            "value": "list_issue_relations"
+          },
+          {
+            "label": "Delete Issue Relation",
+            "value": "delete_issue_relation"
+          },
+          {
+            "label": "Create Favorite",
+            "value": "create_favorite"
+          },
+          {
+            "label": "List Favorites",
+            "value": "list_favorites"
+          },
+          {
+            "label": "Create Project Update",
+            "value": "create_project_update"
+          },
+          {
+            "label": "List Project Updates",
+            "value": "list_project_updates"
+          },
+          {
+            "label": "List Notifications",
+            "value": "list_notifications"
+          },
+          {
+            "label": "Update Notification (mark read)",
+            "value": "update_notification"
+          },
+          {
+            "label": "Create Customer",
+            "value": "create_customer"
+          },
+          {
+            "label": "List Customers",
+            "value": "list_customers"
+          },
+          {
+            "label": "Get Customer",
+            "value": "get_customer"
+          },
+          {
+            "label": "Update Customer",
+            "value": "update_customer"
+          },
+          {
+            "label": "Delete Customer",
+            "value": "delete_customer"
+          },
+          {
+            "label": "Merge Customers",
+            "value": "merge_customers"
+          },
+          {
+            "label": "Create Customer Request",
+            "value": "create_customer_request"
+          },
+          {
+            "label": "Update Customer Request",
+            "value": "update_customer_request"
+          },
+          {
+            "label": "List Customer Requests",
+            "value": "list_customer_requests"
+          },
+          {
+            "label": "Create Customer Status",
+            "value": "create_customer_status"
+          },
+          {
+            "label": "Update Customer Status",
+            "value": "update_customer_status"
+          },
+          {
+            "label": "Delete Customer Status",
+            "value": "delete_customer_status"
+          },
+          {
+            "label": "List Customer Statuses",
+            "value": "list_customer_statuses"
+          },
+          {
+            "label": "Create Customer Tier",
+            "value": "create_customer_tier"
+          },
+          {
+            "label": "Update Customer Tier",
+            "value": "update_customer_tier"
+          },
+          {
+            "label": "Delete Customer Tier",
+            "value": "delete_customer_tier"
+          },
+          {
+            "label": "List Customer Tiers",
+            "value": "list_customer_tiers"
+          },
+          {
+            "label": "Create Project Label",
+            "value": "create_project_label"
+          },
+          {
+            "label": "Update Project Label",
+            "value": "update_project_label"
+          },
+          {
+            "label": "Delete Project Label",
+            "value": "delete_project_label"
+          },
+          {
+            "label": "List Project Labels",
+            "value": "list_project_labels"
+          },
+          {
+            "label": "Add Label to Project",
+            "value": "add_label_to_project"
+          },
+          {
+            "label": "Remove Label from Project",
+            "value": "remove_label_from_project"
+          },
+          {
+            "label": "Create Project Milestone",
+            "value": "create_project_milestone"
+          },
+          {
+            "label": "Update Project Milestone",
+            "value": "update_project_milestone"
+          },
+          {
+            "label": "Delete Project Milestone",
+            "value": "delete_project_milestone"
+          },
+          {
+            "label": "List Project Milestones",
+            "value": "list_project_milestones"
+          },
+          {
+            "label": "Create Project Status",
+            "value": "create_project_status"
+          },
+          {
+            "label": "Update Project Status",
+            "value": "update_project_status"
+          },
+          {
+            "label": "Delete Project Status",
+            "value": "delete_project_status"
+          },
+          {
+            "label": "List Project Statuses",
+            "value": "list_project_statuses"
           }
         ],
         "type": "options"
@@ -41063,7 +41295,27 @@
           "value": [
             "create_issue",
             "update_issue",
-            "create_project"
+            "create_project",
+            "update_project",
+            "create_label",
+            "update_label",
+            "create_workflow_state",
+            "update_workflow_state",
+            "create_cycle",
+            "create_attachment",
+            "update_attachment",
+            "create_customer",
+            "update_customer",
+            "create_customer_status",
+            "update_customer_status",
+            "create_customer_tier",
+            "update_customer_tier",
+            "create_project_label",
+            "update_project_label",
+            "create_project_milestone",
+            "update_project_milestone",
+            "create_project_status",
+            "update_project_status"
           ]
         },
         "label": "Title",
@@ -41076,7 +41328,12 @@
           "value": [
             "create_issue",
             "update_issue",
-            "create_project"
+            "create_project",
+            "update_project",
+            "create_label",
+            "update_label",
+            "create_project_milestone",
+            "update_project_milestone"
           ]
         },
         "label": "Description (Markdown)",
@@ -41088,7 +41345,11 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "create_project"
+            "create_project",
+            "create_label",
+            "create_workflow_state",
+            "create_cycle",
+            "get_active_cycle"
           ]
         },
         "label": "Team ID",
@@ -41106,7 +41367,14 @@
             "create_comment",
             "list_comments",
             "add_label_to_issue",
-            "remove_label_from_issue"
+            "remove_label_from_issue",
+            "unarchive_issue",
+            "create_attachment",
+            "list_attachments",
+            "create_issue_relation",
+            "list_issue_relations",
+            "create_favorite",
+            "create_customer_request"
           ]
         },
         "label": "Issue ID",
@@ -41118,7 +41386,8 @@
           "field": "operation",
           "value": [
             "create_issue",
-            "update_issue"
+            "update_issue",
+            "update_workflow_state"
           ]
         },
         "label": "State ID",
@@ -41156,7 +41425,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "create_comment"
+            "create_comment",
+            "update_comment"
           ]
         },
         "label": "Comment Body",
@@ -41178,7 +41448,17 @@
         "condition": {
           "field": "operation",
           "value": [
-            "get_project"
+            "get_project",
+            "update_project",
+            "archive_project",
+            "delete_project",
+            "create_favorite",
+            "create_project_update",
+            "list_project_updates",
+            "add_label_to_project",
+            "remove_label_from_project",
+            "create_project_milestone",
+            "list_project_milestones"
           ]
         },
         "label": "Project ID",
@@ -41190,11 +41470,350 @@
           "field": "operation",
           "value": [
             "add_label_to_issue",
-            "remove_label_from_issue"
+            "remove_label_from_issue",
+            "update_label",
+            "archive_label"
           ]
         },
         "label": "Label ID",
         "name": "label_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_comment",
+            "delete_comment"
+          ]
+        },
+        "label": "Comment ID",
+        "name": "comment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_label",
+            "update_label",
+            "create_workflow_state",
+            "update_workflow_state",
+            "create_customer_status",
+            "update_customer_status",
+            "create_customer_tier",
+            "update_customer_tier",
+            "create_project_label",
+            "update_project_label",
+            "create_project_status",
+            "update_project_status"
+          ]
+        },
+        "label": "Label Color (hex)",
+        "name": "label_color",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_workflow_state"
+          ]
+        },
+        "label": "Workflow State Type",
+        "name": "state_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_cycle"
+          ]
+        },
+        "label": "Cycle ID",
+        "name": "cycle_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_cycle"
+          ]
+        },
+        "label": "Starts At (ISO)",
+        "name": "starts_at",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_cycle"
+          ]
+        },
+        "label": "Ends At (ISO)",
+        "name": "ends_at",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_attachment",
+            "delete_attachment"
+          ]
+        },
+        "label": "Attachment ID",
+        "name": "attachment_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_attachment"
+          ]
+        },
+        "label": "Attachment URL",
+        "name": "attachment_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_attachment",
+            "update_attachment"
+          ]
+        },
+        "label": "Attachment Subtitle",
+        "name": "attachment_subtitle",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue_relation"
+          ]
+        },
+        "label": "Related Issue ID",
+        "name": "related_issue_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_issue_relation"
+          ]
+        },
+        "label": "Relation Type (blocks|duplicate|related)",
+        "name": "relation_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "delete_issue_relation"
+          ]
+        },
+        "label": "Relation ID",
+        "name": "relation_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_notification"
+          ]
+        },
+        "label": "Notification ID",
+        "name": "notification_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_notification"
+          ]
+        },
+        "label": "Mark Read Timestamp (ISO)",
+        "name": "mark_read",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_customer",
+            "update_customer",
+            "delete_customer",
+            "merge_customers",
+            "create_customer_request"
+          ]
+        },
+        "label": "Customer ID",
+        "name": "customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer",
+            "update_customer"
+          ]
+        },
+        "label": "Customer Domain",
+        "name": "customer_domain",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "merge_customers"
+          ]
+        },
+        "label": "Target Customer ID (merge into)",
+        "name": "target_customer_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_customer_request"
+          ]
+        },
+        "label": "Customer Request ID",
+        "name": "customer_request_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer_request",
+            "update_customer_request"
+          ]
+        },
+        "label": "Customer Request Body",
+        "name": "customer_request_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_customer_status",
+            "delete_customer_status"
+          ]
+        },
+        "label": "Customer Status ID",
+        "name": "customer_status_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_customer_status",
+            "create_project_status"
+          ]
+        },
+        "label": "Status Type (active|churned|prospect)",
+        "name": "status_type",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_customer_tier",
+            "delete_customer_tier"
+          ]
+        },
+        "label": "Customer Tier ID",
+        "name": "customer_tier_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_project_label",
+            "delete_project_label",
+            "add_label_to_project",
+            "remove_label_from_project"
+          ]
+        },
+        "label": "Project Label ID",
+        "name": "project_label_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_project_milestone",
+            "delete_project_milestone"
+          ]
+        },
+        "label": "Milestone ID",
+        "name": "milestone_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_project_milestone",
+            "update_project_milestone"
+          ]
+        },
+        "label": "Target Date (ISO)",
+        "name": "target_date",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_project_status",
+            "delete_project_status"
+          ]
+        },
+        "label": "Project Status ID",
+        "name": "project_status_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_project_update"
+          ]
+        },
+        "label": "Update Body (Markdown)",
+        "name": "update_body",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "create_project_update"
+          ]
+        },
+        "label": "Update Health (onTrack|atRisk|offTrack)",
+        "name": "update_health",
         "type": "string"
       },
       {
