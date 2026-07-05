@@ -31286,6 +31286,98 @@
           {
             "label": "Delete Element",
             "value": "delete_element"
+          },
+          {
+            "label": "Batch Update (raw requests)",
+            "value": "batch_update"
+          },
+          {
+            "label": "Write (alias of batch_update)",
+            "value": "write"
+          },
+          {
+            "label": "Read (alias of Get)",
+            "value": "read"
+          },
+          {
+            "label": "Insert Text (raw)",
+            "value": "insert_text"
+          },
+          {
+            "label": "Delete Text (raw)",
+            "value": "delete_text"
+          },
+          {
+            "label": "Update Text Style (raw)",
+            "value": "update_text_style"
+          },
+          {
+            "label": "Update Paragraph Style (raw)",
+            "value": "update_paragraph_style"
+          },
+          {
+            "label": "Create Paragraph Bullets",
+            "value": "create_paragraph_bullets"
+          },
+          {
+            "label": "Delete Paragraph Bullets",
+            "value": "delete_paragraph_bullets"
+          },
+          {
+            "label": "Update Shape Properties",
+            "value": "update_shape_properties"
+          },
+          {
+            "label": "Update Page (Slide) Properties",
+            "value": "update_page_properties"
+          },
+          {
+            "label": "Update Image Properties",
+            "value": "update_image_properties"
+          },
+          {
+            "label": "Create Line",
+            "value": "create_line"
+          },
+          {
+            "label": "Replace All Shapes with Image",
+            "value": "replace_all_shapes_with_image"
+          },
+          {
+            "label": "Get Page (Slide)",
+            "value": "get_page"
+          },
+          {
+            "label": "Copy Presentation (alias)",
+            "value": "copy_presentation"
+          },
+          {
+            "label": "Export Presentation (alias)",
+            "value": "export_presentation"
+          },
+          {
+            "label": "Add Image (alias)",
+            "value": "add_image"
+          },
+          {
+            "label": "Create Shape (alias)",
+            "value": "create_shape"
+          },
+          {
+            "label": "Create Table (alias)",
+            "value": "create_table"
+          },
+          {
+            "label": "Delete Object (alias)",
+            "value": "delete_object"
+          },
+          {
+            "label": "Duplicate Object (alias)",
+            "value": "duplicate_object"
+          },
+          {
+            "label": "Reorder Slides (alias)",
+            "value": "reorder_slides"
           }
         ],
         "type": "options"
@@ -64570,22 +64662,19 @@
   "action.slack": {
     "allow_error": true,
     "category": "integration",
-    "color": "#1c1c1c",
-    "credential_type": "slack_oauth",
+    "color": "#4A154B",
+    "credential_type": [
+      "slack_oauth",
+      "slack_bot_token"
+    ],
     "default_height": null,
     "default_width": null,
-    "description": "Complete Slack integration: messaging, channels, users, reactions, and modals.",
+    "description": "Slack \u2014 messages, threads, channels, users, reactions, views, canvases.",
     "dynamic_outputs_from": null,
     "icon": "slack",
     "inputs": 1,
     "name": "Slack",
-    "operation_tool_map": {
-      "chat.delete": "slack_delete_message",
-      "chat.postMessage": "slack_send_message",
-      "chat.update": "slack_update_message",
-      "conversations.info": "slack_get_channel_info",
-      "conversations.list": "slack_list_channels"
-    },
+    "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
       {
@@ -64593,8 +64682,8 @@
         "type": "boolean"
       },
       {
-        "label": "error",
-        "type": "string"
+        "label": "data",
+        "type": "object"
       },
       {
         "label": "ts",
@@ -64603,67 +64692,18 @@
       {
         "label": "channel",
         "type": "string"
-      },
-      {
-        "label": "message",
-        "type": "object"
-      },
-      {
-        "label": "user",
-        "type": "object"
-      },
-      {
-        "label": "channels",
-        "type": "array"
-      },
-      {
-        "label": "members",
-        "type": "array"
-      },
-      {
-        "label": "view",
-        "type": "object"
       }
     ],
     "properties": [
       {
-        "default": "runmycrew_bot",
-        "label": "Authentication",
-        "name": "authentication",
-        "options": [
-          {
-            "label": "RunMyCrew Bot (OAuth)",
-            "value": "runmycrew_bot"
-          },
-          {
-            "label": "Custom Bot (Token)",
-            "value": "custom_bot"
-          }
+        "credentialType": [
+          "slack_oauth",
+          "slack_bot_token"
         ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "field": "authentication",
-          "value": "runmycrew_bot"
-        },
-        "credentialType": "slack_oauth",
         "label": "Slack Account",
         "name": "credential",
         "required": true,
         "type": "credential"
-      },
-      {
-        "condition": {
-          "field": "authentication",
-          "value": "custom_bot"
-        },
-        "label": "Bot Token",
-        "name": "bot_token",
-        "placeholder": "xoxb-...",
-        "required": true,
-        "secret": true,
-        "type": "string"
       },
       {
         "default": "send_message",
@@ -64675,16 +64715,56 @@
             "value": "send_message"
           },
           {
+            "label": "Send Message (alias)",
+            "value": "send"
+          },
+          {
             "label": "Update Message",
             "value": "update_message"
+          },
+          {
+            "label": "Update Message (alias)",
+            "value": "update"
           },
           {
             "label": "Delete Message",
             "value": "delete_message"
           },
           {
+            "label": "Delete Message (alias)",
+            "value": "delete"
+          },
+          {
             "label": "Send Ephemeral Message",
             "value": "send_ephemeral"
+          },
+          {
+            "label": "Ephemeral (alias)",
+            "value": "ephemeral"
+          },
+          {
+            "label": "Get Message Permalink",
+            "value": "get_permalink"
+          },
+          {
+            "label": "Get Single Message",
+            "value": "get_message"
+          },
+          {
+            "label": "Get Thread (all messages)",
+            "value": "get_thread"
+          },
+          {
+            "label": "Get Thread Replies",
+            "value": "get_thread_replies"
+          },
+          {
+            "label": "Get Channel History",
+            "value": "get_channel_history"
+          },
+          {
+            "label": "Read Channel (alias)",
+            "value": "read"
           },
           {
             "label": "List Channels",
@@ -64703,8 +64783,12 @@
             "value": "list_members"
           },
           {
-            "label": "Invite to Channel",
+            "label": "Invite Users to Channel",
             "value": "invite_to_channel"
+          },
+          {
+            "label": "Open DM / Multi-DM",
+            "value": "create_conversation"
           },
           {
             "label": "List Users",
@@ -64715,36 +64799,96 @@
             "value": "get_user_info"
           },
           {
+            "label": "Get User (alias)",
+            "value": "get_user"
+          },
+          {
             "label": "Get User Presence",
             "value": "get_user_presence"
+          },
+          {
+            "label": "Look Up User by Email",
+            "value": "lookup_by_email"
+          },
+          {
+            "label": "Set User Status",
+            "value": "set_status"
+          },
+          {
+            "label": "Set User Title",
+            "value": "set_title"
+          },
+          {
+            "label": "Set Suggested Prompts (assistant)",
+            "value": "set_suggested_prompts"
           },
           {
             "label": "Add Reaction",
             "value": "add_reaction"
           },
           {
+            "label": "React (alias)",
+            "value": "react"
+          },
+          {
             "label": "Remove Reaction",
             "value": "remove_reaction"
           },
           {
-            "label": "Open Modal (View)",
+            "label": "Unreact (alias)",
+            "value": "unreact"
+          },
+          {
+            "label": "Open View (modal)",
             "value": "open_view"
           },
           {
-            "label": "Push Modal (View)",
+            "label": "Push View (modal stack)",
             "value": "push_view"
           },
           {
-            "label": "Update Modal (View)",
+            "label": "Update View",
             "value": "update_view"
           },
           {
-            "label": "Publish Home View",
+            "label": "Publish Home Tab View",
             "value": "publish_view"
           },
           {
-            "label": "Get Message Replies",
-            "value": "get_message"
+            "label": "Upload File (getUploadURL flow \u2014 v2)",
+            "value": "upload_file"
+          },
+          {
+            "label": "Get File Info (for download)",
+            "value": "download"
+          },
+          {
+            "label": "Create Canvas (standalone)",
+            "value": "canvas"
+          },
+          {
+            "label": "Create Channel Canvas",
+            "value": "create_channel_canvas"
+          },
+          {
+            "label": "Get Canvas (via files.info)",
+            "value": "get_canvas"
+          },
+          {
+            "label": "Edit Canvas",
+            "value": "edit_canvas"
+          },
+          {
+            "label": "List Canvases (via files.list)",
+            "value": "list_canvases"
+          },
+          {
+            "label": "Look Up Canvas Sections",
+            "value": "lookup_canvas_sections"
+          },
+          {
+            "label": "Delete Canvas",
+            "value": "delete_canvas"
           }
         ],
         "type": "options"
@@ -64754,102 +64898,61 @@
           "field": "operation",
           "value": [
             "send_message",
+            "send",
+            "update_message",
+            "update",
+            "delete_message",
+            "delete",
             "send_ephemeral",
+            "ephemeral",
+            "get_permalink",
+            "get_message",
+            "get_thread",
+            "get_thread_replies",
+            "get_channel_history",
+            "read",
+            "get_channel_info",
+            "list_members",
+            "invite_to_channel",
+            "set_suggested_prompts",
             "add_reaction",
+            "react",
             "remove_reaction",
-            "get_message"
-          ]
-        },
-        "default": "channel",
-        "label": "Destination",
-        "name": "selectBy",
-        "options": [
-          {
-            "label": "Channel",
-            "value": "channel"
-          },
-          {
-            "label": "User (DM)",
-            "value": "user"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "all": [
-            {
-              "field": "operation",
-              "value": [
-                "send_message",
-                "update_message",
-                "delete_message",
-                "send_ephemeral",
-                "get_channel_info",
-                "list_members",
-                "invite_to_channel",
-                "add_reaction",
-                "remove_reaction",
-                "get_message"
-              ]
-            },
-            {
-              "field": "selectBy",
-              "value": "channel"
-            }
+            "unreact",
+            "create_channel_canvas"
           ]
         },
         "label": "Channel ID",
-        "loadOptions": "/integrations/slack/channels",
-        "loadOptionsDependsOn": [
-          "authentication",
-          "credential",
-          "bot_token"
-        ],
         "name": "channel",
-        "placeholder": "C1234567890",
         "type": "string"
       },
       {
         "condition": {
-          "any": [
-            {
-              "field": "operation",
-              "value": [
-                "get_user_info",
-                "get_user_presence",
-                "publish_view"
-              ]
-            },
-            {
-              "all": [
-                {
-                  "field": "operation",
-                  "value": [
-                    "send_message",
-                    "send_ephemeral",
-                    "add_reaction",
-                    "remove_reaction",
-                    "get_message"
-                  ]
-                },
-                {
-                  "field": "selectBy",
-                  "value": "user"
-                }
-              ]
-            }
+          "field": "operation",
+          "value": [
+            "create_channel"
+          ]
+        },
+        "label": "Channel Name",
+        "name": "channel_name",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "send_ephemeral",
+            "ephemeral",
+            "get_user_info",
+            "get_user",
+            "get_user_presence",
+            "set_status",
+            "set_title",
+            "publish_view"
           ]
         },
         "label": "User ID",
-        "loadOptions": "/integrations/slack/users",
-        "loadOptionsDependsOn": [
-          "authentication",
-          "credential",
-          "bot_token"
-        ],
         "name": "user",
-        "placeholder": "U1234567890",
         "type": "string"
       },
       {
@@ -64857,40 +64960,11 @@
           "field": "operation",
           "value": [
             "send_message",
+            "send",
             "update_message",
-            "send_ephemeral"
-          ]
-        },
-        "default": "text",
-        "label": "Message Format",
-        "name": "messageFormat",
-        "options": [
-          {
-            "label": "Plain Text",
-            "value": "text"
-          },
-          {
-            "label": "Block Kit (JSON)",
-            "value": "blocks"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "all": [
-            {
-              "field": "operation",
-              "value": [
-                "send_message",
-                "update_message",
-                "send_ephemeral"
-              ]
-            },
-            {
-              "field": "messageFormat",
-              "value": "text"
-            }
+            "update",
+            "send_ephemeral",
+            "ephemeral"
           ]
         },
         "label": "Message Text",
@@ -64899,21 +64973,15 @@
       },
       {
         "condition": {
-          "all": [
-            {
-              "field": "operation",
-              "value": [
-                "send_message",
-                "update_message",
-                "send_ephemeral"
-              ]
-            },
-            {
-              "field": "messageFormat",
-              "value": "blocks"
-            }
+          "field": "operation",
+          "value": [
+            "send_message",
+            "send",
+            "update_message",
+            "send_ephemeral"
           ]
         },
+        "default": [],
         "label": "Blocks (JSON)",
         "name": "blocks",
         "type": "json"
@@ -64922,24 +64990,46 @@
         "condition": {
           "field": "operation",
           "value": [
-            "update_message",
-            "delete_message",
-            "add_reaction",
-            "remove_reaction",
-            "get_message"
+            "send_message"
           ]
         },
-        "label": "Message Timestamp (ts)",
+        "default": [],
+        "label": "Attachments (JSON)",
+        "name": "attachments",
+        "type": "json"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "update_message",
+            "update",
+            "delete_message",
+            "delete",
+            "get_permalink",
+            "get_message",
+            "add_reaction",
+            "react",
+            "remove_reaction",
+            "unreact"
+          ]
+        },
+        "label": "Message Timestamp",
         "name": "ts",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "invite_to_channel"
+          "value": [
+            "send_message",
+            "get_thread",
+            "get_thread_replies",
+            "set_suggested_prompts"
+          ]
         },
-        "label": "User IDs (comma separated)",
-        "name": "users",
+        "label": "Thread TS (reply to)",
+        "name": "thread_ts",
         "type": "string"
       },
       {
@@ -64947,12 +65037,67 @@
           "field": "operation",
           "value": [
             "add_reaction",
+            "react",
             "remove_reaction",
+            "unreact"
+          ]
+        },
+        "label": "Reaction (emoji, no colons)",
+        "name": "reaction",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "invite_to_channel",
+            "create_conversation"
+          ]
+        },
+        "label": "Users (comma-separated)",
+        "name": "users",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
             "create_channel"
           ]
         },
-        "label": "Emoji/Channel Name",
-        "name": "name",
+        "default": false,
+        "label": "Private Channel",
+        "name": "is_private",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_thread_replies",
+            "get_channel_history",
+            "read",
+            "list_channels",
+            "list_members",
+            "list_users"
+          ]
+        },
+        "default": 100,
+        "label": "Limit",
+        "mode": "advanced",
+        "name": "limit",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "list_channels"
+          ]
+        },
+        "label": "Cursor",
+        "mode": "advanced",
+        "name": "cursor",
         "type": "string"
       },
       {
@@ -64963,7 +65108,7 @@
             "push_view"
           ]
         },
-        "label": "Trigger ID",
+        "label": "Trigger ID (from interaction payload)",
         "name": "trigger_id",
         "type": "string"
       },
@@ -64977,7 +65122,8 @@
             "publish_view"
           ]
         },
-        "label": "View Payload (JSON)",
+        "default": {},
+        "label": "View (JSON)",
         "name": "view",
         "type": "json"
       },
@@ -64985,39 +65131,221 @@
         "condition": {
           "field": "operation",
           "value": [
-            "send_message",
-            "send_ephemeral"
+            "update_view"
           ]
         },
-        "label": "Thread TS",
-        "mode": "advanced",
-        "name": "thread_ts",
+        "label": "View ID (for update)",
+        "name": "view_id",
         "type": "string"
       },
       {
         "condition": {
           "field": "operation",
-          "value": "send_message"
+          "value": [
+            "update_view",
+            "publish_view"
+          ]
         },
-        "label": "Attachments",
-        "mode": "advanced",
-        "name": "attachments",
-        "type": "file-list"
+        "label": "Hash (for view update)",
+        "name": "hash",
+        "type": "string"
       },
       {
         "condition": {
           "field": "operation",
           "value": [
-            "list_channels",
-            "list_members",
-            "list_users"
+            "download"
           ]
         },
-        "default": 100,
-        "label": "Limit",
-        "mode": "advanced",
-        "name": "limit",
+        "label": "File ID",
+        "name": "file_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upload_file"
+          ]
+        },
+        "label": "File Content",
+        "name": "file_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "upload_file"
+          ]
+        },
+        "label": "Filename",
+        "name": "filename",
+        "type": "string"
+      },
+      {
+        "label": "Filetype",
+        "name": "filetype",
+        "type": "string"
+      },
+      {
+        "label": "File Title",
+        "name": "file_title",
+        "type": "string"
+      },
+      {
+        "label": "Initial Comment",
+        "name": "initial_comment",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "lookup_by_email"
+          ]
+        },
+        "label": "Email",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_channel_history"
+          ]
+        },
+        "label": "Oldest (unix ts)",
+        "name": "oldest",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_channel_history"
+          ]
+        },
+        "label": "Latest (unix ts)",
+        "name": "latest",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "get_canvas",
+            "edit_canvas",
+            "lookup_canvas_sections",
+            "delete_canvas"
+          ]
+        },
+        "label": "Canvas ID",
+        "name": "canvas_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "canvas",
+            "create_channel_canvas",
+            "edit_canvas"
+          ]
+        },
+        "label": "Canvas Content (Markdown)",
+        "name": "canvas_content",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "canvas"
+          ]
+        },
+        "label": "Canvas Title",
+        "name": "canvas_title",
+        "type": "string"
+      },
+      {
+        "label": "Canvas Section ID",
+        "name": "section_id",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "lookup_canvas_sections"
+          ]
+        },
+        "label": "Section Lookup Query",
+        "name": "section_lookup_query",
+        "type": "string"
+      },
+      {
+        "label": "Profile Field",
+        "name": "profile_field",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_title"
+          ]
+        },
+        "label": "Profile Value",
+        "name": "profile_value",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_status"
+          ]
+        },
+        "label": "Status Text",
+        "name": "status_text",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_status"
+          ]
+        },
+        "label": "Status Emoji",
+        "name": "status_emoji",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_status"
+          ]
+        },
+        "default": 0,
+        "label": "Status Expiration (unix)",
+        "name": "status_expiration",
         "type": "number"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "set_suggested_prompts"
+          ]
+        },
+        "default": [],
+        "label": "Suggested Prompts (JSON array)",
+        "name": "prompts",
+        "type": "json"
       },
       {
         "default": 0,
@@ -65048,9 +65376,7 @@
         "type": "number"
       }
     ],
-    "tools": [
-      "slack"
-    ],
+    "tools": null,
     "type": "action.slack"
   },
   "action.smtp": {

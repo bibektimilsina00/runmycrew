@@ -205,6 +205,23 @@ class GoogleSlidesProperties(BaseModel):
     # through unchanged.
     outline: Any = None
 
+    # Phase 4-close-6i — sim gslides parity aliases.
+    # Raw batch_update requests array (dev-facing escape hatch).
+    batch_update_requests: Any = None
+    # Text ops (insert_text / delete_text / update_text_style /
+    # update_paragraph_style) — target an object by id + optional range.
+    text_content: str | None = None
+    text_style_body: Any = None
+    paragraph_style_body: Any = None
+    # Shape/page/image property update payloads.
+    shape_properties_body: Any = None
+    page_properties_body: Any = None
+    image_properties_body: Any = None
+    # Bullet preset (createParagraphBullets).
+    bullet_preset: str | None = None
+    # create_line — line category.
+    line_category: str = "STRAIGHT"
+
     @field_validator(
         "presentation_id",
         "slide_id",
@@ -360,6 +377,39 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                         {"label": "Insert Shape", "value": "insert_shape"},
                         {"label": "Replace Image", "value": "replace_image"},
                         {"label": "Delete Element", "value": "delete_element"},
+                        # ─── Phase 4-close-6i sim parity ─────────────
+                        {"label": "Batch Update (raw requests)", "value": "batch_update"},
+                        {"label": "Write (alias of batch_update)", "value": "write"},
+                        {"label": "Read (alias of Get)", "value": "read"},
+                        {"label": "Insert Text (raw)", "value": "insert_text"},
+                        {"label": "Delete Text (raw)", "value": "delete_text"},
+                        {"label": "Update Text Style (raw)", "value": "update_text_style"},
+                        {
+                            "label": "Update Paragraph Style (raw)",
+                            "value": "update_paragraph_style",
+                        },
+                        {"label": "Create Paragraph Bullets", "value": "create_paragraph_bullets"},
+                        {"label": "Delete Paragraph Bullets", "value": "delete_paragraph_bullets"},
+                        {"label": "Update Shape Properties", "value": "update_shape_properties"},
+                        {
+                            "label": "Update Page (Slide) Properties",
+                            "value": "update_page_properties",
+                        },
+                        {"label": "Update Image Properties", "value": "update_image_properties"},
+                        {"label": "Create Line", "value": "create_line"},
+                        {
+                            "label": "Replace All Shapes with Image",
+                            "value": "replace_all_shapes_with_image",
+                        },
+                        {"label": "Get Page (Slide)", "value": "get_page"},
+                        {"label": "Copy Presentation (alias)", "value": "copy_presentation"},
+                        {"label": "Export Presentation (alias)", "value": "export_presentation"},
+                        {"label": "Add Image (alias)", "value": "add_image"},
+                        {"label": "Create Shape (alias)", "value": "create_shape"},
+                        {"label": "Create Table (alias)", "value": "create_table"},
+                        {"label": "Delete Object (alias)", "value": "delete_object"},
+                        {"label": "Duplicate Object (alias)", "value": "duplicate_object"},
+                        {"label": "Reorder Slides (alias)", "value": "reorder_slides"},
                     ],
                 },
                 # presentation_id — needed for everything except `create`
@@ -2124,6 +2174,267 @@ def _gen_object_id(prefix: str) -> str:
     return f"{prefix}_{secrets.token_hex(10)}"
 
 
+# ─── Phase 4-close-6i — sim gslides parity handlers ──────────────────
+#
+# Sim ships 52 gslides ops; we already ship 26 higher-level ops. These
+# 26 additions expose sim's granular batch_update primitives directly
+# (batch_update raw, insert_text, delete_text, update_text_style,
+# update_paragraph_style, create_paragraph_bullets, ...) plus a few
+# aliases (read=get, write=batch_update, add_image=insert_image,
+# copy_presentation=copy, export_presentation=export, delete_object=
+# delete_element, duplicate_object=duplicate_slide, reorder_slides=
+# reorder_slide, get_page, create_shape=insert_shape,
+# create_table=insert_table).
+
+
+async def _batch_update(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    reqs = getattr(node.props, "batch_update_requests", None) or []
+    if not reqs:
+        return NodeResult(success=False, error="batch_update_requests required")
+    if not isinstance(reqs, list):
+        return NodeResult(success=False, error="batch_update_requests must be a list")
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, reqs)
+    )
+
+
+async def _insert_text(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "insertText": {
+            "objectId": eid,
+            "text": getattr(node.props, "text_content", "") or "",
+            "insertionIndex": int(getattr(node.props, "start_index", 0) or 0),
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _delete_text(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    text_range = {"type": "ALL"}
+    si, ei = node.props.start_index, node.props.end_index
+    if si is not None and ei is not None:
+        text_range = {"type": "FIXED_RANGE", "startIndex": int(si), "endIndex": int(ei)}
+    req = {"deleteText": {"objectId": eid, "textRange": text_range}}
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _update_text_style(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "updateTextStyle": {
+            "objectId": eid,
+            "style": getattr(node.props, "text_style_body", None) or {},
+            "fields": "*",
+            "textRange": {"type": "ALL"},
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _update_paragraph_style_raw(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "updateParagraphStyle": {
+            "objectId": eid,
+            "style": getattr(node.props, "paragraph_style_body", None) or {},
+            "fields": "*",
+            "textRange": {"type": "ALL"},
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _create_paragraph_bullets(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "createParagraphBullets": {
+            "objectId": eid,
+            "bulletPreset": getattr(node.props, "bullet_preset", None)
+            or "BULLET_DISC_CIRCLE_SQUARE",
+            "textRange": {"type": "ALL"},
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _delete_paragraph_bullets(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "deleteParagraphBullets": {
+            "objectId": eid,
+            "textRange": {"type": "ALL"},
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _update_shape_properties(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "updateShapeProperties": {
+            "objectId": eid,
+            "shapeProperties": getattr(node.props, "shape_properties_body", None) or {},
+            "fields": "*",
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _update_page_properties(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    sid = node.props.slide_id or ""
+    if not sid:
+        return NodeResult(success=False, error="slide_id required")
+    req = {
+        "updatePageProperties": {
+            "objectId": sid,
+            "pageProperties": getattr(node.props, "page_properties_body", None) or {},
+            "fields": "*",
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _update_image_properties(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    eid = _require_element(node)
+    if isinstance(eid, NodeResult):
+        return eid
+    req = {
+        "updateImageProperties": {
+            "objectId": eid,
+            "imageProperties": getattr(node.props, "image_properties_body", None) or {},
+            "fields": "*",
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _create_line(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    sid = node.props.slide_id or ""
+    if not sid:
+        return NodeResult(success=False, error="slide_id required")
+    obj_id = _gen_object_id("line")
+    req = {
+        "createLine": {
+            "objectId": obj_id,
+            "lineCategory": getattr(node.props, "line_category", None) or "STRAIGHT",
+            "elementProperties": {
+                "pageObjectId": sid,
+                "size": {
+                    "width": {"magnitude": 3000000, "unit": "EMU"},
+                    "height": {"magnitude": 0, "unit": "EMU"},
+                },
+                "transform": {
+                    "scaleX": 1,
+                    "scaleY": 1,
+                    "translateX": 0,
+                    "translateY": 0,
+                    "unit": "EMU",
+                },
+            },
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
+async def _get_page(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    sid = node.props.slide_id or ""
+    if not sid:
+        return NodeResult(success=False, error="slide_id required")
+    r = await client.get(f"{SLIDES_API}/{pid}/pages/{sid}", headers=headers)
+    r.raise_for_status()
+    return NodeResult(success=True, output_data=r.json())
+
+
+async def _replace_all_shapes_with_image(node, client, headers):
+    pid = _require_presentation(node)
+    if isinstance(pid, NodeResult):
+        return pid
+    req = {
+        "replaceAllShapesWithImage": {
+            "containsText": {
+                "text": getattr(node.props, "find_text", "") or "",
+                "matchCase": bool(getattr(node.props, "match_case", False)),
+            },
+            "imageUrl": getattr(node.props, "background_image_url", "") or "",
+        }
+    }
+    return NodeResult(
+        success=True, output_data=await _slides_batch_update(client, headers, pid, [req])
+    )
+
+
 _HANDLERS: dict[str, Any] = {
     "create": _create,
     "create_from_outline": _create_from_outline,
@@ -2151,4 +2462,33 @@ _HANDLERS: dict[str, Any] = {
     "insert_shape": _insert_shape,
     "replace_image": _replace_image,
     "delete_element": _delete_element,
+    # ─── Phase 4-close-6i — sim gslides parity ops ─────────────────
+    # Raw batch_update escape hatch.
+    "batch_update": _batch_update,
+    "write": _batch_update,  # sim alias
+    # Text primitives.
+    "insert_text": _insert_text,
+    "delete_text": _delete_text,
+    "update_text_style": _update_text_style,
+    "update_paragraph_style": _update_paragraph_style_raw,
+    "create_paragraph_bullets": _create_paragraph_bullets,
+    "delete_paragraph_bullets": _delete_paragraph_bullets,
+    # Shape/page/image property updates.
+    "update_shape_properties": _update_shape_properties,
+    "update_page_properties": _update_page_properties,
+    "update_image_properties": _update_image_properties,
+    # New primitives.
+    "create_line": _create_line,
+    "replace_all_shapes_with_image": _replace_all_shapes_with_image,
+    "get_page": _get_page,
+    # Aliases to existing handlers.
+    "read": _get,
+    "copy_presentation": _copy,
+    "export_presentation": _export,
+    "add_image": _insert_image,
+    "create_shape": _insert_shape,
+    "create_table": _insert_table,
+    "delete_object": _delete_element,
+    "duplicate_object": _duplicate_slide,
+    "reorder_slides": _reorder_slide,
 }

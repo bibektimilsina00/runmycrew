@@ -2947,6 +2947,19 @@ PROVIDERS = {
             CredentialField(id="project", label="Project", type="string", placeholder="my-project"),
         ],
     ),
+    "slack_bot_token": APIKeyProvider(
+        id="slack_bot_token",
+        name="Slack Bot Token",
+        icon_slug="slack",
+        color="#4A154B",
+        description="Slack — direct bot token (xoxb-...) alternative to OAuth.",
+        hint="From Slack app → OAuth & Permissions",
+        fields=[
+            CredentialField(
+                id="api_key", label="Bot Token", type="password", placeholder="xoxb-..."
+            ),
+        ],
+    ),
 }
 
 
