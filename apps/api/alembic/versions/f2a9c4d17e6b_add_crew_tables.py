@@ -30,7 +30,7 @@ def upgrade() -> None:
         "crew",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
         sa.Column("name", sa.String(length=255), nullable=False),
-        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("description", sa.String(), nullable=True),
         sa.Column(
             "graph",
             postgresql.JSON(astext_type=sa.Text()),
