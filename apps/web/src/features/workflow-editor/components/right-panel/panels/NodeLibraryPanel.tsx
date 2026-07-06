@@ -4,7 +4,10 @@ import { useNodeLibrary, CATEGORY_LABEL } from '../../../hooks/useNodeLibrary'
 import { getIcon } from '../../../utils/icon-map'
 
 export function NodeLibraryPanel() {
-  const { query, setQuery, grouped, spawnNode, onDragStart } = useNodeLibrary()
+  const {
+    query, setQuery, grouped, spawnNode, onDragStart,
+    loopMode, presets, spawnPreset, onDragStartPreset,
+  } = useNodeLibrary()
 
   return (
     <div className="flex h-full flex-col">
@@ -14,7 +17,7 @@ export function NodeLibraryPanel() {
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search nodes…"
+            placeholder={loopMode ? 'Search crew…' : 'Search nodes…'}
             className={cn(
               'h-8 w-full rounded-[8px] border border-[var(--border-faint)] bg-[var(--surface)]',
               'pl-8 pr-3 text-[12.5px] text-[var(--text)] placeholder:text-[var(--text-dim)]',
@@ -25,7 +28,44 @@ export function NodeLibraryPanel() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {grouped.length === 0 ? (
+        {loopMode ? (
+          presets.length === 0 ? (
+            <p className="py-8 text-center text-[12px] text-[var(--text-faint)]">No crew found</p>
+          ) : (
+            <div className="mb-3">
+              <p className="mb-1 px-2 text-[10.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)]">
+                Crew
+              </p>
+              {presets.map(preset => {
+                const Icon = getIcon(preset.icon)
+                return (
+                  <div
+                    key={preset.id}
+                    draggable
+                    onClick={() => spawnPreset(preset)}
+                    onDragStart={e => onDragStartPreset(e, preset)}
+                    className={cn(
+                      'flex cursor-pointer select-none items-center gap-2.5 rounded-[8px] px-2.5 py-2',
+                      'transition-colors hover:bg-[var(--surface)] active:bg-[var(--surface-2)] active:cursor-grabbing',
+                    )}
+                    title="Click to add · Drag to position"
+                  >
+                    <div
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-3 [&_svg]:w-3 [&_img]:h-3 [&_img]:w-3 [&_img]:object-contain"
+                      style={{ background: preset.color ?? 'var(--surface-3)' }}
+                    >
+                      {Icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[12.5px] font-medium text-[var(--text)]">{preset.label}</p>
+                      <p className="truncate text-[11px] text-[var(--text-dim)]">{preset.description}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )
+        ) : grouped.length === 0 ? (
           <p className="py-8 text-center text-[12px] text-[var(--text-faint)]">No nodes found</p>
         ) : (
           grouped.map(({ category, defs }) => (
