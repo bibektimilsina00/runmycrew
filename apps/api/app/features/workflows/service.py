@@ -39,11 +39,6 @@ class WorkflowService:
         workflows = await self.repository.list_by_workspace(workspace.id, kind=kind)
         if workflows:
             return workflows
-        # Only auto-seed the default "Getting Started" automation when
-        # listing automations (or all kinds). A filtered loop list stays
-        # empty so the Loop-Engineering editor starts blank.
-        if kind is not None and kind != "automation":
-            return []
         return [await self.ensure_default_workflow(workspace)]
 
     async def get_workflow(
