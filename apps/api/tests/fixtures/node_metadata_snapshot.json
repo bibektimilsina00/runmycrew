@@ -18414,11 +18414,44 @@
             "name": "clarity"
           }
         ],
-        "description": "Array of {name, description, min, max} metrics.",
+        "description": "Score the content on each metric (name, description, min\u2013max range).",
         "label": "Metrics",
         "name": "metrics",
+        "properties": [
+          {
+            "label": "Name",
+            "name": "name",
+            "placeholder": "correctness",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "label": "Description",
+            "name": "description",
+            "placeholder": "What does this metric measure?",
+            "type": "string"
+          },
+          {
+            "default": 0,
+            "label": "Min",
+            "name": "min",
+            "type": "number"
+          },
+          {
+            "default": 10,
+            "label": "Max",
+            "name": "max",
+            "type": "number"
+          }
+        ],
         "required": true,
-        "type": "json"
+        "type": "collection",
+        "typeOptions": {
+          "addButtonText": "Add metric",
+          "autoIncrementField": "name",
+          "autoIncrementPrefix": "metric",
+          "multipleValues": true
+        }
       },
       {
         "default": 0.0,
