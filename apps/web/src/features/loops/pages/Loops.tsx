@@ -73,9 +73,9 @@ export function Loops() {
       <div className="page-head">
         <div>
           <span className="eyebrow">Workspace · {items.length} total</span>
-          <h1>Loop Engineering</h1>
+          <h1>Crews</h1>
           <p className="text-[13px] text-[var(--text-mute)] mt-[4px]">
-            Autonomous AI agents that run in verified loops.
+            Teams of AI agents that plan, build, and verify their own work in a loop.
           </p>
         </div>
         <div className="btn-group">
