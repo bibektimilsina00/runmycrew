@@ -6,7 +6,8 @@
 // Resolved node types (verified against the backend node registry):
 //   ai.agent_crew   — Agent Crew   (category ai)
 //   action.agent    — Agent        (category ai)
-//   action.evaluator— Evaluator    (category ai)
+//   action.evaluator— Evaluator    (category ai)  — model-judge checker (ladder L4)
+//   ai.verify       — Verify       (category ai)  — objective checker (ladder L1–L3)
 //   logic.human_input — Human Input (category logic)
 //   action.memory   — Memory       (category ai)
 //
@@ -73,9 +74,25 @@ export const CREW_PRESETS: CrewPreset[] = [
     },
   },
   {
+    id: 'verify',
+    label: 'Verify',
+    description: 'Objective check · L1–L3',
+    icon: 'ShieldCheck',
+    color: '#3fb98b',
+    nodeType: 'ai.verify',
+    // Defaults to an L1 deterministic assertion — the strongest, most
+    // autonomous rung. Edit the expression, or switch mode to rule (L2) /
+    // http · code (L3) in the inspector. Unlike the model-judge Reviewer,
+    // this produces a reproducible pass/fail, not an opinion.
+    defaultProperties: {
+      mode: 'expression',
+      expression: '{{$json.passed}} == true',
+    },
+  },
+  {
     id: 'reviewer',
     label: 'Reviewer',
-    description: 'Checker · not the maker',
+    description: 'Model judge · L4',
     icon: 'CheckCheck',
     color: '#16a34a',
     nodeType: 'action.evaluator',

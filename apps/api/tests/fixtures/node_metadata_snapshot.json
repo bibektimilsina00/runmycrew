@@ -79718,6 +79718,257 @@
     "tools": null,
     "type": "ai.agent_crew"
   },
+  "ai.verify": {
+    "allow_error": true,
+    "category": "ai",
+    "color": "#3fb98b",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Objective verification checker for a crew loop. Runs a deterministic L1-L3 check (expression / rule / http / code) and emits a {passed, feedback} verdict the Agent Crew orchestrator reads.",
+    "dynamic_outputs_from": null,
+    "icon": "CheckCheck",
+    "inputs": 1,
+    "name": "Verify",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "passed",
+        "type": "boolean"
+      },
+      {
+        "label": "feedback",
+        "type": "string"
+      },
+      {
+        "label": "level",
+        "type": "number"
+      },
+      {
+        "label": "mode",
+        "type": "string"
+      },
+      {
+        "label": "average",
+        "type": "number"
+      },
+      {
+        "label": "details",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": "expression",
+        "description": "Verification ladder level. Deterministic to field-truth.",
+        "label": "Mode",
+        "name": "mode",
+        "options": [
+          {
+            "label": "Expression (L1)",
+            "value": "expression"
+          },
+          {
+            "label": "Rule (L2)",
+            "value": "rule"
+          },
+          {
+            "label": "HTTP (L3)",
+            "value": "http"
+          },
+          {
+            "label": "Code (L3)",
+            "value": "code"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "expression"
+        },
+        "description": "Template boolean. Passes when it resolves truthy.",
+        "label": "Expression",
+        "name": "expression",
+        "placeholder": "{{$json.status}} == success",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "rule"
+        },
+        "description": "Text (or JSON) the rule is applied to.",
+        "label": "Subject",
+        "name": "content",
+        "placeholder": "{{$previous_node.output.text}}",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "rule"
+        },
+        "default": "contains",
+        "label": "Rule Type",
+        "name": "ruleType",
+        "options": [
+          {
+            "label": "Contains",
+            "value": "contains"
+          },
+          {
+            "label": "Does Not Contain",
+            "value": "not_contains"
+          },
+          {
+            "label": "Regex",
+            "value": "regex"
+          },
+          {
+            "label": "Required Keys",
+            "value": "required_keys"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "rule"
+        },
+        "label": "Pattern",
+        "name": "pattern",
+        "placeholder": "expected substring or regex",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "rule"
+        },
+        "description": "Comma-separated keys that must exist in the JSON subject.",
+        "label": "Required Keys",
+        "name": "requiredKeys",
+        "placeholder": "id, name, email",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "http"
+        },
+        "label": "URL",
+        "name": "url",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "http"
+        },
+        "default": "GET",
+        "label": "Method",
+        "name": "method",
+        "options": [
+          {
+            "label": "GET",
+            "value": "GET"
+          },
+          {
+            "label": "POST",
+            "value": "POST"
+          },
+          {
+            "label": "PUT",
+            "value": "PUT"
+          },
+          {
+            "label": "DELETE",
+            "value": "DELETE"
+          },
+          {
+            "label": "PATCH",
+            "value": "PATCH"
+          },
+          {
+            "label": "HEAD",
+            "value": "HEAD"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "http"
+        },
+        "default": "2xx",
+        "label": "Expected Status",
+        "name": "expectedStatus",
+        "placeholder": "2xx | 200 | 200-299",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "http"
+        },
+        "description": "Optional substring the response body must contain.",
+        "label": "Body Contains",
+        "name": "bodyContains",
+        "required": false,
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "mode",
+          "value": "code"
+        },
+        "description": "Python run in the sandbox with `input`. Passes when `output` is truthy (or `output['passed']` is truthy).",
+        "label": "Code",
+        "name": "code",
+        "placeholder": "output = {'passed': input['count'] > 0}",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.verify"
+  },
   "common.file": {
     "allow_error": true,
     "category": "logic",
