@@ -4,6 +4,7 @@ import apps.api.app.features.api_keys.models  # noqa: F401
 import apps.api.app.features.assets.models  # noqa: F401
 import apps.api.app.features.copilot.models  # noqa: F401
 import apps.api.app.features.credentials.models  # noqa: F401
+import apps.api.app.features.crews.models  # noqa: F401
 import apps.api.app.features.escalation.models  # noqa: F401
 import apps.api.app.features.executions.models  # noqa: F401
 import apps.api.app.features.folders.models  # noqa: F401
