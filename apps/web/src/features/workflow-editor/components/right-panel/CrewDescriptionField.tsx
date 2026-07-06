@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
 import { editorAPI } from '../../services/editorAPI'
@@ -15,10 +15,14 @@ export function CrewDescriptionField() {
   const setWorkflow = useWorkflowEditorStore((s) => s.setWorkflow)
   const [value, setValue] = useState(workflow?.description ?? '')
 
-  // Re-sync when a different crew loads (or the server value changes).
-  useEffect(() => {
+  // Re-sync the editable value when a different crew loads. Adjusting state
+  // during render (React's recommended pattern) instead of in an effect, so
+  // there's no cascading-render setState-in-effect.
+  const [lastId, setLastId] = useState(workflow?.id)
+  if (workflow?.id !== lastId) {
+    setLastId(workflow?.id)
     setValue(workflow?.description ?? '')
-  }, [workflow?.id, workflow?.description])
+  }
 
   const mutation = useMutation({
     mutationFn: (description: string) => editorAPI.updateDescription(workflow?.id ?? '', description),
