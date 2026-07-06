@@ -13,6 +13,7 @@ class WorkflowCreate(SQLModel):
     color: str | None = None
     graph: dict[str, Any] = Field(default_factory=lambda: {"nodes": [], "edges": []})
     env: dict[str, str] | None = None
+    kind: str = "automation"
 
 
 class WorkflowUpdate(SQLModel):
@@ -24,6 +25,7 @@ class WorkflowUpdate(SQLModel):
     is_active: bool | None = None
     color: str | None = None
     env: dict[str, str] | None = None
+    kind: str | None = None
     expected_version: int | None = None
 
 
@@ -51,6 +53,7 @@ class WorkflowOut(SQLModel):
     position: int
     color: str | None = None
     env: dict[str, str] | None = None
+    kind: str = "automation"
     version_vector: int = 0
     created_at: datetime
     updated_at: datetime

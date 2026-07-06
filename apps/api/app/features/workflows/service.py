@@ -33,10 +33,17 @@ class WorkflowService:
     def __init__(self, db: AsyncSession):
         self.repository = WorkflowRepository(db)
 
-    async def list_workflows(self, user: User, workspace: Workspace) -> list[Workflow]:
-        workflows = await self.repository.list_by_workspace(workspace.id)
+    async def list_workflows(
+        self, user: User, workspace: Workspace, kind: str | None = None
+    ) -> list[Workflow]:
+        workflows = await self.repository.list_by_workspace(workspace.id, kind=kind)
         if workflows:
             return workflows
+        # Only auto-seed the default "Getting Started" automation when
+        # listing automations (or all kinds). A filtered loop list stays
+        # empty so the Loop-Engineering editor starts blank.
+        if kind is not None and kind != "automation":
+            return []
         return [await self.ensure_default_workflow(workspace)]
 
     async def get_workflow(
@@ -61,6 +68,7 @@ class WorkflowService:
             position=data.position,
             color=color,
             env=data.env,
+            kind=data.kind,
         )
         created = await self.repository.create(workflow)
         # New workflows usually start empty, but templates / duplicates

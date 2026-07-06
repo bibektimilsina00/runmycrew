@@ -10,6 +10,7 @@ export const APP_ROUTES = {
   SETTINGS: '/settings',
   SHOWCASE: '/showcase',
   AUTOMATIONS: '/automations',
+  LOOPS: '/loops',
   TEMPLATES: '/templates',
   TEMPLATE_DETAIL: (slug: string) => `/templates/${slug}`,
   MY_TEMPLATES: '/templates/mine',

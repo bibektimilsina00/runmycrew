@@ -21,6 +21,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'home', label: 'Home', icon: Icons.Home, to: APP_ROUTES.DASHBOARD },
       { id: 'automations', label: 'Automations', icon: Icons.Flow, to: APP_ROUTES.AUTOMATIONS },
+      { id: 'loops', label: 'Loop Engineering', icon: Icons.Bolt, to: APP_ROUTES.LOOPS },
       { id: 'templates', label: 'Templates', icon: Icons.Layers, to: APP_ROUTES.TEMPLATES },
     ],
   },

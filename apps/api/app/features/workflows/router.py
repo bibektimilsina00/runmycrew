@@ -115,6 +115,7 @@ def _fmt_last_run(last_run: dict | None) -> str | None:
 
 @router.get("/with-stats")
 async def list_workflows_with_stats(
+    kind: str | None = None,
     current_user: User = Depends(get_current_user),
     workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
@@ -123,7 +124,7 @@ async def list_workflows_with_stats(
 
     service = WorkflowService(db)
     repo = ExecutionRepository(db)
-    workflows = await service.list_workflows(current_user, workspace)
+    workflows = await service.list_workflows(current_user, workspace, kind=kind)
     wf_ids = [w.id for w in workflows]
     counts = await repo.count_by_workflow(wf_ids)
     last_runs = await repo.last_run_by_workflow(wf_ids)
@@ -151,6 +152,8 @@ async def list_workflows_with_stats(
                 "user_id": str(w.user_id),
                 "created_at": w.created_at.isoformat(),
                 "updated_at": w.updated_at.isoformat(),
+                # persisted discriminator: "automation" | "loop"
+                "workflow_kind": w.kind,
                 # computed
                 "kind": kind,
                 "trigger": _derive_trigger(w.graph),
@@ -169,12 +172,13 @@ async def list_workflows_with_stats(
 
 @router.get("/", response_model=list[WorkflowOut])
 async def list_workflows(
+    kind: str | None = None,
     current_user: User = Depends(get_current_user),
     workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     service = WorkflowService(db)
-    return await service.list_workflows(current_user, workspace)
+    return await service.list_workflows(current_user, workspace, kind=kind)
 
 
 @router.post("/", response_model=WorkflowOut, status_code=status.HTTP_201_CREATED)

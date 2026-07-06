@@ -5,6 +5,11 @@ import type { NodeDefinition } from '../types/editorTypes'
 
 const CATEGORY_ORDER = ['trigger', 'action', 'ai', 'logic', 'browser', 'integration'] as const
 
+// Loop Engineering shows a focused palette of AI-orchestration nodes only —
+// the 100s of integration/action/browser nodes are hidden so the canvas reads
+// as "autonomous agents in verified loops".
+const LOOP_CATEGORIES = new Set(['trigger', 'ai', 'logic'])
+
 export const CATEGORY_LABEL: Record<string, string> = {
   trigger:     'Triggers',
   action:      'Actions',
@@ -16,18 +21,27 @@ export const CATEGORY_LABEL: Record<string, string> = {
 
 export function useNodeLibrary() {
   const nodeDefinitions = useWorkflowEditorStore(s => s.nodeDefinitions)
+  const workflow = useWorkflowEditorStore(s => s.workflow)
   const setNodes = useWorkflowEditorStore(s => s.setNodes)
   const pushHistory = useWorkflowEditorStore(s => s.pushHistory)
   const [query, setQuery] = useState('')
   const { screenToFlowPosition } = useReactFlow()
 
+  // In a loop workflow, restrict the palette to AI-orchestration categories
+  // BEFORE search + grouping so both respect the focused set.
+  const loopMode = workflow?.kind === 'loop'
+  const available = useMemo(
+    () => (loopMode ? nodeDefinitions.filter(d => LOOP_CATEGORIES.has(d.category)) : nodeDefinitions),
+    [nodeDefinitions, loopMode],
+  )
+
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
-    if (!q) return nodeDefinitions
-    return nodeDefinitions.filter(
+    if (!q) return available
+    return available.filter(
       d => d.name.toLowerCase().includes(q) || d.description.toLowerCase().includes(q),
     )
-  }, [nodeDefinitions, query])
+  }, [available, query])
 
   const grouped = useMemo(() => {
     const map = new Map<string, typeof filtered>()
