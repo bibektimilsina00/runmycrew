@@ -97,6 +97,7 @@ export const CREW_PRESETS: CrewPreset[] = [
     color: '#16a34a',
     nodeType: 'action.evaluator',
     defaultProperties: {
+      provider: 'openai',
       content: '{{$json.content}}',
       metrics: [
         { name: 'correctness', description: 'Does it meet the spec and actually work?', min: 0, max: 10 },

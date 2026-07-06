@@ -8,7 +8,7 @@ import httpx
 from pydantic import BaseModel, Field
 
 from apps.api.app.core.logger import get_logger
-from apps.api.app.credential_manager.api_keys import get_ai_provider
+from apps.api.app.credential_manager.api_keys import get_ai_provider, get_ai_providers
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
@@ -27,6 +27,10 @@ class EvaluatorMetric(BaseModel):
 class EvaluatorProperties(BaseModel):
     provider: str = "openai"
     credential: str | None = None
+    openaiCredential: str | None = None
+    anthropicCredential: str | None = None
+    googleCredential: str | None = None
+    groqCredential: str | None = None
     model: str | None = None
     content: str = ""
     metrics: list[EvaluatorMetric] | str = Field(default_factory=list)
@@ -51,39 +55,41 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                 {
                     "name": "provider",
                     "label": "Provider",
-                    "type": "string",
+                    "type": "options",
                     "default": "openai",
+                    "required": True,
+                    "placeholder": "Type or select an AI provider",
                     "loadOptions": "/ai/providers",
+                    "typeOptions": {"searchable": True, "allowCustom": True},
                 },
+                *cls._provider_credential_properties(),
                 {
                     "name": "credential",
-                    "label": "Credential",
+                    "label": "Provider Credential",
                     "type": "credential",
                     "required": True,
                     "dependsOn": ["provider"],
                     "credentialTypeByField": {
                         "field": "provider",
-                        "values": {
-                            "openai": "openai_api_key",
-                            "anthropic": "anthropic_api_key",
-                            "google": "google_api_key",
-                            "groq": "groq_api_key",
-                            "openrouter": "openrouter_api_key",
-                            "deepseek": "deepseek_api_key",
-                            "mistral": "mistral_api_key",
-                            "xai": "xai_api_key",
-                            "together": "together_api_key",
-                            "fireworks": "fireworks_api_key",
-                        },
+                        "values": cls._credential_type_by_provider(),
                     },
                 },
                 {
                     "name": "model",
                     "label": "Model",
-                    "type": "string",
+                    "type": "options",
                     "required": True,
+                    "placeholder": "Type or select a model ID",
                     "loadOptions": "/ai/models",
-                    "loadOptionsDependsOn": ["provider", "credential"],
+                    "loadOptionsDependsOn": [
+                        "provider",
+                        "credential",
+                        "openaiCredential",
+                        "anthropicCredential",
+                        "googleCredential",
+                        "groqCredential",
+                    ],
+                    "typeOptions": {"searchable": True, "allowCustom": True},
                 },
                 {
                     "name": "content",
@@ -154,6 +160,60 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
             ],
             allow_error=True,
         )
+
+    @classmethod
+    def _provider_credential_properties(cls) -> list[dict[str, Any]]:
+        credential_properties = [
+            {
+                "name": "openaiCredential",
+                "label": "OpenAI API Key",
+                "type": "credential",
+                "credentialType": "openai_api_key",
+                "required": {"field": "provider", "value": "openai"},
+                "condition": {"field": "provider", "value": "openai"},
+            },
+            {
+                "name": "anthropicCredential",
+                "label": "Anthropic API Key",
+                "type": "credential",
+                "credentialType": "anthropic_api_key",
+                "required": {"field": "provider", "value": "anthropic"},
+                "condition": {"field": "provider", "value": "anthropic"},
+            },
+            {
+                "name": "googleCredential",
+                "label": "Google API Key",
+                "type": "credential",
+                "credentialType": "google_api_key",
+                "required": {"field": "provider", "value": "google"},
+                "condition": {"field": "provider", "value": "google"},
+            },
+            {
+                "name": "groqCredential",
+                "label": "Groq API Key",
+                "type": "credential",
+                "credentialType": "groq_api_key",
+                "required": {"field": "provider", "value": "groq"},
+                "condition": {"field": "provider", "value": "groq"},
+            },
+        ]
+        catalog_by_provider = {provider.ai_provider_id: provider for provider in get_ai_providers()}
+        for prop in credential_properties:
+            provider_id = prop["condition"]["value"]
+            catalog_provider = catalog_by_provider.get(provider_id)
+            if catalog_provider:
+                prop["label"] = f"{catalog_provider.name} API Key"
+                prop["credentialType"] = catalog_provider.id
+            prop["visibility"] = "hidden"
+        return credential_properties
+
+    @classmethod
+    def _credential_type_by_provider(cls) -> dict[str, str]:
+        return {
+            provider.ai_provider_id: provider.id
+            for provider in get_ai_providers()
+            if provider.ai_provider_id
+        }
 
     def _parse_metrics(self) -> list[EvaluatorMetric]:
         raw = self.props.metrics

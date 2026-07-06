@@ -18355,7 +18355,73 @@
         "label": "Provider",
         "loadOptions": "/ai/providers",
         "name": "provider",
-        "type": "string"
+        "placeholder": "Type or select an AI provider",
+        "required": true,
+        "type": "options",
+        "typeOptions": {
+          "allowCustom": true,
+          "searchable": true
+        }
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "openai"
+        },
+        "credentialType": "openai_api_key",
+        "label": "OpenAI API Key",
+        "name": "openaiCredential",
+        "required": {
+          "field": "provider",
+          "value": "openai"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "anthropic"
+        },
+        "credentialType": "anthropic_api_key",
+        "label": "Anthropic API Key",
+        "name": "anthropicCredential",
+        "required": {
+          "field": "provider",
+          "value": "anthropic"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "google"
+        },
+        "credentialType": "google_api_key",
+        "label": "Google Gemini API Key",
+        "name": "googleCredential",
+        "required": {
+          "field": "provider",
+          "value": "google"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "groq"
+        },
+        "credentialType": "groq_api_key",
+        "label": "Groq API Key",
+        "name": "groqCredential",
+        "required": {
+          "field": "provider",
+          "value": "groq"
+        },
+        "type": "credential",
+        "visibility": "hidden"
       },
       {
         "credentialTypeByField": {
@@ -18376,7 +18442,7 @@
         "dependsOn": [
           "provider"
         ],
-        "label": "Credential",
+        "label": "Provider Credential",
         "name": "credential",
         "required": true,
         "type": "credential"
@@ -18386,11 +18452,20 @@
         "loadOptions": "/ai/models",
         "loadOptionsDependsOn": [
           "provider",
-          "credential"
+          "credential",
+          "openaiCredential",
+          "anthropicCredential",
+          "googleCredential",
+          "groqCredential"
         ],
         "name": "model",
+        "placeholder": "Type or select a model ID",
         "required": true,
-        "type": "string"
+        "type": "options",
+        "typeOptions": {
+          "allowCustom": true,
+          "searchable": true
+        }
       },
       {
         "label": "Content to Evaluate",
