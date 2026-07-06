@@ -75,6 +75,33 @@ class CrewService:
         )
         return await self.create_crew(data, user, workspace)
 
+    async def run_crew(
+        self,
+        crew_id: uuid.UUID,
+        user: User,
+        workspace: Workspace,
+        trigger_type: str = "manual",
+        input_data: dict | None = None,
+    ) -> uuid.UUID:
+        """Trigger a crew run and return the crew_execution id.
+
+        Reuses the shared workflow execution engine: the crew's graph is
+        handed to execution_engine.trigger_crew, which records a
+        CrewExecution row and enqueues the Celery task.
+        """
+        crew = await self.get_crew(crew_id, user, workspace)
+
+        from apps.api.app.execution_engine.engine import execution_engine
+
+        return await execution_engine.trigger_crew(crew.id, crew.graph, trigger_type, input_data)
+
+    async def list_executions(self, crew_id: uuid.UUID, user: User, workspace: Workspace) -> list:
+        # Ensure crew exists and is in-scope before returning its history.
+        await self.get_crew(crew_id, user, workspace)
+        from apps.api.app.features.crews.repository import CrewExecutionRepository
+
+        return await CrewExecutionRepository(self.repository.db).list_by_crew(crew_id)
+
     def _initial_graph(self, graph: dict | None) -> dict:
         if graph:
             return graph

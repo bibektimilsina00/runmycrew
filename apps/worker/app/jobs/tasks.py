@@ -210,3 +210,151 @@ async def _run_workflow(
         await log_and_emit(error_msg, level="error")
         await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
         raise
+
+
+@celery_app.task(name="execute_crew")
+def execute_crew(
+    crew_execution_id: str,
+    crew_id: str,
+    graph: dict,
+    trigger_data: dict,
+):
+    """Crew execution task. Reuses WorkflowRunner via _run_crew."""
+    try:
+        asyncio.run(
+            _run_crew(
+                crew_execution_id,
+                crew_id,
+                graph,
+                trigger_data,
+            )
+        )
+    except Exception as e:
+        logger.error(f"execute_crew task failed: {e}", exc_info=True)
+
+
+async def _run_crew(
+    crew_execution_id: str,
+    crew_id: str,
+    graph: dict,
+    trigger_data: dict,
+):
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.execution_engine.engine.event_emitter import RedisEventEmitter
+    from apps.api.app.execution_engine.engine.workflow_runner import (
+        CancelledException,
+        PauseSignal,
+        WorkflowRunner,
+    )
+    from apps.api.app.features.credentials.service import CredentialService
+    from apps.api.app.features.crews.models import Crew
+    from apps.api.app.features.crews.repository import CrewExecutionRepository
+
+    credentials_list: list[dict[str, Any]] = []
+    secrets_dict: dict[str, str] = {}
+    workspace_id_str: str | None = None
+    crew_env: dict[str, Any] = {}
+
+    async with AsyncSessionLocal() as db:
+        crew = await db.get(Crew, uuid.UUID(crew_id))
+        if crew:
+            workspace_id_str = str(crew.workspace_id)
+            credential_service = CredentialService(db)
+            credentials_list = await credential_service.list_decrypted_for_user(crew.user_id)
+            # Load user secrets for {{secrets.KEY}} interpolation
+            try:
+                import sqlalchemy as sa
+
+                from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
+                from apps.api.app.features.secrets.models import Secret
+
+                _enc = AESEncryptionService()
+                result = await db.execute(sa.select(Secret).where(Secret.user_id == crew.user_id))
+                from contextlib import suppress
+
+                for s in result.scalars().all():
+                    with suppress(Exception):
+                        secrets_dict[s.name] = _enc.decrypt(s.encrypted_value)
+            except Exception as e:
+                logger.warning(f"Failed to load secrets for crew {crew_id}: {e}")
+        else:
+            logger.error(f"Crew {crew_id} not found when fetching credentials")
+
+    emitter = RedisEventEmitter(crew_execution_id, workspace_id=workspace_id_str)
+
+    async with AsyncSessionLocal() as db:
+        repo = CrewExecutionRepository(db)
+        await repo.update_status(uuid.UUID(crew_execution_id), "running")
+
+    await emitter.emit("execution_started", {})
+
+    try:
+        async with AsyncSessionLocal() as db:
+            # crew_id is passed as WorkflowRunner's workflow_id; the runner's
+            # concurrency mutex falls back to "skip" when no Workflow row exists.
+            runner = WorkflowRunner(
+                workflow_id=crew_id,
+                execution_id=crew_execution_id,
+                graph=graph,
+                db=db,
+                credentials=credentials_list,
+                emitter=emitter,
+                workspace_id=workspace_id_str,
+            )
+            runner.env = crew_env
+            runner.secrets = secrets_dict
+
+            output = await runner.run(trigger_data)
+
+        async with AsyncSessionLocal() as db:
+            repo = CrewExecutionRepository(db)
+            await repo.update_status(uuid.UUID(crew_execution_id), "completed", output_data=output)
+
+        await emitter.emit("execution_completed", {"status": "completed", "output": output})
+
+    except CancelledException:
+        async with AsyncSessionLocal() as db:
+            repo = CrewExecutionRepository(db)
+            await repo.update_status(uuid.UUID(crew_execution_id), "cancelled")
+
+        await emitter.emit("execution_cancelled", {"status": "cancelled"})
+        logger.info(f"Crew execution {crew_execution_id} cancelled")
+
+    except PauseSignal as pause:
+        import secrets
+
+        token = secrets.token_urlsafe(32)
+        snap = {
+            "executed_nodes": list(runner._executed.keys()),
+            "node_outputs": runner._outputs,
+            "variables": runner.variables,
+            "graph": graph,
+        }
+        async with AsyncSessionLocal() as db:
+            repo = CrewExecutionRepository(db)
+            await repo.save_pause(
+                uuid.UUID(crew_execution_id),
+                node_id=pause.node_id,
+                resume_token=token,
+                resume_schema=pause.resume_schema,
+                snapshot=snap,
+            )
+        await emitter.emit(
+            "execution_paused",
+            {
+                "node_id": pause.node_id,
+                "resume_token": token,
+                "resume_schema": pause.resume_schema,
+            },
+        )
+        logger.info(f"Crew execution {crew_execution_id} paused at node {pause.node_id}")
+
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"Crew {crew_id} failed: {error_msg}")
+        async with AsyncSessionLocal() as db:
+            repo = CrewExecutionRepository(db)
+            await repo.update_status(uuid.UUID(crew_execution_id), "failed")
+
+        await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
+        raise

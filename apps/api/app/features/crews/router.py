@@ -1,10 +1,15 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
-from apps.api.app.features.crews.schemas import CrewCreate, CrewOut, CrewUpdate
+from apps.api.app.features.crews.schemas import (
+    CrewCreate,
+    CrewExecutionOut,
+    CrewOut,
+    CrewUpdate,
+)
 from apps.api.app.features.crews.service import CrewService
 from apps.api.app.features.users.models import User
 from apps.api.app.features.workspaces.models import Workspace
@@ -96,18 +101,25 @@ async def duplicate_crew(
     return await service.duplicate_crew(crew_id, current_user, workspace)
 
 
-@router.post("/{crew_id}/run")
+@router.post("/{crew_id}/run", status_code=status.HTTP_201_CREATED)
 async def run_crew(
     crew_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    # Stage 1 foundation only — the crew execution engine lands in stage 2.
-    # Validate access first so this behaves like a real endpoint once wired.
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
     service = CrewService(db)
-    await service.get_crew(crew_id, current_user, workspace)
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Crew execution is not implemented yet (stage 2).",
-    )
+    execution_id = await service.run_crew(crew_id, current_user, workspace)
+    return {"execution_id": str(execution_id)}
+
+
+@router.get("/{crew_id}/executions", response_model=list[CrewExecutionOut])
+async def list_crew_executions(
+    crew_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    service = CrewService(db)
+    return await service.list_executions(crew_id, current_user, workspace)
