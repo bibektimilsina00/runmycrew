@@ -152,9 +152,7 @@ async def list_workflows_with_stats(
                 "user_id": str(w.user_id),
                 "created_at": w.created_at.isoformat(),
                 "updated_at": w.updated_at.isoformat(),
-                # persisted discriminator: "automation" | "loop"
-                "workflow_kind": w.kind,
-                # computed
+                # computed display kind: "flow" | "agent" | "schedule"
                 "kind": kind,
                 "trigger": _derive_trigger(w.graph),
                 "status": _derive_status(w, last_run),
