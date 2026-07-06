@@ -79597,6 +79597,127 @@
     "tools": null,
     "type": "action.zoominfo"
   },
+  "ai.agent_crew": {
+    "allow_error": false,
+    "category": "ai",
+    "color": "#8b5cf6",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Orchestrate downstream role-agents in a verified maker/checker loop with named terminal states and a cost-per-accepted-change metric.",
+    "dynamic_outputs_from": null,
+    "icon": "Repeat",
+    "inputs": 1,
+    "name": "Agent Crew",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "status",
+        "type": "string"
+      },
+      {
+        "label": "terminal_state",
+        "type": "string"
+      },
+      {
+        "label": "rounds",
+        "type": "number"
+      },
+      {
+        "label": "result",
+        "type": "object"
+      },
+      {
+        "label": "usage",
+        "type": "object"
+      },
+      {
+        "label": "cost_per_accepted_change",
+        "type": "number"
+      },
+      {
+        "label": "verification_level",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "description": "Passed to every downstream round as `goal`.",
+        "label": "Goal",
+        "name": "goal",
+        "placeholder": "Describe the objective the crew should achieve.",
+        "type": "string"
+      },
+      {
+        "default": 4,
+        "description": "Maximum maker/checker rounds before the loop is exhausted.",
+        "label": "Max Rounds",
+        "name": "maxRounds",
+        "type": "number"
+      },
+      {
+        "default": 1,
+        "description": "Minimum rounds before success/blocked can terminate the loop.",
+        "label": "Min Rounds",
+        "name": "minRounds",
+        "type": "number"
+      },
+      {
+        "default": 2,
+        "description": "Terminate as 'stalled' when the checker average fails to improve for this many consecutive rounds.",
+        "label": "Stagnation Rounds",
+        "mode": "advanced",
+        "name": "stagnationRounds",
+        "type": "number"
+      },
+      {
+        "default": 3,
+        "description": "1-5 rigor hint (informational, passed through to output).",
+        "label": "Verification Level",
+        "mode": "advanced",
+        "name": "verificationLevel",
+        "type": "number"
+      },
+      {
+        "default": 0.5,
+        "description": "Budget cap; loop terminates as 'exhausted' when exceeded.",
+        "label": "Max Cost (USD)",
+        "name": "maxCostUsd",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.agent_crew"
+  },
   "common.file": {
     "allow_error": true,
     "category": "logic",

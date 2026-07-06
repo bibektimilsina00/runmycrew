@@ -7,6 +7,7 @@ from apps.api.app.node_system.nodes.agiloft.agiloft_node import AgiloftNode
 from apps.api.app.node_system.nodes.ahrefs.ahrefs_node import AhrefsNode
 from apps.api.app.node_system.nodes.ai.a2a.a2a import A2ANode
 from apps.api.app.node_system.nodes.ai.agent.agent import AgentNode
+from apps.api.app.node_system.nodes.ai.agent_crew.agent_crew import AgentCrewNode
 from apps.api.app.node_system.nodes.ai.browser_use.browser_use_node import BrowserUseNode
 from apps.api.app.node_system.nodes.ai.embeddings.embeddings_node import EmbeddingsNode
 from apps.api.app.node_system.nodes.ai.evaluator.evaluator import EvaluatorNode
@@ -408,6 +409,7 @@ node_registry = NodeRegistry()
 node_registry.register(TriggerNode)
 node_registry.register(CronTriggerNode)
 node_registry.register(AgentNode)
+node_registry.register(AgentCrewNode)
 node_registry.register(LLMNode)
 node_registry.register(KnowledgeNode)
 node_registry.register(VisionNode)

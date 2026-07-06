@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useReactFlow } from 'reactflow'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import type { NodeDefinition } from '../types/editorTypes'
+import { CREW_PRESETS, type CrewPreset } from '@/features/loops/utils/crewPresets'
 
 const CATEGORY_ORDER = ['trigger', 'action', 'ai', 'logic', 'browser', 'integration'] as const
 
@@ -55,12 +56,31 @@ export function useNodeLibrary() {
       .map(c => ({ category: c, defs: map.get(c)! }))
   }, [filtered])
 
-  const spawnNode = (def: NodeDefinition) => {
+  // In loop mode the palette shows curated role-agent presets ("Crew") instead
+  // of the raw category nodes. A preset is only surfaced when its underlying
+  // nodeType actually exists in the loaded definitions, so a missing backend
+  // node simply drops from the list rather than spawning a broken node.
+  const presets = useMemo<CrewPreset[]>(() => {
+    if (!loopMode) return []
+    const types = new Set(nodeDefinitions.map(d => d.type))
+    const q = query.toLowerCase().trim()
+    return CREW_PRESETS.filter(p => types.has(p.nodeType)).filter(p => {
+      if (!q) return true
+      return p.label.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
+    })
+  }, [loopMode, nodeDefinitions, query])
+
+  const positionForSpawn = () => {
     const canvasCenterX = (window.innerWidth - 360) / 2
     const canvasCenterY = window.innerHeight / 2
     const position = screenToFlowPosition({ x: canvasCenterX, y: canvasCenterY })
     position.x += (Math.random() - 0.5) * 80
     position.y += (Math.random() - 0.5) * 80
+    return position
+  }
+
+  const spawnNode = (def: NodeDefinition) => {
+    const position = positionForSpawn()
     pushHistory()
     setNodes(ns => [...ns, {
       id: crypto.randomUUID(),
@@ -70,10 +90,26 @@ export function useNodeLibrary() {
     }])
   }
 
+  const spawnPreset = (preset: CrewPreset) => {
+    const position = positionForSpawn()
+    pushHistory()
+    setNodes(ns => [...ns, {
+      id: crypto.randomUUID(),
+      type: preset.nodeType,
+      position,
+      data: { label: preset.label, properties: { ...preset.defaultProperties } },
+    }])
+  }
+
   const onDragStart = (e: React.DragEvent, def: NodeDefinition) => {
     e.dataTransfer.setData('application/reactflow', def.type)
     e.dataTransfer.effectAllowed = 'move'
   }
 
-  return { query, setQuery, grouped, spawnNode, onDragStart }
+  const onDragStartPreset = (e: React.DragEvent, preset: CrewPreset) => {
+    e.dataTransfer.setData('application/reactflow', preset.nodeType)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  return { query, setQuery, grouped, spawnNode, onDragStart, loopMode, presets, spawnPreset, onDragStartPreset }
 }

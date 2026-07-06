@@ -7,6 +7,7 @@ import { InspectorHeader } from './components/inspector-header'
 import { PropertyGroupList } from './components/property-group-list'
 import { TriggerFixtureChip } from './components/trigger-fixture-chip'
 import { UpstreamConnectionsSection } from './components/upstream-connections-section'
+import { CrewInspectorSection } from './components/crew-inspector-section'
 import { PeerTypingIndicator, useCollaborationSenders } from '../../collaboration'
 import { useEffect } from 'react'
 
@@ -117,6 +118,14 @@ export function EditorInspector({ nodes, updateNodeData, className }: EditorInsp
                   </div>
                 )}
               </div>
+            )}
+
+            {selectedNode.type === 'ai.agent_crew' && (
+              <CrewInspectorSection
+                nodeId={selectedNode.id}
+                verificationLevel={Number(properties.verificationLevel ?? 1)}
+                onVerificationLevelChange={level => updateProperty('verificationLevel', level)}
+              />
             )}
           </div>
 

@@ -1,0 +1,108 @@
+// Curated role-agent presets shown in the Loop Engineering palette instead of
+// the raw node list. Each preset maps to a real backend node `type` and seeds
+// role-specific default properties, so dropping one onto the canvas produces a
+// configured crew member rather than an empty node.
+//
+// Resolved node types (verified against the backend node registry):
+//   ai.agent_crew   — Agent Crew   (category ai)
+//   action.agent    — Agent        (category ai)
+//   action.evaluator— Evaluator    (category ai)
+//   logic.human_input — Human Input (category logic)
+//   action.memory   — Memory       (category ai)
+//
+// A preset is only rendered when its `nodeType` exists in the loaded
+// definitions (see useNodeLibrary), so listing one whose backend node is
+// missing degrades gracefully.
+
+export interface CrewPreset {
+  id: string
+  label: string
+  description: string
+  icon: string
+  color: string
+  nodeType: string
+  defaultProperties: Record<string, unknown>
+}
+
+export const CREW_PRESETS: CrewPreset[] = [
+  {
+    id: 'crew',
+    label: 'Crew',
+    description: 'Orchestrates the loop',
+    icon: 'Users',
+    color: '#7c3aed',
+    nodeType: 'ai.agent_crew',
+    defaultProperties: { goal: '', maxRounds: 4 },
+  },
+  {
+    id: 'planner',
+    label: 'Planner',
+    description: 'Plans · writes the spec',
+    icon: 'ClipboardList',
+    color: '#2563eb',
+    nodeType: 'action.agent',
+    defaultProperties: {
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are the planner. Turn the goal into a concrete, buildable spec. On a reviewer rejection, revise the weakest part — not everything.',
+        },
+        { role: 'user', content: '{{$trigger.output}}' },
+      ],
+      temperature: 0.3,
+    },
+  },
+  {
+    id: 'worker',
+    label: 'Worker',
+    description: 'Builds from the spec',
+    icon: 'Hammer',
+    color: '#0891b2',
+    nodeType: 'action.agent',
+    defaultProperties: {
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Build exactly what the spec says. One change per round. Leave working code untouched.',
+        },
+        { role: 'user', content: '{{$json}}' },
+      ],
+      temperature: 0.2,
+    },
+  },
+  {
+    id: 'reviewer',
+    label: 'Reviewer',
+    description: 'Checker · not the maker',
+    icon: 'CheckCheck',
+    color: '#16a34a',
+    nodeType: 'action.evaluator',
+    defaultProperties: {
+      content: '{{$json.content}}',
+      metrics: [
+        { name: 'correctness', description: 'Does it meet the spec and actually work?', min: 0, max: 10 },
+        { name: 'completeness', description: 'Is anything missing?', min: 0, max: 10 },
+      ],
+    },
+  },
+  {
+    id: 'human-approval',
+    label: 'Human Approval',
+    description: 'Gate irreversible steps',
+    icon: 'UserCheck',
+    color: '#d97706',
+    nodeType: 'logic.human_input',
+    defaultProperties: {},
+  },
+  {
+    id: 'memory',
+    label: 'Memory',
+    description: 'State across rounds',
+    icon: 'Database',
+    color: '#64748b',
+    nodeType: 'action.memory',
+    defaultProperties: {},
+  },
+]

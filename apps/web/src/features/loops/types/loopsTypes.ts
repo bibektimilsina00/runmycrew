@@ -35,4 +35,7 @@ export interface LoopCreateRequest {
   description?: string
   folder_id?: string | null
   color?: string | null
+  // Optional starter graph seeded on create. Matches the editor's persisted
+  // graph shape ({ nodes, edges }); WorkflowCreate accepts it directly.
+  graph?: { nodes: unknown[]; edges: unknown[] }
 }
