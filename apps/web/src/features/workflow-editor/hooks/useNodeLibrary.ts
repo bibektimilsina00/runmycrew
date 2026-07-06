@@ -23,14 +23,16 @@ export const CATEGORY_LABEL: Record<string, string> = {
 export function useNodeLibrary() {
   const nodeDefinitions = useWorkflowEditorStore(s => s.nodeDefinitions)
   const workflow = useWorkflowEditorStore(s => s.workflow)
+  const mode = useWorkflowEditorStore(s => s.mode)
   const setNodes = useWorkflowEditorStore(s => s.setNodes)
   const pushHistory = useWorkflowEditorStore(s => s.pushHistory)
   const [query, setQuery] = useState('')
   const { screenToFlowPosition } = useReactFlow()
 
-  // In a loop workflow, restrict the palette to AI-orchestration categories
-  // BEFORE search + grouping so both respect the focused set.
-  const loopMode = workflow?.kind === 'loop'
+  // In a loop workflow OR a crew, restrict the palette to AI-orchestration
+  // categories BEFORE search + grouping so both respect the focused set.
+  // Crews have no `kind`, so the store's `mode` forces the focused palette.
+  const loopMode = mode === 'crew' || workflow?.kind === 'loop'
   const available = useMemo(
     () => (loopMode ? nodeDefinitions.filter(d => LOOP_CATEGORIES.has(d.category)) : nodeDefinitions),
     [nodeDefinitions, loopMode],

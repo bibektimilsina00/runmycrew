@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ReactFlowProvider } from 'reactflow'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useWorkflowEditor } from '../hooks/useWorkflowEditor'
+import type { EditorEntity } from '../services/editorAPI'
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts'
 import { useCopilotDiffStore } from '../stores/copilotDiffStore'
 import { useCopilotPendingStore } from '../stores/copilotPendingStore'
@@ -13,7 +14,13 @@ import { BottomPanel } from '../components/bottom-panel/BottomPanel'
 import { EditorLoading } from '../components/overlays/EditorLoading'
 import { EditorError } from '../components/overlays/EditorError'
 
-export function WorkflowEditor() {
+interface WorkflowEditorProps {
+  // Which backend entity to load/save/run via. Defaults to 'workflow' so the
+  // existing Automations route is byte-identical; the /crews route passes 'crew'.
+  entity?: EditorEntity
+}
+
+export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   useEditorShortcuts()
@@ -52,7 +59,7 @@ export function WorkflowEditor() {
     selectNode,
     run,
     isRunning,
-  } = useWorkflowEditor(id ?? '')
+  } = useWorkflowEditor(id ?? '', entity)
 
   const diffActive = useCopilotDiffStore(s => s.active)
   const proposed   = useCopilotDiffStore(s => s.proposed)

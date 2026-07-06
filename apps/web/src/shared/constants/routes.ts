@@ -33,6 +33,7 @@ export const APP_ROUTES = {
   INVITE_ACCEPT: '/invites/:token',
   WORKFLOW_DETAIL: '/workflows/:id',
   WORKFLOW: (id: string) => `/workflows/${id}`,
+  CREW_EDITOR: (id: string) => `/crews/${id}`,
 } as const
 
 export type AppRoute = typeof APP_ROUTES[keyof typeof APP_ROUTES]
@@ -70,6 +71,17 @@ export const API_ROUTES = {
   WORKFLOW_TOGGLE: (id: string) => `/workflows/${id}/toggle`,
   WORKFLOW_DUPLICATE: (id: string) => `/workflows/${id}/duplicate`,
   WORKFLOW_RUN: (id: string) => `/workflows/${id}/run`,
+
+  // Crews (dedicated /crews backend — replaces the old kind=loop workflow hack)
+  CREWS: '/crews/',
+  CREW_GET: (id: string) => `/crews/${id}`,
+  CREW_UPDATE: (id: string) => `/crews/${id}`,
+  CREW_DELETE: (id: string) => `/crews/${id}`,
+  CREW_TOGGLE: (id: string) => `/crews/${id}/toggle`,
+  CREW_DUPLICATE: (id: string) => `/crews/${id}/duplicate`,
+  CREW_RUN: (id: string) => `/crews/${id}/run`,
+  CREW_EXECUTIONS: (id: string) => `/crews/${id}/executions`,
+
   DASHBOARD_STATS: '/dashboard/stats',
   CRON_VALIDATE: '/cron/validate',
   CRON_NEXT_RUNS: '/cron/next-runs',

@@ -1,39 +1,62 @@
 import { requestJson } from '@/shared/utils/apiClient'
 import { API_ROUTES } from '@/shared/constants/routes'
-import { WorkflowDetailSchema, ApiNodeDefinitionListSchema } from '../types/editorTypes'
+import { WorkflowDetailSchema, CrewDetailSchema, ApiNodeDefinitionListSchema } from '../types/editorTypes'
 import { z } from 'zod'
 
+// The editor is shared between two backend entities. `'workflow'` (default)
+// hits `/workflows/*`; `'crew'` hits the dedicated `/crews/*` endpoints. Crew
+// differences: no optimistic-concurrency version (omit `expected_version`),
+// toggle is POST (workflow is PATCH), and responses are parsed with
+// CrewDetailSchema (which defaults the store's `kind` / `version_vector`).
+export type EditorEntity = 'workflow' | 'crew'
+
+// WorkflowDetail and CrewDetail both satisfy the store's WorkflowDetail shape.
+// Widen the parse-schema union so callers can stay entity-agnostic.
+const DetailSchema = z.union([WorkflowDetailSchema, CrewDetailSchema])
+
 export const editorAPI = {
-  getWorkflow: (id: string, signal?: AbortSignal) =>
-    requestJson(WorkflowDetailSchema, {
-      url: API_ROUTES.WORKFLOW_GET(id),
-      method: 'GET',
-      signal,
-    }),
+  getWorkflow: (id: string, signal?: AbortSignal, entity: EditorEntity = 'workflow') =>
+    entity === 'crew'
+      ? requestJson(CrewDetailSchema, { url: API_ROUTES.CREW_GET(id), method: 'GET', signal })
+      : requestJson(WorkflowDetailSchema, { url: API_ROUTES.WORKFLOW_GET(id), method: 'GET', signal }),
 
-  saveGraph: (id: string, graph: object, expectedVersion?: number) =>
-    requestJson(WorkflowDetailSchema, {
-      url: API_ROUTES.WORKFLOW_UPDATE(id),
-      method: 'PUT',
-      data: { graph, expected_version: expectedVersion },
-    }),
+  saveGraph: (id: string, graph: object, expectedVersion?: number, entity: EditorEntity = 'workflow') =>
+    entity === 'crew'
+      ? requestJson(CrewDetailSchema, {
+          url: API_ROUTES.CREW_UPDATE(id),
+          method: 'PUT',
+          data: { graph }, // crews have no version — omit expected_version
+        })
+      : requestJson(WorkflowDetailSchema, {
+          url: API_ROUTES.WORKFLOW_UPDATE(id),
+          method: 'PUT',
+          data: { graph, expected_version: expectedVersion },
+        }),
 
-  rename: (id: string, name: string) =>
-    requestJson(WorkflowDetailSchema, {
-      url: API_ROUTES.WORKFLOW_UPDATE(id),
+  rename: (id: string, name: string, entity: EditorEntity = 'workflow') =>
+    requestJson(DetailSchema, {
+      url: entity === 'crew' ? API_ROUTES.CREW_UPDATE(id) : API_ROUTES.WORKFLOW_UPDATE(id),
       method: 'PUT',
       data: { name },
     }),
 
-  toggleActive: (id: string) =>
-    requestJson(z.object({ id: z.string(), is_active: z.boolean() }), {
-      url: API_ROUTES.WORKFLOW_TOGGLE(id),
-      method: 'PATCH',
+  // Crew-only: persist the editable description via the shared PUT /crews/{id}.
+  updateDescription: (id: string, description: string) =>
+    requestJson(CrewDetailSchema, {
+      url: API_ROUTES.CREW_UPDATE(id),
+      method: 'PUT',
+      data: { description },
     }),
 
-  run: (id: string) =>
+  toggleActive: (id: string, entity: EditorEntity = 'workflow') =>
+    requestJson(z.object({ id: z.string(), is_active: z.boolean() }), {
+      url: entity === 'crew' ? API_ROUTES.CREW_TOGGLE(id) : API_ROUTES.WORKFLOW_TOGGLE(id),
+      method: entity === 'crew' ? 'POST' : 'PATCH', // crew toggle is POST
+    }),
+
+  run: (id: string, entity: EditorEntity = 'workflow') =>
     requestJson(z.object({ execution_id: z.string() }), {
-      url: API_ROUTES.WORKFLOW_RUN(id),
+      url: entity === 'crew' ? API_ROUTES.CREW_RUN(id) : API_ROUTES.WORKFLOW_RUN(id),
       method: 'POST',
     }),
 

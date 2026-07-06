@@ -28,6 +28,32 @@ export const WorkflowDetailSchema = z.object({
 })
 export type WorkflowDetail = z.infer<typeof WorkflowDetailSchema>
 
+// ── Crew (from /crews backend) ────────────────────────────────────────────────
+//
+// Crews are the real backend model that superseded the old `kind=loop`
+// workflow hack. The editor store is shared with workflows, so we parse the
+// crew payload straight into the same `WorkflowDetail` shape the store reads.
+// Crews have no `kind` / `version_vector` / `schema_version` — those store
+// fields are defaulted here (`kind: 'automation'`, `version_vector: 0`) so the
+// editor's version-vector + kind logic is inert for crews. The focused palette
+// is instead forced via the editor store's `mode`, not `kind` (see
+// useNodeLibrary + useWorkflowEditor). Crews additionally carry `position`.
+export const CrewDetailSchema = z.object({
+  id:             z.string().uuid(),
+  name:           z.string(),
+  description:    z.string().nullable().optional(),
+  is_active:      z.boolean(),
+  color:          z.string().nullable().optional(),
+  position:       z.number().nullable().optional(),
+  graph:          z.any(),
+  created_at:     z.string(),
+  updated_at:     z.string(),
+  // Defaulted store-compat fields (crews don't send these).
+  kind:           z.enum(['automation', 'loop']).default('automation'),
+  version_vector: z.number().default(0),
+})
+export type CrewDetail = z.infer<typeof CrewDetailSchema>
+
 // ── Save state ────────────────────────────────────────────────────────────────
 
 export type SaveState = 'saved' | 'saving' | 'unsaved' | 'error'

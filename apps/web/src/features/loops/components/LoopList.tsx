@@ -87,7 +87,7 @@ export function LoopList({ items }: Props) {
           <div
             key={a.id}
             className="table-row group cursor-pointer"
-            onClick={() => navigate(APP_ROUTES.WORKFLOW(a.id))}
+            onClick={() => navigate(APP_ROUTES.CREW_EDITOR(a.id))}
           >
             <span className={`status-dot ${statusDot(a.status)}`} />
 

@@ -22,7 +22,16 @@ interface GraphSnapshot {
 const HISTORY_LIMIT = 50
 const PASTE_OFFSET = 40
 
+export type EditorMode = 'workflow' | 'crew'
+
 interface WorkflowEditorState {
+  // Which backend entity this editor session is editing. `'workflow'` is the
+  // default (Automations); `'crew'` is set when loading via the /crews route.
+  // Drives the forced focused palette (see useNodeLibrary) without relying on
+  // `kind`, which crews don't have.
+  mode: EditorMode
+  setMode: (m: EditorMode) => void
+
   // Loaded workflow meta
   workflow: WorkflowDetail | null
   setWorkflow: (w: WorkflowDetail) => void
@@ -87,6 +96,9 @@ interface WorkflowEditorState {
 const NODE_RUN_ABORTS = new Map<string, AbortController>()
 
 export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => ({
+  mode: 'workflow',
+  setMode: (mode) => set({ mode }),
+
   workflow: null,
   setWorkflow: (workflow) => set({ workflow }),
 
@@ -308,6 +320,7 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>((set, get) => 
     for (const abort of NODE_RUN_ABORTS.values()) abort.abort()
     NODE_RUN_ABORTS.clear()
     set({
+      mode: 'workflow',
       workflow: null,
       nodes: [],
       edges: [],
