@@ -239,12 +239,12 @@ export function ExpressionEditor({
   // appears in the middle of the field while you type at the start.
   const sharedInputClass = cn(
     'w-full bg-transparent outline-none text-sm text-transparent caret-text',
-    'font-mono leading-normal',
+    'font-[var(--font-ui)] leading-normal',
     'placeholder:text-text-faint',
   )
 
   const sharedPreClass = cn(
-    'pointer-events-none m-0 text-sm leading-normal whitespace-pre-wrap break-words font-mono',
+    'pointer-events-none m-0 text-sm leading-normal whitespace-pre-wrap break-words font-[var(--font-ui)]',
   )
 
   return (
