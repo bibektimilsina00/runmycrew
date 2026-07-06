@@ -44,6 +44,47 @@ class ExecutionEngine:
         logger.info(f"Enqueued execution {execution_id} for workflow {workflow_id}")
         return execution_id
 
+    async def trigger_crew(
+        self,
+        crew_id: uuid.UUID,
+        graph: dict,
+        trigger_type: str = "manual",
+        input_data: dict | None = None,
+    ) -> uuid.UUID:
+        """Trigger a crew run by reusing the workflow execution engine.
+
+        A crew stores the same node-graph shape as a workflow, so we feed
+        the graph to the shared WorkflowRunner and record a CrewExecution
+        row for separate crew run history.
+        """
+        from apps.api.app.features.crews.models import CrewExecution
+
+        async with AsyncSessionLocal() as db:
+            crew_execution = CrewExecution(
+                crew_id=crew_id,
+                trigger_type=trigger_type,
+                status="pending",
+                input_data=input_data or {},
+            )
+            db.add(crew_execution)
+            await db.commit()
+            await db.refresh(crew_execution)
+
+            crew_execution_id = crew_execution.id
+
+        # Enqueue Celery task AFTER DB commit (so worker can query it)
+        from apps.worker.app.jobs.tasks import execute_crew
+
+        execute_crew.delay(
+            crew_execution_id=str(crew_execution_id),
+            crew_id=str(crew_id),
+            graph=graph,
+            trigger_data=input_data or {},
+        )
+
+        logger.info(f"Enqueued crew execution {crew_execution_id} for crew {crew_id}")
+        return crew_execution_id
+
     async def dispatch_existing(
         self,
         execution_id: uuid.UUID,
