@@ -54,6 +54,12 @@ class Workflow(SQLModelBase, table=True):
     #   - "skip"    — fire nothing if we are more than 1 tick late
     cron_drift_policy: str = Field(default="latest", max_length=16)
 
+    # ── Loop engineering — workflow kind discriminator ────────────
+    # "automation" = the full n8n-style editor (all nodes).
+    # "loop"       = the focused loop-engineering editor (AI-orchestration
+    #                nodes only). See docs/loop-engineering-plan.md.
+    kind: str = Field(default="automation", max_length=16)
+
     user: "User" = Relationship(back_populates="workflows")
     folder: "Folder" = Relationship(back_populates="workflows")
     executions: list["Execution"] = Relationship(

@@ -44,11 +44,14 @@ class WorkflowRepository:
         )
         return list(result.scalars().all())
 
-    async def list_by_workspace(self, workspace_id: uuid.UUID) -> list[Workflow]:
+    async def list_by_workspace(
+        self, workspace_id: uuid.UUID, kind: str | None = None
+    ) -> list[Workflow]:
+        statement = select(Workflow).where(Workflow.workspace_id == workspace_id)
+        if kind is not None:
+            statement = statement.where(Workflow.kind == kind)
         result = await self.db.execute(
-            select(Workflow)
-            .where(Workflow.workspace_id == workspace_id)
-            .order_by(Workflow.position.asc(), Workflow.created_at.desc())
+            statement.order_by(Workflow.position.asc(), Workflow.created_at.desc())
         )
         return list(result.scalars().all())
 

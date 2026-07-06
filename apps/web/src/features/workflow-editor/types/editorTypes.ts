@@ -16,6 +16,11 @@ export const WorkflowDetailSchema = z.object({
   description:    z.string().nullable().optional(),
   is_active:      z.boolean(),
   color:          z.string().nullable().optional(),
+  // Distinguishes the full Automations editor from the focused Loop
+  // Engineering editor. The palette narrows to AI-orchestration nodes
+  // when kind === 'loop'. Optional + defaulted so pre-`kind` backends
+  // (and any legacy rows) still parse as automations.
+  kind:           z.enum(['automation', 'loop']).default('automation'),
   graph:          z.any(),
   version_vector: z.number().default(0),
   created_at:     z.string(),
