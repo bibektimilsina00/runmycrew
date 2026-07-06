@@ -19,6 +19,7 @@ from apps.api.app.node_system.nodes.ai.perplexity.perplexity_node import Perplex
 from apps.api.app.node_system.nodes.ai.stt.stt_node import STTNode
 from apps.api.app.node_system.nodes.ai.thinking.thinking import ThinkingNode
 from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
+from apps.api.app.node_system.nodes.ai.verify.verify import VerifyNode
 from apps.api.app.node_system.nodes.ai.vision.vision_node import VisionNode
 from apps.api.app.node_system.nodes.airtable.airtable_node import AirtableNode
 from apps.api.app.node_system.nodes.airweave.airweave_node import AirweaveNode
@@ -410,6 +411,7 @@ node_registry.register(TriggerNode)
 node_registry.register(CronTriggerNode)
 node_registry.register(AgentNode)
 node_registry.register(AgentCrewNode)
+node_registry.register(VerifyNode)
 node_registry.register(LLMNode)
 node_registry.register(KnowledgeNode)
 node_registry.register(VisionNode)
