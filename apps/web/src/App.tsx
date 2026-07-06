@@ -69,6 +69,8 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<EditorLayout />}>
             <Route path="/workflows/:id" element={<WorkflowEditor />} />
+            {/* Crews reuse the workflow editor but load/save/run via /crews */}
+            <Route path="/crews/:id" element={<WorkflowEditor entity="crew" />} />
           </Route>
         </Route>
 

@@ -36,6 +36,49 @@ export interface LoopCreateRequest {
   folder_id?: string | null
   color?: string | null
   // Optional starter graph seeded on create. Matches the editor's persisted
-  // graph shape ({ nodes, edges }); WorkflowCreate accepts it directly.
+  // graph shape ({ nodes, edges }); CrewCreate accepts it directly.
   graph?: { nodes: unknown[]; edges: unknown[] }
+}
+
+// ── Crew (from the dedicated /crews backend) ──────────────────────────────────
+//
+// The list UI still renders the `Loop` display shape (kind/trigger/status/…),
+// but the real backend is now `/crews`, whose CrewOut payload is leaner — no
+// kind/env/version. We parse CrewOut and map it into `Loop` (see crewToLoop)
+// so the list page + row component stay unchanged.
+export const CrewOutSchema = z.object({
+  id:          z.string().uuid(),
+  name:        z.string(),
+  description: z.string().nullable().optional(),
+  graph:       z.any(),
+  is_active:   z.boolean(),
+  position:    z.number().nullable().optional(),
+  color:       z.string().nullable().optional(),
+  created_at:  z.string(),
+  updated_at:  z.string(),
+})
+export type CrewOut = z.infer<typeof CrewOutSchema>
+
+// Map a CrewOut into the `Loop` display shape the list expects. Crews have no
+// execution stats or trigger metadata in the list payload, so those derive to
+// sensible defaults; `status` follows is_active (active vs paused).
+export function crewToLoop(c: CrewOut): Loop {
+  return {
+    id:              c.id,
+    name:            c.name,
+    description:     c.description ?? null,
+    is_active:       c.is_active,
+    color:          c.color ?? null,
+    folder_id:      null,
+    workspace_id:    '',
+    user_id:         '',
+    created_at:      c.created_at,
+    updated_at:      c.updated_at,
+    kind:            'agent',
+    trigger:         '',
+    status:          c.is_active ? 'active' : 'paused',
+    execution_count: 0,
+    last_run:        null,
+    last_run_status: null,
+  }
 }

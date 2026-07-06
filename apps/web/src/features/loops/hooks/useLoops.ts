@@ -17,9 +17,9 @@ export function useLoops() {
 }
 
 /**
- * Create a loop workflow (kind:'loop') and navigate straight into the shared
- * editor at /workflows/:id. Because the loaded workflow's kind === 'loop', the
- * editor renders the focused Loop Engineering palette.
+ * Create a crew and navigate straight into the shared editor at /crews/:id.
+ * The /crews route loads the editor in `entity="crew"` mode, which forces the
+ * focused Crew palette (no `kind` needed).
  */
 export function useCreateLoop() {
   const qc = useQueryClient()
@@ -49,7 +49,7 @@ export function useCreateLoop() {
     },
     onSuccess: (created) => {
       qc.invalidateQueries({ queryKey: KEYS.list })
-      navigate(APP_ROUTES.WORKFLOW(created.id))
+      navigate(APP_ROUTES.CREW_EDITOR(created.id))
     },
   })
 }

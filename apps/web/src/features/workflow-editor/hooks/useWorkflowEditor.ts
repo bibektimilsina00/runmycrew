@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { addEdge, type Connection, type Edge, type Node } from 'reactflow'
 import type { ApiNodeDefinition, NodeDefinition } from '../types/editorTypes'
 
-import { editorAPI } from '../services/editorAPI'
+import { editorAPI, type EditorEntity } from '../services/editorAPI'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../stores/editorLayoutStore'
 import { useRunsStore } from '@/features/runs/store/runsStore'
@@ -61,8 +61,9 @@ export function normalizeDefinition(d: ApiNodeDefinition): NodeDefinition {
   }
 }
 
-export function useWorkflowEditor(workflowId: string) {
+export function useWorkflowEditor(workflowId: string, entity: EditorEntity = 'workflow') {
   const storeWorkflow = useWorkflowEditorStore(s => s.workflow)
+  const setMode = useWorkflowEditorStore(s => s.setMode)
   const saveState = useWorkflowEditorStore(s => s.saveState)
   const setWorkflow = useWorkflowEditorStore(s => s.setWorkflow)
   const setNodeDefinitions = useWorkflowEditorStore(s => s.setNodeDefinitions)
@@ -96,10 +97,16 @@ export function useWorkflowEditor(workflowId: string) {
     }
   }, [rawDefinitions, setNodeDefinitions])
 
+  // Sync the store's editor mode to the entity being edited so the focused
+  // palette (crews) is forced regardless of `kind`. Runs before data loads.
+  useEffect(() => {
+    setMode(entity === 'crew' ? 'crew' : 'workflow')
+  }, [entity, setMode])
+
   // ── Fetch workflow ────────────────────────────────────────────────────────
   const { data: workflow, isLoading, error } = useQuery({
-    queryKey: ['workflow-editor', workflowId],
-    queryFn: ({ signal }) => editorAPI.getWorkflow(workflowId, signal),
+    queryKey: ['workflow-editor', entity, workflowId],
+    queryFn: ({ signal }) => editorAPI.getWorkflow(workflowId, signal, entity),
     staleTime: Infinity, // editor owns the data
   })
 
@@ -122,7 +129,7 @@ export function useWorkflowEditor(workflowId: string) {
   // ── Auto-save ─────────────────────────────────────────────────────────────
   const saveMutation = useMutation({
     mutationFn: ({ graph, version }: { graph: SavedGraph; version: number }) =>
-      editorAPI.saveGraph(workflowId, graph, version),
+      editorAPI.saveGraph(workflowId, graph, version, entity),
     onMutate: () => setSaveState('saving'),
     onSuccess: (updated) => {
       retrying.current = false
@@ -231,6 +238,18 @@ export function useWorkflowEditor(workflowId: string) {
 
   const runMutation = useMutation({
     mutationFn: async () => {
+      // Crews only expose POST /crews/{id}/run — no listen-slot path.
+      if (entity === 'crew') {
+        const res = await editorAPI.run(workflowId, 'crew')
+        return {
+          execution_id: res.execution_id,
+          waiting_for: null,
+          node_id: null,
+          target_id: null,
+          ttl_seconds: null,
+          mode: 'run' as const,
+        }
+      }
       if (hasMetaTrigger()) {
         const res = await editorAPI.listen(workflowId)
         return {
@@ -295,13 +314,19 @@ export function useWorkflowEditor(workflowId: string) {
 
   // ── Rename ────────────────────────────────────────────────────────────────
   const renameMutation = useMutation({
-    mutationFn: (name: string) => editorAPI.rename(workflowId, name),
+    mutationFn: (name: string) => editorAPI.rename(workflowId, name, entity),
+    onSuccess: (updated) => setWorkflow(updated),
+  })
+
+  // ── Description (crew-only) ───────────────────────────────────────────────
+  const descriptionMutation = useMutation({
+    mutationFn: (description: string) => editorAPI.updateDescription(workflowId, description),
     onSuccess: (updated) => setWorkflow(updated),
   })
 
   // ── Toggle active ─────────────────────────────────────────────────────────
   const toggleMutation = useMutation({
-    mutationFn: () => editorAPI.toggleActive(workflowId),
+    mutationFn: () => editorAPI.toggleActive(workflowId, entity),
     onSuccess: (res) => {
       if (storeWorkflow) setWorkflow({ ...storeWorkflow, is_active: res.is_active })
     },
@@ -332,6 +357,7 @@ export function useWorkflowEditor(workflowId: string) {
     run: runMutation.mutate,
     cancelListen: cancelListenMutation.mutate,
     rename: renameMutation.mutate,
+    updateDescription: descriptionMutation.mutate,
     toggle: toggleMutation.mutate,
     isRunning: runMutation.isPending,
     saveState,
