@@ -95,7 +95,7 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                 {
                     "name": "metrics",
                     "label": "Metrics",
-                    "type": "json",
+                    "type": "collection",
                     "required": True,
                     "default": [
                         {
@@ -111,7 +111,30 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                             "max": 10,
                         },
                     ],
-                    "description": "Array of {name, description, min, max} metrics.",
+                    "typeOptions": {
+                        "multipleValues": True,
+                        "addButtonText": "Add metric",
+                        "autoIncrementField": "name",
+                        "autoIncrementPrefix": "metric",
+                    },
+                    "properties": [
+                        {
+                            "name": "name",
+                            "label": "Name",
+                            "type": "string",
+                            "placeholder": "correctness",
+                            "required": True,
+                        },
+                        {
+                            "name": "description",
+                            "label": "Description",
+                            "type": "string",
+                            "placeholder": "What does this metric measure?",
+                        },
+                        {"name": "min", "label": "Min", "type": "number", "default": 0},
+                        {"name": "max", "label": "Max", "type": "number", "default": 10},
+                    ],
+                    "description": "Score the content on each metric (name, description, min–max range).",
                 },
                 {
                     "name": "temperature",
