@@ -60,7 +60,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.gitlab_webhook",
-    name="GitLab Webhook",
+    name="GitLab",
     description=(
         "Fires the instant GitLab posts a webhook delivery to your "
         "workflow URL. Pair with a project-level webhook configured "

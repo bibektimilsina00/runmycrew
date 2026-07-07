@@ -58040,6 +58040,62 @@
           {
             "label": "Identify by Email",
             "value": "identify_by_email"
+          },
+          {
+            "label": "Credit Check",
+            "value": "credit_check"
+          },
+          {
+            "label": "IP to Hashed Email",
+            "value": "ip_to_hem"
+          },
+          {
+            "label": "IP to MAID",
+            "value": "ip_to_maid"
+          },
+          {
+            "label": "HEM to Business Profile",
+            "value": "hem_to_business_profile"
+          },
+          {
+            "label": "HEM to Best LinkedIn",
+            "value": "hem_to_best_linkedin"
+          },
+          {
+            "label": "HEM to LinkedIn",
+            "value": "hem_to_linkedin"
+          },
+          {
+            "label": "HEM to MAID",
+            "value": "hem_to_maid"
+          },
+          {
+            "label": "Email to Activity",
+            "value": "email_to_activity"
+          },
+          {
+            "label": "LinkedIn to Business Profile",
+            "value": "linkedin_to_business_profile"
+          },
+          {
+            "label": "LinkedIn to Best Personal Email",
+            "value": "linkedin_to_best_personal_email"
+          },
+          {
+            "label": "LinkedIn to Personal Email",
+            "value": "linkedin_to_personal_email"
+          },
+          {
+            "label": "LinkedIn to Hashed Emails",
+            "value": "linkedin_to_hashed_emails"
+          },
+          {
+            "label": "LinkedIn to Mobile Phone",
+            "value": "linkedin_to_mobile_phone"
+          },
+          {
+            "label": "LinkedIn Slug Search",
+            "value": "linkedin_slug_search"
           }
         ],
         "type": "options"
@@ -58173,7 +58229,8 @@
         "condition": {
           "field": "operation",
           "value": [
-            "identify_by_email"
+            "identify_by_email",
+            "email_to_activity"
           ]
         },
         "label": "Email",
@@ -58375,6 +58432,63 @@
         "label": "Filter",
         "mode": "advanced",
         "name": "filter",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "hem_to_business_profile",
+            "hem_to_best_linkedin",
+            "hem_to_linkedin",
+            "hem_to_maid"
+          ]
+        },
+        "label": "Hashed Email (HEM)",
+        "name": "hem",
+        "type": "string"
+      },
+      {
+        "label": "Mobile Advertiser ID",
+        "name": "maid",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "linkedin_to_business_profile",
+            "linkedin_to_best_personal_email",
+            "linkedin_to_personal_email",
+            "linkedin_to_hashed_emails",
+            "linkedin_to_mobile_phone"
+          ]
+        },
+        "label": "LinkedIn URL",
+        "name": "linkedin_url",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "linkedin_slug_search"
+          ]
+        },
+        "label": "LinkedIn Slug",
+        "name": "linkedin_slug",
+        "type": "string"
+      },
+      {
+        "condition": {
+          "field": "operation",
+          "value": [
+            "ip_to_hem",
+            "ip_to_maid"
+          ]
+        },
+        "label": "IP Address",
+        "name": "ip_address",
         "type": "string"
       },
       {
@@ -81780,7 +81894,7 @@
     "dynamic_outputs_from": null,
     "icon": "azure_devops",
     "inputs": 0,
-    "name": "Azure DevOps Webhook",
+    "name": "Azure DevOps",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -81880,7 +81994,7 @@
         "description": "GITLAB_TOKEN secret. Deliveries without a valid `Authorization` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Azure DevOps Webhook webhook settings",
+        "placeholder": "Set the same value in Azure DevOps webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -82175,7 +82289,7 @@
     "dynamic_outputs_from": null,
     "icon": "circleback",
     "inputs": 0,
-    "name": "Circleback Webhook",
+    "name": "Circleback",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -82238,7 +82352,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `x-circleback-signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Circleback Webhook webhook settings",
+        "placeholder": "Set the same value in Circleback webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -82275,167 +82389,6 @@
     "tools": null,
     "type": "trigger.circleback_webhook"
   },
-  "trigger.confluence": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "confluence_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll Confluence Cloud for new / updated pages + blog posts, new comments on a target page, or new spaces.",
-    "dynamic_outputs_from": null,
-    "icon": "confluence",
-    "inputs": 0,
-    "name": "Confluence",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "title",
-        "type": "string"
-      },
-      {
-        "label": "space_id",
-        "type": "string"
-      },
-      {
-        "label": "status",
-        "type": "string"
-      },
-      {
-        "label": "created_at",
-        "type": "string"
-      },
-      {
-        "label": "version_number",
-        "type": "number"
-      },
-      {
-        "label": "text",
-        "type": "string"
-      },
-      {
-        "label": "web_url",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "confluence_api_key",
-        "label": "Confluence Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "page_created",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "Page Created",
-            "value": "page_created"
-          },
-          {
-            "label": "Page Updated",
-            "value": "page_updated"
-          },
-          {
-            "label": "Blog Post Created",
-            "value": "blog_created"
-          },
-          {
-            "label": "Blog Post Updated",
-            "value": "blog_updated"
-          },
-          {
-            "label": "Comment Created on Page",
-            "value": "comment_created"
-          },
-          {
-            "label": "Space Created",
-            "value": "space_created"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "page_created",
-            "page_updated",
-            "blog_created",
-            "blog_updated"
-          ]
-        },
-        "label": "Space ID (optional; blank = all spaces)",
-        "mode": "advanced",
-        "name": "space_id",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "comment_created"
-          ]
-        },
-        "label": "Page ID (for comment_created event)",
-        "name": "page_id",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 90,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.confluence"
-  },
   "trigger.confluence_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -82447,7 +82400,7 @@
     "dynamic_outputs_from": null,
     "icon": "confluence",
     "inputs": 0,
-    "name": "Confluence Webhook",
+    "name": "Confluence",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -82594,7 +82547,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Confluence Webhook webhook settings",
+        "placeholder": "Set the same value in Confluence webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -82710,130 +82663,6 @@
     "tools": null,
     "type": "trigger.cron"
   },
-  "trigger.emailbison": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "emailbison_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll Emailbison for new leads (workspace-wide or per-campaign) and new campaigns. Per-delivery email events require a webhook.",
-    "dynamic_outputs_from": null,
-    "icon": "emailbison",
-    "inputs": 0,
-    "name": "Emailbison",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "email",
-        "type": "string"
-      },
-      {
-        "label": "name",
-        "type": "string"
-      },
-      {
-        "label": "status",
-        "type": "string"
-      },
-      {
-        "label": "campaign_id",
-        "type": "string"
-      },
-      {
-        "label": "created_at",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "emailbison_api_key",
-        "label": "Emailbison Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_lead",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New Lead",
-            "value": "new_lead"
-          },
-          {
-            "label": "New Campaign",
-            "value": "new_campaign"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "label": "Campaign ID (optional; blank = workspace-wide leads)",
-        "mode": "advanced",
-        "name": "campaign_id",
-        "type": "string"
-      },
-      {
-        "default": 50,
-        "label": "Per page",
-        "mode": "advanced",
-        "name": "per_page",
-        "type": "number"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 90,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.emailbison"
-  },
   "trigger.emailbison_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -82845,7 +82674,7 @@
     "dynamic_outputs_from": null,
     "icon": "emailbison",
     "inputs": 0,
-    "name": "Emailbison Webhook",
+    "name": "Emailbison",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -82936,7 +82765,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `x-emailbison-signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Emailbison Webhook webhook settings",
+        "placeholder": "Set the same value in Emailbison webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -82984,7 +82813,7 @@
     "dynamic_outputs_from": null,
     "icon": "fathom",
     "inputs": 0,
-    "name": "Fathom Webhook",
+    "name": "Fathom",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -83055,7 +82884,7 @@
         "description": "GITLAB_TOKEN secret. Deliveries without a valid `x-webhook-secret` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Fathom Webhook webhook settings",
+        "placeholder": "Set the same value in Fathom webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -83103,7 +82932,7 @@
     "dynamic_outputs_from": null,
     "icon": "fireflies",
     "inputs": 0,
-    "name": "Fireflies Webhook",
+    "name": "Fireflies",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -83170,7 +82999,7 @@
         "description": "HMAC_SHA1 secret. Deliveries without a valid `x-hub-signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Fireflies Webhook webhook settings",
+        "placeholder": "Set the same value in Fireflies webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -83843,171 +83672,6 @@
     "tools": null,
     "type": "trigger.gforms_response"
   },
-  "trigger.github": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#ffffff",
-    "credential_type": [
-      "github_oauth",
-      "github_pat"
-    ],
-    "default_height": null,
-    "default_width": null,
-    "description": "Polls a GitHub repo for new issues, pull requests, issue comments, releases, or commits. First poll snapshots silently; later polls emit one execution per new item. Use the GitHub Webhook trigger instead when you can expose a public URL.",
-    "dynamic_outputs_from": null,
-    "icon": "github",
-    "inputs": 0,
-    "name": "GitHub",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "number",
-        "type": "number"
-      },
-      {
-        "label": "title",
-        "type": "string"
-      },
-      {
-        "label": "event_type",
-        "type": "string"
-      },
-      {
-        "label": "html_url",
-        "type": "string"
-      },
-      {
-        "label": "author",
-        "type": "object"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": [
-          "github_oauth",
-          "github_pat"
-        ],
-        "label": "GitHub Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_issue",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New issue",
-            "value": "new_issue"
-          },
-          {
-            "label": "New pull request",
-            "value": "new_pr"
-          },
-          {
-            "label": "New issue / PR comment",
-            "value": "new_issue_comment"
-          },
-          {
-            "label": "New release",
-            "value": "new_release"
-          },
-          {
-            "label": "New commit",
-            "value": "new_commit"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "label": "Owner (user or org)",
-        "name": "owner",
-        "placeholder": "octocat",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "label": "Repository",
-        "loadOptions": "/integrations/github/repos",
-        "loadOptionsDependsOn": [
-          "credential",
-          "owner"
-        ],
-        "name": "repo",
-        "placeholder": "hello-world",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": "new_commit"
-        },
-        "description": "Leave blank to track the repo's default branch.",
-        "label": "Branch (optional)",
-        "loadOptions": "/integrations/github/branches",
-        "loadOptionsDependsOn": [
-          "credential",
-          "owner",
-          "repo"
-        ],
-        "name": "branch",
-        "placeholder": "main",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 120,
-        "description": "Min 30s. GitHub's unauthenticated rate limit is 60/hr.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.github"
-  },
   "trigger.github_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -84022,7 +83686,7 @@
     "dynamic_outputs_from": null,
     "icon": "github",
     "inputs": 0,
-    "name": "GitHub Webhook",
+    "name": "GitHub",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -84189,128 +83853,6 @@
     "tools": null,
     "type": "trigger.github_webhook"
   },
-  "trigger.gitlab": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "gitlab_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll GitLab for new issues, merge requests, releases, commits.",
-    "dynamic_outputs_from": null,
-    "icon": "gitlab",
-    "inputs": 0,
-    "name": "GitLab",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "title",
-        "type": "string"
-      },
-      {
-        "label": "state",
-        "type": "string"
-      },
-      {
-        "label": "web_url",
-        "type": "string"
-      },
-      {
-        "label": "event_type",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "gitlab_api_key",
-        "label": "GitLab Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_issue",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New Issue",
-            "value": "new_issue"
-          },
-          {
-            "label": "New Merge Request",
-            "value": "new_mr"
-          },
-          {
-            "label": "New Release",
-            "value": "new_release"
-          },
-          {
-            "label": "New Commit",
-            "value": "new_commit"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "label": "Project ID (or namespace%2Fproject URL-encoded)",
-        "name": "project_id",
-        "placeholder": "12345678 or my-group%2Fmy-project",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 60,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.gitlab"
-  },
   "trigger.gitlab_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -84322,7 +83864,7 @@
     "dynamic_outputs_from": null,
     "icon": "gitlab",
     "inputs": 0,
-    "name": "GitLab Webhook",
+    "name": "GitLab",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -84416,7 +83958,7 @@
         "description": "GITLAB_TOKEN secret. Deliveries without a valid `X-Gitlab-Token` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in GitLab Webhook webhook settings",
+        "placeholder": "Set the same value in GitLab webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -84608,7 +84150,7 @@
     "dynamic_outputs_from": null,
     "icon": "gong",
     "inputs": 0,
-    "name": "Gong Webhook",
+    "name": "Gong",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -84671,7 +84213,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Gong-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Gong Webhook webhook settings",
+        "placeholder": "Set the same value in Gong webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -85769,127 +85311,6 @@
     "tools": null,
     "type": "trigger.imap"
   },
-  "trigger.instantly": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "instantly_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll Instantly for new leads, lead status changes (interested / meeting_booked / unsubscribed / \u2026), or completed campaigns. For per-delivery email events attach an Instantly webhook.",
-    "dynamic_outputs_from": null,
-    "icon": "instantly",
-    "inputs": 0,
-    "name": "Instantly",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "email",
-        "type": "string"
-      },
-      {
-        "label": "status",
-        "type": "string"
-      },
-      {
-        "label": "campaign_id",
-        "type": "string"
-      },
-      {
-        "label": "change",
-        "type": "object"
-      },
-      {
-        "label": "name",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "instantly_api_key",
-        "label": "Instantly Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_lead",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New Lead",
-            "value": "new_lead"
-          },
-          {
-            "label": "Lead Status Changed",
-            "value": "lead_status_changed"
-          },
-          {
-            "label": "Campaign Completed",
-            "value": "campaign_completed"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "label": "Campaign ID (optional; blank = all campaigns)",
-        "mode": "advanced",
-        "name": "campaign_id",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 90,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.instantly"
-  },
   "trigger.instantly_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -85901,7 +85322,7 @@
     "dynamic_outputs_from": null,
     "icon": "instantly",
     "inputs": 0,
-    "name": "Instantly Webhook",
+    "name": "Instantly",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -86024,7 +85445,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `x-instantly-signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Instantly Webhook webhook settings",
+        "placeholder": "Set the same value in Instantly webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -86179,207 +85600,6 @@
     "tools": null,
     "type": "trigger.intercom"
   },
-  "trigger.jira": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "jira_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll Jira for new issues, updates, comments, worklogs, sprints, or projects. Basic auth via email + API token.",
-    "dynamic_outputs_from": null,
-    "icon": "jira",
-    "inputs": 0,
-    "name": "Jira",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "key",
-        "type": "string"
-      },
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "summary",
-        "type": "string"
-      },
-      {
-        "label": "status",
-        "type": "string"
-      },
-      {
-        "label": "updated",
-        "type": "string"
-      },
-      {
-        "label": "body",
-        "type": "string"
-      },
-      {
-        "label": "issue_key",
-        "type": "string"
-      },
-      {
-        "label": "name",
-        "type": "string"
-      },
-      {
-        "label": "state",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "jira_api_key",
-        "label": "Jira Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_issue",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New Issue Matching JQL",
-            "value": "new_issue"
-          },
-          {
-            "label": "Issue Updated",
-            "value": "issue_updated"
-          },
-          {
-            "label": "New Comment on Issue",
-            "value": "new_comment"
-          },
-          {
-            "label": "New Worklog on Issue",
-            "value": "new_worklog"
-          },
-          {
-            "label": "New Sprint on Board",
-            "value": "new_sprint"
-          },
-          {
-            "label": "Sprint Started",
-            "value": "sprint_started"
-          },
-          {
-            "label": "Sprint Closed",
-            "value": "sprint_closed"
-          },
-          {
-            "label": "New Project",
-            "value": "new_project"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_issue",
-            "issue_updated"
-          ]
-        },
-        "label": "JQL (for issue events)",
-        "name": "jql",
-        "placeholder": "project = \"ABC\" AND status = \"To Do\"",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_issue",
-            "issue_updated"
-          ]
-        },
-        "default": 50,
-        "label": "Max Results",
-        "mode": "advanced",
-        "name": "max_results",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_comment",
-            "new_worklog"
-          ]
-        },
-        "label": "Issue Key (for comment/worklog events)",
-        "name": "issue_key",
-        "placeholder": "ABC-123",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_sprint",
-            "sprint_started",
-            "sprint_closed"
-          ]
-        },
-        "label": "Board ID (for sprint events)",
-        "name": "board_id",
-        "placeholder": "12",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 90,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.jira"
-  },
   "trigger.jira_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -86391,7 +85611,7 @@
     "dynamic_outputs_from": null,
     "icon": "jira",
     "inputs": 0,
-    "name": "Jira Webhook",
+    "name": "Jira",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -86514,7 +85734,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Jira Webhook webhook settings",
+        "placeholder": "Set the same value in Jira webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -86551,128 +85771,6 @@
     "tools": null,
     "type": "trigger.jira_webhook"
   },
-  "trigger.lemlist": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "lemlist_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll Lemlist for new activities (email events at coarse cadence) or new leads added to a campaign. For real-time email events, attach a Lemlist webhook instead.",
-    "dynamic_outputs_from": null,
-    "icon": "lemlist",
-    "inputs": 0,
-    "name": "Lemlist",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "type",
-        "type": "string"
-      },
-      {
-        "label": "campaign_id",
-        "type": "string"
-      },
-      {
-        "label": "lead_email",
-        "type": "string"
-      },
-      {
-        "label": "first_name",
-        "type": "string"
-      },
-      {
-        "label": "date",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "lemlist_api_key",
-        "label": "Lemlist Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "activity_created",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New Activity",
-            "value": "activity_created"
-          },
-          {
-            "label": "New Lead Added to Campaign",
-            "value": "new_lead_in_campaign"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_lead_in_campaign"
-          ]
-        },
-        "label": "Campaign ID (required for lead events; optional for activities)",
-        "name": "campaign_id",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 90,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.lemlist"
-  },
   "trigger.lemlist_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -86684,7 +85782,7 @@
     "dynamic_outputs_from": null,
     "icon": "lemlist",
     "inputs": 0,
-    "name": "Lemlist Webhook",
+    "name": "Lemlist",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -86767,7 +85865,7 @@
         "description": "GITLAB_TOKEN secret. Deliveries without a valid `x-webhook-token` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Lemlist Webhook webhook settings",
+        "placeholder": "Set the same value in Lemlist webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -86804,147 +85902,6 @@
     "tools": null,
     "type": "trigger.lemlist_webhook"
   },
-  "trigger.linear": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": "linear_api_key",
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll Linear for new / updated issues or new comments.",
-    "dynamic_outputs_from": null,
-    "icon": "linear",
-    "inputs": 0,
-    "name": "Linear",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "identifier",
-        "type": "string"
-      },
-      {
-        "label": "title",
-        "type": "string"
-      },
-      {
-        "label": "url",
-        "type": "string"
-      },
-      {
-        "label": "createdAt",
-        "type": "string"
-      },
-      {
-        "label": "updatedAt",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": "linear_api_key",
-        "label": "Linear Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_issue",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "New Issue",
-            "value": "new_issue"
-          },
-          {
-            "label": "Issue Updated",
-            "value": "updated_issue"
-          },
-          {
-            "label": "New Comment",
-            "value": "new_comment"
-          },
-          {
-            "label": "New Cycle",
-            "value": "new_cycle"
-          },
-          {
-            "label": "Cycle Updated",
-            "value": "cycle_updated"
-          },
-          {
-            "label": "New Project",
-            "value": "new_project"
-          },
-          {
-            "label": "New Project Update",
-            "value": "new_project_update"
-          },
-          {
-            "label": "New Label",
-            "value": "new_label"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "label": "Team ID (optional; blank = all teams)",
-        "mode": "advanced",
-        "name": "team_id",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 60,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.linear"
-  },
   "trigger.linear_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -86956,7 +85913,7 @@
     "dynamic_outputs_from": null,
     "icon": "linear",
     "inputs": 0,
-    "name": "Linear Webhook",
+    "name": "Linear",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -87071,7 +86028,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `Linear-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Linear Webhook webhook settings",
+        "placeholder": "Set the same value in Linear webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -87119,7 +86076,7 @@
     "dynamic_outputs_from": null,
     "icon": "loops",
     "inputs": 0,
-    "name": "Loops Webhook",
+    "name": "Loops",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -87202,7 +86159,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Loops-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Loops Webhook webhook settings",
+        "placeholder": "Set the same value in Loops webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -87250,7 +86207,7 @@
     "dynamic_outputs_from": null,
     "icon": "mailgun",
     "inputs": 0,
-    "name": "Mailgun Webhook",
+    "name": "Mailgun",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -87337,7 +86294,7 @@
         "description": "MAILGUN secret. Deliveries without a valid `` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Mailgun Webhook webhook settings",
+        "placeholder": "Set the same value in Mailgun webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -88203,7 +87160,7 @@
     "dynamic_outputs_from": null,
     "icon": "microsoft_teams",
     "inputs": 0,
-    "name": "Microsoft Teams Webhook",
+    "name": "Microsoft Teams",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -88262,7 +87219,7 @@
         "description": "HMAC_SHA256_B64 secret. Deliveries without a valid `Authorization` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Microsoft Teams Webhook webhook settings",
+        "placeholder": "Set the same value in Microsoft Teams webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -88444,170 +87401,6 @@
     "tools": null,
     "type": "trigger.monday"
   },
-  "trigger.notion": {
-    "allow_error": true,
-    "category": "trigger",
-    "color": "#1c1c1c",
-    "credential_type": [
-      "notion_oauth",
-      "notion_api_key"
-    ],
-    "default_height": null,
-    "default_width": null,
-    "description": "Poll a Notion database for new / updated pages, a page for new comments, or the workspace for new databases.",
-    "dynamic_outputs_from": null,
-    "icon": "notion",
-    "inputs": 0,
-    "name": "Notion",
-    "operation_tool_map": null,
-    "outputs": 1,
-    "outputs_schema": [
-      {
-        "label": "id",
-        "type": "string"
-      },
-      {
-        "label": "title",
-        "type": "string"
-      },
-      {
-        "label": "url",
-        "type": "string"
-      },
-      {
-        "label": "last_edited_time",
-        "type": "string"
-      },
-      {
-        "label": "created_time",
-        "type": "string"
-      },
-      {
-        "label": "text",
-        "type": "string"
-      },
-      {
-        "label": "page_id",
-        "type": "string"
-      }
-    ],
-    "properties": [
-      {
-        "credentialType": [
-          "notion_oauth",
-          "notion_api_key"
-        ],
-        "label": "Notion Account",
-        "name": "credential",
-        "required": true,
-        "type": "credential"
-      },
-      {
-        "default": "new_page",
-        "label": "Event",
-        "name": "event_type",
-        "options": [
-          {
-            "label": "Page Added to Database",
-            "value": "new_page"
-          },
-          {
-            "label": "Page Updated",
-            "value": "page_updated"
-          },
-          {
-            "label": "Page Content Updated",
-            "value": "page_content_updated"
-          },
-          {
-            "label": "New Comment on Page",
-            "value": "new_comment"
-          },
-          {
-            "label": "New Database Created",
-            "value": "new_database"
-          }
-        ],
-        "type": "options"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_page",
-            "page_updated",
-            "page_content_updated"
-          ]
-        },
-        "label": "Database ID (for page events / new_database ignored)",
-        "name": "database_id",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "event_type",
-          "value": [
-            "new_comment"
-          ]
-        },
-        "label": "Page ID (for new_comment event)",
-        "name": "page_id",
-        "type": "string"
-      },
-      {
-        "default": 25,
-        "label": "Page Size",
-        "mode": "advanced",
-        "name": "page_size",
-        "type": "number"
-      },
-      {
-        "default": 25,
-        "label": "Max events per poll",
-        "mode": "advanced",
-        "name": "max_per_poll",
-        "type": "number"
-      },
-      {
-        "default": 60,
-        "description": "Min 30s, max 3600s.",
-        "label": "Poll interval (seconds)",
-        "mode": "advanced",
-        "name": "poll_interval_seconds",
-        "type": "number"
-      },
-      {
-        "default": 0,
-        "description": "Number of times to retry this node on failure (0 = no retries).",
-        "group": "Retry",
-        "label": "Retries",
-        "mode": "advanced",
-        "name": "retries",
-        "type": "number"
-      },
-      {
-        "condition": {
-          "field": "retries",
-          "value": [
-            1,
-            2,
-            3,
-            4,
-            5
-          ]
-        },
-        "default": 1000,
-        "description": "Milliseconds to wait between retries.",
-        "group": "Retry",
-        "label": "Retry Delay (ms)",
-        "mode": "advanced",
-        "name": "retry_delay_ms",
-        "type": "number"
-      }
-    ],
-    "tools": null,
-    "type": "trigger.notion"
-  },
   "trigger.notion_webhook": {
     "allow_error": true,
     "category": "trigger",
@@ -88619,7 +87412,7 @@
     "dynamic_outputs_from": null,
     "icon": "notion",
     "inputs": 0,
-    "name": "Notion Webhook",
+    "name": "Notion",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -88706,7 +87499,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Notion-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Notion Webhook webhook settings",
+        "placeholder": "Set the same value in Notion webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -89007,7 +87800,7 @@
     "dynamic_outputs_from": null,
     "icon": "postmark",
     "inputs": 0,
-    "name": "Postmark Webhook",
+    "name": "Postmark",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -89086,7 +87879,7 @@
         "description": "HMAC_SHA1_B64 secret. Deliveries without a valid `X-Postmark-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Postmark Webhook webhook settings",
+        "placeholder": "Set the same value in Postmark webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -89508,7 +88301,7 @@
   "trigger.slack": {
     "allow_error": false,
     "category": "trigger",
-    "color": "#1c1c1c",
+    "color": "#4A154B",
     "credential_type": "slack_oauth",
     "default_height": null,
     "default_width": null,
@@ -89516,7 +88309,7 @@
     "dynamic_outputs_from": null,
     "icon": "slack",
     "inputs": 0,
-    "name": "Slack Trigger",
+    "name": "Slack",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -89954,7 +88747,7 @@
     "dynamic_outputs_from": null,
     "icon": "twilio",
     "inputs": 0,
-    "name": "Twilio Voice Webhook",
+    "name": "Twilio Voice",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -90049,7 +88842,7 @@
         "description": "TWILIO secret. Deliveries without a valid `X-Twilio-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Twilio Voice Webhook webhook settings",
+        "placeholder": "Set the same value in Twilio Voice webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -90097,7 +88890,7 @@
     "dynamic_outputs_from": null,
     "icon": "twilio",
     "inputs": 0,
-    "name": "Twilio Webhook",
+    "name": "Twilio",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -90175,7 +88968,7 @@
         "description": "TWILIO secret. Deliveries without a valid `X-Twilio-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Twilio Webhook webhook settings",
+        "placeholder": "Set the same value in Twilio webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -90223,7 +89016,7 @@
     "dynamic_outputs_from": null,
     "icon": "typeform",
     "inputs": 0,
-    "name": "Typeform Webhook",
+    "name": "Typeform",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -90286,7 +89079,7 @@
         "description": "HMAC_SHA256_B64 secret. Deliveries without a valid `Typeform-Signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Typeform Webhook webhook settings",
+        "placeholder": "Set the same value in Typeform webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -90334,7 +89127,7 @@
     "dynamic_outputs_from": null,
     "icon": "vercel",
     "inputs": 0,
-    "name": "Vercel Webhook",
+    "name": "Vercel",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -90421,7 +89214,7 @@
         "description": "HMAC_SHA1 secret. Deliveries without a valid `x-vercel-signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Vercel Webhook webhook settings",
+        "placeholder": "Set the same value in Vercel webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -90469,7 +89262,7 @@
     "dynamic_outputs_from": null,
     "icon": "webflow",
     "inputs": 0,
-    "name": "Webflow Webhook",
+    "name": "Webflow",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -90559,7 +89352,7 @@
         "description": "WEBFLOW secret. Deliveries without a valid `x-webflow-signature` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in Webflow Webhook webhook settings",
+        "placeholder": "Set the same value in Webflow webhook settings",
         "required": true,
         "secret": true,
         "type": "string"
@@ -90700,7 +89493,7 @@
     "dynamic_outputs_from": null,
     "icon": "whatsapp",
     "inputs": 0,
-    "name": "WhatsApp Webhook",
+    "name": "WhatsApp",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -90807,7 +89600,7 @@
         "description": "HMAC_SHA256 secret. Deliveries without a valid `X-Hub-Signature-256` header are rejected.",
         "label": "Webhook Secret",
         "name": "secret",
-        "placeholder": "Set the same value in WhatsApp Webhook webhook settings",
+        "placeholder": "Set the same value in WhatsApp webhook settings",
         "required": true,
         "secret": true,
         "type": "string"

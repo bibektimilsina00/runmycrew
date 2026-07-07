@@ -61,7 +61,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.azure_devops_webhook",
-    name="Azure DevOps Webhook",
+    name="Azure DevOps",
     description=(
         "Fires when Azure DevOps posts a service-hook delivery. Configure "
         "Basic-auth on the ADO side and paste the same `Basic base64(...)` "

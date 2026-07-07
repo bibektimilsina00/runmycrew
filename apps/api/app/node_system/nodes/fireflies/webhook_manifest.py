@@ -42,7 +42,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.fireflies_webhook",
-    name="Fireflies Webhook",
+    name="Fireflies",
     description=(
         "Fires when Fireflies posts a meeting event (transcript ready, "
         "summary complete). Verified via HMAC-SHA1 in `x-hub-signature`."

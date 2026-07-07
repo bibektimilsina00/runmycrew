@@ -48,7 +48,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.postmark_webhook",
-    name="Postmark Webhook",
+    name="Postmark",
     description=(
         "Fires when Postmark posts a delivery event (Delivery, Bounce, "
         "Open, Click, SpamComplaint, SubscriptionChange, ManualSuppression). "

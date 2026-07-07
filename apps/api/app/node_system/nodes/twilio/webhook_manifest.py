@@ -61,7 +61,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.twilio_webhook",
-    name="Twilio Webhook",
+    name="Twilio",
     description=(
         "Receives Twilio deliveries — inbound SMS, call status callbacks, "
         "Studio Flow events. Signature verified via HMAC-SHA1 of URL + form "

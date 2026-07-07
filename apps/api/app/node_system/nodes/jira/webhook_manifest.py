@@ -64,7 +64,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.jira_webhook",
-    name="Jira Webhook",
+    name="Jira",
     description=(
         "Fires when Atlassian Cloud posts a Jira webhook. Full sim event "
         "parity — issue/comment/worklog/sprint create+update+delete, "

@@ -43,7 +43,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.emailbison_webhook",
-    name="Emailbison Webhook",
+    name="Emailbison",
     description=(
         "Fires when Emailbison posts a per-email event (sent, opened, "
         "clicked, bounced, reply, lead status). Verified via HMAC-SHA256 "

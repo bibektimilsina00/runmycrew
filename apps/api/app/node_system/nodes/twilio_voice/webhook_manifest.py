@@ -48,7 +48,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.twilio_voice",
-    name="Twilio Voice Webhook",
+    name="Twilio Voice",
     description=(
         "Fires when Twilio posts a Voice call status callback (initiated, "
         "ringing, answered, completed, ...). Verified via HMAC-SHA1 of "

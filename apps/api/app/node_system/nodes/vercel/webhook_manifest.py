@@ -61,7 +61,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.vercel_webhook",
-    name="Vercel Webhook",
+    name="Vercel",
     description=(
         "Fires when Vercel posts a webhook delivery — deployment lifecycle, "
         "project creation. HMAC-SHA1 verified via `x-vercel-signature`."

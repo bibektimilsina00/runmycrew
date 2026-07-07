@@ -42,7 +42,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.lemlist_webhook",
-    name="Lemlist Webhook",
+    name="Lemlist",
     description=(
         "Fires when Lemlist posts a per-email event (bounced, clicked, "
         "opened, replied, sent, interested, linkedin_replied, "

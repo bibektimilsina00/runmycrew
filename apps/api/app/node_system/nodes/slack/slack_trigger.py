@@ -20,11 +20,11 @@ class SlackTriggerNode(BaseNode[SlackTriggerProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="trigger.slack",
-            name="Slack Trigger",
+            name="Slack",
             category="trigger",
             description="Listen for any Slack event: messages, reactions, channel changes, app interactions, and more.",
             icon="slack",
-            color="#1c1c1c",
+            color="#4A154B",
             properties=[
                 {
                     "name": "authentication",

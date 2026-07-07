@@ -42,7 +42,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.circleback_webhook",
-    name="Circleback Webhook",
+    name="Circleback",
     description=(
         "Fires when Circleback posts a meeting event (meeting.ended, "
         "insights.ready, action_items.ready). Verified via HMAC-SHA256 "

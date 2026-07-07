@@ -49,7 +49,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.microsoft_teams_webhook",
-    name="Microsoft Teams Webhook",
+    name="Microsoft Teams",
     description=(
         "Fires when a Teams channel outgoing-webhook delivers a message. "
         "Verifies `Authorization: HMAC {base64_sha256}` against the webhook "

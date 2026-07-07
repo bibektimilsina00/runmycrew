@@ -90,7 +90,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.typeform_webhook",
-    name="Typeform Webhook",
+    name="Typeform",
     description=(
         "Fires when a Typeform is submitted. Verified via HMAC-SHA256 "
         "base64 in `Typeform-Signature`. Answers are flattened into "

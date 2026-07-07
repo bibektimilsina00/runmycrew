@@ -57,7 +57,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.mailgun_webhook",
-    name="Mailgun Webhook",
+    name="Mailgun",
     description=(
         "Fires when Mailgun posts a delivery event (delivered, opened, "
         "clicked, failed, complained, unsubscribed). Body-based signature "

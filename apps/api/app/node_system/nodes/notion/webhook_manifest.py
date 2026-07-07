@@ -59,7 +59,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.notion_webhook",
-    name="Notion Webhook",
+    name="Notion",
     description=(
         "Fires when Notion posts a webhook delivery — pages, databases, "
         "comments. Full sim event parity via body-path routing on `type`. "
