@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 320 320" height="320" width="320">
+<g clip-path="url(#clip0_6_406)">
+<rect fill="white" height="320" width="320"></rect>
+<rect fill="url(#paint0_diamond_6_406)" height="320" width="320"></rect>
+<g filter="url(#filter0_f_6_406)" opacity="0.6" style="mix-blend-mode:hard-light">
+<ellipse fill-opacity="0.5" fill="url(#paint1_radial_6_406)" transform="rotate(-180 375.5 -61)" ry="113" rx="439.5" cy="-61" cx="375.5"></ellipse>
+</g>
+<g clip-path="url(#clip1_6_406)">
+<path fill="white" d="M119.689 143.396L160 73.9751L259.9 246.025H60.0996L100.41 176.602L128.925 192.972L117.131 213.283H202.868L160 139.457L148.206 159.768L119.689 143.396Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+</g>
+<path fill="url(#paint2_linear_6_406)" d="M119.649 143.539L160 74L260 246.342H60L100.351 176.801L128.894 193.198L117.089 213.544H202.911L160 139.593L148.195 159.939L119.649 143.539Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+</g>
+<defs>
+<filter color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse" height="496.092" width="1149.09" y="-309.046" x="-199.046" id="filter0_f_6_406">
+<feFlood result="BackgroundImageFix" flood-opacity="0"></feFlood>
+<feBlend result="shape" in2="BackgroundImageFix" in="SourceGraphic" mode="normal"></feBlend>
+<feGaussianBlur result="effect1_foregroundBlur_6_406" stdDeviation="67.5229"></feGaussianBlur>
+</filter>
+<radialGradient gradientTransform="translate(171.575 182.224) rotate(-103.078) scale(189.629 259.402)" gradientUnits="userSpaceOnUse" r="1" cy="0" cx="0" id="paint0_diamond_6_406">
+<stop stop-color="#1C0A4F"></stop>
+<stop stop-color="#0A1847" offset="1"></stop>
+</radialGradient>
+<radialGradient gradientTransform="translate(375.5 -61) rotate(90) scale(183.857 715.088)" gradientUnits="userSpaceOnUse" r="1" cy="0" cx="0" id="paint1_radial_6_406">
+<stop stop-opacity="0.67" stop-color="#FF52D9"></stop>
+<stop stop-opacity="0" stop-color="#FF52D9" offset="1"></stop>
+</radialGradient>
+<linearGradient gradientUnits="userSpaceOnUse" y2="124.674" x2="220.082" y1="246.342" x1="221.931" id="paint2_linear_6_406">
+<stop stop-color="#41FF54"></stop>
+<stop stop-color="#E7FF52" offset="1"></stop>
+</linearGradient>
+<clipPath id="clip0_6_406">
+<rect fill="white" height="320" width="320"></rect>
+</clipPath>
+<clipPath id="clip1_6_406">
+<rect transform="translate(60.0996 60.1001)" fill="white" height="199.8" width="199.8"></rect>
+</clipPath>
+</defs>
+</svg>
