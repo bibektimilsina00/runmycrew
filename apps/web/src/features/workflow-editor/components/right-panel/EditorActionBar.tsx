@@ -10,7 +10,6 @@ import { cn } from '@/lib/cn'
 import { Button } from '@/shared/components'
 import { useEditorActionBar } from '../../hooks/useEditorActionBar'
 import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
-import { CrewDescriptionField } from './CrewDescriptionField'
 import { PublishTemplateModal } from '@/features/templates/components/PublishTemplateModal'
 
 interface EditorActionBarProps {
@@ -81,7 +80,6 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
   } = useEditorActionBar()
   const { id: workflowId } = useParams<{ id: string }>()
   const workflowName = useWorkflowEditorStore((s) => s.workflow?.name ?? '')
-  const isCrew = useWorkflowEditorStore((s) => s.mode === 'crew')
   const [publishOpen, setPublishOpen] = useState(false)
 
   const menuItems: DropdownItem[] = [
@@ -165,9 +163,6 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
         defaultTitle={workflowName}
       />
     </div>
-
-    {/* Crew-only editable description, shown under the action row. */}
-    {isCrew && <CrewDescriptionField />}
     </div>
   )
 }
