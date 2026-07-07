@@ -1,19 +1,38 @@
 import { useState, type CSSProperties } from 'react'
 
 /**
- * Brand-icon CDN. jsDelivr fronts theSVG's GitHub repo on a global
- * edge network — sub-100ms TTFB, CORS-open, aggressive cache headers.
- * Using `@main` keeps us auto-updating to whatever icons theSVG adds.
+ * Brand-icon renderer with a hand-curated local override.
  *
- * Why `<img>` instead of inline SVG via fetch+injection? The browser
- * already does what we'd build by hand: HTTP caching, lazy loading,
- * failure handling. The trade-off is that we can't recolour the
- * loaded SVG via CSS — so we ship the `default` (full-colour) variant
- * onto a neutral tile background. That's also the modern look
- * (Linear / Figma / n8n) — the brand identity comes from the logo,
- * not a tinted tile beneath it.
+ * Resolution order:
+ *  1. **Local SVG** — a file in `src/assets/brand-icons/<slug>.svg`.
+ *     Bundled at build time via `import.meta.glob`, so the filename is
+ *     the key — no registry to edit. Local always wins (that's the point:
+ *     curate the brands you care about).
+ *  2. **theSVG CDN** — jsDelivr fronts theSVG's GitHub repo on a global
+ *     edge network for slugs with no local file. `@main` auto-updates.
+ *  3. **Blank tile** — if both miss.
+ *
+ * Why `<img>` instead of inline SVG? The browser already does HTTP
+ * caching, lazy loading, and failure handling for us. Trade-off: we can't
+ * recolour the loaded SVG via CSS, so we ship the full-colour variant onto
+ * a neutral tile — also the modern look (Linear / Figma / n8n).
  */
 const CDN_BASE = 'https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons'
+
+// Compile-time map of the hand-curated overrides. Drop `<slug>.svg` into
+// src/assets/brand-icons/ (slug = provider icon_slug or a node's lowercase
+// icon name) and it takes precedence over the CDN. See that folder's README.
+const localModules = import.meta.glob('/src/assets/brand-icons/*.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
+const LOCAL_ICONS: Record<string, string> = {}
+for (const [path, url] of Object.entries(localModules)) {
+  const slug = path.split('/').pop()?.replace(/\.svg$/i, '').toLowerCase()
+  if (slug) LOCAL_ICONS[slug] = url
+}
 
 interface BrandIconProps {
   slug: string
@@ -32,9 +51,11 @@ export function BrandIcon({ slug, className, style }: BrandIconProps) {
   if (errored) {
     return <span className={className ?? 'inline-block'} style={style} />
   }
+  const local = LOCAL_ICONS[slug.toLowerCase()]
+  const src = local ?? `${CDN_BASE}/${slug}/default.svg`
   return (
     <img
-      src={`${CDN_BASE}/${slug}/default.svg`}
+      src={src}
       alt={slug}
       loading="lazy"
       decoding="async"
