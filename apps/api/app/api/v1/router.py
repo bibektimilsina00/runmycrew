@@ -14,6 +14,7 @@ from apps.api.app.features.escalation.router import router as escalation_router
 from apps.api.app.features.executions.router import router as executions_router
 from apps.api.app.features.executions.websocket import router as executions_ws_router
 from apps.api.app.features.folders.router import router as folders_router
+from apps.api.app.features.icons.router import router as icons_router
 from apps.api.app.features.integrations.router import router as integrations_router
 from apps.api.app.features.knowledge.router import router as knowledge_router
 from apps.api.app.features.logs.router import router as logs_router
@@ -44,6 +45,7 @@ router.include_router(workspaces_router, prefix="/workspaces", tags=["workspaces
 # prefix so the URL reads naturally.
 router.include_router(escalation_router, prefix="/workspaces", tags=["escalation"])
 router.include_router(folders_router, prefix="/folders", tags=["folders"])
+router.include_router(icons_router, prefix="/icons", tags=["icons"])
 router.include_router(executions_router, prefix="/executions", tags=["executions"])
 router.include_router(credentials_router, prefix="/credentials", tags=["credentials"])
 router.include_router(integrations_router, prefix="/integrations", tags=["integrations"])
