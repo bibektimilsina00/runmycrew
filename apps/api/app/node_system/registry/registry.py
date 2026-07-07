@@ -144,10 +144,8 @@ from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNo
 from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
 from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
-from apps.api.app.node_system.nodes.github.github_trigger import GitHubTriggerNode
 from apps.api.app.node_system.nodes.github.github_webhook import GitHubWebhookTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_node import GitLabNode
-from apps.api.app.node_system.nodes.gitlab.gitlab_trigger import GitLabTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
@@ -429,7 +427,6 @@ node_registry.register(ConditionNode)
 node_registry.register(SlackNode)
 node_registry.register(SlackTriggerNode)
 node_registry.register(GitHubNode)
-node_registry.register(GitHubTriggerNode)
 node_registry.register(GitHubWebhookTriggerNode)
 node_registry.register(GitLabWebhookTriggerNode)
 node_registry.register(NotionNode)
@@ -506,7 +503,6 @@ node_registry.register(TrelloNode)
 node_registry.register(ZendeskNode)
 node_registry.register(CalcomNode)
 # Phase 3.1 — dev/CRM polling triggers.
-node_registry.register(GitLabTriggerNode)
 node_registry.register(JiraTriggerNode)
 node_registry.register(HubSpotTriggerNode)
 node_registry.register(AsanaTriggerNode)

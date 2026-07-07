@@ -89,7 +89,7 @@ class GitHubWebhookTriggerNode(BaseNode[GitHubWebhookTriggerProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="trigger.github_webhook",
-            name="GitHub Webhook",
+            name="GitHub",
             category="trigger",
             description=(
                 "Fires the instant GitHub posts a webhook delivery to your "
