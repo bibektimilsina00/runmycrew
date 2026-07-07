@@ -58040,62 +58040,6 @@
           {
             "label": "Identify by Email",
             "value": "identify_by_email"
-          },
-          {
-            "label": "Credit Check",
-            "value": "credit_check"
-          },
-          {
-            "label": "IP to Hashed Email",
-            "value": "ip_to_hem"
-          },
-          {
-            "label": "IP to MAID",
-            "value": "ip_to_maid"
-          },
-          {
-            "label": "HEM to Business Profile",
-            "value": "hem_to_business_profile"
-          },
-          {
-            "label": "HEM to Best LinkedIn",
-            "value": "hem_to_best_linkedin"
-          },
-          {
-            "label": "HEM to LinkedIn",
-            "value": "hem_to_linkedin"
-          },
-          {
-            "label": "HEM to MAID",
-            "value": "hem_to_maid"
-          },
-          {
-            "label": "Email to Activity",
-            "value": "email_to_activity"
-          },
-          {
-            "label": "LinkedIn to Business Profile",
-            "value": "linkedin_to_business_profile"
-          },
-          {
-            "label": "LinkedIn to Best Personal Email",
-            "value": "linkedin_to_best_personal_email"
-          },
-          {
-            "label": "LinkedIn to Personal Email",
-            "value": "linkedin_to_personal_email"
-          },
-          {
-            "label": "LinkedIn to Hashed Emails",
-            "value": "linkedin_to_hashed_emails"
-          },
-          {
-            "label": "LinkedIn to Mobile Phone",
-            "value": "linkedin_to_mobile_phone"
-          },
-          {
-            "label": "LinkedIn Slug Search",
-            "value": "linkedin_slug_search"
           }
         ],
         "type": "options"
@@ -58229,8 +58173,7 @@
         "condition": {
           "field": "operation",
           "value": [
-            "identify_by_email",
-            "email_to_activity"
+            "identify_by_email"
           ]
         },
         "label": "Email",
@@ -58432,63 +58375,6 @@
         "label": "Filter",
         "mode": "advanced",
         "name": "filter",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": [
-            "hem_to_business_profile",
-            "hem_to_best_linkedin",
-            "hem_to_linkedin",
-            "hem_to_maid"
-          ]
-        },
-        "label": "Hashed Email (HEM)",
-        "name": "hem",
-        "type": "string"
-      },
-      {
-        "label": "Mobile Advertiser ID",
-        "name": "maid",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": [
-            "linkedin_to_business_profile",
-            "linkedin_to_best_personal_email",
-            "linkedin_to_personal_email",
-            "linkedin_to_hashed_emails",
-            "linkedin_to_mobile_phone"
-          ]
-        },
-        "label": "LinkedIn URL",
-        "name": "linkedin_url",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": [
-            "linkedin_slug_search"
-          ]
-        },
-        "label": "LinkedIn Slug",
-        "name": "linkedin_slug",
-        "type": "string"
-      },
-      {
-        "condition": {
-          "field": "operation",
-          "value": [
-            "ip_to_hem",
-            "ip_to_maid"
-          ]
-        },
-        "label": "IP Address",
-        "name": "ip_address",
         "type": "string"
       },
       {
