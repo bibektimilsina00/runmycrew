@@ -43,7 +43,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.fathom_webhook",
-    name="Fathom Webhook",
+    name="Fathom",
     description=(
         "Fires when Fathom posts a meeting event (summary ready, action "
         "items generated). Verified via bare-secret compare against "

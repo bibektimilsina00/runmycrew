@@ -43,7 +43,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.instantly_webhook",
-    name="Instantly Webhook",
+    name="Instantly",
     description=(
         "Fires when Instantly posts a per-email event (opens, clicks, "
         "replies, bounces, lead status changes). Verified via HMAC-SHA256 "

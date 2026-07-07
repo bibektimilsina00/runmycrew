@@ -41,7 +41,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.gong_webhook",
-    name="Gong Webhook",
+    name="Gong",
     description=(
         "Fires when a Gong automation rule delivers a call event "
         "(processed / recording ready / stats updated). Verified via "

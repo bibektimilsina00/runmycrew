@@ -42,7 +42,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.loops_webhook",
-    name="Loops Webhook",
+    name="Loops",
     description=(
         "Fires when Loops posts a delivery / engagement event. Verified "
         "via HMAC-SHA256 in `X-Loops-Signature`."

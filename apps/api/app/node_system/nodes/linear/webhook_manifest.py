@@ -60,7 +60,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.linear_webhook",
-    name="Linear Webhook",
+    name="Linear",
     description=(
         "Fires when Linear posts a webhook delivery. Full sim parity "
         "including delete/remove events (unlocks the events the Phase 4.2 "

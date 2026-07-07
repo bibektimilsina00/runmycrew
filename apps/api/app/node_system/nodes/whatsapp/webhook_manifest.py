@@ -60,7 +60,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.whatsapp",
-    name="WhatsApp Webhook",
+    name="WhatsApp",
     description=(
         "Fires when Meta's WhatsApp Cloud API posts a message or status "
         "update. Verified via HMAC-SHA256 in `X-Hub-Signature-256`."

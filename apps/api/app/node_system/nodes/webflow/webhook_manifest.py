@@ -48,7 +48,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.webflow_webhook",
-    name="Webflow Webhook",
+    name="Webflow",
     description=(
         "Fires when a Webflow webhook posts a delivery — form submissions, "
         "e-commerce orders, publish events. Signed with HMAC-SHA256 over "

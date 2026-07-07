@@ -83,7 +83,6 @@ from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
 from apps.api.app.node_system.nodes.confluence.confluence_node import ConfluenceNode
-from apps.api.app.node_system.nodes.confluence.confluence_trigger import ConfluenceTriggerNode
 from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
     ConfluenceWebhookTriggerNode,
 )
@@ -113,7 +112,6 @@ from apps.api.app.node_system.nodes.duckduckgo.duckduckgo_node import DuckDuckGo
 from apps.api.app.node_system.nodes.elasticsearch.elasticsearch_node import ElasticsearchNode
 from apps.api.app.node_system.nodes.elevenlabs.elevenlabs_node import ElevenLabsNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_node import EmailbisonNode
-from apps.api.app.node_system.nodes.emailbison.emailbison_trigger import EmailbisonTriggerNode
 from apps.api.app.node_system.nodes.emailbison.emailbison_webhook import (
     EmailbisonWebhookTriggerNode,
 )
@@ -144,10 +142,8 @@ from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNo
 from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
 from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
-from apps.api.app.node_system.nodes.github.github_trigger import GitHubTriggerNode
 from apps.api.app.node_system.nodes.github.github_webhook import GitHubWebhookTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_node import GitLabNode
-from apps.api.app.node_system.nodes.gitlab.gitlab_trigger import GitLabTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
 from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
 from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
@@ -205,13 +201,11 @@ from apps.api.app.node_system.nodes.imap.imap_trigger import IMAPTriggerNode
 from apps.api.app.node_system.nodes.incidentio.incidentio_node import IncidentIONode
 from apps.api.app.node_system.nodes.infisical.infisical_node import InfisicalNode
 from apps.api.app.node_system.nodes.instantly.instantly_node import InstantlyNode
-from apps.api.app.node_system.nodes.instantly.instantly_trigger import InstantlyTriggerNode
 from apps.api.app.node_system.nodes.instantly.instantly_webhook import InstantlyWebhookTriggerNode
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jina.jina_node import JinaAINode
 from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
-from apps.api.app.node_system.nodes.jira.jira_trigger import JiraTriggerNode
 from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
 from apps.api.app.node_system.nodes.jira_service_management.jira_service_management_node import (
     JiraServiceManagementNode,
@@ -224,10 +218,8 @@ from apps.api.app.node_system.nodes.latex.latex_node import LatexNode
 from apps.api.app.node_system.nodes.launchdarkly.launchdarkly_node import LaunchDarklyNode
 from apps.api.app.node_system.nodes.leadmagic.leadmagic_node import LeadMagicNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_node import LemlistNode
-from apps.api.app.node_system.nodes.lemlist.lemlist_trigger import LemlistTriggerNode
 from apps.api.app.node_system.nodes.lemlist.lemlist_webhook import LemlistWebhookTriggerNode
 from apps.api.app.node_system.nodes.linear.linear_node import LinearNode
-from apps.api.app.node_system.nodes.linear.linear_trigger import LinearTriggerNode
 from apps.api.app.node_system.nodes.linear.linear_webhook import LinearWebhookTriggerNode
 from apps.api.app.node_system.nodes.linkedin.linkedin_node import LinkedInNode
 from apps.api.app.node_system.nodes.linkup.linkup_node import LinkupNode
@@ -280,7 +272,6 @@ from apps.api.app.node_system.nodes.neverbounce.neverbounce_node import NeverBou
 from apps.api.app.node_system.nodes.new_relic.new_relic_node import NewRelicNode
 from apps.api.app.node_system.nodes.newsapi.newsapi_node import NewsAPINode
 from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
-from apps.api.app.node_system.nodes.notion.notion_trigger import NotionTriggerNode
 from apps.api.app.node_system.nodes.notion.notion_webhook import NotionWebhookTriggerNode
 from apps.api.app.node_system.nodes.obsidian.obsidian_node import ObsidianNode
 from apps.api.app.node_system.nodes.okta.okta_node import OktaNode
@@ -429,7 +420,6 @@ node_registry.register(ConditionNode)
 node_registry.register(SlackNode)
 node_registry.register(SlackTriggerNode)
 node_registry.register(GitHubNode)
-node_registry.register(GitHubTriggerNode)
 node_registry.register(GitHubWebhookTriggerNode)
 node_registry.register(GitLabWebhookTriggerNode)
 node_registry.register(NotionNode)
@@ -506,8 +496,6 @@ node_registry.register(TrelloNode)
 node_registry.register(ZendeskNode)
 node_registry.register(CalcomNode)
 # Phase 3.1 — dev/CRM polling triggers.
-node_registry.register(GitLabTriggerNode)
-node_registry.register(JiraTriggerNode)
 node_registry.register(HubSpotTriggerNode)
 node_registry.register(AsanaTriggerNode)
 node_registry.register(PagerDutyTriggerNode)
@@ -515,12 +503,10 @@ node_registry.register(PagerDutyTriggerNode)
 node_registry.register(TrelloTriggerNode)
 node_registry.register(CalendlyTriggerNode)
 node_registry.register(CalcomTriggerNode)
-node_registry.register(NotionTriggerNode)
 node_registry.register(IntercomTriggerNode)
 # Phase 3.3 — support/notif polling triggers.
 node_registry.register(ZendeskTriggerNode)
 node_registry.register(OutlookMailTriggerNode)
-node_registry.register(LinearTriggerNode)
 node_registry.register(TelegramTriggerNode)
 # Phase 3.4 — webhook triggers.
 node_registry.register(AzureDevOpsWebhookTriggerNode)
@@ -617,7 +603,6 @@ node_registry.register(FileNode)
 node_registry.register(AttioTriggerNode)
 node_registry.register(SalesforceTriggerNode)
 node_registry.register(ConfluenceNode)
-node_registry.register(ConfluenceTriggerNode)
 node_registry.register(ServiceNowNode)
 node_registry.register(ServiceNowTriggerNode)
 node_registry.register(GreenhouseNode)
@@ -627,10 +612,7 @@ node_registry.register(AshbyTriggerNode)
 node_registry.register(GrainNode)
 node_registry.register(GrainTriggerNode)
 node_registry.register(LemlistNode)
-node_registry.register(LemlistTriggerNode)
-node_registry.register(InstantlyTriggerNode)
 node_registry.register(EmailbisonNode)
-node_registry.register(EmailbisonTriggerNode)
 node_registry.register(InstantlyWebhookTriggerNode)
 node_registry.register(LemlistWebhookTriggerNode)
 node_registry.register(EmailbisonWebhookTriggerNode)

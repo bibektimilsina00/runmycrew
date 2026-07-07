@@ -62,7 +62,7 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.confluence_webhook",
-    name="Confluence Webhook",
+    name="Confluence",
     description=(
         "Fires when Atlassian Cloud posts a Confluence webhook. Full sim "
         "event parity — pages/blogs/comments/attachments/labels/spaces "
