@@ -1,0 +1,57 @@
+<svg
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <title>Luma</title>
+      <path d="M2 5.999L12.392 0v24L2 18V5.999z" fill="#000" />
+      <path d="M12.392 24L2 18l10.392-6 10.393 6-10.393 6z" fill="url(#grad-a)" />
+      <path d="M12.392 24L2 18l10.392-6 10.393 6-10.393 6z" fill="url(#grad-b)" />
+      <path
+        d="M2 5.999L12.392 0v24L2 18V5.999z"
+        fill="url(#grad-c)"
+      />
+      <path
+        d="M12.392 24L2 18l10.392-6 10.393 6-10.393 6z"
+        fill="url(#grad-d)"
+      />
+      <path
+        d="M2 5.999L12.392 0v24L2 18V5.999z"
+        fill="url(#grad-e)"
+      />
+      <defs>
+        <linearGradient gradientUnits="userSpaceOnUse" id="grad-a" x1="2" x2="22.785" y1="18" y2="18">
+          <stop stop-color="#00A" />
+          <stop offset="1" stop-color="#A78DFF" />
+        </linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" id="grad-b" x1="2" x2="22.785" y1="18" y2="18">
+          <stop stop-color="#00A" />
+          <stop offset="1" stop-color="#A78DFF" />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="grad-c"
+          x1="13.748"
+          x2="4.672"
+          y1="22.642"
+          y2="3.745"
+        >
+          <stop stop-color="#004EFF" />
+          <stop offset="1" stop-color="#0FF" />
+        </linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" id="grad-d" x1="2" x2="22.785" y1="18" y2="18">
+          <stop stop-color="#00A" />
+          <stop offset="1" stop-color="#A78DFF" />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="grad-e"
+          x1="13.748"
+          x2="4.672"
+          y1="22.642"
+          y2="3.745"
+        >
+          <stop stop-color="#004EFF" />
+          <stop offset="1" stop-color="#0FF" />
+        </linearGradient>
+      </defs>
+    </svg>
