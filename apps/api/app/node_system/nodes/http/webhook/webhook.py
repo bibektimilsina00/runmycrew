@@ -26,7 +26,7 @@ class WebhookTriggerNode(BaseNode[WebhookTriggerProperties]):
             name="Webhook Trigger",
             category="trigger",
             description="Trigger workflow via HTTP POST request",
-            icon="Zap",
+            icon="webhook",
             color="#ec4899",
             properties=[
                 {

@@ -7,13 +7,14 @@ from apps.api.app.credential_manager.oauth.base import (
     REDIRECT_URI,
     with_expiry_metadata,
 )
+from apps.api.app.node_system.nodes.github import COLOR, ICON_SLUG, NAME
 
 
 class GitHubOAuthProvider:
     id = "github_oauth"
-    name = "GitHub"
-    icon_slug = "github"
-    color = "#ffffff"
+    name = NAME
+    icon_slug = ICON_SLUG
+    color = COLOR
     type = "oauth"
     description = "Connect to GitHub using OAuth 2.0"
     scopes = [
