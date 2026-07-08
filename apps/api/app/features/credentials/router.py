@@ -2,14 +2,16 @@ import secrets
 import uuid
 from typing import Any
 
+import httpx
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
 from apps.api.app.credential_manager.api_keys import PROVIDERS as API_KEY_PROVIDERS
 from apps.api.app.credential_manager.oauth.flow import PROVIDERS as OAUTH_PROVIDERS
+from apps.api.app.features.credentials.lookups import LookupResponse, get_lookup_handler
 from apps.api.app.features.credentials.schemas import (
     AuditLogOut,
     CredentialCreate,
@@ -299,6 +301,56 @@ async def _resolve_google_token(
             detail="Credential has no access_token. Re-connect the account.",
         )
     return str(access_token)
+
+
+# ── Generic remote-picker dispatcher ──────────────────────────────────
+#
+# One endpoint drives every FieldSpec that declares `remote=RemoteLookup(...)`.
+# The router only routes; the actual "call GitHub / Slack / Notion" logic
+# lives in per-node `lookups.py` modules (auto-discovered on boot). New
+# picker = 1 handler function + a `remote=` annotation on the manifest
+# field. No dispatch table to hand-edit here.
+_LOOKUP_RESERVED_PARAMS = {"q", "cursor"}
+
+
+@router.get("/{credential_id}/lookup/{provider}/{resource}", response_model=LookupResponse)
+async def lookup_credential_resource(
+    credential_id: uuid.UUID,
+    provider: str,
+    resource: str,
+    request: Request,
+    q: str | None = Query(None),
+    cursor: str | None = Query(None),
+    workspace: Workspace = Depends(get_current_workspace),
+    service: CredentialService = Depends(get_credential_service),
+) -> LookupResponse:
+    """Populate a remote-picker dropdown for a given credential.
+
+    Routes to the handler registered under `(provider, resource)`.
+    Non-reserved query params are passed straight through to the
+    handler — used for dependent pickers (e.g. `?owner=octocat` when
+    listing repos).
+    """
+    handler = get_lookup_handler(provider, resource)
+    if handler is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No lookup handler for {provider}:{resource}",
+        )
+    cred = await service.repo.get_by_id_and_workspace(credential_id, workspace.id)
+    if cred is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Credential not found")
+    data = await service.get_decrypted_credential(cred)
+    if not isinstance(data, dict):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Credential is missing decrypted token data.",
+        )
+    # Pass every non-reserved query param through to the handler as a
+    # flat string map. Handlers pick what they need + ignore the rest.
+    extra = {k: v for k, v in request.query_params.items() if k not in _LOOKUP_RESERVED_PARAMS}
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        return await handler(client, data, extra, cursor, q)
 
 
 # ── Google file pickers (generic — any Google-native mime) ──────────────

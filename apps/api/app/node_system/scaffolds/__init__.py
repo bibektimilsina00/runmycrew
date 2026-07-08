@@ -64,6 +64,7 @@ from apps.api.app.node_system.scaffolds.rest_manifest import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 from apps.api.app.node_system.scaffolds.rest_node_factory import build_rest_node
 from apps.api.app.node_system.scaffolds.webhook_manifest import (
@@ -90,6 +91,7 @@ __all__ = [
     "PollingTriggerManifest",
     "ProviderManifest",
     "RESTError",
+    "RemoteLookup",
     "SignatureScheme",
     "SignatureSpec",
     "WebhookEvent",

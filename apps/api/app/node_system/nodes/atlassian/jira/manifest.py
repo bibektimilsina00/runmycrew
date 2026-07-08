@@ -10,7 +10,12 @@ and puts the token on the password side.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.jira",
@@ -26,11 +31,27 @@ MANIFEST = ProviderManifest(
     auth_basic_username="{email}",
     fields=[
         FieldSpec(name="issue_key", label="Issue Key", type="string", placeholder="PROJ-123"),
-        FieldSpec(name="project_key", label="Project Key", type="string"),
-        FieldSpec(name="project_id", label="Project ID", type="string"),
+        FieldSpec(
+            name="project_key",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(provider="jira", resource="projects"),
+        ),
+        FieldSpec(name="project_id", label="Project ID", type="string", mode="advanced"),
         FieldSpec(name="summary", label="Summary", type="string"),
         FieldSpec(name="description", label="Description", type="string"),
-        FieldSpec(name="issue_type", label="Issue Type", type="string", default="Task"),
+        FieldSpec(
+            name="issue_type",
+            label="Issue Type",
+            type="string",
+            default="Task",
+            remote=RemoteLookup(
+                provider="jira",
+                resource="issue_types",
+                params={"project": "${project_key}"},
+                depends_on=["project_key"],
+            ),
+        ),
         FieldSpec(name="priority", label="Priority", type="string"),
         FieldSpec(name="assignee_id", label="Assignee Account ID", type="string"),
         FieldSpec(name="reporter_id", label="Reporter Account ID", type="string"),

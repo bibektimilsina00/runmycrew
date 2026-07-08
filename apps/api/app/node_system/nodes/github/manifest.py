@@ -10,7 +10,12 @@ same credential shape.
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.github import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 
 def _labels(v):  # noqa: ANN001 — dynamic props
@@ -42,8 +47,25 @@ MANIFEST = ProviderManifest(
         "X-GitHub-Api-Version": "2022-11-28",
     },
     fields=[
-        FieldSpec(name="owner", label="Owner (user or org)", type="string", placeholder="octocat"),
-        FieldSpec(name="repo", label="Repository", type="string", placeholder="hello-world"),
+        FieldSpec(
+            name="owner",
+            label="Owner (user or org)",
+            type="string",
+            placeholder="octocat",
+            remote=RemoteLookup(provider="github", resource="owners"),
+        ),
+        FieldSpec(
+            name="repo",
+            label="Repository",
+            type="string",
+            placeholder="hello-world",
+            remote=RemoteLookup(
+                provider="github",
+                resource="repos",
+                params={"owner": "${owner}"},
+                depends_on=["owner"],
+            ),
+        ),
         FieldSpec(name="issue_number", label="Issue Number", type="number"),
         FieldSpec(name="pull_number", label="Pull Request Number", type="number"),
         FieldSpec(name="title", label="Title", type="string"),
@@ -55,7 +77,17 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="state_filter", label="State Filter", type="string", default="open"),
         FieldSpec(name="per_page", label="Per Page", type="number", default=30, mode="advanced"),
         FieldSpec(name="page", label="Page", type="number", default=1, mode="advanced"),
-        FieldSpec(name="branch", label="Branch", type="string"),
+        FieldSpec(
+            name="branch",
+            label="Branch",
+            type="string",
+            remote=RemoteLookup(
+                provider="github",
+                resource="branches",
+                params={"owner": "${owner}", "repo": "${repo}"},
+                depends_on=["owner", "repo"],
+            ),
+        ),
         FieldSpec(name="base_branch", label="Base Branch", type="string", default="main"),
         FieldSpec(name="head_branch", label="Head Branch", type="string"),
         FieldSpec(name="ref", label="Ref (branch/tag/sha)", type="string"),

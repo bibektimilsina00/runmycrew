@@ -27,6 +27,37 @@ from pydantic import BaseModel, ConfigDict, Field
 # ── field / op schema ────────────────────────────────────────────────
 
 
+class RemoteLookup(BaseModel):
+    """Field-level "pull the options from an external API" descriptor.
+
+    When present on a `FieldSpec`, the frontend renders a searchable
+    dropdown populated from `/credentials/{cred}/lookup/{provider}/
+    {resource}` instead of a plain text input. The backend routes to a
+    handler registered under `(provider, resource)` — handlers live in
+    `nodes/<...>/lookups.py` and are auto-discovered on boot.
+
+    `params` values may reference sibling fields on the same node with
+    `${field_name}` — resolved on the frontend at fetch time and passed
+    through as query params.
+
+    `depends_on` names the sibling fields whose value change should
+    invalidate the cached options (e.g. Repo depends on Owner). An
+    empty list = fetch once per open.
+
+    `allow_manual` (default true) tells the frontend to show a "List
+    ↔ Manual" toggle — power users still need to be able to paste an
+    exact id or drop in a `{{ expression }}`.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    provider: str
+    resource: str
+    params: dict[str, str] = Field(default_factory=dict)
+    depends_on: list[str] = Field(default_factory=list)
+    allow_manual: bool = True
+
+
 class FieldSpec(BaseModel):
     """One row in the inspector schema.
 
@@ -63,6 +94,12 @@ class FieldSpec(BaseModel):
     # When `type == "credential"`. Accepts a list so a node can take
     # either OAuth or an API key for the same provider.
     credential_type: str | list[str] | None = None
+    # Turn this string field into a credential-scoped remote picker
+    # (See `RemoteLookup`). Optional and additive — a field without
+    # `remote` renders as the ordinary string editor. Fields marked
+    # `remote` should still declare `type="string"` so the value stays a
+    # plain id in the workflow graph.
+    remote: RemoteLookup | None = None
 
     def to_inspector_dict(self) -> dict[str, Any]:
         """Project this spec into the dict shape the inspector reads."""
@@ -89,6 +126,8 @@ class FieldSpec(BaseModel):
             d["mode"] = self.mode
         if self.credential_type is not None:
             d["credentialType"] = self.credential_type
+        if self.remote is not None:
+            d["remote"] = self.remote.model_dump()
         return d
 
 
