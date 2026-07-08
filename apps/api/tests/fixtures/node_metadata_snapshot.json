@@ -7536,6 +7536,13 @@
         },
         "label": "Bucket",
         "name": "bucket",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "aws",
+          "resource": "s3_buckets"
+        },
         "required": true,
         "type": "string"
       },
@@ -8150,8 +8157,15 @@
             "get_queue_attributes"
           ]
         },
-        "label": "Queue URL",
+        "label": "Queue",
         "name": "queue_url",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "aws",
+          "resource": "sqs_queues"
+        },
         "type": "string"
       },
       {
@@ -49380,8 +49394,15 @@
             "get_cell"
           ]
         },
-        "label": "Workbook (Drive Item ID)",
+        "label": "Workbook",
         "name": "workbook_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "excel_workbooks"
+        },
         "type": "string"
       },
       {
@@ -49632,8 +49653,15 @@
             "create_plan"
           ]
         },
-        "label": "Group ID",
+        "label": "Team",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -49647,8 +49675,19 @@
             "create_task"
           ]
         },
-        "label": "Plan ID",
+        "label": "Plan",
         "name": "plan_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "group_id"
+          ],
+          "params": {
+            "group_id": "${group_id}"
+          },
+          "provider": "microsoft",
+          "resource": "planner_plans"
+        },
         "type": "string"
       },
       {
@@ -49870,8 +49909,15 @@
             "list_channel_messages"
           ]
         },
-        "label": "Team ID",
+        "label": "Team",
         "name": "team_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -49883,8 +49929,19 @@
             "list_channel_messages"
           ]
         },
-        "label": "Channel ID",
+        "label": "Channel",
         "name": "channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "team_id"
+          ],
+          "params": {
+            "team_id": "${team_id}"
+          },
+          "provider": "microsoft",
+          "resource": "channels"
+        },
         "type": "string"
       },
       {
@@ -53288,9 +53345,16 @@
             "create_folder"
           ]
         },
-        "label": "Folder ID",
+        "label": "Folder",
         "name": "folder_id",
         "placeholder": "root",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "onedrive_folders"
+        },
         "type": "string"
       },
       {
@@ -54386,9 +54450,16 @@
             "move_message"
           ]
         },
-        "label": "Folder ID",
+        "label": "Folder",
         "name": "folder_id",
         "placeholder": "inbox",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "outlook_folders"
+        },
         "type": "string"
       },
       {
@@ -66950,8 +67021,15 @@
             "delete_item"
           ]
         },
-        "label": "Site ID",
+        "label": "Site",
         "name": "site_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "sharepoint_sites"
+        },
         "type": "string"
       },
       {

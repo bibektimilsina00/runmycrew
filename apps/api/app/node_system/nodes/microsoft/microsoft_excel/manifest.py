@@ -15,6 +15,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -29,7 +30,12 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="workbook_id", label="Workbook (Drive Item ID)", type="string"),
+        FieldSpec(
+            name="workbook_id",
+            label="Workbook",
+            type="string",
+            remote=RemoteLookup(provider="microsoft", resource="excel_workbooks"),
+        ),
         FieldSpec(name="worksheet", label="Worksheet Name", type="string", placeholder="Sheet1"),
         FieldSpec(name="range", label="Range (A1)", type="string", placeholder="A1:C10"),
         FieldSpec(name="values", label="Values (JSON 2D array)", type="json"),

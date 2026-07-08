@@ -10,6 +10,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -25,7 +26,13 @@ MANIFEST = ProviderManifest(
     auth="bearer",
     fields=[
         FieldSpec(name="item_id", label="Item ID", type="string"),
-        FieldSpec(name="folder_id", label="Folder ID", type="string", placeholder="root"),
+        FieldSpec(
+            name="folder_id",
+            label="Folder",
+            type="string",
+            placeholder="root",
+            remote=RemoteLookup(provider="microsoft", resource="onedrive_folders"),
+        ),
         FieldSpec(
             name="path",
             label="Path",
