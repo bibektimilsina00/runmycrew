@@ -6,5 +6,5 @@ pick it up on next backend reload.
 """
 
 NAME = "Notion"
-COLOR = "#1c1c1c"
+COLOR = "#ffffff"
 ICON_SLUG = "notion"
