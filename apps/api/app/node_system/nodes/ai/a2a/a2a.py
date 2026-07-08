@@ -13,6 +13,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.a2a import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -39,11 +40,11 @@ class A2ANode(BaseNode[A2AProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.a2a",
-            name="Agent Call",
+            name=NAME,
             category="ai",
             description="Call, check or cancel another agent or workflow via the A2A protocol.",
-            icon="Network",
-            color="#8b5cf6",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "operation",

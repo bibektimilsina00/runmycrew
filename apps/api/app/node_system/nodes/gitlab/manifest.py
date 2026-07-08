@@ -11,15 +11,16 @@ files, releases, and members toward sim's 31-op parity.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.gitlab import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
 
 MANIFEST = ProviderManifest(
     type="action.gitlab",
-    name="GitLab",
+    name=NAME,
     category="integration",
     description="GitLab — issues, MRs, pipelines, projects, files, releases, members.",
-    icon_slug="gitlab",
-    color="#FC6D26",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://gitlab.com/api/v4",
     credential_type="gitlab_api_key",
     token_field=["api_key"],

@@ -123,6 +123,15 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.ashby import (
         ashby_trigger as _ashby_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.atlassian.confluence import (
+        confluence_trigger as _confluence_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.atlassian.jira import (
+        jira_trigger as _jira_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.atlassian.trello import (
+        trello_trigger as _trello_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.attio import (
         attio_trigger as _attio_trigger,  # noqa: F401
     )
@@ -132,43 +141,44 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.calendly import (
         calendly_trigger as _calendly_trigger,  # noqa: F401
     )
-    from apps.api.app.node_system.nodes.confluence import (
-        confluence_trigger as _confluence_trigger,  # noqa: F401
-    )
     from apps.api.app.node_system.nodes.emailbison import (
         emailbison_trigger as _emailbison_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.gcalendar import gcal_trigger as _gcal_trigger  # noqa: F401
-    from apps.api.app.node_system.nodes.gchat import (
-        gchat_trigger as _gchat_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.gdrive import (
-        gdrive_trigger as _gdrive_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.gforms import (
-        gforms_trigger as _gforms_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.gitlab import (
         gitlab_trigger as _gitlab_trigger,  # noqa: F401
     )
-    from apps.api.app.node_system.nodes.gmail import gmail_trigger as _gmail_trigger  # noqa: F401
-    from apps.api.app.node_system.nodes.google_sheets import (
+    from apps.api.app.node_system.nodes.google.gcalendar import (
+        gcal_trigger as _gcal_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.gchat import (
+        gchat_trigger as _gchat_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.gdrive import (
+        gdrive_trigger as _gdrive_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.gforms import (
+        gforms_trigger as _gforms_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.gmail import (
+        gmail_trigger as _gmail_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.google_sheets import (
         google_sheets_trigger as _google_sheets_trigger,  # noqa: F401
     )
-    from apps.api.app.node_system.nodes.gpeople import (
+    from apps.api.app.node_system.nodes.google.gpeople import (
         gpeople_trigger as _gpeople_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.gtasks import (
+        gtasks_trigger as _gtasks_trigger,  # noqa: F401
+    )
+    from apps.api.app.node_system.nodes.google.gyt import (
+        gyt_trigger as _gyt_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.grain import (
         grain_trigger as _grain_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.greenhouse import (
         greenhouse_trigger as _greenhouse_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.gtasks import (
-        gtasks_trigger as _gtasks_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.gyt import (
-        gyt_trigger as _gyt_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.hubspot import (
         hubspot_trigger as _hubspot_trigger,  # noqa: F401
@@ -182,23 +192,20 @@ def eager_register_polling_providers() -> None:
     from apps.api.app.node_system.nodes.intercom import (
         intercom_trigger as _intercom_trigger,  # noqa: F401
     )
-    from apps.api.app.node_system.nodes.jira import (
-        jira_trigger as _jira_trigger,  # noqa: F401
-    )
     from apps.api.app.node_system.nodes.lemlist import (
         lemlist_trigger as _lemlist_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.linear import (
         linear_trigger as _linear_trigger,  # noqa: F401
     )
+    from apps.api.app.node_system.nodes.microsoft.outlook import (
+        outlook_trigger as _outlook_trigger,  # noqa: F401
+    )
     from apps.api.app.node_system.nodes.monday import (
         monday_trigger as _monday_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.notion import (
         notion_trigger as _notion_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.outlook import (
-        outlook_trigger as _outlook_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.pagerduty import (
         pagerduty_trigger as _pagerduty_trigger,  # noqa: F401
@@ -214,9 +221,6 @@ def eager_register_polling_providers() -> None:
     )
     from apps.api.app.node_system.nodes.telegram import (
         telegram_trigger as _telegram_trigger,  # noqa: F401
-    )
-    from apps.api.app.node_system.nodes.trello import (
-        trello_trigger as _trello_trigger,  # noqa: F401
     )
     from apps.api.app.node_system.nodes.zendesk import (
         zendesk_trigger as _zendesk_trigger,  # noqa: F401

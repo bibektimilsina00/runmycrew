@@ -67,7 +67,7 @@ function AnimatedTooltip({ items, className }: AnimatedTooltipProps) {
             className={cn(
               'relative w-8 h-8 rounded-full border-2 border-bg overflow-hidden',
               'bg-surface-2 flex items-center justify-center',
-              'cursor-pointer transition-transform duration-[150ms] group-hover:z-10 group-hover:scale-110',
+              'cursor-pointer transition-transform [transition-duration:150ms] group-hover:z-10 group-hover:scale-110',
             )}
           >
             {item.image ? (

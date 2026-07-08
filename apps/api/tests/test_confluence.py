@@ -8,7 +8,7 @@ tests would need a live Atlassian site.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.nodes.confluence.trigger_manifest import (
+from apps.api.app.node_system.nodes.atlassian.confluence.trigger_manifest import (
     _flatten_blog,
     _flatten_comment,
     _flatten_page,
@@ -105,7 +105,7 @@ def test_space_flatten_carries_key_and_type() -> None:
 def test_confluence_action_node_registers_all_ops() -> None:
     """Regression guard — a Confluence op removed from the manifest
     would silently vanish from the inspector otherwise."""
-    from apps.api.app.node_system.nodes.confluence.manifest import MANIFEST
+    from apps.api.app.node_system.nodes.atlassian.confluence.manifest import MANIFEST
 
     op_ids = {o.id for o in MANIFEST.operations}
     assert {

@@ -33,6 +33,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.github import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.nodes.github.github_helpers import (
     GitHubError,
     coerce_owner_repo,
@@ -97,7 +98,7 @@ class GitHubTriggerNode(BaseNode[GitHubTriggerProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="trigger.github",
-            name="GitHub",
+            name=NAME,
             category="trigger",
             description=(
                 "Polls a GitHub repo for new issues, pull requests, issue "
@@ -105,8 +106,8 @@ class GitHubTriggerNode(BaseNode[GitHubTriggerProperties]):
                 "later polls emit one execution per new item. Use the GitHub "
                 "Webhook trigger instead when you can expose a public URL."
             ),
-            icon="github",
-            color="#ffffff",
+            icon=ICON_SLUG,
+            color=COLOR,
             credential_type=["github_oauth", "github_pat"],
             properties=[
                 {

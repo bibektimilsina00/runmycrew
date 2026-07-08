@@ -18,6 +18,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.gitlab import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -140,10 +141,10 @@ async def _walk_gitlab(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.gitlab",
-    name="GitLab",
+    name=NAME,
     description="Poll GitLab for new issues, merge requests, releases, commits.",
-    icon_slug="gitlab",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="",
     credential_type="gitlab_api_key",
     token_field=["api_key"],

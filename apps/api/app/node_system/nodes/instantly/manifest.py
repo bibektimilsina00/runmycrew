@@ -11,6 +11,7 @@ campaign-management + lead-flow ops the typical workflow needs:
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.instantly import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -19,11 +20,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.instantly",
-    name="Instantly",
+    name=NAME,
     category="integration",
     description="Cold-email outreach campaigns + lead management via Instantly.ai.",
-    icon_slug="instantly",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.instantly.ai/api/v2",
     credential_type="instantly_api_key",
     token_field=["api_key"],

@@ -7,6 +7,7 @@ sending lives at `/v3/{domain}/messages`.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.mailgun import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -15,11 +16,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.mailgun",
-    name="Mailgun",
+    name=NAME,
     category="integration",
     description="Mailgun — transactional + marketing email.",
-    icon_slug="mailgun",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.mailgun.net/v3",
     credential_type="mailgun_api_key",
     token_field=["api_key"],

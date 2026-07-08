@@ -31,7 +31,7 @@ class PostgresNode(BaseNode[PostgresProperties]):
             category="integration",
             description="Query or execute SQL against a PostgreSQL database.",
             icon="postgresql",
-            color="#1c1c1c",
+            color="#ffffff",
             properties=[
                 {
                     "name": "connectionString",

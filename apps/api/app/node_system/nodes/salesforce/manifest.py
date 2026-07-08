@@ -5,22 +5,20 @@ credential's `instance_url` (`https://mycompany.my.salesforce.com`) +
 `/services/data/v60.0`. The scaffold's `{instance_url}` template is
 read from the credential dict via `_PropCredView`.
 
-Refactored from a custom BaseNode. Existing 6 op names preserved:
-query, create_record, get_record, update_record, delete_record,
-list_objects. Adds 20+ new ops toward sim's 40-op parity.
 """
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.salesforce import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
 
 MANIFEST = ProviderManifest(
     type="action.salesforce",
-    name="Salesforce",
+    name=NAME,
     category="integration",
     description="Salesforce — SObject records (Lead, Contact, Account, Opportunity, Case).",
-    icon_slug="salesforce",
-    color="#00A1E0",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="{instance_url}/services/data/v60.0",
     credential_type="salesforce_oauth",
     token_field=["access_token"],
@@ -54,7 +52,6 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="job_id", label="Bulk Job ID", type="string"),
     ],
     operations=[
-        # ─── legacy 6 ops ─────────────────────────────────────────
         OpSpec(
             id="query",
             label="SOQL Query",

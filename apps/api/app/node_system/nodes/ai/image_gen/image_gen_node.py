@@ -10,6 +10,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.image_gen import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -34,11 +35,11 @@ class ImageGenNode(BaseNode[ImageGenProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.image_gen",
-            name="Image Generator",
+            name=NAME,
             category="ai",
             description="Generate images from text prompts using DALL-E 3 or DALL-E 2.",
-            icon="ImagePlus",
-            color="#a855f7",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "credential",

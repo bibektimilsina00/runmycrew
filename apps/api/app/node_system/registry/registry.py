@@ -32,29 +32,36 @@ from apps.api.app.node_system.nodes.asana.asana_node import AsanaNode
 from apps.api.app.node_system.nodes.asana.asana_trigger import AsanaTriggerNode
 from apps.api.app.node_system.nodes.ashby.ashby_node import AshbyNode
 from apps.api.app.node_system.nodes.ashby.ashby_trigger import AshbyTriggerNode
+from apps.api.app.node_system.nodes.atlassian.confluence.confluence_node import ConfluenceNode
+from apps.api.app.node_system.nodes.atlassian.confluence.confluence_webhook import (
+    ConfluenceWebhookTriggerNode,
+)
+from apps.api.app.node_system.nodes.atlassian.jira.jira_node import JiraNode
+from apps.api.app.node_system.nodes.atlassian.jira.jira_webhook import JiraWebhookTriggerNode
+from apps.api.app.node_system.nodes.atlassian.jira_service_management.jira_service_management_node import (
+    JiraServiceManagementNode,
+)
+from apps.api.app.node_system.nodes.atlassian.trello.trello_node import TrelloNode
+from apps.api.app.node_system.nodes.atlassian.trello.trello_trigger import TrelloTriggerNode
 from apps.api.app.node_system.nodes.attio.attio_node import AttioNode
 from apps.api.app.node_system.nodes.attio.attio_trigger import AttioTriggerNode
-from apps.api.app.node_system.nodes.aws_appconfig.aws_appconfig_node import AWSAppConfigNode
-from apps.api.app.node_system.nodes.aws_athena.aws_athena_node import AWSAthenaNode
-from apps.api.app.node_system.nodes.aws_cloudformation.aws_cloudformation_node import (
+from apps.api.app.node_system.nodes.aws.aws_appconfig.aws_appconfig_node import AWSAppConfigNode
+from apps.api.app.node_system.nodes.aws.aws_athena.aws_athena_node import AWSAthenaNode
+from apps.api.app.node_system.nodes.aws.aws_cloudformation.aws_cloudformation_node import (
     AWSCloudFormationNode,
 )
-from apps.api.app.node_system.nodes.aws_cloudwatch_logs.aws_cloudwatch_logs_node import (
+from apps.api.app.node_system.nodes.aws.aws_cloudwatch_logs.aws_cloudwatch_logs_node import (
     AWSCloudWatchLogsNode,
 )
-from apps.api.app.node_system.nodes.aws_iam.aws_iam_node import AWSIAMNode
-from apps.api.app.node_system.nodes.aws_rds.aws_rds_node import AWSRDSNode
-from apps.api.app.node_system.nodes.aws_s3.aws_s3_node import AWSS3Node
-from apps.api.app.node_system.nodes.aws_secrets_manager.aws_secrets_manager_node import (
+from apps.api.app.node_system.nodes.aws.aws_iam.aws_iam_node import AWSIAMNode
+from apps.api.app.node_system.nodes.aws.aws_rds.aws_rds_node import AWSRDSNode
+from apps.api.app.node_system.nodes.aws.aws_s3.aws_s3_node import AWSS3Node
+from apps.api.app.node_system.nodes.aws.aws_secrets_manager.aws_secrets_manager_node import (
     AWSSecretsManagerNode,
 )
-from apps.api.app.node_system.nodes.aws_ses.aws_ses_node import AWSSESNode
-from apps.api.app.node_system.nodes.aws_sqs.aws_sqs_node import AWSSQSNode
-from apps.api.app.node_system.nodes.aws_sts.aws_sts_node import AWSSTSNode
-from apps.api.app.node_system.nodes.azure_devops.azure_devops_node import AzureDevOpsNode
-from apps.api.app.node_system.nodes.azure_devops.azure_devops_webhook import (
-    AzureDevOpsWebhookTriggerNode,
-)
+from apps.api.app.node_system.nodes.aws.aws_ses.aws_ses_node import AWSSESNode
+from apps.api.app.node_system.nodes.aws.aws_sqs.aws_sqs_node import AWSSQSNode
+from apps.api.app.node_system.nodes.aws.aws_sts.aws_sts_node import AWSSTSNode
 from apps.api.app.node_system.nodes.box.box_node import BoxNode
 from apps.api.app.node_system.nodes.brandfetch.brandfetch_node import BrandfetchNode
 from apps.api.app.node_system.nodes.brex.brex_node import BrexNode
@@ -82,10 +89,6 @@ from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetV
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
-from apps.api.app.node_system.nodes.confluence.confluence_node import ConfluenceNode
-from apps.api.app.node_system.nodes.confluence.confluence_webhook import (
-    ConfluenceWebhookTriggerNode,
-)
 from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextNode
 from apps.api.app.node_system.nodes.convex.convex_node import ConvexNode
 from apps.api.app.node_system.nodes.crowdstrike.crowdstrike_node import CrowdStrikeNode
@@ -129,47 +132,57 @@ from apps.api.app.node_system.nodes.fireflies.fireflies_node import FirefliesNod
 from apps.api.app.node_system.nodes.fireflies.fireflies_webhook import (
     FirefliesWebhookTriggerNode,
 )
-from apps.api.app.node_system.nodes.ga4.ga4_node import GoogleAnalyticsNode
 from apps.api.app.node_system.nodes.gamma.gamma_node import GammaNode
-from apps.api.app.node_system.nodes.gcalendar.gcal_node import GCalNode
-from apps.api.app.node_system.nodes.gcalendar.gcal_trigger import GCalTriggerNode
-from apps.api.app.node_system.nodes.gchat.gchat_node import GoogleChatNode
-from apps.api.app.node_system.nodes.gchat.gchat_trigger import GoogleChatTriggerNode
-from apps.api.app.node_system.nodes.gcs.gcs_node import GoogleCloudStorageNode
-from apps.api.app.node_system.nodes.gdocs.gdocs_node import GoogleDocsNode
-from apps.api.app.node_system.nodes.gdrive.gdrive_node import GDriveNode
-from apps.api.app.node_system.nodes.gdrive.gdrive_trigger import GDriveTriggerNode
-from apps.api.app.node_system.nodes.gforms.gforms_node import GoogleFormsNode
-from apps.api.app.node_system.nodes.gforms.gforms_trigger import GoogleFormsTriggerNode
 from apps.api.app.node_system.nodes.github.github_node import GitHubNode
 from apps.api.app.node_system.nodes.github.github_webhook import GitHubWebhookTriggerNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_node import GitLabNode
 from apps.api.app.node_system.nodes.gitlab.gitlab_webhook import GitLabWebhookTriggerNode
-from apps.api.app.node_system.nodes.gmail.gmail_node import GmailNode
-from apps.api.app.node_system.nodes.gmail.gmail_trigger import GmailTriggerNode
 from apps.api.app.node_system.nodes.gong.gong_node import GongNode
 from apps.api.app.node_system.nodes.gong.gong_webhook import GongWebhookTriggerNode
-from apps.api.app.node_system.nodes.google_ads.google_ads_node import GoogleAdsNode
-from apps.api.app.node_system.nodes.google_bigquery.google_bigquery_node import GoogleBigQueryNode
-from apps.api.app.node_system.nodes.google_books.google_books_node import GoogleBooksNode
-from apps.api.app.node_system.nodes.google_contacts.google_contacts_node import GoogleContactsNode
-from apps.api.app.node_system.nodes.google_groups.google_groups_node import GoogleGroupsNode
-from apps.api.app.node_system.nodes.google_maps.google_maps_node import GoogleMapsNode
-from apps.api.app.node_system.nodes.google_meet.google_meet_node import GoogleMeetNode
-from apps.api.app.node_system.nodes.google_pagespeed.google_pagespeed_node import (
+from apps.api.app.node_system.nodes.google.ga4.ga4_node import GoogleAnalyticsNode
+from apps.api.app.node_system.nodes.google.gcalendar.gcal_node import GCalNode
+from apps.api.app.node_system.nodes.google.gcalendar.gcal_trigger import GCalTriggerNode
+from apps.api.app.node_system.nodes.google.gchat.gchat_node import GoogleChatNode
+from apps.api.app.node_system.nodes.google.gchat.gchat_trigger import GoogleChatTriggerNode
+from apps.api.app.node_system.nodes.google.gcs.gcs_node import GoogleCloudStorageNode
+from apps.api.app.node_system.nodes.google.gdocs.gdocs_node import GoogleDocsNode
+from apps.api.app.node_system.nodes.google.gdrive.gdrive_node import GDriveNode
+from apps.api.app.node_system.nodes.google.gdrive.gdrive_trigger import GDriveTriggerNode
+from apps.api.app.node_system.nodes.google.gforms.gforms_node import GoogleFormsNode
+from apps.api.app.node_system.nodes.google.gforms.gforms_trigger import GoogleFormsTriggerNode
+from apps.api.app.node_system.nodes.google.gmail.gmail_node import GmailNode
+from apps.api.app.node_system.nodes.google.gmail.gmail_trigger import GmailTriggerNode
+from apps.api.app.node_system.nodes.google.google_ads.google_ads_node import GoogleAdsNode
+from apps.api.app.node_system.nodes.google.google_bigquery.google_bigquery_node import (
+    GoogleBigQueryNode,
+)
+from apps.api.app.node_system.nodes.google.google_books.google_books_node import GoogleBooksNode
+from apps.api.app.node_system.nodes.google.google_contacts.google_contacts_node import (
+    GoogleContactsNode,
+)
+from apps.api.app.node_system.nodes.google.google_groups.google_groups_node import GoogleGroupsNode
+from apps.api.app.node_system.nodes.google.google_maps.google_maps_node import GoogleMapsNode
+from apps.api.app.node_system.nodes.google.google_meet.google_meet_node import GoogleMeetNode
+from apps.api.app.node_system.nodes.google.google_pagespeed.google_pagespeed_node import (
     GooglePageSpeedNode,
 )
-from apps.api.app.node_system.nodes.google_search.google_search_node import GoogleSearchNode
-from apps.api.app.node_system.nodes.google_sheets.google_sheets import GoogleSheetsNode
-from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
+from apps.api.app.node_system.nodes.google.google_search.google_search_node import GoogleSearchNode
+from apps.api.app.node_system.nodes.google.google_sheets.google_sheets import GoogleSheetsNode
+from apps.api.app.node_system.nodes.google.google_sheets.google_sheets_trigger import (
     GoogleSheetsTriggerNode,
 )
-from apps.api.app.node_system.nodes.google_translate.google_translate_node import (
+from apps.api.app.node_system.nodes.google.google_translate.google_translate_node import (
     GoogleTranslateNode,
 )
-from apps.api.app.node_system.nodes.google_vault.google_vault_node import GoogleVaultNode
-from apps.api.app.node_system.nodes.gpeople.gpeople_node import GooglePeopleNode
-from apps.api.app.node_system.nodes.gpeople.gpeople_trigger import GooglePeopleTriggerNode
+from apps.api.app.node_system.nodes.google.google_vault.google_vault_node import GoogleVaultNode
+from apps.api.app.node_system.nodes.google.gpeople.gpeople_node import GooglePeopleNode
+from apps.api.app.node_system.nodes.google.gpeople.gpeople_trigger import GooglePeopleTriggerNode
+from apps.api.app.node_system.nodes.google.gsc.gsc_node import GoogleSearchConsoleNode
+from apps.api.app.node_system.nodes.google.gslides.gslides_node import GoogleSlidesNode
+from apps.api.app.node_system.nodes.google.gtasks.gtasks_node import GoogleTasksNode
+from apps.api.app.node_system.nodes.google.gtasks.gtasks_trigger import GoogleTasksTriggerNode
+from apps.api.app.node_system.nodes.google.gyt.gyt_node import GoogleYouTubeNode
+from apps.api.app.node_system.nodes.google.gyt.gyt_trigger import GoogleYouTubeTriggerNode
 from apps.api.app.node_system.nodes.grafana.grafana_node import GrafanaCloudNode
 from apps.api.app.node_system.nodes.grain.grain_node import GrainNode
 from apps.api.app.node_system.nodes.grain.grain_trigger import GrainTriggerNode
@@ -177,13 +190,7 @@ from apps.api.app.node_system.nodes.granola.granola_node import GranolaNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_node import GreenhouseNode
 from apps.api.app.node_system.nodes.greenhouse.greenhouse_trigger import GreenhouseTriggerNode
 from apps.api.app.node_system.nodes.greptile.greptile_node import GreptileNode
-from apps.api.app.node_system.nodes.gsc.gsc_node import GoogleSearchConsoleNode
-from apps.api.app.node_system.nodes.gslides.gslides_node import GoogleSlidesNode
-from apps.api.app.node_system.nodes.gtasks.gtasks_node import GoogleTasksNode
-from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import GoogleTasksTriggerNode
 from apps.api.app.node_system.nodes.guardrails.guardrails_node import GuardrailsNode
-from apps.api.app.node_system.nodes.gyt.gyt_node import GoogleYouTubeNode
-from apps.api.app.node_system.nodes.gyt.gyt_trigger import GoogleYouTubeTriggerNode
 from apps.api.app.node_system.nodes.hackernews.hackernews_node import HackerNewsNode
 from apps.api.app.node_system.nodes.hex.hex_node import HexNode
 from apps.api.app.node_system.nodes.http.request.request import HttpRequestNode
@@ -205,11 +212,6 @@ from apps.api.app.node_system.nodes.instantly.instantly_webhook import Instantly
 from apps.api.app.node_system.nodes.intercom.intercom_node import IntercomNode
 from apps.api.app.node_system.nodes.intercom.intercom_trigger import IntercomTriggerNode
 from apps.api.app.node_system.nodes.jina.jina_node import JinaAINode
-from apps.api.app.node_system.nodes.jira.jira_node import JiraNode
-from apps.api.app.node_system.nodes.jira.jira_webhook import JiraWebhookTriggerNode
-from apps.api.app.node_system.nodes.jira_service_management.jira_service_management_node import (
-    JiraServiceManagementNode,
-)
 from apps.api.app.node_system.nodes.kalshi.kalshi_node import KalshiNode
 from apps.api.app.node_system.nodes.ketch.ketch_node import KetchNode
 from apps.api.app.node_system.nodes.klaviyo.klaviyo_node import KlaviyoNode
@@ -242,26 +244,40 @@ from apps.api.app.node_system.nodes.mailgun.mailgun_webhook import MailgunWebhoo
 from apps.api.app.node_system.nodes.mcp.mcp_node import McpNode
 from apps.api.app.node_system.nodes.mem0.mem0_node import Mem0Node
 from apps.api.app.node_system.nodes.messagebird.messagebird_node import MessageBirdNode
-from apps.api.app.node_system.nodes.meta.facebook_action import FacebookActionNode
-from apps.api.app.node_system.nodes.meta.facebook_trigger import FacebookTriggerNode
-from apps.api.app.node_system.nodes.meta.instagram_action import InstagramActionNode
-from apps.api.app.node_system.nodes.meta.instagram_trigger import InstagramTriggerNode
-from apps.api.app.node_system.nodes.meta.lead_action import LeadActionNode
-from apps.api.app.node_system.nodes.meta.lead_trigger import LeadTriggerNode
-from apps.api.app.node_system.nodes.meta.whatsapp_action import WhatsAppActionNode
-from apps.api.app.node_system.nodes.meta.whatsapp_trigger import WhatsAppTriggerNode
-from apps.api.app.node_system.nodes.microsoft_ad.microsoft_ad_node import MicrosoftEntraNode
-from apps.api.app.node_system.nodes.microsoft_dataverse.microsoft_dataverse_node import (
+from apps.api.app.node_system.nodes.meta.facebook.facebook_action import FacebookActionNode
+from apps.api.app.node_system.nodes.meta.facebook.facebook_trigger import FacebookTriggerNode
+from apps.api.app.node_system.nodes.meta.instagram.instagram_action import InstagramActionNode
+from apps.api.app.node_system.nodes.meta.instagram.instagram_trigger import InstagramTriggerNode
+from apps.api.app.node_system.nodes.meta.lead.lead_action import LeadActionNode
+from apps.api.app.node_system.nodes.meta.lead.lead_trigger import LeadTriggerNode
+from apps.api.app.node_system.nodes.meta.whatsapp.whatsapp_action import WhatsAppActionNode
+from apps.api.app.node_system.nodes.meta.whatsapp.whatsapp_trigger import WhatsAppTriggerNode
+from apps.api.app.node_system.nodes.microsoft.azure_devops.azure_devops_node import AzureDevOpsNode
+from apps.api.app.node_system.nodes.microsoft.azure_devops.azure_devops_webhook import (
+    AzureDevOpsWebhookTriggerNode,
+)
+from apps.api.app.node_system.nodes.microsoft.microsoft_ad.microsoft_ad_node import (
+    MicrosoftEntraNode,
+)
+from apps.api.app.node_system.nodes.microsoft.microsoft_dataverse.microsoft_dataverse_node import (
     MicrosoftDataverseNode,
 )
-from apps.api.app.node_system.nodes.microsoft_excel.microsoft_excel_node import MicrosoftExcelNode
-from apps.api.app.node_system.nodes.microsoft_planner.microsoft_planner_node import (
+from apps.api.app.node_system.nodes.microsoft.microsoft_excel.microsoft_excel_node import (
+    MicrosoftExcelNode,
+)
+from apps.api.app.node_system.nodes.microsoft.microsoft_planner.microsoft_planner_node import (
     MicrosoftPlannerNode,
 )
-from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_node import MicrosoftTeamsNode
-from apps.api.app.node_system.nodes.microsoft_teams.microsoft_teams_webhook import (
+from apps.api.app.node_system.nodes.microsoft.microsoft_teams.microsoft_teams_node import (
+    MicrosoftTeamsNode,
+)
+from apps.api.app.node_system.nodes.microsoft.microsoft_teams.microsoft_teams_webhook import (
     MicrosoftTeamsWebhookTriggerNode,
 )
+from apps.api.app.node_system.nodes.microsoft.onedrive.onedrive_node import OneDriveNode
+from apps.api.app.node_system.nodes.microsoft.outlook.outlook_node import OutlookNode
+from apps.api.app.node_system.nodes.microsoft.outlook.outlook_trigger import OutlookMailTriggerNode
+from apps.api.app.node_system.nodes.microsoft.sharepoint.sharepoint_node import SharePointNode
 from apps.api.app.node_system.nodes.millionverifier.millionverifier_node import MillionVerifierNode
 from apps.api.app.node_system.nodes.mistral_parse.mistral_parse_node import MistralOCRNode
 from apps.api.app.node_system.nodes.mixpanel.mixpanel_node import MixpanelNode
@@ -275,12 +291,9 @@ from apps.api.app.node_system.nodes.notion.notion_node import NotionNode
 from apps.api.app.node_system.nodes.notion.notion_webhook import NotionWebhookTriggerNode
 from apps.api.app.node_system.nodes.obsidian.obsidian_node import ObsidianNode
 from apps.api.app.node_system.nodes.okta.okta_node import OktaNode
-from apps.api.app.node_system.nodes.onedrive.onedrive_node import OneDriveNode
 from apps.api.app.node_system.nodes.onepassword.onepassword_node import OnePasswordConnectNode
 from apps.api.app.node_system.nodes.openai.openai_node import OpenAINode
 from apps.api.app.node_system.nodes.openalex.openalex_node import OpenAlexNode
-from apps.api.app.node_system.nodes.outlook.outlook_node import OutlookNode
-from apps.api.app.node_system.nodes.outlook.outlook_trigger import OutlookMailTriggerNode
 from apps.api.app.node_system.nodes.pagerduty.pagerduty_trigger import PagerDutyTriggerNode
 from apps.api.app.node_system.nodes.parallel_ai.parallel_ai_node import ParallelAINode
 from apps.api.app.node_system.nodes.peopledatalabs.peopledatalabs_node import PeopleDataLabsNode
@@ -313,8 +326,8 @@ from apps.api.app.node_system.nodes.rootly.rootly_node import RootlyNode
 from apps.api.app.node_system.nodes.rss.rss_trigger import RSSTriggerNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_node import SalesforceNode
 from apps.api.app.node_system.nodes.salesforce.salesforce_trigger import SalesforceTriggerNode
-from apps.api.app.node_system.nodes.sap_concur.sap_concur_node import SAPConcurNode
-from apps.api.app.node_system.nodes.sap_s4hana.sap_s4hana_node import SAPS4HANANode
+from apps.api.app.node_system.nodes.sap.sap_concur.sap_concur_node import SAPConcurNode
+from apps.api.app.node_system.nodes.sap.sap_s4hana.sap_s4hana_node import SAPS4HANANode
 from apps.api.app.node_system.nodes.sendblue.sendblue_node import SendblueNode
 from apps.api.app.node_system.nodes.sendgrid.sendgrid_node import SendGridNode
 from apps.api.app.node_system.nodes.sentry.sentry_node import SentryNode
@@ -322,7 +335,6 @@ from apps.api.app.node_system.nodes.serper.serper_node import SerperNode
 from apps.api.app.node_system.nodes.servicenow.servicenow_node import ServiceNowNode
 from apps.api.app.node_system.nodes.servicenow.servicenow_trigger import ServiceNowTriggerNode
 from apps.api.app.node_system.nodes.sftp.sftp_node import SftpNode
-from apps.api.app.node_system.nodes.sharepoint.sharepoint_node import SharePointNode
 from apps.api.app.node_system.nodes.shopify.shopify_node import ShopifyNode
 from apps.api.app.node_system.nodes.similarweb.similarweb_node import SimilarWebNode
 from apps.api.app.node_system.nodes.sixtyfour.sixtyfour_node import SixtyFourNode
@@ -343,14 +355,12 @@ from apps.api.app.node_system.nodes.telegram.telegram_trigger import TelegramTri
 from apps.api.app.node_system.nodes.temporal.temporal_node import TemporalCloudNode
 from apps.api.app.node_system.nodes.textract.textract_node import AWSTextractNode
 from apps.api.app.node_system.nodes.tinybird.tinybird_node import TinybirdNode
-from apps.api.app.node_system.nodes.trello.trello_node import TrelloNode
-from apps.api.app.node_system.nodes.trello.trello_trigger import TrelloTriggerNode
 from apps.api.app.node_system.nodes.trigger_dev.trigger_dev_node import TriggerDevNode
-from apps.api.app.node_system.nodes.twilio.twilio_node import TwilioNode
-from apps.api.app.node_system.nodes.twilio.twilio_webhook import TwilioWebhookTriggerNode
-from apps.api.app.node_system.nodes.twilio_sms.twilio_sms_node import TwilioSMSNode
-from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_node import TwilioVoiceNode
-from apps.api.app.node_system.nodes.twilio_voice.twilio_voice_webhook import (
+from apps.api.app.node_system.nodes.twilio.twilio.twilio_node import TwilioNode
+from apps.api.app.node_system.nodes.twilio.twilio.twilio_webhook import TwilioWebhookTriggerNode
+from apps.api.app.node_system.nodes.twilio.twilio_sms.twilio_sms_node import TwilioSMSNode
+from apps.api.app.node_system.nodes.twilio.twilio_voice.twilio_voice_node import TwilioVoiceNode
+from apps.api.app.node_system.nodes.twilio.twilio_voice.twilio_voice_webhook import (
     TwilioVoiceWebhookTriggerNode,
 )
 from apps.api.app.node_system.nodes.typeform.typeform_node import TypeformNode
@@ -377,10 +387,31 @@ from apps.api.app.node_system.nodes.zerobounce.zerobounce_node import ZeroBounce
 from apps.api.app.node_system.nodes.zoom.zoom_node import ZoomNode
 from apps.api.app.node_system.nodes.zoominfo.zoominfo_node import ZoomInfoNode
 
+# Physical brand folders under `nodes/`. If a node class lives inside
+# one, its `brand` field is auto-derived. Kept explicit rather than
+# "any top-level folder = brand" so single-node folders (e.g. `slack/`)
+# stay ungrouped.
+_BRAND_FOLDERS = {"ai", "aws", "google", "microsoft", "atlassian", "twilio", "sap", "meta"}
+
 
 class NodeRegistry:
     def __init__(self):
         self._nodes: dict[str, type[BaseNode]] = {}
+
+    @staticmethod
+    def _brand_of(node_class: type[BaseNode]) -> str | None:
+        # `apps.api.app.node_system.nodes.<x>.<y>...` — token right after
+        # `nodes.` is either a brand folder or a flat node folder. REST-
+        # scaffold nodes live in `rest_node_factory` (no folder signal)
+        # — the factory stamps their calling module on `_source_module`.
+        module = getattr(node_class, "_source_module", None) or node_class.__module__
+        parts = module.split(".")
+        try:
+            i = parts.index("nodes")
+        except ValueError:
+            return None
+        token = parts[i + 1] if i + 1 < len(parts) else None
+        return token if token in _BRAND_FOLDERS else None
 
     def register(self, node_class: type[BaseNode]) -> None:
         metadata = node_class.get_metadata()
@@ -392,7 +423,17 @@ class NodeRegistry:
         return self._nodes[node_type]
 
     def list_nodes(self) -> list[dict[str, Any]]:
-        return [cls.get_metadata().model_dump() for cls in self._nodes.values()]
+        out = []
+        for cls in self._nodes.values():
+            # Dump then set — DO NOT mutate the shared metadata object.
+            # Some scaffold nodes cache `metadata` at class level; a
+            # mutation here leaks into any caller that later reads
+            # `get_metadata()` directly (snapshot tests, etc).
+            row = cls.get_metadata().model_dump()
+            if row.get("brand") is None:
+                row["brand"] = self._brand_of(cls)
+            out.append(row)
+        return out
 
 
 node_registry = NodeRegistry()

@@ -48,7 +48,7 @@ MANIFEST = WebhookTriggerManifest(
         "HMAC-SHA256 in `X-Gong-Signature`."
     ),
     icon_slug="gong",
-    color="#1c1c1c",
+    color="#ffffff",
     provider="gong",
     signature=SignatureSpec(
         scheme="hmac_sha256",

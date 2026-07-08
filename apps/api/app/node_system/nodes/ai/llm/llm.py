@@ -12,6 +12,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.llm import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -50,11 +51,11 @@ class LLMNode(BaseNode[LLMProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.llm",
-            name="LLM",
+            name=NAME,
             category="ai",
             description="Generate text with any LLM. Simple prompt in, text out — no tools or agentic loop.",
-            icon="Sparkles",
-            color="#6366f1",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

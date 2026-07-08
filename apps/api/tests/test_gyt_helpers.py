@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gyt.gyt_node import (
+from apps.api.app.node_system.nodes.google.gyt.gyt_node import (
     GoogleYouTubeProperties,
     _flatten_channel,
     _flatten_comment,
@@ -12,7 +12,7 @@ from apps.api.app.node_system.nodes.gyt.gyt_node import (
     _flatten_subscription,
     _flatten_video,
 )
-from apps.api.app.node_system.nodes.gyt.gyt_rss import parse_feed
+from apps.api.app.node_system.nodes.google.gyt.gyt_rss import parse_feed
 
 # ── _flatten_video ─────────────────────────────────────────────────────
 

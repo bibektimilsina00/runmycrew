@@ -7,7 +7,7 @@ import json
 import pytest
 
 from apps.api.app.node_system.base.errors import STRUCTURED_ERROR_SENTINEL
-from apps.api.app.node_system.nodes.gchat.gchat_node import (
+from apps.api.app.node_system.nodes.google.gchat.gchat_node import (
     GoogleChatProperties,
     _coerce_cards,
     _normalise_message_name,

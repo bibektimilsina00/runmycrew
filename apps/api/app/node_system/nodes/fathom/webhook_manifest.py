@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.fathom import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -43,14 +44,14 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.fathom_webhook",
-    name="Fathom",
+    name=NAME,
     description=(
         "Fires when Fathom posts a meeting event (summary ready, action "
         "items generated). Verified via bare-secret compare against "
         "`x-webhook-secret`."
     ),
-    icon_slug="fathom",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="fathom",
     signature=SignatureSpec(
         scheme="gitlab_token",

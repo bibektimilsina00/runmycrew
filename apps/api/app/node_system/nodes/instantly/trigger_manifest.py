@@ -26,6 +26,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.instantly import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -189,14 +190,14 @@ async def _walk_instantly(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.instantly",
-    name="Instantly",
+    name=NAME,
     description=(
         "Poll Instantly for new leads, lead status changes (interested / "
         "meeting_booked / unsubscribed / …), or completed campaigns. For "
         "per-delivery email events attach an Instantly webhook."
     ),
-    icon_slug="instantly",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url=_INSTANTLY_API,
     credential_type="instantly_api_key",
     token_field=["api_key"],

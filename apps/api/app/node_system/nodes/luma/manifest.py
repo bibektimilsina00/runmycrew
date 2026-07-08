@@ -13,7 +13,7 @@ MANIFEST = ProviderManifest(
     category="integration",
     description="Luma — events + calendars via lu.ma.",
     icon_slug="luma",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.lu.ma/public/v1",
     credential_type="luma_api_key",
     token_field=["api_key"],
@@ -33,6 +33,17 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="api_id", label="Event API ID", type="string"),
         FieldSpec(name="guests", label="Guests (JSON array of {email, name})", type="json"),
         FieldSpec(name="limit", label="Limit", type="number", default=25, mode="advanced"),
+        FieldSpec(name="luma_event_api_id", label="Event API ID", type="string"),
+        FieldSpec(name="luma_event_body", label="Event Body (JSON)", type="json", default={}),
+        FieldSpec(name="luma_slug", label="Event Slug", type="string"),
+        FieldSpec(name="luma_guest_email", label="Guest Email", type="string"),
+        FieldSpec(name="luma_guests_body", label="Guests Body (JSON)", type="json", default={}),
+        FieldSpec(
+            name="luma_guest_status", label="Guest Status (approved|declined|going)", type="string"
+        ),
+        FieldSpec(
+            name="luma_invite_emails", label="Invite Emails (JSON array)", type="json", default=[]
+        ),
     ],
     operations=[
         OpSpec(
@@ -74,6 +85,83 @@ MANIFEST = ProviderManifest(
             body_builder=lambda v: {
                 "event_api_id": getattr(v, "api_id", "") or "",
                 "guests": getattr(v, "guests", None) or [],
+            },
+        ),
+        OpSpec(
+            id="create_event",
+            label="Create Event",
+            method="POST",
+            path="/public/v1/event/create",
+            visible_fields=["luma_event_body"],
+            body_builder=lambda v: getattr(v, "luma_event_body", None) or {},
+        ),
+        OpSpec(
+            id="update_event",
+            label="Update Event",
+            method="POST",
+            path="/public/v1/event/update",
+            visible_fields=["luma_event_api_id", "luma_event_body"],
+            body_builder=lambda v: {
+                "api_id": getattr(v, "luma_event_api_id", "") or "",
+                **(getattr(v, "luma_event_body", None) or {}),
+            },
+        ),
+        OpSpec(
+            id="lookup_event",
+            label="Lookup Event by Slug",
+            method="GET",
+            path="/public/v1/event/lookup",
+            visible_fields=["luma_slug"],
+            query_builder=lambda v: {"slug": getattr(v, "luma_slug", "") or ""},
+        ),
+        OpSpec(
+            id="cancel_event",
+            label="Cancel Event",
+            method="POST",
+            path="/public/v1/event/cancel",
+            visible_fields=["luma_event_api_id"],
+            body_builder=lambda v: {"api_id": getattr(v, "luma_event_api_id", "") or ""},
+        ),
+        OpSpec(
+            id="get_guests",
+            label="Get Event Guests",
+            method="GET",
+            path="/public/v1/event/get-guests",
+            visible_fields=["luma_event_api_id"],
+            query_builder=lambda v: {"event_api_id": getattr(v, "luma_event_api_id", "") or ""},
+        ),
+        OpSpec(
+            id="get_guest",
+            label="Get Guest",
+            method="GET",
+            path="/public/v1/event/get-guest",
+            visible_fields=["luma_event_api_id", "luma_guest_email"],
+            query_builder=lambda v: {
+                "event_api_id": getattr(v, "luma_event_api_id", "") or "",
+                "email": getattr(v, "luma_guest_email", "") or "",
+            },
+        ),
+        OpSpec(
+            id="send_invites",
+            label="Send Invites",
+            method="POST",
+            path="/public/v1/event/send-invites",
+            visible_fields=["luma_event_api_id", "luma_invite_emails"],
+            body_builder=lambda v: {
+                "event_api_id": getattr(v, "luma_event_api_id", "") or "",
+                "guests": getattr(v, "luma_invite_emails", []) or [],
+            },
+        ),
+        OpSpec(
+            id="update_guest_status",
+            label="Update Guest Status",
+            method="POST",
+            path="/public/v1/event/update-guest-status",
+            visible_fields=["luma_event_api_id", "luma_guest_email", "luma_guest_status"],
+            body_builder=lambda v: {
+                "event_api_id": getattr(v, "luma_event_api_id", "") or "",
+                "email": getattr(v, "luma_guest_email", "") or "",
+                "status": getattr(v, "luma_guest_status", "") or "",
             },
         ),
     ],

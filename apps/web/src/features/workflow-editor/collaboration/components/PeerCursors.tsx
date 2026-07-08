@@ -25,7 +25,7 @@ export function PeerCursors() {
             key={session.session_id}
             // ~120ms transition smooths cursor between 25fps wire updates
             // without lagging noticeably behind the peer's actual mouse.
-            className="absolute will-change-transform transition-transform duration-[120ms] ease-out"
+            className="absolute will-change-transform transition-transform [transition-duration:120ms] ease-out"
             style={{
               transform: `translate3d(${screen.x}px, ${screen.y}px, 0)`,
             }}

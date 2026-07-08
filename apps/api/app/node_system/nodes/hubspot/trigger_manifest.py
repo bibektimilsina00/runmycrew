@@ -8,6 +8,7 @@ to accept both credential types in Phase 2.2).
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.hubspot import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -37,10 +38,10 @@ register_flatten("hubspot.crm", _flatten_crm)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.hubspot",
-    name="HubSpot",
+    name=NAME,
     description="Poll HubSpot for new contacts, companies, deals, or tickets.",
-    icon_slug="hubspot",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.hubapi.com",
     credential_type=["hubspot_oauth", "hubspot_api_key"],
     token_field=["access_token", "api_key"],

@@ -14,6 +14,7 @@ a personal account but they want to act on a team. Optional everywhere.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.vercel import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -22,11 +23,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.vercel",
-    name="Vercel",
+    name=NAME,
     category="integration",
     description="Manage Vercel deployments, projects, domains, and env vars.",
-    icon_slug="vercel",
-    color="#ffffff",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.vercel.com",
     credential_type="vercel_api_key",
     token_field=["api_key"],

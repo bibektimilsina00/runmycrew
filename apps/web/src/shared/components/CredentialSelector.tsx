@@ -120,7 +120,7 @@ export function CredentialSelector({
         <DropdownTrigger asChild disabled={disabled}>
           <div className={cn(
             "flex items-center !gap-3 w-full h-9 pl-2 pr-2.5 text-sm text-left bg-surface border border-border-soft rounded-[8px] cursor-pointer",
-            "transition-[background-color,border-color] duration-[120ms]",
+            "transition-[background-color,border-color] [transition-duration:120ms]",
             "hover:border-border hover:bg-surface-2 focus:outline-none focus:border-accent focus:bg-surface-2",
             "data-[state=open]:border-accent data-[state=open]:bg-surface-2",
             className

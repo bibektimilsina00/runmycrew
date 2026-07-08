@@ -166,7 +166,7 @@ def main() -> None:
         print(f"  ✓ wrote {slug}.svg  ({note})\n")
 
     print(f"\ndone — {saved} saved, {skipped} skipped.")
-    print("Restart the backend (make dev-all) to pick up new icons.")
+    print("Restart the backend (make api) to pick up new icons.")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ Attio is a flexible-schema CRM exposing a Records-style API at
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.attio import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -16,11 +17,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.attio",
-    name="Attio",
+    name=NAME,
     category="integration",
     description="Attio CRM — manage records on any custom object schema.",
-    icon_slug="attio",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.attio.com/v2",
     credential_type="attio_api_key",
     token_field=["api_key"],

@@ -7,6 +7,7 @@ types, plus webhook subscription CRUD.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.calendly import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -15,11 +16,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.calendly",
-    name="Calendly",
+    name=NAME,
     category="integration",
     description="Calendly — scheduled events, invitees, event types, webhooks.",
-    icon_slug="calendly",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.calendly.com",
     credential_type="calendly_oauth",
     token_field=["access_token"],

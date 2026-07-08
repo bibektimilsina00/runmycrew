@@ -171,7 +171,7 @@ MANIFEST = PollingTriggerManifest(
         "Public URL only — no credential required."
     ),
     icon_slug="rss",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="",
     # `credential_type=None` — unauthenticated poller. Factory skips
     # the credential inspector row; scheduler skips the cred lookup.

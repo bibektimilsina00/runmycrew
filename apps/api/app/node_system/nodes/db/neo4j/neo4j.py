@@ -33,7 +33,7 @@ class Neo4jNode(BaseNode[Neo4jProperties]):
             category="integration",
             description="Run a Cypher query against a Neo4j graph database.",
             icon="neo4j",
-            color="#1c1c1c",
+            color="#ffffff",
             properties=[
                 {
                     "name": "uri",

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.google_sheets.google_sheets_trigger import (
+from apps.api.app.node_system.nodes.google.google_sheets.google_sheets_trigger import (
     EVENT_ROW_ADDED,
     EVENT_ROW_UPDATED,
     GoogleSheetsTriggerNode,

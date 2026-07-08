@@ -7,6 +7,7 @@ webhook delivery, not polling — deferred to a future 4.9 webhook batch.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.emailbison import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -47,13 +48,13 @@ register_flatten("emailbison.campaign", _flatten_campaign)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.emailbison",
-    name="Emailbison",
+    name=NAME,
     description=(
         "Poll Emailbison for new leads (workspace-wide or per-campaign) "
         "and new campaigns. Per-delivery email events require a webhook."
     ),
-    icon_slug="emailbison",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.emailbison.com/api/v1",
     credential_type="emailbison_api_key",
     token_field=["api_key"],

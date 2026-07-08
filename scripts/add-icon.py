@@ -141,7 +141,7 @@ def main() -> None:
     print(f"✓ wrote {out_path.relative_to(REPO)}  (slug: {slug})")
     print(f"  {note}")
     print(
-        "  served at /api/v1/icons/" + slug + " (backend restart / next `make dev-all` picks it up)"
+        "  served at /api/v1/icons/" + slug + " (backend restart / next `make api` picks it up)"
     )
 
 

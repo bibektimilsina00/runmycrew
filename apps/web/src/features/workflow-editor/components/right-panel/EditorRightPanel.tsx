@@ -88,7 +88,7 @@ export function EditorRightPanel({
                   onDragStart={locked ? undefined : onTabDragStart(id)}
                   onClick={() => setRightActive(id)}
                   className={cn(
-                    'flex items-center gap-1.5 h-[30px] px-[10px] text-[12px] font-semibold rounded-[6px] transition-all duration-[120ms] border',
+                    'flex items-center gap-1.5 h-[30px] px-[10px] text-[12px] font-semibold rounded-[6px] transition-all [transition-duration:120ms] border',
                     active
                       ? 'bg-[var(--surface)] text-[var(--text)] border-[var(--border-soft)] shadow-[var(--shadow-float)]'
                       : 'text-[var(--text-mute)] hover:text-[var(--text)] hover:bg-[var(--surface)]/30 border-transparent',

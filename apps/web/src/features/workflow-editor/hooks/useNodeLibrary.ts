@@ -45,16 +45,44 @@ export function useNodeLibrary() {
     )
   }, [available, query])
 
+  // Nodes are grouped by `category` (Triggers/Actions/AI/…). Inside the
+  // Integrations bucket, we further split by `brand` so all google nodes
+  // (gmail, gdrive, gsheets, …) collapse under a "Google" subgroup and
+  // stop drowning the list. Nodes without a brand stay ungrouped at the
+  // top of the bucket. Same structure as before, just with an optional
+  // per-brand sub-map inside each category entry.
   const grouped = useMemo(() => {
-    const map = new Map<string, typeof filtered>()
+    const byCat = new Map<string, typeof filtered>()
     for (const def of filtered) {
-      const list = map.get(def.category) ?? []
+      const list = byCat.get(def.category) ?? []
       list.push(def)
-      map.set(def.category, list)
+      byCat.set(def.category, list)
     }
     return CATEGORY_ORDER
-      .filter(c => map.has(c))
-      .map(c => ({ category: c, defs: map.get(c)! }))
+      .filter(c => byCat.has(c))
+      .map(c => {
+        const defs = byCat.get(c)!
+        const byBrand = new Map<string, typeof defs>()
+        const unbranded: typeof defs = []
+        for (const d of defs) {
+          if (d.brand) {
+            const list = byBrand.get(d.brand) ?? []
+            list.push(d)
+            byBrand.set(d.brand, list)
+          } else {
+            unbranded.push(d)
+          }
+        }
+        // Preserve unbranded first, then brands alphabetically — one bucket
+        // per brand, each sorted by node name for a stable read.
+        const brands = Array.from(byBrand.keys()).sort()
+        return {
+          category: c,
+          defs,
+          unbranded,
+          brands: brands.map(b => ({ brand: b, defs: byBrand.get(b)!.slice().sort((a, z) => a.name.localeCompare(z.name)) })),
+        }
+      })
   }, [filtered])
 
   // In loop mode the palette shows curated role-agent presets ("Crew") instead

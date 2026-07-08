@@ -31,7 +31,7 @@ export function useAuth() {
   const clearAuth = useAuthStore((state) => state.logout)
 
   // React Query for current user profile
-  const { data: meData, refetch, isFetching, isLoading: isQueryLoading } = useQuery({
+  const { data: meData, refetch, isFetching, isLoading: isQueryLoading, isError: isMeError } = useQuery({
     queryKey: authKeys.me(),
     queryFn: async ({ signal }) => {
       try {
@@ -60,7 +60,7 @@ export function useAuth() {
       try {
         const tokenRes = await authAPI.login(payload, signal)
         setToken(tokenRes.access_token)
-        
+
         // Fetch profile immediately and update query cache
         const profile = await queryClient.fetchQuery({
           queryKey: authKeys.me(),
@@ -85,7 +85,7 @@ export function useAuth() {
       setLoading(true)
       try {
         await authAPI.register(payload, signal)
-        
+
         // Auto-login upon successful registration
         const tokenRes = await authAPI.login({
           email: payload.email,
@@ -229,8 +229,11 @@ export function useAuth() {
     (forgotPasswordMutation.error?.message ?? null) ||
     (resetPasswordMutation.error?.message ?? null)
 
-  // We are restoring the session if we have a token, but the user profile is not loaded yet and the query is running
-  const isRestoringSession = !!token && !meData && !user && isQueryLoading
+  // Restoring only while the /me query is genuinely in-flight for the first
+  // time. Once it errors OR times out we stop restoring so the router can
+  // either show the app (if we had a cached user) or redirect to /login
+  // instead of leaving a spinner up forever when the backend is down.
+  const isRestoringSession = !!token && !meData && !user && isQueryLoading && !isMeError
 
   return {
     token,

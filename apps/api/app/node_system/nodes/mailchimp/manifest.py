@@ -19,14 +19,13 @@ from apps.api.app.node_system.scaffolds import (
 
 _HOST = "https://{dc}.api.mailchimp.com/3.0"
 
-
 MANIFEST = ProviderManifest(
     type="action.mailchimp",
     name="Mailchimp",
     category="integration",
     description="Mailchimp — lists, members, campaigns, tags.",
     icon_slug="mailchimp",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="",
     credential_type="mailchimp_api_key",
     token_field=["api_key"],

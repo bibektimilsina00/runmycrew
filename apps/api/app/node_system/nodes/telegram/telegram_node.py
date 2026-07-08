@@ -10,6 +10,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.telegram import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -37,11 +38,11 @@ class TelegramNode(BaseNode[TelegramProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.telegram",
-            name="Telegram",
+            name=NAME,
             category="integration",
             description="Send messages, photos, and documents via a Telegram bot.",
-            icon="telegram",
-            color="#1c1c1c",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "bot_token",

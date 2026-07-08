@@ -35,7 +35,7 @@ function SpotlightCard({ children, className, spotlightColor }: SpotlightCardPro
       onMouseLeave={() => setOpacity(0)}
       className={cn(
         'relative overflow-hidden rounded-[12px] border border-border-faint bg-bg',
-        'transition-[border-color] duration-[200ms] hover:border-border-soft',
+        'transition-[border-color] [transition-duration:200ms] hover:border-border-soft',
         className,
       )}
     >

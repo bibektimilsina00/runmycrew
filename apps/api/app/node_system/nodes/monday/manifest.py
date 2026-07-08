@@ -15,6 +15,7 @@ from typing import Any
 import httpx
 
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.monday import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -142,11 +143,11 @@ async def _add_update(node: Any, client: httpx.AsyncClient, headers: dict[str, s
 
 MANIFEST = ProviderManifest(
     type="action.monday",
-    name="Monday.com",
+    name=NAME,
     category="integration",
     description="Monday.com — manage boards, items, updates via GraphQL.",
-    icon_slug="monday",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.monday.com",
     credential_type="monday_api_key",
     token_field=["api_key"],
@@ -159,6 +160,10 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="column_values", label="Column Values (JSON)", type="json"),
         FieldSpec(name="body", label="Update body", type="string"),
         FieldSpec(name="limit", label="Limit", type="number", default=25, mode="advanced"),
+        FieldSpec(name="monday_query", label="GraphQL Query", type="string"),
+        FieldSpec(
+            name="monday_variables", label="GraphQL Variables (JSON)", type="json", default={}
+        ),
     ],
     operations=[
         OpSpec(
@@ -188,6 +193,91 @@ MANIFEST = ProviderManifest(
             label="Add Update to Item",
             visible_fields=["item_id", "body"],
             handler=_add_update,
+        ),
+        OpSpec(
+            id="get_item",
+            label="Get Item",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "query($id: [ID!]) { items(ids: $id) { id name column_values { id text } } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
+        ),
+        OpSpec(
+            id="get_items",
+            label="Get Items",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "query($ids: [ID!]) { items(ids: $ids) { id name } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
+        ),
+        OpSpec(
+            id="search_items",
+            label="Search Items",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_query"],
+            body_builder=lambda v: {"query": getattr(v, "monday_query", "") or ""},
+        ),
+        OpSpec(
+            id="archive_item",
+            label="Archive Item",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "mutation($id: ID!) { archive_item(item_id: $id) { id } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
+        ),
+        OpSpec(
+            id="move_item_to_group",
+            label="Move Item to Group",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "mutation($item: ID!, $group: String!) { move_item_to_group(item_id: $item, group_id: $group) { id } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
+        ),
+        OpSpec(
+            id="create_subitem",
+            label="Create Subitem",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "mutation($parent: ID!, $name: String!) { create_subitem(parent_item_id: $parent, item_name: $name) { id } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
+        ),
+        OpSpec(
+            id="create_update",
+            label="Create Update (comment)",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "mutation($item: ID!, $body: String!) { create_update(item_id: $item, body: $body) { id } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
+        ),
+        OpSpec(
+            id="create_group",
+            label="Create Group on Board",
+            method="POST",
+            path="/v2",
+            visible_fields=["monday_variables"],
+            body_builder=lambda v: {
+                "query": "mutation($board: ID!, $name: String!) { create_group(board_id: $board, group_name: $name) { id } }",
+                "variables": getattr(v, "monday_variables", None) or {},
+            },
         ),
     ],
     outputs_schema=[

@@ -1,14 +1,13 @@
-.PHONY: setup dev build-web lint lint-py lint-js type-check test clean db-up migrate docker-build docker-up beat
+.PHONY: setup db-up migrate api worker beat web site lint clean
 
+# ── One-time setup ──────────────────────────────────────────────────
 setup:
 	pnpm install
 	cd apps/api && uv sync
 	cd apps/worker && uv sync
 	uvx pre-commit install
 
-dev:
-	pnpm dev
-
+# ── Local dev (run each in its own terminal) ────────────────────────
 db-up:
 	docker-compose up -d db redis
 
@@ -24,29 +23,17 @@ worker:
 beat:
 	cd apps/api && PYTHONPATH=../.. uv run celery -A apps.api.app.core.celery beat --loglevel=info
 
-dev-all:
-	@./scripts/dev.sh
+web:
+	pnpm --filter runmycrew-web dev
 
-lint: lint-py lint-js
+site:
+	pnpm --filter runmycrew-site dev
 
-lint-py:
+# ── Utilities ───────────────────────────────────────────────────────
+lint:
 	uv run --project apps/api ruff check . --fix
 	uv run --project apps/api ruff format .
-
-lint-js:
-	pnpm --filter web lint
-
-type-check:
-	pnpm --filter web exec tsc --noEmit
-
-build-web:
-	pnpm --filter web run build
-
-docker-build:
-	docker-compose build
-
-docker-up:
-	docker-compose up -d
+	pnpm --filter runmycrew-web lint
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

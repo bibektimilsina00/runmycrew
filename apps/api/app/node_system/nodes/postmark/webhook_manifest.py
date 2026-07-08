@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.postmark import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -48,14 +49,14 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.postmark_webhook",
-    name="Postmark",
+    name=NAME,
     description=(
         "Fires when Postmark posts a delivery event (Delivery, Bounce, "
         "Open, Click, SpamComplaint, SubscriptionChange, ManualSuppression). "
         "Verified via base64 HMAC-SHA1 in `X-Postmark-Signature`."
     ),
-    icon_slug="postmark",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="postmark_webhook",
     signature=SignatureSpec(
         scheme="hmac_sha1_b64",

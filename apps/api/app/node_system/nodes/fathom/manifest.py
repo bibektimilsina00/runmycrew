@@ -8,6 +8,7 @@ Meetings, action items, participants read-only.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.fathom import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -16,11 +17,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.fathom",
-    name="Fathom",
+    name=NAME,
     category="integration",
     description="Fathom.video — meetings, transcripts, action items.",
-    icon_slug="fathom",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.fathom.ai/external/v1",
     credential_type="fathom_api_key",
     token_field=["api_key"],

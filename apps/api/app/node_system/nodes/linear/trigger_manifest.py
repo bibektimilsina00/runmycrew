@@ -15,6 +15,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.linear import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -277,10 +278,10 @@ async def _walk_linear(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.linear",
-    name="Linear",
+    name=NAME,
     description="Poll Linear for new / updated issues or new comments.",
-    icon_slug="linear",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.linear.app",
     credential_type="linear_api_key",
     token_field=["api_key"],

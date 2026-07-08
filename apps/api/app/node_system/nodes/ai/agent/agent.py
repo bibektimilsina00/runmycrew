@@ -13,6 +13,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.agent import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -165,11 +166,11 @@ class AgentNode(BaseNode[AgentProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.agent",
-            name="Agent",
+            name=NAME,
             category="ai",
             description="Run an AI agent with provider selection, tools, memory, and structured output.",
-            icon="Bot",
-            color="#8b5cf6",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

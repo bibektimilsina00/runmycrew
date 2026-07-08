@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gpeople.gpeople_node import (
+from apps.api.app.node_system.nodes.google.gpeople.gpeople_node import (
     GooglePeopleProperties,
     _birthday_to_struct,
     _flatten_contact,

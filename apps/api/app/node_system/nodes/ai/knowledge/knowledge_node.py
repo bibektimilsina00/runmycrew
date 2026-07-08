@@ -10,6 +10,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.knowledge import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -30,11 +31,11 @@ class KnowledgeNode(BaseNode[KnowledgeProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.knowledge",
-            name="Knowledge Base",
+            name=NAME,
             category="ai",
             description="Search a knowledge base using semantic similarity. Returns the most relevant text chunks.",
-            icon="Database",
-            color="#0ea5e9",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "knowledge_base_id",

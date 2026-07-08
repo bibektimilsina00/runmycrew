@@ -10,10 +10,6 @@ The scaffold auto-detects that when `content_type` on the manifest is
 values (Stripe accepts nested via bracket notation but we don't need
 that for the surface we ship).
 
-Refactored from a custom BaseNode. Existing 8 op names preserved:
-create_payment_intent, get_payment_intent, list_payments,
-create_customer, get_customer, list_customers, create_refund,
-list_invoices. Adds 15+ new ops toward sim's 50-op parity.
 """
 
 from __future__ import annotations
@@ -26,7 +22,7 @@ MANIFEST = ProviderManifest(
     category="integration",
     description="Stripe — payments, customers, subscriptions, invoices, refunds.",
     icon_slug="stripe",
-    color="#635BFF",
+    color="#ffffff",
     base_url="https://api.stripe.com/v1",
     credential_type="stripe_api_key",
     token_field=["api_key"],
@@ -82,7 +78,6 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="destination", label="Destination Account ID", type="string"),
     ],
     operations=[
-        # ─── legacy 8 ops (preserved) ──────────────────────────────
         OpSpec(
             id="create_payment_intent",
             label="Create Payment Intent",

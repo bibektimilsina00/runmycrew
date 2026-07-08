@@ -16,14 +16,13 @@ from apps.api.app.node_system.scaffolds import (
 
 _HOST = "https://{subdomain}.zendesk.com/api/v2"
 
-
 MANIFEST = ProviderManifest(
     type="action.zendesk",
     name="Zendesk",
     category="integration",
     description="Zendesk Support — tickets, users, organizations.",
     icon_slug="zendesk",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="",
     credential_type="zendesk_api_key",
     token_field=["api_key"],

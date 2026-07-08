@@ -4,9 +4,6 @@ Discord API v10 at `https://discord.com/api/v10`. Bot token auth via
 `Authorization: Bot {token}` header — the scaffold's `header_token`
 scheme with a custom value template covers this.
 
-Refactored from a custom BaseNode with 6 ops. Legacy op ids preserved:
-send_message, send_embed, get_messages, delete_message, get_guild,
-get_user. Adds 20+ new ops toward sim's 35-op parity.
 """
 
 from __future__ import annotations
@@ -19,7 +16,7 @@ MANIFEST = ProviderManifest(
     category="integration",
     description="Discord — messages, channels, guilds, members, roles, webhooks.",
     icon_slug="discord",
-    color="#5865F2",
+    color="#ffffff",
     base_url="https://discord.com/api/v10",
     credential_type="discord_bot_token",
     token_field=["api_key", "bot_token"],
@@ -53,7 +50,6 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="limit", label="Limit", type="number", default=50, mode="advanced"),
     ],
     operations=[
-        # ─── legacy 6 ops ──────────────────────────────────────────
         OpSpec(
             id="send_message",
             label="Send Message",

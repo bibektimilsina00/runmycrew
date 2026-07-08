@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gforms.gforms_node import (
+from apps.api.app.node_system.nodes.google.gforms.gforms_node import (
     GoogleFormsProperties,
     _build_question_id_to_title,
     _extract_answer_value,

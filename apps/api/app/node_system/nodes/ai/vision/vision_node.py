@@ -11,6 +11,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.vision import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -47,11 +48,11 @@ class VisionNode(BaseNode[VisionProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.vision",
-            name="Vision",
+            name=NAME,
             category="ai",
             description="Analyze images with AI. Pass an image URL and a prompt, get back a text description or answer.",
-            icon="Eye",
-            color="#ec4899",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

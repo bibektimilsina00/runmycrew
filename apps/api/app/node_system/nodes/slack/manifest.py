@@ -6,30 +6,24 @@ Slack Web API at `https://slack.com/api`. Bearer auth from either
 POST with a JSON body — the scaffold's default is POST with
 `content_type="application/json"` which fits.
 
-Refactored from a 628-LOC custom BaseNode. Existing 19 op names +
-endpoint URLs preserved verbatim — workflows using send_message /
-update_message / delete_message / send_ephemeral / list_channels /
-get_channel_info / create_channel / list_members / invite_to_channel
-/ list_users / get_user_info / get_user_presence / add_reaction /
-remove_reaction / open_view / push_view / update_view / publish_view
-/ upload_file continue to work.
-
-Adds 16+ new ops to reach sim's 35-op parity: channel history, thread
-replies, permalink, conversation lookup by email, DM open, files list,
-canvases full lifecycle, profile set status/title.
+Ops span: messaging (send/update/delete/ephemeral/permalink), threads
++ channel history, channels CRUD, members, users + profile (status/
+title), assistant suggested prompts, reactions, views (Block Kit modals
++ home), files, canvases (full CRUD + section lookup).
 """
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.slack import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
 
 MANIFEST = ProviderManifest(
     type="action.slack",
-    name="Slack",
+    name=NAME,
     category="integration",
     description="Slack — messages, threads, channels, users, reactions, views, canvases.",
-    icon_slug="slack",
-    color="#4A154B",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://slack.com/api",
     credential_type=["slack_oauth", "slack_bot_token"],
     token_field=["access_token", "api_key", "bot_token"],
@@ -76,7 +70,7 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="prompts", label="Suggested Prompts (JSON array)", type="json", default=[]),
     ],
     operations=[
-        # ─── messaging (legacy + sim aliases) ─────────────────────
+        # ─── messaging ─────────────────────────────────────────────
         OpSpec(
             id="send_message",
             label="Send Message",
@@ -95,18 +89,6 @@ MANIFEST = ProviderManifest(
                 if val
             },
         ),
-        OpSpec(  # sim alias
-            id="send",
-            label="Send Message (alias)",
-            method="POST",
-            path="/chat.postMessage",
-            visible_fields=["channel", "text", "blocks"],
-            body_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "text": getattr(v, "text", "") or "",
-                "blocks": getattr(v, "blocks", None) or None,
-            },
-        ),
         OpSpec(
             id="update_message",
             label="Update Message",
@@ -120,32 +102,9 @@ MANIFEST = ProviderManifest(
                 "blocks": getattr(v, "blocks", None) or None,
             },
         ),
-        OpSpec(  # sim alias
-            id="update",
-            label="Update Message (alias)",
-            method="POST",
-            path="/chat.update",
-            visible_fields=["channel", "ts", "text"],
-            body_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "ts": getattr(v, "ts", "") or "",
-                "text": getattr(v, "text", "") or "",
-            },
-        ),
         OpSpec(
             id="delete_message",
             label="Delete Message",
-            method="POST",
-            path="/chat.delete",
-            visible_fields=["channel", "ts"],
-            body_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "ts": getattr(v, "ts", "") or "",
-            },
-        ),
-        OpSpec(  # sim alias
-            id="delete",
-            label="Delete Message (alias)",
             method="POST",
             path="/chat.delete",
             visible_fields=["channel", "ts"],
@@ -165,18 +124,6 @@ MANIFEST = ProviderManifest(
                 "user": getattr(v, "user", "") or "",
                 "text": getattr(v, "text", "") or "",
                 "blocks": getattr(v, "blocks", None) or None,
-            },
-        ),
-        OpSpec(
-            id="ephemeral",
-            label="Ephemeral (alias)",
-            method="POST",
-            path="/chat.postEphemeral",
-            visible_fields=["channel", "user", "text"],
-            body_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "user": getattr(v, "user", "") or "",
-                "text": getattr(v, "text", "") or "",
             },
         ),
         OpSpec(
@@ -242,17 +189,6 @@ MANIFEST = ProviderManifest(
                     "latest": getattr(v, "latest", None) or None,
                 }.items()
                 if val
-            },
-        ),
-        OpSpec(
-            id="read",
-            label="Read Channel (alias)",
-            method="GET",
-            path="/conversations.history",
-            visible_fields=["channel", "limit"],
-            query_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "limit": int(getattr(v, "limit", 20) or 20),
             },
         ),
         # ─── channels ──────────────────────────────────────────────
@@ -339,14 +275,6 @@ MANIFEST = ProviderManifest(
             query_builder=lambda v: {"user": getattr(v, "user", "") or ""},
         ),
         OpSpec(
-            id="get_user",
-            label="Get User (alias)",
-            method="GET",
-            path="/users.info",
-            visible_fields=["user"],
-            query_builder=lambda v: {"user": getattr(v, "user", "") or ""},
-        ),
-        OpSpec(
             id="get_user_presence",
             label="Get User Presence",
             method="GET",
@@ -415,32 +343,8 @@ MANIFEST = ProviderManifest(
             },
         ),
         OpSpec(
-            id="react",
-            label="React (alias)",
-            method="POST",
-            path="/reactions.add",
-            visible_fields=["channel", "ts", "reaction"],
-            body_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "timestamp": getattr(v, "ts", "") or "",
-                "name": getattr(v, "reaction", "") or "",
-            },
-        ),
-        OpSpec(
             id="remove_reaction",
             label="Remove Reaction",
-            method="POST",
-            path="/reactions.remove",
-            visible_fields=["channel", "ts", "reaction"],
-            body_builder=lambda v: {
-                "channel": getattr(v, "channel", "") or "",
-                "timestamp": getattr(v, "ts", "") or "",
-                "name": getattr(v, "reaction", "") or "",
-            },
-        ),
-        OpSpec(
-            id="unreact",
-            label="Unreact (alias)",
             method="POST",
             path="/reactions.remove",
             visible_fields=["channel", "ts", "reaction"],

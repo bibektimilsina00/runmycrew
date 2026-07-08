@@ -40,7 +40,7 @@ const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElem
     <tr
       ref={ref}
       className={cn(
-        'border-b border-border-faint transition-colors duration-[100ms]',
+        'border-b border-border-faint transition-colors [transition-duration:100ms]',
         'hover:bg-surface/60 data-[state=selected]:bg-surface',
         className,
       )}

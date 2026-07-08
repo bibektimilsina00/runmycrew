@@ -54,7 +54,7 @@ class SshNode(BaseNode[SshProperties]):
             outputs=1,
             description="Execute a remote command over SSH (asyncssh).",
             icon="ssh",
-            color="#1c1c1c",
+            color="#ffffff",
             credential_type="ssh_credentials",
             properties=[
                 {

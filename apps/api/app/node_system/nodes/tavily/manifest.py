@@ -47,14 +47,13 @@ def _flatten_extract(body: Any) -> dict[str, Any]:
 register_flatten("tavily.search", _flatten_search)
 register_flatten("tavily.extract", _flatten_extract)
 
-
 MANIFEST = ProviderManifest(
     type="action.tavily",
     name="Tavily",
     category="integration",
     description="LLM-grounded web search + URL extraction tuned for RAG and agents.",
     icon_slug="tavily",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.tavily.com",
     credential_type="tavily_api_key",
     token_field=["api_key"],

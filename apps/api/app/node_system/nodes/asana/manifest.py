@@ -7,6 +7,7 @@ and team metadata.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.asana import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -15,11 +16,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.asana",
-    name="Asana",
+    name=NAME,
     category="integration",
     description="Asana — projects, tasks, sections, teams.",
-    icon_slug="asana",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://app.asana.com/api/1.0",
     credential_type="asana_oauth",
     token_field=["access_token"],

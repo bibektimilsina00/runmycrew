@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.instantly import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -43,14 +44,14 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.instantly_webhook",
-    name="Instantly",
+    name=NAME,
     description=(
         "Fires when Instantly posts a per-email event (opens, clicks, "
         "replies, bounces, lead status changes). Verified via HMAC-SHA256 "
         "in `x-instantly-signature`."
     ),
-    icon_slug="instantly",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="instantly_webhook",
     signature=SignatureSpec(
         scheme="hmac_sha256",

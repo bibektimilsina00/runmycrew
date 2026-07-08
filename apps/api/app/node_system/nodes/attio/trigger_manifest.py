@@ -27,6 +27,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.attio import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -265,14 +266,14 @@ async def _walk_attio(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.attio",
-    name="Attio",
+    name=NAME,
     description=(
         "Poll Attio for new records, list entries, notes, tasks, comments, "
         "or workspace members. Attio hosts custom object schemas — pick "
         "which object_slug or list_id to watch per event."
     ),
-    icon_slug="attio",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.attio.com/v2",
     credential_type="attio_api_key",
     token_field=["api_key"],

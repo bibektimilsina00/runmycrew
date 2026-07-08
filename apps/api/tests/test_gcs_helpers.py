@@ -7,7 +7,7 @@ import json
 import pytest
 
 from apps.api.app.node_system.base.errors import STRUCTURED_ERROR_SENTINEL
-from apps.api.app.node_system.nodes.gcs.gcs_node import (
+from apps.api.app.node_system.nodes.google.gcs.gcs_node import (
     GoogleCloudStorageProperties,
     _coerce_json_field,
     _object_path,

@@ -55,7 +55,7 @@ MANIFEST = WebhookTriggerManifest(
         "timestamp + body under the webhook secret you configured."
     ),
     icon_slug="webflow",
-    color="#1c1c1c",
+    color="#ffffff",
     provider="webflow",
     signature=SignatureSpec(
         scheme="webflow",

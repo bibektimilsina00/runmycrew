@@ -11,6 +11,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.tts import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -37,11 +38,11 @@ class TTSNode(BaseNode[TTSProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.tts",
-            name="Text to Speech",
+            name=NAME,
             category="ai",
             description="Convert text to natural-sounding speech. Returns base64-encoded audio.",
-            icon="Volume2",
-            color="#10b981",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

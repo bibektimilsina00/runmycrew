@@ -8,6 +8,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.agent_crew import COLOR, ICON_SLUG, NAME
 
 _MAX_ROUNDS = 20
 
@@ -30,14 +31,14 @@ class AgentCrewNode(BaseNode[AgentCrewProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="ai.agent_crew",
-            name="Agent Crew",
+            name=NAME,
             category="ai",
             description=(
                 "Orchestrate downstream role-agents in a verified maker/checker loop "
                 "with named terminal states and a cost-per-accepted-change metric."
             ),
-            icon="Repeat",
-            color="#8b5cf6",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "goal",

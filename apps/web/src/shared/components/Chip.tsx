@@ -20,7 +20,7 @@ export function Chip({ active, onClick, children, leftIcon, className }: ChipPro
         'inline-flex items-center gap-1.5',
         'px-3 py-1.5 rounded-full border',
         'text-xs font-medium',
-        'transition-[background,color,border-color] duration-[120ms]',
+        'transition-[background,color,border-color] [transition-duration:120ms]',
         'cursor-pointer select-none',
         active
           ? 'bg-surface-2 border-border text-text'

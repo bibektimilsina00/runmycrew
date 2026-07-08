@@ -49,7 +49,7 @@ class PostgresqlNode(BaseNode[PostgresqlProperties]):
             outputs=1,
             description="Run parameterized SQL against a PostgreSQL database.",
             icon="postgresql",
-            color="#336791",
+            color="#ffffff",
             credential_type="postgresql_credentials",
             properties=[
                 {

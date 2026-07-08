@@ -16,7 +16,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         'bg-bg border border-border-faint rounded-[8px]',
         'px-3 py-2.5',
         'text-sm text-text placeholder:text-text-faint',
-        'transition-[background-color,border-color] duration-[120ms]',
+        'transition-[background-color,border-color] [transition-duration:120ms]',
         error   ? 'border-err'
         : success ? 'border-ok'
         : 'hover:border-border-soft focus:border-border focus:bg-surface',

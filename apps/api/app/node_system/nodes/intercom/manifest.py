@@ -7,6 +7,7 @@ use: contacts CRUD, message send, conversation reply, segment list.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.intercom import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -15,11 +16,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.intercom",
-    name="Intercom",
+    name=NAME,
     category="integration",
     description="Intercom — manage contacts, conversations, and messages.",
-    icon_slug="intercom",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.intercom.io",
     credential_type="intercom_api_key",
     token_field=["api_key"],

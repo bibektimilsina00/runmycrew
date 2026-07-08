@@ -15,6 +15,35 @@ interface Props {
   onCreated?: (credentialId?: string) => void
 }
 
+function ProviderTile({ p, onClick }: { p: Provider; onClick: (p: Provider) => void }) {
+  return (
+    <button
+      onClick={() => onClick(p)}
+      className="flex items-center gap-3 px-4 py-3 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px] text-left hover:border-[var(--border-soft)] hover:bg-[var(--surface)] transition-all group"
+    >
+      {p.icon_slug ? (
+        <div
+          className="flex w-[32px] h-[32px] shrink-0 items-center justify-center rounded-[7px] p-1 [&_img]:h-[22px] [&_img]:w-[22px] [&_img]:object-contain"
+          style={{ background: p.color ?? 'var(--surface)' }}
+        >
+          <BrandIcon slug={p.icon_slug} />
+        </div>
+      ) : (
+        <span className="w-[32px] h-[32px] rounded-[7px] bg-[var(--surface-2)] flex items-center justify-center text-[11px] font-bold text-[var(--text)] shrink-0">
+          {p.name.slice(0, 2).toUpperCase()}
+        </span>
+      )}
+      <span className="flex flex-col gap-0.5 min-w-0">
+        <span className="text-[13px] font-medium text-[var(--text)] truncate">{p.name}</span>
+        <span className="text-[10.5px] font-mono text-[var(--text-faint)] uppercase tracking-widest">
+          {p.type === 'oauth' ? 'OAuth' : 'API Key'}
+        </span>
+      </span>
+      <Icons.CaretRight style={{ width: 12, height: 12, color: 'var(--text-dim)', flexShrink: 0, marginLeft: 'auto', opacity: 0 }} className="group-hover:opacity-100 transition-opacity" />
+    </button>
+  )
+}
+
 export function ConnectModal({ providers, onClose, initialProviderId, onCreated }: Props) {
   const { toast } = useToast()
   const createCredential = useCreateCredential()
@@ -27,6 +56,7 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<'all' | 'oauth' | 'api_key'>('all')
   const [selected, setSelected] = useState<Provider | null>(initial)
+  const [openBrand, setOpenBrand] = useState<string | null>(null)
   const [connName, setConnName] = useState(initial?.name ?? '')
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
   const [connecting, setConnecting] = useState(false)
@@ -39,6 +69,32 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
     }
     return true
   })
+
+  // Collapse per-service providers under one brand tile. A brand tile
+  // acts like a folder — clicking opens the brand's inner list. When
+  // the user searches, the brand grouping stays but auto-opens every
+  // brand that has a matching child so results stay visible.
+  const brandMap = new Map<string, Provider[]>()
+  const flat: Provider[] = []
+  for (const p of filtered) {
+    if (p.brand) {
+      const list = brandMap.get(p.brand) ?? []
+      list.push(p)
+      brandMap.set(p.brand, list)
+    } else {
+      flat.push(p)
+    }
+  }
+  const searching = search.trim().length > 0
+  const brandGroups = Array.from(brandMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([brand, providers]) => ({ brand, providers }))
+
+  const BRAND_LABEL: Record<string, string> = {
+    google: 'Google', aws: 'AWS', microsoft: 'Microsoft',
+    atlassian: 'Atlassian', twilio: 'Twilio', sap: 'SAP',
+    meta: 'Meta', ai: 'AI',
+  }
 
   const handleSelectProvider = (p: Provider) => {
     setSelected(p)
@@ -83,7 +139,7 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
   return createPortal(
     <>
       <div className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[640px] h-[72vh] bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] flex flex-col shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]">
+      <div className="fixed z-[9999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[1280px] h-[92vh] bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] flex flex-col shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-faint)]">
           <div>
@@ -135,41 +191,51 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
                   <span className="text-[13px]">No integrations match "{search}"</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {filtered.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => handleSelectProvider(p)}
-                      className="flex items-center gap-3 px-4 py-3 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px] text-left hover:border-[var(--border-soft)] hover:bg-[var(--surface)] transition-all group"
-                    >
-                      {p.icon_slug ? (
-                        <div
-                          className="flex w-[32px] h-[32px] shrink-0 items-center justify-center rounded-[7px] p-1 [&_img]:h-[22px] [&_img]:w-[22px] [&_img]:object-contain"
-                          style={{ background: p.color ?? 'var(--surface)' }}
-                        >
-                          <BrandIcon slug={p.icon_slug} />
-                        </div>
-                      ) : (
-                        <span className="w-[32px] h-[32px] rounded-[7px] bg-[var(--surface-2)] flex items-center justify-center text-[11px] font-bold text-[var(--text)] shrink-0">
-                          {p.name.slice(0, 2).toUpperCase()}
-                        </span>
-                      )}
-                      <span className="flex flex-col gap-0.5 min-w-0">
-                        <span className="text-[13px] font-medium text-[var(--text)] truncate">{p.name}</span>
-                        <span className="text-[10.5px] font-mono text-[var(--text-faint)] uppercase tracking-widest">
-                          {p.type === 'oauth' ? 'OAuth' : 'API Key'}
-                        </span>
-                      </span>
-                      <Icons.CaretRight style={{ width: 12, height: 12, color: 'var(--text-dim)', flexShrink: 0, marginLeft: 'auto', opacity: 0 }} className="group-hover:opacity-100 transition-opacity" />
-                    </button>
+                <div className="grid grid-cols-4 gap-2">
+                  {flat.map(p => (
+                    <ProviderTile key={p.id} p={p} onClick={handleSelectProvider} />
                   ))}
+                  {brandGroups.map(({ brand, providers: kids }) => {
+                    const isOpen = openBrand === brand || searching
+                    // Brand tile shows the brand icon + count. When open,
+                    // the children render below in a nested full-width row.
+                    return (
+                      <div key={brand} className={isOpen ? 'col-span-4' : ''}>
+                        <button
+                          onClick={() => setOpenBrand(o => o === brand ? null : brand)}
+                          className="w-full flex items-center gap-3 px-4 py-3 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px] text-left hover:border-[var(--border-soft)] hover:bg-[var(--surface)] transition-all"
+                        >
+                          <div className="flex w-[32px] h-[32px] shrink-0 items-center justify-center rounded-[7px] p-1 bg-[var(--surface-2)] [&_img]:h-[22px] [&_img]:w-[22px] [&_img]:object-contain">
+                            <BrandIcon slug={brand} />
+                          </div>
+                          <span className="flex flex-col gap-0.5 min-w-0 flex-1">
+                            <span className="text-[13px] font-medium text-[var(--text)] truncate">{BRAND_LABEL[brand] ?? brand}</span>
+                            <span className="text-[10.5px] font-mono text-[var(--text-faint)] uppercase tracking-widest">
+                              {kids.length} service{kids.length === 1 ? '' : 's'}
+                            </span>
+                          </span>
+                          <span className={`shrink-0 text-[10px] text-[var(--text-dim)] transition-transform ${isOpen ? 'rotate-90' : ''}`}>▶</span>
+                        </button>
+                        {isOpen && (
+                          <div className="mt-2 grid grid-cols-4 gap-2 border-l-2 border-[var(--border-faint)] pl-3 ml-2">
+                            {kids.map(p => (
+                              <ProviderTile key={p.id} p={p} onClick={handleSelectProvider} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
           </>
         ) : (
-          /* Connect form */
-          <div className="p-6 flex flex-col gap-5 overflow-y-auto">
+          /* Connect form — content scrolls; the Cancel/Connect row is
+             pinned to the modal's bottom so users always see the
+             primary action, no matter how many scope items render. */
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             {/* Provider info */}
             <div className="flex items-center gap-3 p-4 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px]">
               {selected.icon_slug && (
@@ -231,7 +297,9 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
               </div>
             ))}
 
-            <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--border-faint)]">
+            </div>
+            {/* Pinned footer */}
+            <div className="shrink-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border-faint)] bg-[var(--bg-2)]">
               <button onClick={onClose} className="px-4 py-2 rounded-[9px] text-[13px] font-medium text-[var(--text-mute)] bg-[var(--surface)] border border-[var(--border-faint)] hover:bg-[var(--surface-2)] transition-colors">
                 Cancel
               </button>

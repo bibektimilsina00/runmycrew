@@ -5,15 +5,16 @@ REST at https://api.circleback.ai/v1. See sim-parity roadmap Phase 4.23.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.circleback import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
 
 MANIFEST = ProviderManifest(
     type="action.circleback",
-    name="Circleback",
+    name=NAME,
     category="integration",
     description="Circleback — AI meeting notes + action items.",
-    icon_slug="circleback",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.circleback.ai/v1",
     credential_type="circleback_api_key",
     token_field=["api_key"],

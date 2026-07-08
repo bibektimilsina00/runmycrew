@@ -11,10 +11,10 @@ Covers:
 from __future__ import annotations
 
 from apps.api.app.features.webhooks.service import _extract_body_path
-from apps.api.app.node_system.nodes.jira.webhook_manifest import (
+from apps.api.app.node_system.nodes.atlassian.jira.webhook_manifest import (
     MANIFEST as JIRA,
 )
-from apps.api.app.node_system.nodes.jira.webhook_manifest import (
+from apps.api.app.node_system.nodes.atlassian.jira.webhook_manifest import (
     _shape as jira_shape,
 )
 from apps.api.app.node_system.nodes.linear.webhook_manifest import (

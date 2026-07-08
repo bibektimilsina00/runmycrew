@@ -17,6 +17,7 @@ Not in polling — need webhook: prospect_created (Greenhouse's
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.greenhouse import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -107,12 +108,12 @@ register_flatten("greenhouse.offer", _flatten_offer)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.greenhouse",
-    name="Greenhouse",
+    name=NAME,
     description=(
         "Poll Greenhouse ATS for new / updated candidates, applications, jobs, or offers."
     ),
-    icon_slug="greenhouse",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://harvest.greenhouse.io/v1",
     credential_type="greenhouse_api_key",
     token_field=["api_key"],

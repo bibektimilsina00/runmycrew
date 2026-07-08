@@ -10,8 +10,8 @@ interface TestPanelProps {
   isRunning: boolean
 }
 
-const standardInputCls = 'w-full rounded-[8px] border border-border-soft bg-surface px-3 py-1.5 text-[12.5px] text-[var(--text)] placeholder:text-text-faint outline-none transition-[background-color,border-color] duration-[120ms] hover:border-border hover:bg-surface-2 focus:border-accent focus:bg-surface-2'
-const jsonAreaCls = 'w-full rounded-[8px] border border-border-faint bg-bg px-3 py-2.5 text-xs text-[var(--text)] font-mono placeholder:text-text-faint outline-none transition-[background-color,border-color] duration-[120ms] hover:border-border-soft focus:border-border focus:bg-surface leading-relaxed'
+const standardInputCls = 'w-full rounded-[8px] border border-border-soft bg-surface px-3 py-1.5 text-[12.5px] text-[var(--text)] placeholder:text-text-faint outline-none transition-[background-color,border-color] [transition-duration:120ms] hover:border-border hover:bg-surface-2 focus:border-accent focus:bg-surface-2'
+const jsonAreaCls = 'w-full rounded-[8px] border border-border-faint bg-bg px-3 py-2.5 text-xs text-[var(--text)] font-mono placeholder:text-text-faint outline-none transition-[background-color,border-color] [transition-duration:120ms] hover:border-border-soft focus:border-border focus:bg-surface leading-relaxed'
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -98,19 +98,19 @@ export function TestPanel({ onRun, isRunning }: TestPanelProps) {
                         setSelectedId(s.id)
                       }}
                       className={cn(
-                        'group relative flex h-8 w-full items-center justify-between gap-2.5 rounded-[6px] px-2.5 text-left transition-all duration-[120ms] cursor-pointer select-none',
+                        'group relative flex h-8 w-full items-center justify-between gap-2.5 rounded-[6px] px-2.5 text-left transition-all [transition-duration:120ms] cursor-pointer select-none',
                         isActive
                           ? 'bg-[var(--surface)] text-[var(--text)] border-l-2 border-[var(--accent)] pl-2'
                           : 'text-[var(--text-mute)] hover:bg-[var(--surface)]/30 hover:text-[var(--text)] border-l-2 border-transparent pl-2',
                       )}
                     >
                       <span className="truncate text-[12.5px] min-w-0 flex-1">{s.name}</span>
-                      
-                      <span className="text-[10px] text-[var(--text-faint)] shrink-0 font-medium font-mono group-hover:opacity-0 transition-opacity duration-[120ms]">
+
+                      <span className="text-[10px] text-[var(--text-faint)] shrink-0 font-medium font-mono group-hover:opacity-0 transition-opacity [transition-duration:120ms]">
                         {s.lastRun ? s.lastRun.t : 'never'}
                       </span>
-                      
-                      <div className="absolute right-2.5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto flex items-center gap-1 shrink-0 transition-opacity duration-[120ms]">
+
+                      <div className="absolute right-2.5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto flex items-center gap-1 shrink-0 transition-opacity [transition-duration:120ms]">
                         <Button
                           variant="icon-sm"
                           onClick={(e) => {

@@ -35,7 +35,7 @@ async def list_marketplace(
     category: str | None = None,
     kind: str | None = None,
     q: str | None = None,
-    sort: str = Query("newest", regex="^(newest|popular|price-low|price-high)$"),
+    sort: str = Query("newest", pattern="^(newest|popular|price-low|price-high)$"),
     limit: int = Query(24, ge=1, le=60),
     offset: int = Query(0, ge=0),
     _: User = Depends(get_current_user),

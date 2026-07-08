@@ -66,7 +66,7 @@ MANIFEST = WebhookTriggerManifest(
         "update. Verified via HMAC-SHA256 in `X-Hub-Signature-256`."
     ),
     icon_slug="whatsapp",
-    color="#25D366",
+    color="#ffffff",
     provider="whatsapp",
     signature=SignatureSpec(
         scheme="hmac_sha256",

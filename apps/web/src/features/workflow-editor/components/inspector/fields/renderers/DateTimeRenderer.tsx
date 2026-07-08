@@ -103,7 +103,7 @@ export function DateTimeRenderer({
         className={cn(
           'flex h-9 w-full rounded-[8px] border border-border-soft bg-bg2 pl-3 pr-9 text-sm text-text',
           'placeholder:text-text-faint',
-          'transition-[background-color,border-color] duration-[120ms]',
+          'transition-[background-color,border-color] [transition-duration:120ms]',
           'hover:border-border hover:bg-surface',
           'focus:outline-none focus:border-accent focus:bg-surface-2',
           disabled && 'cursor-not-allowed opacity-40',
@@ -118,7 +118,7 @@ export function DateTimeRenderer({
           'absolute right-1.5 top-1/2 -translate-y-1/2',
           'flex h-6 w-6 items-center justify-center rounded-[6px]',
           'text-text-faint hover:bg-surface-3 hover:text-text',
-          'transition-colors duration-[100ms]',
+          'transition-colors [transition-duration:100ms]',
           disabled && 'cursor-not-allowed opacity-40',
         )}
       >

@@ -175,6 +175,7 @@ export interface NodeDefinition {
   credentialType?: string
   tools?: string[]
   operationToolMap?: Record<string, string>
+  brand?: string | null
 }
 
 // ── Node definitions (from backend /nodes/) ───────────────────────────────────
@@ -234,6 +235,7 @@ export const ApiNodeDefinitionSchema = z.object({
   dynamic_outputs_from: z.string().nullable().optional(),
   allow_error:   z.boolean().optional(),
   credential_type: z.union([z.string(), z.array(z.string())]).nullable().optional(),
+  brand:         z.string().nullable().optional(),
 })
 
 export const ApiNodeDefinitionListSchema = z.array(ApiNodeDefinitionSchema)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gslides.gslides_node import (
+from apps.api.app.node_system.nodes.google.gslides.gslides_node import (
     GoogleSlidesProperties,
     _build_outline_slide_requests,
     _coerce_outline_string,

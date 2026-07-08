@@ -9,6 +9,7 @@ list highlights, list stories, list users, get single item.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.grain import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -17,11 +18,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.grain",
-    name="Grain",
+    name=NAME,
     category="integration",
     description="Grain — meetings, recordings, highlights, stories.",
-    icon_slug="grain",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.grain.com/_/public-api",
     credential_type="grain_api_key",
     token_field=["api_key"],

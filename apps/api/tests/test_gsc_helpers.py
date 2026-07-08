@@ -8,7 +8,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from apps.api.app.node_system.base.errors import STRUCTURED_ERROR_SENTINEL
-from apps.api.app.node_system.nodes.gsc.gsc_node import (
+from apps.api.app.node_system.nodes.google.gsc.gsc_node import (
     GoogleSearchConsoleProperties,
     _coerce_json_field,
     _normalise_date,

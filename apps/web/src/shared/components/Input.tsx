@@ -18,7 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         className={cn(
           'flex items-center gap-2 px-3 h-9',
           'bg-bg border border-border-faint rounded-[8px]',
-          'transition-[background-color,border-color] duration-[120ms]',
+          'transition-[background-color,border-color] [transition-duration:120ms]',
           error   ? 'border-err'
           : success ? 'border-ok'
           : 'hover:border-border-soft focus-within:border-border focus-within:bg-surface',

@@ -22,6 +22,9 @@ export const ProviderSchema = z.object({
   fields: z.array(ProviderFieldSchema).nullable().optional(),
   hint: z.string().nullable().optional(),
   scopes: z.array(z.string()).nullable().optional(),
+  // Brand group (google/aws/microsoft/…) — collapses per-service
+  // providers under one tile in the picker. `null` = ungrouped.
+  brand: z.string().nullable().optional(),
 })
 export type Provider = z.infer<typeof ProviderSchema>
 
