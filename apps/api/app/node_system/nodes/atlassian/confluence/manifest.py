@@ -17,6 +17,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _HOST = "{base_url}/wiki/api/v2"
@@ -45,9 +46,24 @@ MANIFEST = ProviderManifest(
     auth="basic",
     auth_basic_username="{email}",
     fields=[
-        FieldSpec(name="page_id", label="Page ID", type="string"),
+        FieldSpec(
+            name="page_id",
+            label="Page",
+            type="string",
+            remote=RemoteLookup(
+                provider="confluence",
+                resource="pages",
+                params={"space": "${space_key}"},
+                depends_on=["space_key"],
+            ),
+        ),
         FieldSpec(name="space_id", label="Space ID", type="string"),
-        FieldSpec(name="space_key", label="Space Key", type="string"),
+        FieldSpec(
+            name="space_key",
+            label="Space",
+            type="string",
+            remote=RemoteLookup(provider="confluence", resource="spaces"),
+        ),
         FieldSpec(name="title", label="Title", type="string"),
         FieldSpec(name="body", label="Body (HTML/storage)", type="string"),
         FieldSpec(name="parent_id", label="Parent Page ID", type="string"),

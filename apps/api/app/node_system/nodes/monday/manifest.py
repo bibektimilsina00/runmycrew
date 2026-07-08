@@ -20,6 +20,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MONDAY_API = "https://api.monday.com/v2"
@@ -154,7 +155,12 @@ MANIFEST = ProviderManifest(
     auth="header_token",
     auth_header_name="Authorization",
     fields=[
-        FieldSpec(name="board_id", label="Board ID", type="string"),
+        FieldSpec(
+            name="board_id",
+            label="Board",
+            type="string",
+            remote=RemoteLookup(provider="monday", resource="boards"),
+        ),
         FieldSpec(name="item_id", label="Item ID", type="string"),
         FieldSpec(name="item_name", label="Item Name", type="string"),
         FieldSpec(name="column_values", label="Column Values (JSON)", type="json"),

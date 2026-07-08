@@ -8901,9 +8901,16 @@
             "delete_folder"
           ]
         },
-        "label": "Folder ID",
+        "label": "Folder",
         "name": "folder_id",
         "placeholder": "0 (root)",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "box",
+          "resource": "folders"
+        },
         "type": "string"
       },
       {
@@ -12092,8 +12099,19 @@
             "list_comments"
           ]
         },
-        "label": "Page ID",
+        "label": "Page",
         "name": "page_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "space_key"
+          ],
+          "params": {
+            "space": "${space_key}"
+          },
+          "provider": "confluence",
+          "resource": "pages"
+        },
         "type": "string"
       },
       {
@@ -12112,8 +12130,15 @@
         "type": "string"
       },
       {
-        "label": "Space Key",
+        "label": "Space",
         "name": "space_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "confluence",
+          "resource": "spaces"
+        },
         "type": "string"
       },
       {
@@ -41548,13 +41573,27 @@
             "add_profile_to_list"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "klaviyo",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
-        "label": "Segment ID",
+        "label": "Segment",
         "name": "segment_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "klaviyo",
+          "resource": "segments"
+        },
         "type": "string"
       },
       {
@@ -50851,8 +50890,15 @@
             "update_item"
           ]
         },
-        "label": "Board ID",
+        "label": "Board",
         "name": "board_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "monday",
+          "resource": "boards"
+        },
         "type": "string"
       },
       {
@@ -74902,8 +74948,15 @@
             "create_list"
           ]
         },
-        "label": "Board ID",
+        "label": "Board",
         "name": "board_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "trello",
+          "resource": "boards"
+        },
         "type": "string"
       },
       {
@@ -74915,8 +74968,19 @@
             "update_card"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "board_id"
+          ],
+          "params": {
+            "board_id": "${board_id}"
+          },
+          "provider": "trello",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
