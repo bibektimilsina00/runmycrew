@@ -50,6 +50,11 @@ class NodeMetadata(BaseModel):
     operation_tool_map: dict[str, str] | None = None
     default_width: int | None = None
     default_height: int | None = None
+    # Brand group (e.g. "google" for gmail/gdrive/gsheets, "aws" for
+    # aws_s3/aws_sqs/…). Frontend sidebar groups nodes by this. Auto-
+    # derived from folder path at registration time — see
+    # `NodeRegistry.register`. `None` = ungrouped.
+    brand: str | None = None
 
     def model_post_init(self, __context: Any) -> None:
         # Inject retry properties into every node automatically

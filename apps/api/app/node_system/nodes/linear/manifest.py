@@ -19,6 +19,7 @@ import httpx
 from pydantic import BaseModel
 
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.linear import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -1238,14 +1239,13 @@ async def _list_project_statuses(node, client, headers):
 
 # ── manifest ─────────────────────────────────────────────────────────
 
-
 MANIFEST = ProviderManifest(
     type="action.linear",
-    name="Linear",
+    name=NAME,
     category="integration",
     description="Create and manage Linear issues, projects, and teams.",
-    icon_slug="linear",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     # base_url is unused by the GraphQL handlers (they hit
     # `LINEAR_API` directly), but the scaffold requires a value.
     base_url="https://api.linear.app",

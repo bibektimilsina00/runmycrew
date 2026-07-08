@@ -63,6 +63,7 @@ async def list_providers():
                 "fields": getattr(p, "fields", None),
                 "hint": getattr(p, "hint", None),
                 "scopes": getattr(p, "scopes", None),
+                "brand": getattr(p, "brand", None),
             }
         )
 
@@ -78,6 +79,7 @@ async def list_providers():
                 "fields": p.fields,
                 "hint": p.hint,
                 "scopes": getattr(p, "scopes", None),
+                "brand": getattr(p, "brand", None),
             }
         )
 
@@ -1007,7 +1009,7 @@ async def list_gchat_spaces(
             )
             resp.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        from apps.api.app.node_system.nodes.gchat.gchat_node import format_chat_error
+        from apps.api.app.node_system.nodes.google.gchat.gchat_node import format_chat_error
 
         # Reuse the same hint logic the action / trigger use so the
         # picker dropdown shows the user *what to fix* (enable the
@@ -1072,7 +1074,7 @@ async def list_ga4_properties(
 
     import httpx
 
-    from apps.api.app.node_system.nodes.ga4.ga4_node import format_ga4_error
+    from apps.api.app.node_system.nodes.google.ga4.ga4_node import format_ga4_error
 
     token = await _resolve_google_token(credential_id, workspace, service)
     admin = "https://analyticsadmin.googleapis.com/v1beta"
@@ -1179,7 +1181,7 @@ async def list_gsc_sites(
     """
     import httpx
 
-    from apps.api.app.node_system.nodes.gsc.gsc_node import format_gsc_error
+    from apps.api.app.node_system.nodes.google.gsc.gsc_node import format_gsc_error
 
     token = await _resolve_google_token(credential_id, workspace, service)
     try:
@@ -1237,7 +1239,7 @@ async def list_gcs_buckets(
     """
     import httpx
 
-    from apps.api.app.node_system.nodes.gcs.gcs_node import format_gcs_error
+    from apps.api.app.node_system.nodes.google.gcs.gcs_node import format_gcs_error
 
     project = project_id.strip()
     if not project:

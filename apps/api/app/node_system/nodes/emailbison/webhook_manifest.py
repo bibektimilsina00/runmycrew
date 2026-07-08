@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.emailbison import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -43,14 +44,14 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.emailbison_webhook",
-    name="Emailbison",
+    name=NAME,
     description=(
         "Fires when Emailbison posts a per-email event (sent, opened, "
         "clicked, bounced, reply, lead status). Verified via HMAC-SHA256 "
         "in `x-emailbison-signature`."
     ),
-    icon_slug="emailbison",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="emailbison_webhook",
     signature=SignatureSpec(
         scheme="hmac_sha256",

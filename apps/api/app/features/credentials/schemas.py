@@ -58,6 +58,11 @@ class ProviderOut(SQLModel):
     fields: list[ProviderField] | None = None
     hint: str | None = None
     scopes: list[str] | None = None
+    # Brand group (google/aws/microsoft/…). Frontend groups the
+    # integration picker by this so a user sees one "Google" tile
+    # instead of `gmail_oauth`, `gdrive_oauth`, `gcal_oauth`, … as
+    # separate rows. `None` = ungrouped (stays flat).
+    brand: str | None = None
 
 
 class AuditLogOut(SQLModel):

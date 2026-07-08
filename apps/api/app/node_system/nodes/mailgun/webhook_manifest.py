@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.mailgun import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -57,15 +58,15 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.mailgun_webhook",
-    name="Mailgun",
+    name=NAME,
     description=(
         "Fires when Mailgun posts a delivery event (delivered, opened, "
         "clicked, failed, complained, unsubscribed). Body-based signature "
         "verified via HMAC-SHA256 of {timestamp}{token} under the API key, "
         "with 5-min anti-replay tolerance."
     ),
-    icon_slug="mailgun",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="mailgun_webhook",
     signature=SignatureSpec(
         scheme="mailgun",

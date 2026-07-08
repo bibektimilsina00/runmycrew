@@ -10,6 +10,7 @@ delivery stats by message id.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.postmark import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -18,11 +19,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.postmark",
-    name="Postmark",
+    name=NAME,
     category="integration",
     description="Transactional email via Postmark — single sends, template sends, stats.",
-    icon_slug="postmark",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.postmarkapp.com",
     credential_type="postmark_api_key",
     token_field=["api_key"],

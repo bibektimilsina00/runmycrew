@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.google_sheets.google_sheets import (
+from apps.api.app.node_system.nodes.google.google_sheets.google_sheets import (
     _column_letter,
     _hex_to_rgb01,
     _parse_range_for_grid,

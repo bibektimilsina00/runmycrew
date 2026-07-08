@@ -18,10 +18,11 @@ openssl rand -hex 32   # set ENCRYPTION_KEY in .env
 ```bash
 make db-up        # Postgres + Redis via docker compose
 make migrate      # alembic upgrade head
-make dev          # frontend (Vite)        — http://localhost:3001
 make api          # FastAPI                — http://localhost:8000
 make worker       # Celery worker (separate terminal)
 make beat         # Celery beat (schedules) (separate terminal)
+make web          # frontend (Vite)        — http://localhost:3001
+make site         # marketing site (Next)  — http://localhost:3100
 ```
 
 The API, worker, and beat run as separate processes. The worker is what actually

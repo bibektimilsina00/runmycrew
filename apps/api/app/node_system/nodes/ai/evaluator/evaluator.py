@@ -13,6 +13,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.evaluator import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -46,11 +47,11 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.evaluator",
-            name="Evaluator",
+            name=NAME,
             category="ai",
             description="Use an LLM to score content against defined metrics.",
-            icon="BarChart2",
-            color="#f59e0b",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

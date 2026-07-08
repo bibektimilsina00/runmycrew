@@ -14,28 +14,32 @@ frontend already asks for: a node's lowercase ``icon`` or a provider's
 ``icon_slug``.
 """
 
-from functools import lru_cache
 from pathlib import Path
 
 _NODE_SYSTEM = Path(__file__).resolve().parents[2] / "node_system"
 
 
-@lru_cache(maxsize=1)
-def _icon_map() -> dict[str, str]:
-    """slug -> absolute svg path. Built once per process (a deploy/restart
-    picks up newly-added icons)."""
-    mapping: dict[str, str] = {}
-    nodes_dir = _NODE_SYSTEM / "nodes"
-    if nodes_dir.is_dir():
-        for svg in nodes_dir.glob("*/*.svg"):
-            mapping.setdefault(svg.stem.lower(), str(svg))
-    shared_dir = _NODE_SYSTEM / "icons"
-    if shared_dir.is_dir():
-        for svg in shared_dir.glob("*.svg"):
-            mapping[svg.stem.lower()] = str(svg)  # shared drop-folder wins
-    return mapping
+_EXTS = (".svg", ".png", ".webp", ".jpg", ".jpeg")
 
 
 def resolve_icon_path(slug: str) -> str | None:
-    """Return the absolute path of ``<slug>.svg`` if it exists, else None."""
-    return _icon_map().get(slug.lower())
+    """Return the absolute path of ``<slug>.<ext>`` if it exists, else None.
+
+    SVG preferred, but any of ``.svg .png .webp .jpg .jpeg`` matches — a
+    raster brand logo (e.g. Clearbit PNG) drops in the same way. Rescans
+    on every call — no cache. A dropped-in file shows up on the next
+    request, no restart needed. Cost is one directory walk per icon
+    fetch; icons are hit once per node card and the whole tree is ~250
+    files so this stays well under a millisecond.
+    """
+    slug = slug.lower()
+    for ext in _EXTS:
+        # Colocated icon (`nodes/<any>/<slug>.<ext>`) — rglob covers folders
+        # that nest 2+ levels deep (`nodes/db/mysql/mysql.svg`).
+        for hit in (_NODE_SYSTEM / "nodes").rglob(f"{slug}{ext}"):
+            return str(hit)
+        # Shared drop folder (`node_system/icons/<slug>.<ext>`).
+        shared = _NODE_SYSTEM / "icons" / f"{slug}{ext}"
+        if shared.is_file():
+            return str(shared)
+    return None

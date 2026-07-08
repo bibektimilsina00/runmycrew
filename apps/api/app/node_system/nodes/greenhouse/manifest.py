@@ -7,6 +7,7 @@ The scaffold's `basic_token_only` scheme handles that shape.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.greenhouse import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -15,11 +16,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.greenhouse",
-    name="Greenhouse",
+    name=NAME,
     category="integration",
     description="Greenhouse ATS — jobs, candidates, applications, offers.",
-    icon_slug="greenhouse",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://harvest.greenhouse.io/v1",
     credential_type="greenhouse_api_key",
     token_field=["api_key"],

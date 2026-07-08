@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gtasks.gtasks_trigger import (
+from apps.api.app.node_system.nodes.google.gtasks.gtasks_trigger import (
     EVENT_TASK_ADDED,
     EVENT_TASK_COMPLETED,
     GoogleTasksTriggerNode,

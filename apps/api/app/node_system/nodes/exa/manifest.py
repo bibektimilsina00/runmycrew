@@ -36,14 +36,13 @@ def _flatten_results(body: Any) -> dict[str, Any]:
 
 register_flatten("exa.results", _flatten_results)
 
-
 MANIFEST = ProviderManifest(
     type="action.exa",
     name="Exa",
     category="integration",
     description="Neural web search, find-similar pages, and full-text content extraction.",
     icon_slug="exa",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.exa.ai",
     credential_type="exa_api_key",
     token_field=["api_key"],

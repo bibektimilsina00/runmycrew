@@ -7,7 +7,7 @@ import json
 import pytest
 
 from apps.api.app.node_system.base.errors import STRUCTURED_ERROR_SENTINEL
-from apps.api.app.node_system.nodes.ga4.ga4_node import (
+from apps.api.app.node_system.nodes.google.ga4.ga4_node import (
     GoogleAnalyticsProperties,
     _coerce_json_field,
     _normalise_date,

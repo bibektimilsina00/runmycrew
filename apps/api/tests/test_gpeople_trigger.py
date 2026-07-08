@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from apps.api.app.node_system.nodes.gpeople.trigger_manifest import (
+from apps.api.app.node_system.nodes.google.gpeople.trigger_manifest import (
     _diff_contact_updated,
 )
 from apps.api.app.node_system.scaffolds import diff_known_ids

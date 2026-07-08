@@ -24,6 +24,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.salesforce import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -152,14 +153,14 @@ async def _walk_salesforce(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.salesforce",
-    name="Salesforce",
+    name=NAME,
     description=(
         "Poll Salesforce for new / updated records or opportunity stage "
         "changes on any SObject. Uses Connected App access token + "
         "instance URL from the credential."
     ),
-    icon_slug="salesforce",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="",  # unused — paginate_fn reads instance_url per cred
     credential_type="salesforce_api_key",
     token_field=["api_key", "access_token"],

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gtasks.gtasks_node import _normalise_due
+from apps.api.app.node_system.nodes.google.gtasks.gtasks_node import _normalise_due
 
 
 @pytest.mark.parametrize(

@@ -34,6 +34,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.github import COLOR, ICON_SLUG, NAME
 
 # Subset of GitHub webhook events that workflows commonly route on.
 # Mirror GitHub's exact event names so the X-GitHub-Event header drops
@@ -89,7 +90,7 @@ class GitHubWebhookTriggerNode(BaseNode[GitHubWebhookTriggerProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="trigger.github_webhook",
-            name="GitHub",
+            name=NAME,
             category="trigger",
             description=(
                 "Fires the instant GitHub posts a webhook delivery to your "
@@ -97,8 +98,8 @@ class GitHubWebhookTriggerNode(BaseNode[GitHubWebhookTriggerProperties]):
                 "in GitHub Settings → Webhooks. Use the polling GitHub "
                 "trigger if you can't expose a public URL."
             ),
-            icon="github",
-            color="#ffffff",
+            icon=ICON_SLUG,
+            color=COLOR,
             credential_type=["github_oauth", "github_pat"],
             properties=[
                 {

@@ -11,6 +11,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.stt import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -33,11 +34,11 @@ class STTNode(BaseNode[STTProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.stt",
-            name="Speech to Text",
+            name=NAME,
             category="ai",
             description="Transcribe audio to text using OpenAI Whisper or Groq. Accepts audio URLs or base64 data URIs.",
-            icon="Mic",
-            color="#f97316",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

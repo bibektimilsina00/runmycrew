@@ -7,6 +7,7 @@ get form, list/get responses, create webhook.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.typeform import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -15,11 +16,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.typeform",
-    name="Typeform",
+    name=NAME,
     category="integration",
     description="Typeform — list forms, fetch responses, manage webhooks.",
-    icon_slug="typeform",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.typeform.com",
     credential_type="typeform_api_key",
     token_field=["api_key"],

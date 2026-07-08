@@ -3,14 +3,11 @@
 HubSpot CRM v3 API at `https://api.hubapi.com`. Bearer auth from
 either OAuth (`access_token`) or a private-app token (`api_key`).
 
-Refactored from a custom BaseNode. Existing 10 op names preserved:
-list_contacts, get_contact, create_contact, update_contact,
-search_contacts, create_deal, get_deal, list_deals, create_company,
-list_companies. Adds 30+ new ops toward sim's 38-op parity.
 """
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.hubspot import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
 
 
@@ -30,11 +27,11 @@ def _contact_props(v):  # noqa: ANN001
 
 MANIFEST = ProviderManifest(
     type="action.hubspot",
-    name="HubSpot",
+    name=NAME,
     category="integration",
     description="HubSpot — contacts, companies, deals, tickets, engagements, lists.",
-    icon_slug="hubspot",
-    color="#FF7A59",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.hubapi.com",
     credential_type=["hubspot_oauth", "hubspot_api_key"],
     token_field=["access_token", "api_key"],
@@ -79,7 +76,7 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="after", label="After (paging cursor)", type="string", mode="advanced"),
     ],
     operations=[
-        # ─── contacts (legacy + depth) ─────────────────────────────
+        # ─── contacts ─────────────────────────────
         OpSpec(
             id="list_contacts",
             label="List Contacts",
@@ -136,7 +133,7 @@ MANIFEST = ProviderManifest(
             path="/crm/v3/objects/contacts/{contact_id}",
             visible_fields=["contact_id"],
         ),
-        # ─── deals (legacy + depth) ────────────────────────────────
+        # ─── deals ────────────────────────────────
         OpSpec(
             id="create_deal",
             label="Create Deal",

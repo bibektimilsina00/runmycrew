@@ -20,7 +20,6 @@ from apps.api.app.node_system.scaffolds import (
 _COMMON_QUERY_FIELDS = ["search", "filter", "per_page", "page", "sort"]
 _COMMON_VISIBLE = _COMMON_QUERY_FIELDS
 
-
 MANIFEST = ProviderManifest(
     type="action.openalex",
     name="OpenAlex",

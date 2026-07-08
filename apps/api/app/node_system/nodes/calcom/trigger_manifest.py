@@ -6,6 +6,7 @@ Bearer + cal-api-version header (same shape as the action node).
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.calcom import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -33,10 +34,10 @@ register_flatten("calcom.booking", _flatten_booking)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.calcom",
-    name="Cal.com",
+    name=NAME,
     description="Poll Cal.com for new / cancelled bookings.",
-    icon_slug="calcom",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.cal.com/v2",
     credential_type="calcom_api_key",
     token_field=["api_key"],

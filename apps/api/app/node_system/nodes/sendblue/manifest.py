@@ -22,7 +22,7 @@ MANIFEST = ProviderManifest(
     category="integration",
     description="Sendblue — iMessage + SMS fallback messaging API.",
     icon_slug="sendblue",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.sendblue.co/api",
     credential_type="sendblue_api_key",
     # Sendblue's API key ID rides one header, the secret rides another.

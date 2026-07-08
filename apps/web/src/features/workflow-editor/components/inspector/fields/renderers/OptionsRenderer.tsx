@@ -168,7 +168,7 @@ function ComboBox({ options, value, displayValue, onChange, placeholder, isLoadi
         disabled={disabled}
         className={cn(
           'flex h-9 w-full items-center gap-2 rounded-[8px] border border-border-soft bg-surface px-3 text-sm text-left',
-          'transition-[background-color,border-color] duration-[120ms] hover:border-border hover:bg-surface-2',
+          'transition-[background-color,border-color] [transition-duration:120ms] hover:border-border hover:bg-surface-2',
           open && 'border-accent bg-surface-2',
           disabled && 'opacity-40 cursor-not-allowed',
         )}
@@ -176,11 +176,11 @@ function ComboBox({ options, value, displayValue, onChange, placeholder, isLoadi
         <span className={cn('flex-1 min-w-0 truncate', !displayValue && 'text-text-faint')}>
           {isLoading ? 'Loading…' : (displayValue || placeholder)}
         </span>
-        {isLoading ? <Loader2 className="shrink-0 w-3.5 h-3.5 animate-spin text-text-faint" /> : <ChevronDown className={cn('shrink-0 w-3.5 h-3.5 text-text-faint transition-transform duration-[150ms]', open && 'rotate-180')} />}
+        {isLoading ? <Loader2 className="shrink-0 w-3.5 h-3.5 animate-spin text-text-faint" /> : <ChevronDown className={cn('shrink-0 w-3.5 h-3.5 text-text-faint transition-transform [transition-duration:150ms]', open && 'rotate-180')} />}
       </button>
- 
+
       {open && (
-        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-[8px] border border-border-soft bg-surface shadow-dropdown animate-in fade-in-0 zoom-in-95 duration-[100ms]">
+        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-[8px] border border-border-soft bg-surface shadow-dropdown animate-in fade-in-0 zoom-in-95 [transition-duration:100ms]">
           {/* Search input — pure filter, never mutates the value. */}
           <div className="border-b border-border-soft p-1.5">
             <input
@@ -197,17 +197,17 @@ function ComboBox({ options, value, displayValue, onChange, placeholder, isLoadi
               }}
               placeholder="Search…"
               spellCheck={false}
-              className="h-8 w-full rounded-[6px] bg-surface px-2.5 text-sm text-text border border-border-soft outline-none focus:border-accent focus:bg-surface-2 placeholder:text-text-faint transition-[background-color,border-color] duration-[120ms]"
+              className="h-8 w-full rounded-[6px] bg-surface px-2.5 text-sm text-text border border-border-soft outline-none focus:border-accent focus:bg-surface-2 placeholder:text-text-faint transition-[background-color,border-color] [transition-duration:120ms]"
             />
           </div>
- 
+
           <div className="max-h-52 overflow-y-auto p-1.5">
             {filtered.length === 0 ? (
               allowCustom && query.trim() ? (
                 <button
                   type="button"
                   onMouseDown={e => { e.preventDefault(); commitCustom() }}
-                  className="flex w-full items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-sm text-text-mute hover:bg-surface hover:text-text transition-colors duration-[100ms]"
+                  className="flex w-full items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-sm text-text-mute hover:bg-surface hover:text-text transition-colors [transition-duration:100ms]"
                 >
                   Use <span className="font-mono text-accent">{query.trim()}</span> as custom value
                 </button>
@@ -221,7 +221,7 @@ function ComboBox({ options, value, displayValue, onChange, placeholder, isLoadi
                   type="button"
                   onMouseDown={e => { e.preventDefault(); handleSelect(opt) }}
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-sm transition-colors duration-[100ms]',
+                    'flex w-full items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-sm transition-colors [transition-duration:100ms]',
                     String(opt.value) === String(value) ? 'bg-surface-2 font-medium text-text' : 'text-text-mute hover:bg-surface hover:text-text',
                   )}
                 >
@@ -293,7 +293,7 @@ function MultiSelect({ options, value, onChange, placeholder, isLoading, disable
         disabled={disabled}
         className={cn(
           'flex min-h-[36px] w-full items-center gap-1.5 rounded-[8px] border border-border-soft bg-surface p-1.5 pl-3 text-sm text-left',
-          'transition-[background-color,border-color] duration-[120ms] hover:border-border hover:bg-surface-2',
+          'transition-[background-color,border-color] [transition-duration:120ms] hover:border-border hover:bg-surface-2',
           open && 'border-accent bg-surface-2',
           disabled && 'opacity-40 cursor-not-allowed',
         )}
@@ -320,11 +320,11 @@ function MultiSelect({ options, value, onChange, placeholder, isLoading, disable
             ))
           )}
         </div>
-        {isLoading ? <Loader2 className="shrink-0 w-3.5 h-3.5 animate-spin text-text-faint" /> : <ChevronDown className={cn('shrink-0 w-3.5 h-3.5 text-text-faint transition-transform duration-[150ms]', open && 'rotate-180')} />}
+        {isLoading ? <Loader2 className="shrink-0 w-3.5 h-3.5 animate-spin text-text-faint" /> : <ChevronDown className={cn('shrink-0 w-3.5 h-3.5 text-text-faint transition-transform [transition-duration:150ms]', open && 'rotate-180')} />}
       </button>
- 
+
       {open && (
-        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 max-h-52 overflow-y-auto rounded-[8px] border border-border-soft bg-surface p-1.5 shadow-dropdown animate-in fade-in-0 zoom-in-95 duration-[100ms]">
+        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 max-h-52 overflow-y-auto rounded-[8px] border border-border-soft bg-surface p-1.5 shadow-dropdown animate-in fade-in-0 zoom-in-95 [transition-duration:100ms]">
           {options.length === 0 && (
             <p className="px-2.5 py-2 text-xs text-text-faint">No options</p>
           )}
@@ -336,7 +336,7 @@ function MultiSelect({ options, value, onChange, placeholder, isLoading, disable
                 type="button"
                 onClick={() => toggle(opt.value)}
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-sm transition-colors duration-[100ms]',
+                  'flex w-full items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-sm transition-colors [transition-duration:100ms]',
                   picked ? 'bg-surface-2 font-medium text-text' : 'text-text-mute hover:bg-surface hover:text-text',
                 )}
               >

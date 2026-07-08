@@ -178,7 +178,7 @@ export function GmailQueryRenderer({ prop, value, onChange, disabled }: Renderer
       <div className={cn(
         'flex flex-wrap items-center gap-1.5',
         'min-h-[38px] px-3 py-1.5 rounded-[8px]',
-        'bg-surface border border-solid border-border-soft transition-colors duration-[120ms]',
+        'bg-surface border border-solid border-border-soft transition-colors [transition-duration:120ms]',
         'hover:border-border hover:bg-surface-2 focus-within:border-accent focus-within:bg-surface-2',
       )}>
         {parsed.chips.map((chip, i) => (
@@ -324,7 +324,7 @@ function AddFilterButton({ disabled, onPick }: { disabled?: boolean; onPick: (op
           type="button"
           variant="ghost"
           className={cn(
-            'inline-flex items-center gap-1 h-6 px-2.5 rounded-[6px] text-[11px] font-semibold bg-surface-2 border border-solid border-border-soft text-text-mute hover:bg-surface-3 hover:text-text transition-colors duration-[120ms]',
+            'inline-flex items-center gap-1 h-6 px-2.5 rounded-[6px] text-[11px] font-semibold bg-surface-2 border border-solid border-border-soft text-text-mute hover:bg-surface-3 hover:text-text transition-colors [transition-duration:120ms]',
             disabled && 'opacity-50 pointer-events-none',
           )}
         >

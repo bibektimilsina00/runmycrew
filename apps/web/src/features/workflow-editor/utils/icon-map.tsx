@@ -33,10 +33,10 @@ export const getIcon = (iconName: string): React.ReactNode => {
 }
 
 /** A brand slug is all-lowercase letters / digits, optionally
- *  hyphen-separated — the shape `theSVG.org/icons/<slug>` expects.
- *  Lucide names are PascalCase, so an uppercase first letter is a
- *  perfect signal that this is NOT a brand. */
+ *  hyphen- or underscore-separated (`microsoft_teams`, `google_ads`,
+ *  `google-sheets`). Lucide names are PascalCase, so an uppercase
+ *  first letter is a perfect signal that this is NOT a brand. */
 function looksLikeBrandSlug(name: string): boolean {
   if (!name) return false
-  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)
+  return /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/.test(name)
 }

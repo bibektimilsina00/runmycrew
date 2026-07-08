@@ -14,6 +14,7 @@ trigger surfaces new_lead + new_campaign at a coarse cadence.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.emailbison import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -22,11 +23,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.emailbison",
-    name="Emailbison",
+    name=NAME,
     category="integration",
     description="Emailbison — outbound-email campaigns, leads, workspaces.",
-    icon_slug="emailbison",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.emailbison.com/api/v1",
     credential_type="emailbison_api_key",
     token_field=["api_key"],
@@ -47,6 +48,15 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(name="limit", label="Per page", type="number", default=25, mode="advanced"),
         FieldSpec(name="page", label="Page", type="number", default=1, mode="advanced"),
+        FieldSpec(name="eb_lead_id", label="Lead ID", type="string"),
+        FieldSpec(name="eb_lead_body", label="Lead Body (JSON)", type="json", default={}),
+        FieldSpec(name="eb_campaign_id", label="Campaign ID", type="string"),
+        FieldSpec(name="eb_campaign_body", label="Campaign Body (JSON)", type="json", default={}),
+        FieldSpec(name="eb_campaign_status", label="Campaign Status", type="string"),
+        FieldSpec(name="eb_tag_id", label="Tag ID", type="string"),
+        FieldSpec(name="eb_tag_body", label="Tag Body (JSON)", type="json", default={}),
+        FieldSpec(name="eb_lead_ids", label="Lead IDs (JSON array)", type="json", default=[]),
+        FieldSpec(name="eb_tag_ids", label="Tag IDs (JSON array)", type="json", default=[]),
     ],
     operations=[
         OpSpec(
@@ -136,6 +146,81 @@ MANIFEST = ProviderManifest(
                     "custom_fields": getattr(v, "custom_fields", None) or None,
                 }.items()
                 if val
+            },
+        ),
+        OpSpec(
+            id="get_lead",
+            label="Get Lead",
+            method="GET",
+            path="/leads/{eb_lead_id}",
+            visible_fields=["eb_lead_id"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="create_campaign",
+            label="Create Campaign",
+            method="POST",
+            path="/campaigns",
+            visible_fields=["eb_campaign_body"],
+            body_builder=lambda v: getattr(v, "eb_campaign_body", None) or {},
+        ),
+        OpSpec(
+            id="update_campaign",
+            label="Update Campaign",
+            method="PATCH",
+            path="/campaigns/{eb_campaign_id}",
+            visible_fields=["eb_campaign_id", "eb_campaign_body"],
+            body_builder=lambda v: getattr(v, "eb_campaign_body", None) or {},
+        ),
+        OpSpec(
+            id="update_campaign_status",
+            label="Update Campaign Status",
+            method="PATCH",
+            path="/campaigns/{eb_campaign_id}/status",
+            visible_fields=["eb_campaign_id", "eb_campaign_status"],
+            body_builder=lambda v: {"status": getattr(v, "eb_campaign_status", "") or ""},
+        ),
+        OpSpec(
+            id="attach_leads_to_campaign",
+            label="Attach Leads to Campaign",
+            method="POST",
+            path="/campaigns/{eb_campaign_id}/leads",
+            visible_fields=["eb_campaign_id", "eb_lead_ids"],
+            body_builder=lambda v: {"lead_ids": getattr(v, "eb_lead_ids", []) or []},
+        ),
+        OpSpec(
+            id="list_replies",
+            label="List Replies",
+            method="GET",
+            path="/replies",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_tags",
+            label="List Tags",
+            method="GET",
+            path="/tags",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="create_tag",
+            label="Create Tag",
+            method="POST",
+            path="/tags",
+            visible_fields=["eb_tag_body"],
+            body_builder=lambda v: getattr(v, "eb_tag_body", None) or {},
+        ),
+        OpSpec(
+            id="attach_tags_to_leads",
+            label="Attach Tags to Leads",
+            method="POST",
+            path="/leads/tags",
+            visible_fields=["eb_lead_ids", "eb_tag_ids"],
+            body_builder=lambda v: {
+                "lead_ids": getattr(v, "eb_lead_ids", []) or [],
+                "tag_ids": getattr(v, "eb_tag_ids", []) or [],
             },
         ),
     ],

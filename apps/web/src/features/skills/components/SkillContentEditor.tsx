@@ -58,7 +58,7 @@ export function SkillContentEditor({ value, onChange, placeholder, className }: 
       className={cn(
         'flex-1 overflow-auto rounded-[8px] border border-border-faint bg-bg',
         'focus-within:border-border focus-within:bg-surface',
-        'transition-[background-color,border-color] duration-[120ms]',
+        'transition-[background-color,border-color] [transition-duration:120ms]',
         className,
       )}
     >

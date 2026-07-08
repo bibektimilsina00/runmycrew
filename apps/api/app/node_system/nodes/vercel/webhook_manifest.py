@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.vercel import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -61,13 +62,13 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.vercel_webhook",
-    name="Vercel",
+    name=NAME,
     description=(
         "Fires when Vercel posts a webhook delivery — deployment lifecycle, "
         "project creation. HMAC-SHA1 verified via `x-vercel-signature`."
     ),
-    icon_slug="vercel",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="vercel_webhook",
     signature=SignatureSpec(
         scheme="hmac_sha1",

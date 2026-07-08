@@ -40,7 +40,7 @@ export function Checkbox({ checked = false, onChange, label, className, id }: Ch
         onCheckedChange={handleCheckedChange}
       />
       {label && (
-        <span className="text-[13px] text-text-mute group-hover:text-text transition-colors duration-[120ms] leading-none">
+        <span className="text-[13px] text-text-mute group-hover:text-text transition-colors [transition-duration:120ms] leading-none">
           {label}
         </span>
       )}

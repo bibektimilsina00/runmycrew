@@ -203,7 +203,7 @@ MANIFEST = PollingTriggerManifest(
         "2FA enabled — plain passwords will be rejected by the server."
     ),
     icon_slug="mail",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="",
     credential_type="imap_creds",
     token_field=["password"],

@@ -33,6 +33,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.monday import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -247,15 +248,15 @@ async def _walk_monday(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.monday",
-    name="Monday.com",
+    name=NAME,
     description=(
         "Poll a Monday.com board for new items, item changes (status / "
         "group / column), and new updates. Note: item_deleted / archived "
         "aren't observable via polling — attach a Monday webhook for "
         "those."
     ),
-    icon_slug="monday",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.monday.com",
     credential_type="monday_api_key",
     token_field=["api_key"],

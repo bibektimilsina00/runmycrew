@@ -28,8 +28,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const base = [
   'inline-flex items-center justify-center shrink-0 select-none',
-  'font-medium transition-[background,border-color,color,opacity,transform] duration-[120ms]',
-  'active:scale-[0.97] active:duration-[60ms]',
+  'font-medium transition-[background,border-color,color,opacity,transform] [transition-duration:120ms]',
+  'active:scale-[0.97] active:[transition-duration:60ms]',
   'disabled:opacity-40 disabled:pointer-events-none disabled:active:scale-100',
   '[&_svg]:shrink-0',
 ].join(' ')

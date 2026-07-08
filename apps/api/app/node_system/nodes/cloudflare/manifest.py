@@ -18,14 +18,13 @@ from apps.api.app.node_system.scaffolds import (
 
 _RECORD_TYPES = ["A", "AAAA", "CNAME", "TXT", "MX", "NS", "SRV", "CAA"]
 
-
 MANIFEST = ProviderManifest(
     type="action.cloudflare",
     name="Cloudflare",
     category="integration",
     description="Manage Cloudflare zones, DNS records, and cache.",
     icon_slug="cloudflare",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.cloudflare.com/client/v4",
     credential_type="cloudflare_api_key",
     token_field=["api_key"],

@@ -153,7 +153,7 @@ MANIFEST = PollingTriggerManifest(
         "Basic auth via username + password/token."
     ),
     icon_slug="servicenow",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="",
     credential_type="servicenow_api_key",
     token_field=["api_key"],

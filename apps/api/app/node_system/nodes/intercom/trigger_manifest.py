@@ -8,6 +8,7 @@ handles one page, which is all polling needs (newest at top).
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.intercom import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -49,10 +50,10 @@ register_flatten("intercom.conversation", _flatten_conversation)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.intercom",
-    name="Intercom",
+    name=NAME,
     description="Poll Intercom for new contacts or new conversations.",
-    icon_slug="intercom",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.intercom.io",
     credential_type="intercom_api_key",
     token_field=["api_key"],

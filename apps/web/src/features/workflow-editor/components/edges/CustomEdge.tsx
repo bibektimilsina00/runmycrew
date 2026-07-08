@@ -289,7 +289,7 @@ export const CustomEdge = ({
                 type="button"
                 onClick={handleAddClick}
                 title="Insert node"
-                className="flex h-5 w-5 items-center justify-center rounded-[6px] border border-[var(--border-faint)] bg-[var(--surface)] text-[var(--text-mute)] shadow-[var(--shadow-float)] transition-[background,border-color,color,transform] duration-[120ms] hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] active:scale-[0.97]"
+                className="flex h-5 w-5 items-center justify-center rounded-[6px] border border-[var(--border-faint)] bg-[var(--surface)] text-[var(--text-mute)] shadow-[var(--shadow-float)] transition-[background,border-color,color,transform] [transition-duration:120ms] hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] active:scale-[0.97]"
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -297,7 +297,7 @@ export const CustomEdge = ({
                 type="button"
                 onClick={handleDelete}
                 title="Delete edge"
-                className="flex h-5 w-5 items-center justify-center rounded-[6px] border border-[var(--border-faint)] bg-[var(--surface)] text-[var(--err)] shadow-[var(--shadow-float)] transition-[background,border-color,color,transform] duration-[120ms] hover:border-[oklch(0.70_0.18_22/0.25)] hover:bg-[oklch(0.70_0.18_22/0.10)] hover:text-[var(--err)] active:scale-[0.97]"
+                className="flex h-5 w-5 items-center justify-center rounded-[6px] border border-[var(--border-faint)] bg-[var(--surface)] text-[var(--err)] shadow-[var(--shadow-float)] transition-[background,border-color,color,transform] [transition-duration:120ms] hover:border-[oklch(0.70_0.18_22/0.25)] hover:bg-[oklch(0.70_0.18_22/0.10)] hover:text-[var(--err)] active:scale-[0.97]"
               >
                 <Trash2 className="h-2.5 w-2.5" />
               </button>

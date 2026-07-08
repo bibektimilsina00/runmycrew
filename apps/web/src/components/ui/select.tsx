@@ -16,7 +16,7 @@ const SelectTrigger = forwardRef<
     className={cn(
       'flex items-center gap-2 w-full h-9 pl-3 pr-2.5 text-sm text-left',
       'bg-surface border border-solid border-border-soft rounded-[8px]',
-      'transition-[background-color,border-color] duration-[120ms]',
+      'transition-[background-color,border-color] [transition-duration:120ms]',
       'disabled:opacity-40 disabled:cursor-not-allowed',
       'focus:outline-none focus:border-accent focus:bg-surface-2',
       error
@@ -29,7 +29,7 @@ const SelectTrigger = forwardRef<
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="ml-auto shrink-0 transition-transform duration-[150ms] data-[state=open]:rotate-180" />
+      <ChevronDown className="ml-auto shrink-0 transition-transform [transition-duration:150ms] data-[state=open]:rotate-180" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -125,7 +125,7 @@ const SelectItem = forwardRef<
       'relative flex w-full cursor-pointer select-none items-center rounded-[7px]',
       'py-1.5 pl-8 pr-2 text-sm',
       'text-text-mute outline-none',
-      'transition-colors duration-[100ms]',
+      'transition-colors [transition-duration:100ms]',
       'focus:bg-surface focus:text-text',
       'data-[state=checked]:text-text data-[state=checked]:bg-surface-2 data-[state=checked]:font-medium',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',

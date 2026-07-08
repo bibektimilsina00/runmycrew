@@ -8,6 +8,7 @@ for `known_ids` diffing.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.asana import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -35,10 +36,10 @@ register_flatten("asana.task", _flatten_task)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.asana",
-    name="Asana",
+    name=NAME,
     description="Poll Asana for new / recently-modified tasks in a project.",
-    icon_slug="asana",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://app.asana.com/api/1.0",
     credential_type="asana_oauth",
     token_field=["access_token"],

@@ -5,18 +5,11 @@ GitHub REST API v3 at `https://api.github.com`. OAuth bearer via
 `access_token` key. Also supports classic PATs when supplied via the
 same credential shape.
 
-Refactored from a custom BaseNode (see git history for the earlier
-form) to the shared REST scaffold. Existing 8 op names + endpoint
-URLs are preserved — the change is invisible to workflows that used
-create_issue / list_issues / get_issue / update_issue / add_comment /
-list_comments / get_repo / list_repos. New 30+ ops (PRs, branches,
-files, releases, workflows, projects) are additive.
-
-Sim parity target: 83 ops. We ship ~40 covering the common surface.
 """
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.github import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
 
 
@@ -32,11 +25,11 @@ def _assignees(v):  # noqa: ANN001
 
 MANIFEST = ProviderManifest(
     type="action.github",
-    name="GitHub",
+    name=NAME,
     category="integration",
     description="GitHub — issues, PRs, files, branches, releases, workflows, projects.",
-    icon_slug="github",
-    color="#ffffff",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.github.com",
     credential_type="github_oauth",
     # OAuth stores the token under access_token; PATs shipped under
@@ -106,7 +99,6 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="query", label="Search Query", type="string"),
     ],
     operations=[
-        # ─── legacy 8 ops (preserved) ──────────────────────────────
         OpSpec(
             id="create_issue",
             label="Create Issue",

@@ -14,7 +14,7 @@ const Checkbox = forwardRef<
     ref={ref}
     className={cn(
       'peer h-4 w-4 shrink-0 rounded-[4px] border border-border-soft bg-surface',
-      'transition-[background,border-color] duration-[120ms]',
+      'transition-[background,border-color] [transition-duration:120ms]',
       'hover:border-border hover:bg-surface-2',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-surface-2',
       'disabled:cursor-not-allowed disabled:opacity-40',

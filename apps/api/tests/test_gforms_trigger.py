@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gforms.gforms_trigger import (
+from apps.api.app.node_system.nodes.google.gforms.gforms_trigger import (
     GoogleFormsTriggerProperties,
     _newest_timestamp,
 )

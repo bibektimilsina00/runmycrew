@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gyt.gyt_trigger import (
+from apps.api.app.node_system.nodes.google.gyt.gyt_trigger import (
     EVENT_NEW_COMMENT,
     EVENT_NEW_SUBSCRIBER,
     EVENT_NEW_VIDEO,

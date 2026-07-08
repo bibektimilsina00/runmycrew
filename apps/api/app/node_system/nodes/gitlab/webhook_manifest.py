@@ -28,6 +28,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.gitlab import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     SignatureSpec,
@@ -60,14 +61,14 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.gitlab_webhook",
-    name="GitLab",
+    name=NAME,
     description=(
         "Fires the instant GitLab posts a webhook delivery to your "
         "workflow URL. Pair with a project-level webhook configured "
         "in GitLab Settings → Webhooks."
     ),
-    icon_slug="gitlab",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="gitlab",
     signature=SignatureSpec(
         scheme="gitlab_token",

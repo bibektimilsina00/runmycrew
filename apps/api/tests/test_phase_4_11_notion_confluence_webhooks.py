@@ -21,13 +21,13 @@ from apps.api.app.features.webhooks.service import WebhookService
 # import time and registers the manifest with the webhook manifest
 # registry. Without this, tests that reach into the service by
 # `provider` string fail with a 404.
-from apps.api.app.node_system.nodes.confluence import (
+from apps.api.app.node_system.nodes.atlassian.confluence import (
     confluence_webhook as _conf_wh,  # noqa: F401
 )
-from apps.api.app.node_system.nodes.confluence.webhook_manifest import (
+from apps.api.app.node_system.nodes.atlassian.confluence.webhook_manifest import (
     MANIFEST as CONFLUENCE,
 )
-from apps.api.app.node_system.nodes.confluence.webhook_manifest import (
+from apps.api.app.node_system.nodes.atlassian.confluence.webhook_manifest import (
     _shape as confluence_shape,
 )
 from apps.api.app.node_system.nodes.notion import (

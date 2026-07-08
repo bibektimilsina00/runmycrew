@@ -7,6 +7,7 @@ URI — user provides via the manifest field.
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.calendly import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -33,10 +34,10 @@ register_flatten("calendly.event", _flatten_event)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.calendly",
-    name="Calendly",
+    name=NAME,
     description="Poll Calendly for new scheduled events (or cancellations).",
-    icon_slug="calendly",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.calendly.com",
     credential_type="calendly_oauth",
     token_field=["access_token"],

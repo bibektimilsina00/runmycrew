@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from apps.api.app.node_system.nodes.gdocs.gdocs_node import (
+from apps.api.app.node_system.nodes.google.gdocs.gdocs_node import (
     GoogleDocsProperties,
     _color_field,
     _extract_doc_text,

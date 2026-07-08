@@ -18,14 +18,13 @@ from apps.api.app.node_system.scaffolds import (
 
 _COMMON_FIELDS = ["q", "language", "page_size", "page"]
 
-
 MANIFEST = ProviderManifest(
     type="action.newsapi",
     name="NewsAPI",
     category="integration",
     description="Search 80k+ news sources via newsapi.org — articles, headlines, sources.",
     icon_slug="newsapi",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://newsapi.org/v2",
     credential_type="newsapi_api_key",
     token_field=["api_key"],

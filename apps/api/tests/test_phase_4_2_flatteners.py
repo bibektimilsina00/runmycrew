@@ -9,16 +9,16 @@ instead of the real value — hard to catch without tests.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.nodes.jira.trigger_manifest import (
+from apps.api.app.node_system.nodes.atlassian.jira.trigger_manifest import (
     _flatten_comment as jira_flatten_comment,
 )
-from apps.api.app.node_system.nodes.jira.trigger_manifest import (
+from apps.api.app.node_system.nodes.atlassian.jira.trigger_manifest import (
     _flatten_project as jira_flatten_project,
 )
-from apps.api.app.node_system.nodes.jira.trigger_manifest import (
+from apps.api.app.node_system.nodes.atlassian.jira.trigger_manifest import (
     _flatten_sprint as jira_flatten_sprint,
 )
-from apps.api.app.node_system.nodes.jira.trigger_manifest import (
+from apps.api.app.node_system.nodes.atlassian.jira.trigger_manifest import (
     _flatten_worklog as jira_flatten_worklog,
 )
 from apps.api.app.node_system.nodes.linear.trigger_manifest import (

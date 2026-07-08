@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.typeform import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -90,14 +91,14 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.typeform_webhook",
-    name="Typeform",
+    name=NAME,
     description=(
         "Fires when a Typeform is submitted. Verified via HMAC-SHA256 "
         "base64 in `Typeform-Signature`. Answers are flattened into "
         "`answers[]` + a `by_ref` map keyed on field ref for stable access."
     ),
-    icon_slug="typeform",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="typeform_webhook",
     signature=SignatureSpec(
         scheme="hmac_sha256_b64",

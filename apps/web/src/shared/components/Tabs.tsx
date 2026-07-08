@@ -50,7 +50,7 @@ export function TabsTrigger({ value, children, className }: { value: string; chi
       onClick={() => onValueChange(value)}
       className={cn(
         'relative px-4 py-2.5 text-sm font-medium',
-        'transition-colors duration-[120ms] cursor-pointer select-none',
+        'transition-colors [transition-duration:120ms] cursor-pointer select-none',
         'outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0',
         active
           ? [

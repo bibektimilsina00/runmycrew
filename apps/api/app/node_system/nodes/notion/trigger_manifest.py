@@ -25,6 +25,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.notion import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -175,13 +176,13 @@ async def _walk_notion(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.notion",
-    name="Notion",
+    name=NAME,
     description=(
         "Poll a Notion database for new / updated pages, a page for new "
         "comments, or the workspace for new databases."
     ),
-    icon_slug="notion",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.notion.com/v1",
     credential_type=["notion_oauth", "notion_api_key"],
     token_field=["access_token", "api_key"],

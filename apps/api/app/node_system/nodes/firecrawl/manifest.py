@@ -34,7 +34,6 @@ def _unwrap_data(body: Any) -> Any:
 
 register_flatten("firecrawl.data", _unwrap_data)
 
-
 MANIFEST = ProviderManifest(
     type="action.firecrawl",
     name="Firecrawl",
@@ -42,7 +41,7 @@ MANIFEST = ProviderManifest(
     description="Scrape, crawl, map, and search the web — Firecrawl turns "
     "any site into LLM-ready markdown.",
     icon_slug="firecrawl",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.firecrawl.dev/v1",
     credential_type="firecrawl_api_key",
     token_field=["api_key"],

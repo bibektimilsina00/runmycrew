@@ -220,14 +220,14 @@ export function ExpressionEditor({
   const wrapperClass = multiline
     ? cn(
         'relative w-full bg-surface border border-border-soft rounded-[8px] px-3 py-2.5',
-        'transition-[background-color,border-color] duration-[120ms]',
+        'transition-[background-color,border-color] [transition-duration:120ms]',
         'hover:border-border hover:bg-surface-2 focus-within:border-accent focus-within:bg-surface-2',
         disabled && 'pointer-events-none opacity-60',
       )
     : cn(
         'relative flex h-9 items-center gap-2 px-3',
         'bg-surface border border-border-soft rounded-[8px]',
-        'transition-[background-color,border-color] duration-[120ms]',
+        'transition-[background-color,border-color] [transition-duration:120ms]',
         'hover:border-border hover:bg-surface-2 focus-within:border-accent focus-within:bg-surface-2',
         disabled && 'pointer-events-none opacity-60',
       )

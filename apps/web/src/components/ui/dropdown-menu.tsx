@@ -95,7 +95,7 @@ const DropdownMenuItem = forwardRef<
       ref={ref}
       className={cn(
         'relative flex cursor-pointer select-none items-center gap-2 rounded-[7px] px-2.5 py-1.5 text-sm',
-        'outline-none transition-colors duration-[100ms]',
+        'outline-none transition-colors [transition-duration:100ms]',
         'focus:bg-surface focus:text-text',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
         '[&_svg]:pointer-events-none [&_svg]:w-3.5 [&_svg]:h-3.5 [&_svg]:shrink-0',

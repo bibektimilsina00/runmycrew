@@ -7,6 +7,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.notion import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -30,11 +31,11 @@ class NotionNode(BaseNode[NotionProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.notion",
-            name="Notion",
+            name=NAME,
             category="integration",
             description="Notion integration: manage pages, databases, and content.",
-            icon="notion",
-            color="#1c1c1c",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "credential",

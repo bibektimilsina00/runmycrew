@@ -14,6 +14,7 @@ from typing import Any
 import httpx
 
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.fireflies import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -115,11 +116,11 @@ async def _list_users(node: Any, client: httpx.AsyncClient, headers: dict[str, s
 
 MANIFEST = ProviderManifest(
     type="action.fireflies",
-    name="Fireflies",
+    name=NAME,
     category="integration",
     description="Fireflies.ai — meeting transcripts, summaries, search via GraphQL.",
-    icon_slug="fireflies",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.fireflies.ai",
     credential_type="fireflies_api_key",
     token_field=["api_key"],

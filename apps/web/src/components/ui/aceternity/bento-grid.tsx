@@ -65,7 +65,7 @@ function BentoCard({
       className={cn(
         'group relative flex flex-col overflow-hidden',
         'rounded-[14px] border border-border-faint bg-bg',
-        'p-5 transition-[border-color,transform] duration-[200ms]',
+        'p-5 transition-[border-color,transform] [transition-duration:200ms]',
         'hover:border-border-soft',
         colSpanClass,
         rowSpanClass,

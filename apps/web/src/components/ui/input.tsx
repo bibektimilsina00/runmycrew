@@ -24,7 +24,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             'flex h-9 w-full rounded-[8px] border border-border-soft bg-surface px-3 text-sm text-text',
             'placeholder:text-text-faint',
-            'transition-[background-color,border-color] duration-[120ms]',
+            'transition-[background-color,border-color] [transition-duration:120ms]',
             'hover:border-border hover:bg-surface-2',
             'focus-visible:outline-none focus-visible:border-accent focus-visible:bg-surface-2',
             'disabled:cursor-not-allowed disabled:opacity-40',
@@ -40,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <div
         className={cn(
           'flex items-center gap-2 px-3 h-9 w-full rounded-[8px] border bg-surface',
-          'transition-[background-color,border-color] duration-[120ms]',
+          'transition-[background-color,border-color] [transition-duration:120ms]',
           error
             ? 'border-err'
             : success
@@ -52,7 +52,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {leftIcon && (
           <span
             className={cn(
-              'shrink-0 flex [&_svg]:w-3.5 [&_svg]:h-3.5 transition-colors duration-[120ms]',
+              'shrink-0 flex [&_svg]:w-3.5 [&_svg]:h-3.5 transition-colors [transition-duration:120ms]',
               error ? 'text-err' : success ? 'text-ok' : 'text-text-faint',
             )}
           >

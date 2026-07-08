@@ -28,6 +28,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.notion import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -59,15 +60,15 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.notion_webhook",
-    name="Notion",
+    name=NAME,
     description=(
         "Fires when Notion posts a webhook delivery — pages, databases, "
         "comments. Full sim event parity via body-path routing on `type`. "
         "First delivery is a URL-verification challenge; the scaffold "
         "echoes the token so Notion accepts the endpoint."
     ),
-    icon_slug="notion",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="notion_webhook",
     signature=SignatureSpec(
         scheme="hmac_sha256",

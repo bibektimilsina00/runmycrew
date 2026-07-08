@@ -9,6 +9,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.memory import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -32,11 +33,11 @@ class MemoryNode(BaseNode[MemoryProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.memory",
-            name="Memory",
+            name=NAME,
             category="ai",
             description="Read, write, or clear conversation memory. Shares the same memory store as the Agent node.",
-            icon="BookMarked",
-            color="#f59e0b",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "operation",

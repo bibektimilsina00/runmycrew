@@ -17,14 +17,13 @@ from apps.api.app.node_system.scaffolds import (
 
 _ACCOUNT = "{base_url}/accounts/{account_id}"
 
-
 MANIFEST = ProviderManifest(
     type="action.docusign",
     name="DocuSign",
     category="integration",
     description="DocuSign — send envelopes, manage templates, track signatures.",
     icon_slug="docusign",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="",
     credential_type=["docusign_oauth", "docusign_creds"],
     token_field=["access_token", "api_key"],

@@ -23,6 +23,7 @@ hand-written node — `node_registry.register(build_rest_node(MANIFEST))`.
 
 from __future__ import annotations
 
+import sys
 from typing import Any, get_args, get_origin
 
 import httpx
@@ -301,8 +302,17 @@ def build_rest_node(manifest: ProviderManifest) -> type[BaseNode]:
         credential_type=manifest.credential_type,
     )
 
+    # The manifest was constructed inside a per-provider `manifest.py` —
+    # the caller's module path (`apps.api.app.node_system.nodes.<brand>.
+    # <slug>.manifest`) is the only signal we have for a REST-scaffold
+    # node's brand, since the generated class lives in this factory
+    # module. Stamp it on the class so `NodeRegistry._brand_of` can read
+    # it without a fragile prefix map.
+    caller_module = sys._getframe(1).f_globals.get("__name__", "")
+
     class _ManifestNode(BaseNode[Properties]):  # type: ignore[valid-type]
         _manifest = manifest
+        _source_module = caller_module
 
         @classmethod
         def get_properties_model(cls) -> type[BaseModel]:

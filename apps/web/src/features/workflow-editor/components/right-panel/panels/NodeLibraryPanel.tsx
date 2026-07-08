@@ -1,7 +1,89 @@
+import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useNodeLibrary, CATEGORY_LABEL } from '../../../hooks/useNodeLibrary'
 import { getIcon } from '../../../utils/icon-map'
+import { BrandIcon } from '../../../utils/BrandIcon'
+import type { NodeDefinition } from '../../../types/editorTypes'
+
+const BRAND_LABEL: Record<string, string> = {
+  google: 'Google',
+  aws: 'AWS',
+  microsoft: 'Microsoft',
+  atlassian: 'Atlassian',
+  twilio: 'Twilio',
+  sap: 'SAP',
+  meta: 'Meta',
+  ai: 'AI',
+}
+
+function NodeRow({ def, onSpawn, onDrag }: {
+  def: NodeDefinition
+  onSpawn: (def: NodeDefinition) => void
+  onDrag: (e: React.DragEvent, def: NodeDefinition) => void
+}) {
+  const Icon = getIcon(def.icon)
+  return (
+    <div
+      draggable
+      onClick={() => onSpawn(def)}
+      onDragStart={e => onDrag(e, def)}
+      className={cn(
+        'flex cursor-pointer select-none items-center gap-2.5 rounded-[8px] px-2.5 py-2',
+        'transition-colors hover:bg-[var(--surface)] active:bg-[var(--surface-2)] active:cursor-grabbing',
+      )}
+      title="Click to add · Drag to position"
+    >
+      <div
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-3 [&_svg]:w-3 [&_img]:h-3 [&_img]:w-3 [&_img]:object-contain"
+        style={{ background: def.color ?? 'var(--surface-3)' }}
+      >
+        {Icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[12.5px] font-medium text-[var(--text)]">{def.name}</p>
+      </div>
+    </div>
+  )
+}
+
+function BrandGroup({ brand, defs, onSpawn, onDrag }: {
+  brand: string
+  defs: NodeDefinition[]
+  onSpawn: (def: NodeDefinition) => void
+  onDrag: (e: React.DragEvent, def: NodeDefinition) => void
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mb-0.5">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className={cn(
+          'flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left',
+          'transition-colors hover:bg-[var(--surface)]',
+        )}
+      >
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] bg-[var(--surface-2)] [&_img]:h-3.5 [&_img]:w-3.5 [&_img]:object-contain">
+          <BrandIcon slug={brand} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[12.5px] font-medium text-[var(--text)]">{BRAND_LABEL[brand] ?? brand}</p>
+        </div>
+        <span className="shrink-0 rounded bg-[var(--surface-2)] px-1.5 py-0.5 text-[10px] font-mono text-[var(--text-dim)]">
+          {defs.length}
+        </span>
+        <span className={cn('shrink-0 text-[10px] text-[var(--text-dim)] transition-transform', open && 'rotate-90')}>▶</span>
+      </button>
+      {open && (
+        <div className="ml-4 border-l border-[var(--border-faint)] pl-1">
+          {defs.map(def => (
+            <NodeRow key={def.type} def={def} onSpawn={onSpawn} onDrag={onDrag} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function NodeLibraryPanel() {
   const {
@@ -68,37 +150,17 @@ export function NodeLibraryPanel() {
         ) : grouped.length === 0 ? (
           <p className="py-8 text-center text-[12px] text-[var(--text-faint)]">No nodes found</p>
         ) : (
-          grouped.map(({ category, defs }) => (
+          grouped.map(({ category, unbranded, brands }) => (
             <div key={category} className="mb-3">
               <p className="mb-1 px-2 text-[10.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)]">
                 {CATEGORY_LABEL[category] ?? category}
               </p>
-              {defs.map(def => {
-                const Icon = getIcon(def.icon)
-                return (
-                  <div
-                    key={def.type}
-                    draggable
-                    onClick={() => spawnNode(def)}
-                    onDragStart={e => onDragStart(e, def)}
-                    className={cn(
-                      'flex cursor-pointer select-none items-center gap-2.5 rounded-[8px] px-2.5 py-2',
-                      'transition-colors hover:bg-[var(--surface)] active:bg-[var(--surface-2)] active:cursor-grabbing',
-                    )}
-                    title="Click to add · Drag to position"
-                  >
-                    <div
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-white [&_svg]:h-3 [&_svg]:w-3 [&_img]:h-3 [&_img]:w-3 [&_img]:object-contain"
-                      style={{ background: def.color ?? 'var(--surface-3)' }}
-                    >
-                      {Icon}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[12.5px] font-medium text-[var(--text)]">{def.name}</p>
-                    </div>
-                  </div>
-                )
-              })}
+              {unbranded.map(def => (
+                <NodeRow key={def.type} def={def} onSpawn={spawnNode} onDrag={onDragStart} />
+              ))}
+              {brands.map(({ brand, defs }) => (
+                <BrandGroup key={brand} brand={brand} defs={defs} onSpawn={spawnNode} onDrag={onDragStart} />
+              ))}
             </div>
           ))
         )}

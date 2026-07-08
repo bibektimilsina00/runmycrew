@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.api.app.node_system.nodes.fireflies import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     SignatureSpec,
     WebhookEvent,
@@ -42,13 +43,13 @@ def _shape(payload: Any, event_type: str, delivery_id: str) -> dict[str, Any]:
 
 MANIFEST = WebhookTriggerManifest(
     type="trigger.fireflies_webhook",
-    name="Fireflies",
+    name=NAME,
     description=(
         "Fires when Fireflies posts a meeting event (transcript ready, "
         "summary complete). Verified via HMAC-SHA1 in `x-hub-signature`."
     ),
-    icon_slug="fireflies",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     provider="fireflies",
     signature=SignatureSpec(
         scheme="hmac_sha1",

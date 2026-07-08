@@ -11,6 +11,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.thinking import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -35,11 +36,11 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.thinking",
-            name="Thinking",
+            name=NAME,
             category="ai",
             description="Run a chain-of-thought reasoning step. Shows the model's thinking process.",
-            icon="Brain",
-            color="#8b5cf6",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

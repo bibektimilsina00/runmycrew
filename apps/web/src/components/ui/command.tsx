@@ -123,7 +123,7 @@ const CommandItem = forwardRef<
     className={cn(
       'relative flex cursor-pointer select-none items-center gap-2 rounded-[7px] px-2.5 py-2 text-sm',
       'text-text-mute outline-none',
-      'transition-colors duration-[100ms]',
+      'transition-colors [transition-duration:100ms]',
       'aria-selected:bg-surface aria-selected:text-text',
       'data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-40',
       '[&_svg]:pointer-events-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0',

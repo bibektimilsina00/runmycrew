@@ -10,6 +10,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.embeddings import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -30,11 +31,11 @@ class EmbeddingsNode(BaseNode[EmbeddingsProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="action.embeddings",
-            name="Embeddings",
+            name=NAME,
             category="ai",
             description="Convert text to a vector embedding. Use with the Knowledge Base node or external vector stores.",
-            icon="Braces",
-            color="#6366f1",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "provider",

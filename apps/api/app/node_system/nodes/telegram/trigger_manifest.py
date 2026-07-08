@@ -16,6 +16,7 @@ from typing import Any
 
 import httpx
 
+from apps.api.app.node_system.nodes.telegram import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     PollingEvent,
@@ -146,10 +147,10 @@ async def _walk_telegram(
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.telegram",
-    name="Telegram",
+    name=NAME,
     description="Poll a Telegram bot for new messages, callback queries, or any update.",
-    icon_slug="telegram",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="",
     credential_type="telegram_bot",
     token_field=["bot_token"],

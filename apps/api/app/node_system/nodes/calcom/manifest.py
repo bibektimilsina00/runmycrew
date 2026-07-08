@@ -10,6 +10,7 @@ writing).
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.calcom import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
@@ -18,11 +19,11 @@ from apps.api.app.node_system.scaffolds import (
 
 MANIFEST = ProviderManifest(
     type="action.calcom",
-    name="Cal.com",
+    name=NAME,
     category="integration",
     description="Cal.com — bookings, event types, availability, users.",
-    icon_slug="calcom",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.cal.com/v2",
     credential_type="calcom_api_key",
     token_field=["api_key"],
@@ -53,106 +54,184 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(name="take", label="Take", type="number", default=50, mode="advanced"),
         FieldSpec(name="skip", label="Skip", type="number", default=0, mode="advanced"),
+        FieldSpec(name="booking_id", label="Booking ID", type="string"),
+        FieldSpec(name="booking_body", label="Booking Body (JSON)", type="json", default={}),
+        FieldSpec(name="event_type_body", label="Event Type Body (JSON)", type="json", default={}),
+        FieldSpec(name="schedule_id", label="Schedule ID", type="string"),
+        FieldSpec(name="schedule_body", label="Schedule Body (JSON)", type="json", default={}),
+        FieldSpec(name="cancellation_reason", label="Cancellation Reason", type="string"),
+        FieldSpec(name="reschedule_reason", label="Reschedule Reason", type="string"),
+        FieldSpec(name="start_time", label="Start Time (ISO)", type="string"),
+        FieldSpec(name="end_time", label="End Time (ISO)", type="string"),
+        FieldSpec(name="username", label="Username", type="string"),
     ],
     operations=[
+        OpSpec(
+            id="get_me",
+            label="Get Current User",
+            method="GET",
+            path="/me",
+        ),
         OpSpec(
             id="list_bookings",
             label="List Bookings",
             method="GET",
-            path="/bookings",
-            visible_fields=["status", "take", "skip"],
-            query_builder=lambda v: {
-                k: val
-                for k, val in {
-                    "status": getattr(v, "status", None),
-                    "take": int(getattr(v, "take", 50) or 50),
-                    "skip": int(getattr(v, "skip", 0) or 0),
-                }.items()
-                if val is not None
-            },
-        ),
-        OpSpec(
-            id="get_booking",
-            label="Get Booking",
-            method="GET",
-            path="/bookings/{booking_uid}",
-            visible_fields=["booking_uid"],
+            path="/v2/bookings",
+            visible_fields=[],
+            query_builder=lambda v: {},
         ),
         OpSpec(
             id="create_booking",
             label="Create Booking",
             method="POST",
-            path="/bookings",
-            visible_fields=[
-                "event_type_id",
-                "start",
-                "attendee_email",
-                "attendee_name",
-                "time_zone",
-                "language",
-            ],
-            body_builder=lambda v: {
-                "eventTypeId": int(getattr(v, "event_type_id", 0) or 0),
-                "start": getattr(v, "start", None) or "",
-                "attendee": {
-                    "name": getattr(v, "attendee_name", None) or "",
-                    "email": getattr(v, "attendee_email", None) or "",
-                    "timeZone": getattr(v, "time_zone", None) or "UTC",
-                    "language": getattr(v, "language", None) or "en",
-                },
-            },
+            path="/v2/bookings",
+            visible_fields=["booking_body"],
+            body_builder=lambda v: getattr(v, "booking_body", None) or {},
+        ),
+        OpSpec(
+            id="get_booking",
+            label="Get Booking",
+            method="GET",
+            path="/v2/bookings/{booking_id}",
+            visible_fields=["booking_id"],
+            query_builder=lambda v: {},
         ),
         OpSpec(
             id="cancel_booking",
             label="Cancel Booking",
             method="POST",
-            path="/bookings/{booking_uid}/cancel",
-            visible_fields=["booking_uid", "reason"],
+            path="/v2/bookings/{booking_id}/cancel",
+            visible_fields=["booking_id", "cancellation_reason"],
             body_builder=lambda v: {
-                "cancellationReason": getattr(v, "reason", None) or "",
+                "cancellationReason": getattr(v, "cancellation_reason", None) or None
             },
         ),
         OpSpec(
             id="reschedule_booking",
             label="Reschedule Booking",
             method="POST",
-            path="/bookings/{booking_uid}/reschedule",
-            visible_fields=["booking_uid", "start", "reason"],
+            path="/v2/bookings/{booking_id}/reschedule",
+            visible_fields=["booking_id", "start_time", "reschedule_reason"],
             body_builder=lambda v: {
-                "start": getattr(v, "start", None) or "",
-                "reschedulingReason": getattr(v, "reason", None) or "",
+                "start": getattr(v, "start_time", "") or "",
+                "reschedulingReason": getattr(v, "reschedule_reason", None) or None,
             },
         ),
         OpSpec(
-            id="list_event_types",
-            label="List Event Types",
-            method="GET",
-            path="/event-types",
-            visible_fields=["user_id"],
-            query_builder=lambda v: (
-                {"username": None, "eventTypeId": None}
-                if False
-                else {
-                    k: val
-                    for k, val in {
-                        "userId": getattr(v, "user_id", None),
-                    }.items()
-                    if val is not None
-                }
-            ),
+            id="confirm_booking",
+            label="Confirm Booking",
+            method="POST",
+            path="/v2/bookings/{booking_id}/confirm",
+            visible_fields=["booking_id"],
+            body_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="decline_booking",
+            label="Decline Booking",
+            method="POST",
+            path="/v2/bookings/{booking_id}/decline",
+            visible_fields=["booking_id"],
+            body_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="create_event_type",
+            label="Create Event Type",
+            method="POST",
+            path="/v2/event-types",
+            visible_fields=["event_type_body"],
+            body_builder=lambda v: getattr(v, "event_type_body", None) or {},
         ),
         OpSpec(
             id="get_event_type",
             label="Get Event Type",
             method="GET",
-            path="/event-types/{event_type_id}",
+            path="/v2/event-types/{event_type_id}",
             visible_fields=["event_type_id"],
+            query_builder=lambda v: {},
         ),
         OpSpec(
-            id="get_me",
-            label="Get Current User",
+            id="list_event_types",
+            label="List Event Types",
             method="GET",
-            path="/me",
+            path="/v2/event-types",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="update_event_type",
+            label="Update Event Type",
+            method="PATCH",
+            path="/v2/event-types/{event_type_id}",
+            visible_fields=["event_type_id", "event_type_body"],
+            body_builder=lambda v: getattr(v, "event_type_body", None) or {},
+        ),
+        OpSpec(
+            id="delete_event_type",
+            label="Delete Event Type",
+            method="DELETE",
+            path="/v2/event-types/{event_type_id}",
+            visible_fields=["event_type_id"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="create_schedule",
+            label="Create Schedule",
+            method="POST",
+            path="/v2/schedules",
+            visible_fields=["schedule_body"],
+            body_builder=lambda v: getattr(v, "schedule_body", None) or {},
+        ),
+        OpSpec(
+            id="get_schedule",
+            label="Get Schedule",
+            method="GET",
+            path="/v2/schedules/{schedule_id}",
+            visible_fields=["schedule_id"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="list_schedules",
+            label="List Schedules",
+            method="GET",
+            path="/v2/schedules",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="update_schedule",
+            label="Update Schedule",
+            method="PATCH",
+            path="/v2/schedules/{schedule_id}",
+            visible_fields=["schedule_id", "schedule_body"],
+            body_builder=lambda v: getattr(v, "schedule_body", None) or {},
+        ),
+        OpSpec(
+            id="delete_schedule",
+            label="Delete Schedule",
+            method="DELETE",
+            path="/v2/schedules/{schedule_id}",
+            visible_fields=["schedule_id"],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="get_default_schedule",
+            label="Get Default Schedule",
+            method="GET",
+            path="/v2/schedules/default",
+            visible_fields=[],
+            query_builder=lambda v: {},
+        ),
+        OpSpec(
+            id="get_slots",
+            label="Get Available Slots",
+            method="GET",
+            path="/v2/slots",
+            visible_fields=["event_type_id", "start_time", "end_time"],
+            query_builder=lambda v: {
+                "eventTypeId": getattr(v, "event_type_id", "") or "",
+                "start": getattr(v, "start_time", "") or "",
+                "end": getattr(v, "end_time", "") or "",
+            },
         ),
     ],
     outputs_schema=[

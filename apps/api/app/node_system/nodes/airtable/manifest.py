@@ -45,7 +45,6 @@ def _flatten_create(body: Any) -> dict[str, Any]:
 register_flatten("airtable.records", _flatten_records)
 register_flatten("airtable.create", _flatten_create)
 
-
 # ── query / body builders ────────────────────────────────────────────
 
 
@@ -72,14 +71,13 @@ def _fields_body(props: Any) -> dict[str, Any]:
 
 # ── manifest ─────────────────────────────────────────────────────────
 
-
 MANIFEST = ProviderManifest(
     type="action.airtable",
     name="Airtable",
     category="integration",
     description="Read and write Airtable bases, tables, and records.",
     icon_slug="airtable",
-    color="#1c1c1c",
+    color="#ffffff",
     base_url="https://api.airtable.com/v0",
     credential_type="airtable_api_key",
     token_field=["api_key"],

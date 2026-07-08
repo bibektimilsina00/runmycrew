@@ -24,6 +24,9 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // 15s hard cap. Without this, backend down / slow → infinite hang →
+  // ProtectedRoute stuck showing the "restoring session" spinner forever.
+  timeout: 15000,
 })
 
 // Inject Auth Token into every request

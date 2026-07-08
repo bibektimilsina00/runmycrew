@@ -12,6 +12,7 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.ai.verify import COLOR, ICON_SLUG, NAME
 
 logger = get_logger(__name__)
 
@@ -47,15 +48,15 @@ class VerifyNode(BaseNode[VerifyProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="ai.verify",
-            name="Verify",
+            name=NAME,
             category="ai",
             description=(
                 "Objective verification checker for a crew loop. Runs a deterministic "
                 "L1-L3 check (expression / rule / http / code) and emits a "
                 "{passed, feedback} verdict the Agent Crew orchestrator reads."
             ),
-            icon="CheckCheck",
-            color="#3fb98b",
+            icon=ICON_SLUG,
+            color=COLOR,
             properties=[
                 {
                     "name": "mode",

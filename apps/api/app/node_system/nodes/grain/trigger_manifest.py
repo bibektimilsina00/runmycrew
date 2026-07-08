@@ -16,6 +16,7 @@ Not in polling (need webhook):
 
 from __future__ import annotations
 
+from apps.api.app.node_system.nodes.grain import COLOR, ICON_SLUG, NAME
 from apps.api.app.node_system.scaffolds import (
     PollingEvent,
     PollingTriggerManifest,
@@ -81,10 +82,10 @@ register_flatten("grain.story", _flatten_story)
 
 MANIFEST = PollingTriggerManifest(
     type="trigger.grain",
-    name="Grain",
+    name=NAME,
     description=("Poll Grain for new / updated recordings, highlights, or new stories."),
-    icon_slug="grain",
-    color="#1c1c1c",
+    icon_slug=ICON_SLUG,
+    color=COLOR,
     base_url="https://api.grain.com/_/public-api",
     credential_type="grain_api_key",
     token_field=["api_key"],
