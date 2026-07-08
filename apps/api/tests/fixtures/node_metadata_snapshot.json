@@ -24959,6 +24959,13 @@
         "label": "Owner (user or org)",
         "name": "owner",
         "placeholder": "octocat",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "github",
+          "resource": "owners"
+        },
         "type": "string"
       },
       {
@@ -25038,6 +25045,17 @@
         "label": "Repository",
         "name": "repo",
         "placeholder": "hello-world",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "owner"
+          ],
+          "params": {
+            "owner": "${owner}"
+          },
+          "provider": "github",
+          "resource": "repos"
+        },
         "type": "string"
       },
       {
@@ -25207,6 +25225,19 @@
         },
         "label": "Branch",
         "name": "branch",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "owner",
+            "repo"
+          ],
+          "params": {
+            "owner": "${owner}",
+            "repo": "${repo}"
+          },
+          "provider": "github",
+          "resource": "branches"
+        },
         "type": "string"
       },
       {
@@ -39758,8 +39789,15 @@
             "list_project_versions"
           ]
         },
-        "label": "Project Key",
+        "label": "Project",
         "name": "project_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "jira",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -39770,6 +39808,7 @@
           ]
         },
         "label": "Project ID",
+        "mode": "advanced",
         "name": "project_id",
         "type": "string"
       },
@@ -39808,6 +39847,17 @@
         "default": "Task",
         "label": "Issue Type",
         "name": "issue_type",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_key"
+          ],
+          "params": {
+            "project": "${project_key}"
+          },
+          "provider": "jira",
+          "resource": "issue_types"
+        },
         "type": "string"
       },
       {
@@ -43303,8 +43353,15 @@
             "get_active_cycle"
           ]
         },
-        "label": "Team ID",
+        "label": "Team",
         "name": "team_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "linear",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -43341,9 +43398,20 @@
             "update_workflow_state"
           ]
         },
-        "label": "State ID",
+        "label": "State",
         "mode": "advanced",
         "name": "state_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "team_id"
+          ],
+          "params": {
+            "team_id": "${team_id}"
+          },
+          "provider": "linear",
+          "resource": "states"
+        },
         "type": "string"
       },
       {
@@ -43412,8 +43480,15 @@
             "list_project_milestones"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "linear",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -68062,8 +68137,15 @@
             "create_channel_canvas"
           ]
         },
-        "label": "Channel ID",
+        "label": "Channel",
         "name": "channel",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "slack",
+          "resource": "channels"
+        },
         "type": "string"
       },
       {
@@ -68089,8 +68171,15 @@
             "publish_view"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "slack",
+          "resource": "users"
+        },
         "type": "string"
       },
       {

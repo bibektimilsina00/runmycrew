@@ -127,6 +127,23 @@ export type PropertyCondition =
   | { all: PropertyCondition[] }
   | { any: PropertyCondition[] }
 
+/** Field-level remote picker descriptor.
+ *
+ * When set, the frontend renders `RemotePickerRenderer` instead of the
+ * type's default renderer — hits `/credentials/{cred}/lookup/{provider}/
+ * {resource}` on demand and shows a searchable dropdown. See the
+ * backend `RemoteLookup` model in `rest_manifest.py` for the source of
+ * truth. `${field}` in `params` values interpolates from sibling
+ * property values on the same node.
+ */
+export interface RemoteLookupDescriptor {
+  provider: string
+  resource: string
+  params: Record<string, string>
+  depends_on: string[]
+  allow_manual: boolean
+}
+
 export interface NodeProperty {
   name: string
   label: string
@@ -152,6 +169,7 @@ export interface NodeProperty {
   visibility?: 'user-or-llm' | 'user-only' | 'hidden'
   canonicalId?: string
   group?: string
+  remote?: RemoteLookupDescriptor
 }
 
 export interface NodeDefinition {
@@ -218,6 +236,13 @@ const NodePropertySchema: z.ZodType<NodeProperty> = z.lazy(() =>
     visibility:  z.enum(['user-or-llm', 'user-only', 'hidden']).optional(),
     canonicalId: z.string().optional(),
     group:       z.string().optional(),
+    remote:      z.object({
+      provider: z.string(),
+      resource: z.string(),
+      params: z.record(z.string(), z.string()).default({}),
+      depends_on: z.array(z.string()).default([]),
+      allow_manual: z.boolean().default(true),
+    }).optional(),
   }).passthrough()
 )
 

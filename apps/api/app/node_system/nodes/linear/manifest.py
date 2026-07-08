@@ -24,6 +24,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 LINEAR_API = "https://api.linear.app/graphql"
@@ -1267,8 +1268,9 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(
             name="team_id",
-            label="Team ID",
+            label="Team",
             type="string",
+            remote=RemoteLookup(provider="linear", resource="teams"),
         ),
         FieldSpec(
             name="issue_id",
@@ -1277,9 +1279,15 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(
             name="state_id",
-            label="State ID",
+            label="State",
             type="string",
             mode="advanced",
+            remote=RemoteLookup(
+                provider="linear",
+                resource="states",
+                params={"team_id": "${team_id}"},
+                depends_on=["team_id"],
+            ),
         ),
         FieldSpec(
             name="assignee_id",
@@ -1295,7 +1303,12 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(name="comment_body", label="Comment Body", type="string"),
         FieldSpec(name="search_term", label="Search Term", type="string"),
-        FieldSpec(name="project_id", label="Project ID", type="string"),
+        FieldSpec(
+            name="project_id",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(provider="linear", resource="projects"),
+        ),
         FieldSpec(name="label_id", label="Label ID", type="string"),
         # Phase 4-close-6h additions
         FieldSpec(name="comment_id", label="Comment ID", type="string"),

@@ -15,7 +15,12 @@ title), assistant suggested prompts, reactions, views (Block Kit modals
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.slack import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.slack",
@@ -29,9 +34,19 @@ MANIFEST = ProviderManifest(
     token_field=["access_token", "api_key", "bot_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="channel", label="Channel ID", type="string"),
+        FieldSpec(
+            name="channel",
+            label="Channel",
+            type="string",
+            remote=RemoteLookup(provider="slack", resource="channels"),
+        ),
         FieldSpec(name="channel_name", label="Channel Name", type="string"),
-        FieldSpec(name="user", label="User ID", type="string"),
+        FieldSpec(
+            name="user",
+            label="User",
+            type="string",
+            remote=RemoteLookup(provider="slack", resource="users"),
+        ),
         FieldSpec(name="text", label="Message Text", type="string"),
         FieldSpec(name="blocks", label="Blocks (JSON)", type="json", default=[]),
         FieldSpec(name="attachments", label="Attachments (JSON)", type="json", default=[]),

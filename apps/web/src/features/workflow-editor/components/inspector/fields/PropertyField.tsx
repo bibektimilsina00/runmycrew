@@ -1,6 +1,7 @@
 import type { NodeDefinition, NodeProperty } from '../../../types/editorTypes'
 import { FieldWrapper } from './FieldWrapper'
 import { FIELD_RENDERERS, FallbackRenderer } from './index'
+import { RemotePickerRenderer } from './renderers/RemotePickerRenderer'
 
 export interface PropertyFieldProps {
   prop: NodeProperty
@@ -31,7 +32,14 @@ export function PropertyField({
   defaultValue,
   onReset,
 }: PropertyFieldProps) {
-  const Renderer = FIELD_RENDERERS[prop.type as keyof typeof FIELD_RENDERERS] ?? FallbackRenderer
+  // `remote` on any field wins over the type-based renderer table —
+  // it's a cross-cutting concern (credential-scoped searchable
+  // dropdown + Manual toggle) that piggybacks on the plain string
+  // value. The renderer resolves back to the type-default when the
+  // user flips to Manual mode.
+  const Renderer = prop.remote
+    ? RemotePickerRenderer
+    : FIELD_RENDERERS[prop.type as keyof typeof FIELD_RENDERERS] ?? FallbackRenderer
   const hideLabel = prop.type === 'gmail-query'
 
   return (
