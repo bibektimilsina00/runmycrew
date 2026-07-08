@@ -91,6 +91,17 @@ export function NodeLibraryPanel() {
     loopMode, presets, spawnPreset, onDragStartPreset,
   } = useNodeLibrary()
 
+  // Track which categories the user collapsed. Everything starts open;
+  // a click on the category header toggles just that section. Search
+  // forces every category open so results stay visible.
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const toggleCategory = (c: string) => setCollapsed(prev => {
+    const next = new Set(prev)
+    if (next.has(c)) next.delete(c); else next.add(c)
+    return next
+  })
+  const searching = query.trim().length > 0
+
   return (
     <div className="flex h-full flex-col">
       <div className="shrink-0 border-b border-[var(--border-faint)] p-3">
@@ -150,19 +161,33 @@ export function NodeLibraryPanel() {
         ) : grouped.length === 0 ? (
           <p className="py-8 text-center text-[12px] text-[var(--text-faint)]">No nodes found</p>
         ) : (
-          grouped.map(({ category, unbranded, brands }) => (
-            <div key={category} className="mb-3">
-              <p className="mb-1 px-2 text-[10.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)]">
-                {CATEGORY_LABEL[category] ?? category}
-              </p>
-              {unbranded.map(def => (
-                <NodeRow key={def.type} def={def} onSpawn={spawnNode} onDrag={onDragStart} />
-              ))}
-              {brands.map(({ brand, defs }) => (
-                <BrandGroup key={brand} brand={brand} defs={defs} onSpawn={spawnNode} onDrag={onDragStart} />
-              ))}
-            </div>
-          ))
+          grouped.map(({ category, unbranded, brands, defs }) => {
+            const isOpen = searching || !collapsed.has(category)
+            return (
+              <div key={category} className="mb-3">
+                <button
+                  onClick={() => toggleCategory(category)}
+                  className="mb-1 flex w-full items-center gap-1.5 px-2 text-[10.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)] hover:text-[var(--text)] transition-colors"
+                >
+                  <span className={cn('text-[9px] transition-transform', isOpen && 'rotate-90')}>▶</span>
+                  <span className="flex-1 text-left">{CATEGORY_LABEL[category] ?? category}</span>
+                  <span className="rounded bg-[var(--surface-2)] px-1.5 py-0.5 text-[9.5px] font-mono normal-case tracking-normal text-[var(--text-dim)]">
+                    {defs.length}
+                  </span>
+                </button>
+                {isOpen && (
+                  <>
+                    {unbranded.map(def => (
+                      <NodeRow key={def.type} def={def} onSpawn={spawnNode} onDrag={onDragStart} />
+                    ))}
+                    {brands.map(({ brand, defs }) => (
+                      <BrandGroup key={brand} brand={brand} defs={defs} onSpawn={spawnNode} onDrag={onDragStart} />
+                    ))}
+                  </>
+                )}
+              </div>
+            )
+          })
         )}
       </div>
     </div>
