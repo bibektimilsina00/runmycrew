@@ -5,7 +5,12 @@ REST at https://app.launchdarkly.com/api/v2. See sim-parity roadmap Phase 4.22.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.launchdarkly",
@@ -26,7 +31,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="workspace_id", label="Workspace ID", type="string"),
         FieldSpec(name="name", label="Name", type="string"),
         FieldSpec(name="repository", label="Repository URL", type="string"),
-        FieldSpec(name="project_key", label="Project Key", type="string"),
+        FieldSpec(
+            name="project_key",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(provider="launchdarkly", resource="projects"),
+        ),
         FieldSpec(name="flag_key", label="Feature Flag Key", type="string"),
         FieldSpec(name="environment_key", label="Environment Key", type="string"),
         FieldSpec(name="enabled", label="Enabled (true/false)", type="string"),

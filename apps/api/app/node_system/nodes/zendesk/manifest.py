@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _HOST = "https://{subdomain}.zendesk.com/api/v2"
@@ -32,7 +33,12 @@ MANIFEST = ProviderManifest(
     auth_basic_username="{email}/token",
     fields=[
         FieldSpec(name="ticket_id", label="Ticket ID", type="number"),
-        FieldSpec(name="user_id", label="User ID", type="number"),
+        FieldSpec(
+            name="user_id",
+            label="User",
+            type="number",
+            remote=RemoteLookup(provider="zendesk", resource="users"),
+        ),
         FieldSpec(name="org_id", label="Organization ID", type="number"),
         FieldSpec(name="subject", label="Ticket Subject", type="string"),
         FieldSpec(name="comment", label="Ticket Comment (body)", type="string"),

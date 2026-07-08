@@ -42437,8 +42437,15 @@
             "toggle_flag"
           ]
         },
-        "label": "Project Key",
+        "label": "Project",
         "name": "project_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "launchdarkly",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -53151,8 +53158,15 @@
             "remove_user_from_group"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "okta",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -53167,8 +53181,15 @@
             "list_group_members"
           ]
         },
-        "label": "Group ID",
+        "label": "Group",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "okta",
+          "resource": "groups"
+        },
         "type": "string"
       },
       {
@@ -81625,8 +81646,15 @@
             "get_user"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "zendesk",
+          "resource": "users"
+        },
         "type": "number"
       },
       {
