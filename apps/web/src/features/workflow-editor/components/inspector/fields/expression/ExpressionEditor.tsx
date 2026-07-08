@@ -68,6 +68,7 @@ export function ExpressionEditor({
 
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const preRef = useRef<HTMLPreElement | null>(null)
 
   const [caret, setCaret] = useState(value.length)
   const [popupAnchor, setPopupAnchor] = useState<{ left: number; top: number } | null>(null)
@@ -119,6 +120,14 @@ export function ExpressionEditor({
     if (wrapperRef.current) {
       const r = wrapperRef.current.getBoundingClientRect()
       setPopupAnchor({ left: r.left, top: r.bottom + 4 })
+    }
+    // Mirror the input's native horizontal scroll onto the overlay.
+    // Without this, once the typed text exceeds the visible width the
+    // input scrolls (native behaviour) but the highlight pre stays put,
+    // so caret + glyphs drift apart — the "cursor typing in the middle
+    // of the field" bug.
+    if (preRef.current && el instanceof HTMLInputElement) {
+      preRef.current.style.transform = `translateX(-${el.scrollLeft}px)`
     }
   }, [value.length])
 
@@ -243,8 +252,12 @@ export function ExpressionEditor({
     'placeholder:text-text-faint',
   )
 
+  // Multiline pre wraps like its textarea; single-line pre stays on one
+  // line and follows the input's horizontal scroll via a transform in
+  // `syncCaret`.
   const sharedPreClass = cn(
-    'pointer-events-none m-0 text-sm leading-normal whitespace-pre-wrap break-words font-[var(--font-ui)]',
+    'pointer-events-none m-0 text-sm leading-normal font-[var(--font-ui)]',
+    multiline ? 'whitespace-pre-wrap break-words' : 'whitespace-pre',
   )
 
   return (
@@ -276,8 +289,12 @@ export function ExpressionEditor({
           />
         </div>
       ) : (
-        <div className="relative h-full min-w-0 flex-1">
-          <pre aria-hidden className={cn(sharedPreClass, 'absolute inset-0 flex items-center')}>
+        <div className="relative h-full min-w-0 flex-1 overflow-hidden">
+          <pre
+            ref={preRef}
+            aria-hidden
+            className={cn(sharedPreClass, 'absolute inset-0 flex items-center will-change-transform')}
+          >
             {highlights}
           </pre>
           <input

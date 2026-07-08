@@ -62,9 +62,10 @@ export const NodeToolbar = ({ id, selected }: NodeToolbarProps) => {
     <div
       ref={rootRef}
       className={cn(
-        // Right-aligned: anchor the toolbar to the node's right edge so
-        // the action chips never overlap the node title at the left.
-        'pointer-events-auto absolute right-0 flex items-center gap-[5px]',
+        // Right-aligned with a small inset so the chips never sit flush
+        // against the node's right edge — reads as intentional padding
+        // instead of touching the border.
+        'pointer-events-auto absolute right-2 flex items-center gap-[5px]',
         'transition-opacity duration-150',
         selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         placeBelow ? '-bottom-[30px]' : '-top-[30px]',
