@@ -13,6 +13,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _STORE = "https://{store_domain}.myshopify.com/admin/api/2024-10"
@@ -31,7 +32,12 @@ MANIFEST = ProviderManifest(
     auth_header_name="X-Shopify-Access-Token",
     fields=[
         FieldSpec(name="order_id", label="Order ID", type="string"),
-        FieldSpec(name="product_id", label="Product ID", type="string"),
+        FieldSpec(
+            name="product_id",
+            label="Product",
+            type="string",
+            remote=RemoteLookup(provider="shopify", resource="products"),
+        ),
         FieldSpec(name="customer_id", label="Customer ID", type="string"),
         FieldSpec(name="title", label="Product Title", type="string"),
         FieldSpec(
@@ -65,14 +71,24 @@ MANIFEST = ProviderManifest(
             name="shopify_customer_body", label="Customer Body (JSON)", type="json", default={}
         ),
         FieldSpec(name="inventory_item_id", label="Inventory Item ID", type="string"),
-        FieldSpec(name="location_id", label="Location ID", type="string"),
+        FieldSpec(
+            name="location_id",
+            label="Location",
+            type="string",
+            remote=RemoteLookup(provider="shopify", resource="locations"),
+        ),
         FieldSpec(
             name="available_adjustment", label="Available Adjustment", type="number", default=0
         ),
         FieldSpec(
             name="fulfillment_body", label="Fulfillment Body (JSON)", type="json", default={}
         ),
-        FieldSpec(name="collection_id", label="Collection ID", type="string"),
+        FieldSpec(
+            name="collection_id",
+            label="Collection",
+            type="string",
+            remote=RemoteLookup(provider="shopify", resource="collections"),
+        ),
     ],
     operations=[
         OpSpec(

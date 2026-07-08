@@ -10,7 +10,12 @@ read from the credential dict via `_PropCredView`.
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.salesforce import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.salesforce",
@@ -26,8 +31,9 @@ MANIFEST = ProviderManifest(
     fields=[
         FieldSpec(
             name="sobject",
-            label="SObject (Lead|Contact|Account|Opportunity|Case|...)",
+            label="SObject",
             type="string",
+            remote=RemoteLookup(provider="salesforce", resource="objects"),
         ),
         FieldSpec(name="record_id", label="Record ID", type="string"),
         FieldSpec(name="record_data", label="Record Data (JSON)", type="json", default={}),

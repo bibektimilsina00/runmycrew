@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -26,7 +27,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="form_id", label="Form ID", type="string"),
+        FieldSpec(
+            name="form_id",
+            label="Form",
+            type="string",
+            remote=RemoteLookup(provider="typeform", resource="forms"),
+        ),
         FieldSpec(name="tag", label="Webhook Tag", type="string", placeholder="my-webhook"),
         FieldSpec(name="webhook_url", label="Webhook URL", type="string"),
         FieldSpec(name="enabled", label="Enabled", type="boolean", default=True, mode="advanced"),

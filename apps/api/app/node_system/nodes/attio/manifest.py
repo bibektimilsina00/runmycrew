@@ -13,6 +13,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -32,6 +33,7 @@ MANIFEST = ProviderManifest(
             label="Object",
             type="string",
             placeholder="people | companies | deals | custom_slug",
+            remote=RemoteLookup(provider="attio", resource="objects"),
         ),
         FieldSpec(name="record_id", label="Record ID", type="string"),
         FieldSpec(name="data", label="Record values (JSON)", type="json"),

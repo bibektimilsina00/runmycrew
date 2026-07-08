@@ -5297,6 +5297,13 @@
         "label": "Object",
         "name": "object_slug",
         "placeholder": "people | companies | deals | custom_slug",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "attio",
+          "resource": "objects"
+        },
         "type": "string"
       },
       {
@@ -10500,8 +10507,15 @@
         "type": "string"
       },
       {
-        "label": "Event URI",
+        "label": "Event Type",
         "name": "event_uri",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "calendly",
+          "resource": "event_types"
+        },
         "type": "string"
       },
       {
@@ -56800,9 +56814,20 @@
             "update_deal"
           ]
         },
-        "label": "Stage ID",
+        "label": "Stage",
         "mode": "advanced",
         "name": "stage_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "pipeline_id"
+          ],
+          "params": {
+            "pipeline_id": "${pipeline_id}"
+          },
+          "provider": "pipedrive",
+          "resource": "stages"
+        },
         "type": "number"
       },
       {
@@ -57003,8 +57028,15 @@
             "get_pipeline_deals"
           ]
         },
-        "label": "Pipeline ID",
+        "label": "Pipeline",
         "name": "pipeline_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "pipedrive",
+          "resource": "pipelines"
+        },
         "type": "string"
       },
       {
@@ -64075,8 +64107,15 @@
             "upsert_composite"
           ]
         },
-        "label": "SObject (Lead|Contact|Account|Opportunity|Case|...)",
+        "label": "SObject",
         "name": "sobject",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "salesforce",
+          "resource": "objects"
+        },
         "type": "string"
       },
       {
@@ -67366,8 +67405,15 @@
         "type": "string"
       },
       {
-        "label": "Product ID",
+        "label": "Product",
         "name": "product_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "shopify",
+          "resource": "products"
+        },
         "type": "string"
       },
       {
@@ -67547,8 +67593,15 @@
             "adjust_inventory"
           ]
         },
-        "label": "Location ID",
+        "label": "Location",
         "name": "location_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "shopify",
+          "resource": "locations"
+        },
         "type": "string"
       },
       {
@@ -67582,8 +67635,15 @@
             "get_collection"
           ]
         },
-        "label": "Collection ID",
+        "label": "Collection",
         "name": "collection_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "shopify",
+          "resource": "collections"
+        },
         "type": "string"
       },
       {
@@ -72191,8 +72251,15 @@
             "create_setup_intent"
           ]
         },
-        "label": "Customer ID",
+        "label": "Customer",
         "name": "customer_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "stripe",
+          "resource": "customers"
+        },
         "type": "string"
       },
       {
@@ -72277,8 +72344,19 @@
             "create_checkout_session"
           ]
         },
-        "label": "Price ID",
+        "label": "Price",
         "name": "price_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "product_id"
+          ],
+          "params": {
+            "product_id": "${product_id}"
+          },
+          "provider": "stripe",
+          "resource": "prices"
+        },
         "type": "string"
       },
       {
@@ -72288,8 +72366,15 @@
             "create_price"
           ]
         },
-        "label": "Product ID",
+        "label": "Product",
         "name": "product_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "stripe",
+          "resource": "products"
+        },
         "type": "string"
       },
       {
@@ -76925,8 +77010,15 @@
             "delete_webhook"
           ]
         },
-        "label": "Form ID",
+        "label": "Form",
         "name": "form_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "typeform",
+          "resource": "forms"
+        },
         "type": "string"
       },
       {
@@ -82564,8 +82656,15 @@
           ]
         },
         "default": "me",
-        "label": "User ID or 'me'",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "zoom",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -82578,8 +82677,15 @@
             "get_meeting_recordings"
           ]
         },
-        "label": "Meeting ID",
+        "label": "Meeting",
         "name": "meeting_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "zoom",
+          "resource": "meetings"
+        },
         "type": "string"
       },
       {

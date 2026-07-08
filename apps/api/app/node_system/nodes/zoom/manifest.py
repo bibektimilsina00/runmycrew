@@ -10,6 +10,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -24,8 +25,19 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="user_id", label="User ID or 'me'", type="string", default="me"),
-        FieldSpec(name="meeting_id", label="Meeting ID", type="string"),
+        FieldSpec(
+            name="user_id",
+            label="User",
+            type="string",
+            default="me",
+            remote=RemoteLookup(provider="zoom", resource="users"),
+        ),
+        FieldSpec(
+            name="meeting_id",
+            label="Meeting",
+            type="string",
+            remote=RemoteLookup(provider="zoom", resource="meetings"),
+        ),
         FieldSpec(name="topic", label="Topic", type="string"),
         FieldSpec(
             name="meeting_type",

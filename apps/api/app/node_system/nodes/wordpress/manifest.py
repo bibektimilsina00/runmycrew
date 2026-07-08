@@ -5,7 +5,11 @@ REST at https://{site}/wp-json/wp/v2. See sim-parity roadmap Phase 4.29.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+)
 
 MANIFEST = ProviderManifest(
     type="action.wordpress",

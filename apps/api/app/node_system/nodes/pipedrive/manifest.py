@@ -18,6 +18,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _DEAL_STAGE_FIELDS = ["title", "value", "currency", "stage_id", "person_id", "org_id"]
@@ -41,7 +42,18 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="title", label="Title", type="string"),
         FieldSpec(name="value", label="Value", type="number", mode="advanced"),
         FieldSpec(name="currency", label="Currency", type="string", default="USD", mode="advanced"),
-        FieldSpec(name="stage_id", label="Stage ID", type="number", mode="advanced"),
+        FieldSpec(
+            name="stage_id",
+            label="Stage",
+            type="number",
+            mode="advanced",
+            remote=RemoteLookup(
+                provider="pipedrive",
+                resource="stages",
+                params={"pipeline_id": "${pipeline_id}"},
+                depends_on=["pipeline_id"],
+            ),
+        ),
         FieldSpec(
             name="status",
             label="Status",
@@ -73,7 +85,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="pipedrive_lead_id", label="Lead ID", type="string"),
         FieldSpec(name="pipedrive_lead_body", label="Lead Body (JSON)", type="json", default={}),
         FieldSpec(name="thread_id", label="Mail Thread ID", type="string"),
-        FieldSpec(name="pipeline_id", label="Pipeline ID", type="string"),
+        FieldSpec(
+            name="pipeline_id",
+            label="Pipeline",
+            type="string",
+            remote=RemoteLookup(provider="pipedrive", resource="pipelines"),
+        ),
     ],
     operations=[
         OpSpec(
