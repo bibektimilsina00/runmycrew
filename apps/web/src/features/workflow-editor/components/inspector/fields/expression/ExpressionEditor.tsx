@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { CompletionPopup } from './CompletionPopup'
 import { useExpressionCompletions, type Completion } from './useExpressionCompletions'
-import { findActiveExpressionRegion } from './regionUtils'
+import { findActiveExpressionRegion, findAllExpressionRegions } from './regionUtils'
+import { TOKEN_CLASS, tokenize } from './highlightTokens'
 
 /**
  * Single text field that handles plain text + embedded `{{ expression }}`
@@ -67,6 +68,7 @@ export function ExpressionEditor({
 
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const preRef = useRef<HTMLPreElement | null>(null)
 
   const [caret, setCaret] = useState(value.length)
   const [popupAnchor, setPopupAnchor] = useState<{ left: number; top: number } | null>(null)
@@ -219,63 +221,97 @@ export function ExpressionEditor({
         disabled && 'pointer-events-none opacity-60',
       )
 
-  // The old transparent-input + overlay-pre trick was inherently
-  // fragile with a proportional UI font — every glyph in `<input>`
-  // renders at a slightly different width than the same glyph inside a
-  // `<pre>`, so cursor and highlighted text drift apart as the user
-  // types. We now render the input opaquely and keep the overlay pre
-  // ONLY when the value contains an actual `{{ … }}` region, using it
-  // for a subtle background tint — never underneath the caret's text
-  // path. Result: pixel-perfect caret in every field, no wrapper
-  // acrobatics.
+  // Overlay-based syntax highlighting relies on each glyph occupying
+  // the SAME width in the `<input>`/`<textarea>` and in the `<pre>`
+  // overlay behind it. A proportional font breaks that — the caret
+  // and highlighted glyphs drift by a fraction of a pixel per glyph,
+  // adding up to a visible offset within a few words. `font-mono`
+  // locks every character to a fixed cell width in both layers, so
+  // caret + highlights stay glued together no matter how long the
+  // value gets. Text renders in a mono face; that matches the
+  // expression-editor look of tools like n8n / Retool / Sim.
   const sharedInputClass = cn(
-    'w-full bg-transparent outline-none text-sm text-text',
-    'font-[var(--font-ui)] leading-normal',
+    'w-full bg-transparent outline-none text-[13px] text-transparent caret-text',
+    'font-mono leading-normal',
     'placeholder:text-text-faint',
   )
+
+  const sharedPreClass = cn(
+    'pointer-events-none m-0 text-[13px] leading-normal font-mono text-text',
+    multiline ? 'whitespace-pre-wrap break-words' : 'whitespace-pre',
+  )
+
+  const highlights = useMemo(() => buildHighlights(value), [value])
+
+  const handleInputScroll = useCallback(() => {
+    // Mirror the input's native horizontal scroll onto the overlay so
+    // the highlighted glyphs slide with the caret when the value
+    // exceeds the visible width.
+    const el = inputRef.current
+    if (el && preRef.current && !multiline) {
+      preRef.current.style.transform = `translateX(-${el.scrollLeft}px)`
+    }
+  }, [multiline])
 
   return (
     <div ref={wrapperRef} className={wrapperClass}>
       {multiline ? (
-        <textarea
-          ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-          value={value}
-          onChange={e => {
-            commit(e.target.value)
-            syncCaret()
-          }}
-          onSelect={syncCaret}
-          onClick={syncCaret}
-          onKeyUp={syncCaret}
-          onKeyDown={handleKeyDown}
-          onDrop={handleDrop}
-          onFocus={syncCaret}
-          placeholder={placeholder}
-          disabled={disabled}
-          rows={rows}
-          spellCheck={false}
-          className={cn(sharedInputClass, 'resize-none')}
-        />
+        <div className="relative w-full">
+          <pre ref={preRef} aria-hidden className={cn(sharedPreClass, 'absolute inset-0')}>
+            {highlights}
+            {'\n'}
+          </pre>
+          <textarea
+            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+            value={value}
+            onChange={e => {
+              commit(e.target.value)
+              syncCaret()
+            }}
+            onSelect={syncCaret}
+            onClick={syncCaret}
+            onKeyUp={syncCaret}
+            onKeyDown={handleKeyDown}
+            onDrop={handleDrop}
+            onFocus={syncCaret}
+            placeholder={placeholder}
+            disabled={disabled}
+            rows={rows}
+            spellCheck={false}
+            className={cn(sharedInputClass, 'relative z-10 resize-none')}
+          />
+        </div>
       ) : (
-        <input
-          ref={inputRef as React.RefObject<HTMLInputElement>}
-          type="text"
-          value={value}
-          onChange={e => {
-            commit(e.target.value)
-            syncCaret()
-          }}
-          onSelect={syncCaret}
-          onClick={syncCaret}
-          onKeyUp={syncCaret}
-          onKeyDown={handleKeyDown}
-          onDrop={handleDrop}
-          onFocus={syncCaret}
-          placeholder={placeholder}
-          disabled={disabled}
-          spellCheck={false}
-          className={cn(sharedInputClass, 'h-full border-none')}
-        />
+        <div className="relative h-full min-w-0 flex-1 overflow-hidden">
+          <pre
+            ref={preRef}
+            aria-hidden
+            className={cn(sharedPreClass, 'absolute inset-0 flex items-center will-change-transform')}
+          >
+            {highlights}
+          </pre>
+          <input
+            ref={inputRef as React.RefObject<HTMLInputElement>}
+            type="text"
+            value={value}
+            onChange={e => {
+              commit(e.target.value)
+              syncCaret()
+              handleInputScroll()
+            }}
+            onSelect={syncCaret}
+            onClick={syncCaret}
+            onKeyUp={() => { syncCaret(); handleInputScroll() }}
+            onKeyDown={handleKeyDown}
+            onScroll={handleInputScroll}
+            onDrop={handleDrop}
+            onFocus={syncCaret}
+            placeholder={placeholder}
+            disabled={disabled}
+            spellCheck={false}
+            className={cn(sharedInputClass, 'relative z-10 h-full border-none')}
+          />
+        </div>
       )}
 
       {popupOpen && popupAnchor && shouldShowPopup && (
@@ -288,4 +324,49 @@ export function ExpressionEditor({
       )}
     </div>
   )
+}
+
+/**
+ * Render the input value as styled spans for the overlay:
+ *   - plain text stays inherit-coloured (matches input's text-text).
+ *   - `{{ … }}` regions get a purple-ish tint with a slightly darker
+ *     pair of braces; an unclosed trailing `{{` dims so users see
+ *     they're still typing it.
+ * Mono font + identical line-height/padding on input and pre keep
+ * every glyph column-aligned with its transparent twin in the input.
+ */
+function buildHighlights(source: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = []
+  const regions = findAllExpressionRegions(source)
+  let cursor = 0
+  let keySeq = 0
+  for (const r of regions) {
+    if (r.open > cursor) {
+      nodes.push(<span key={keySeq++}>{source.slice(cursor, r.open)}</span>)
+    }
+    const open = source.slice(r.open, r.open + 2)
+    const inner = source.slice(r.open + 2, r.close)
+    const closed = r.closed
+    const close = closed ? source.slice(r.close, r.close + 2) : ''
+    const braceClass = closed
+      ? 'font-semibold text-[#c678dd]'
+      : 'font-semibold text-[#c678dd] opacity-70'
+    const tokens = tokenize(inner)
+    nodes.push(
+      <span key={keySeq++}>
+        <span className={braceClass}>{open}</span>
+        {tokens.map((t, i) => (
+          <span key={`tok-${keySeq}-${i}`} className={TOKEN_CLASS[t.kind]}>
+            {t.text}
+          </span>
+        ))}
+        {closed && <span className={braceClass}>{close}</span>}
+      </span>,
+    )
+    cursor = closed ? r.close + 2 : source.length
+  }
+  if (cursor < source.length) {
+    nodes.push(<span key={keySeq++}>{source.slice(cursor)}</span>)
+  }
+  return nodes
 }
