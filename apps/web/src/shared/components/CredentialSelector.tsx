@@ -132,78 +132,102 @@ export function CredentialSelector({
             <ChevronDown className="ml-auto shrink-0 w-3.5 h-3.5 text-text-faint" />
           </div>
         </DropdownTrigger>
-        <DropdownContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-[9px] p-1.5">
-          {relevant.length > 0 && (
-            <div className="px-2 pb-1.5 pt-1 text-[9.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)]">
-              {label} · {relevant.length}
-            </div>
-          )}
-          {relevant.length === 0 && (
-            <div className="flex flex-col items-center gap-2 px-3 py-6 text-center">
-              <ProviderTile
-                provider={providers.find(p => p.id === primaryType)}
-                size={28}
-              />
-              <div>
-                <p className="text-[12.5px] font-medium text-[var(--text)]">No {label} yet</p>
-                <p className="text-[11px] text-[var(--text-faint)]">Connect one to use this node.</p>
+        <DropdownContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-[10px] p-0">
+          {/* Empty state — treated as a card, not a list row. Big brand
+              tile at top, one clear CTA at the bottom. When the user
+              has creds this whole block is replaced by the list + a
+              compact new-connection row. */}
+          {relevant.length === 0 ? (
+            <div className="px-5 pb-4 pt-6">
+              <div className="flex flex-col items-center gap-3 pb-4 text-center">
+                <div
+                  className="relative flex h-14 w-14 items-center justify-center rounded-[12px] [&_img]:h-9 [&_img]:w-9 [&_img]:object-contain"
+                  style={{
+                    background: providers.find(p => p.id === primaryType)?.color ?? 'var(--surface-2)',
+                  }}
+                >
+                  <ProviderTile provider={providers.find(p => p.id === primaryType)} size={54} />
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-[var(--text)]">
+                    Connect {label}
+                  </p>
+                  <p className="mt-0.5 text-[12px] text-[var(--text-mute)]">
+                    Link your {label} account to use this node.
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
-          {relevant.map(c => {
-            const rowProvider = providers.find(p => p.id === c.type)
-            const active = value === c.id
-            return (
               <button
-                key={c.id}
                 type="button"
-                onClick={() => onChange(c.id)}
+                onClick={() => setShowConnect(true)}
                 className={cn(
-                  'group flex w-full items-center gap-2.5 rounded-[7px] px-2 py-1.5 text-left transition-colors',
-                  active
-                    ? 'bg-[color-mix(in_oklab,var(--accent)_16%,transparent)]'
-                    : 'hover:bg-[var(--surface)]',
+                  'flex w-full items-center justify-center gap-2 rounded-[9px] px-3 py-2.5',
+                  'bg-[var(--accent)] text-[13px] font-medium text-white',
+                  'transition-[filter,transform] duration-100',
+                  'hover:brightness-110 active:scale-[0.99]',
+                  'shadow-[0_1px_0_oklch(1_0_0/0.08)_inset,0_6px_16px_-6px_oklch(0.55_0.19_275/0.6)]',
                 )}
               >
-                <ProviderTile provider={rowProvider} size={22} />
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span className={cn(
-                    'truncate text-[12.5px]',
-                    active ? 'font-semibold text-[var(--text)]' : 'font-medium text-[var(--text)]',
-                  )}>
-                    {c.name}
-                  </span>
-                  <span className="truncate text-[10.5px] font-mono text-[var(--text-faint)]">
-                    {rowProvider?.type === 'oauth' ? 'OAuth' : 'API Key'} · {c.type}
-                  </span>
-                </span>
-                {active && (
-                  <Icons.Check style={{ width: 14, height: 14, color: 'var(--accent)' }} />
-                )}
+                <Icons.Plug style={{ width: 13, height: 13 }} />
+                Connect {label}
               </button>
-            )
-          })}
-          {relevant.length > 0 && <DropdownSeparator className="!my-1.5" />}
-          <button
-            type="button"
-            onClick={() => setShowConnect(true)}
-            className={cn(
-              'flex w-full items-center gap-2.5 rounded-[7px] px-2 py-1.5 text-left transition-colors',
-              'hover:bg-[color-mix(in_oklab,var(--accent)_10%,transparent)]',
-            )}
-          >
-            <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-[5px] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent)]">
-              <Icons.Plus style={{ width: 12, height: 12 }} />
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col">
-              <span className="text-[12.5px] font-medium text-[var(--accent)]">
-                Connect new {label}
-              </span>
-              <span className="text-[10.5px] font-mono text-[var(--text-faint)]">
-                Opens the provider picker
-              </span>
-            </span>
-          </button>
+            </div>
+          ) : (
+            <div className="p-1.5">
+              <div className="px-2 pb-1.5 pt-1 text-[9.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)]">
+                {label} · {relevant.length}
+              </div>
+              {relevant.map(c => {
+                const rowProvider = providers.find(p => p.id === c.type)
+                const active = value === c.id
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => onChange(c.id)}
+                    className={cn(
+                      'group flex w-full items-center gap-2.5 rounded-[7px] px-2 py-1.5 text-left transition-colors',
+                      active
+                        ? 'bg-[color-mix(in_oklab,var(--accent)_16%,transparent)]'
+                        : 'hover:bg-[var(--surface)]',
+                    )}
+                  >
+                    <ProviderTile provider={rowProvider} size={22} />
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className={cn(
+                        'truncate text-[12.5px]',
+                        active ? 'font-semibold text-[var(--text)]' : 'font-medium text-[var(--text)]',
+                      )}>
+                        {c.name}
+                      </span>
+                      <span className="truncate text-[10.5px] text-[var(--text-faint)]">
+                        {rowProvider?.type === 'oauth' ? 'OAuth' : 'API Key'}
+                      </span>
+                    </span>
+                    {active && (
+                      <Icons.Check style={{ width: 14, height: 14, color: 'var(--accent)' }} />
+                    )}
+                  </button>
+                )
+              })}
+              <DropdownSeparator className="!my-1.5" />
+              <button
+                type="button"
+                onClick={() => setShowConnect(true)}
+                className={cn(
+                  'flex w-full items-center gap-2.5 rounded-[7px] px-2 py-1.5 text-left transition-colors',
+                  'hover:bg-[color-mix(in_oklab,var(--accent)_10%,transparent)]',
+                )}
+              >
+                <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-[5px] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent)]">
+                  <Icons.Plus style={{ width: 12, height: 12 }} />
+                </span>
+                <span className="truncate text-[12.5px] font-medium text-[var(--accent)]">
+                  Connect another {label}
+                </span>
+              </button>
+            </div>
+          )}
         </DropdownContent>
       </Dropdown>
 
