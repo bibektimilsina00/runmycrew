@@ -16,6 +16,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -36,7 +37,13 @@ MANIFEST = ProviderManifest(
         "X-Algolia-API-Key": "{api_key}",
     },
     fields=[
-        FieldSpec(name="index_name", label="Index", type="string", required=True),
+        FieldSpec(
+            name="index_name",
+            label="Index",
+            type="string",
+            required=True,
+            remote=RemoteLookup(provider="algolia", resource="indices"),
+        ),
         FieldSpec(name="object_id", label="Object ID", type="string"),
         FieldSpec(name="query", label="Query", type="string"),
         FieldSpec(name="record", label="Record (JSON)", type="json"),

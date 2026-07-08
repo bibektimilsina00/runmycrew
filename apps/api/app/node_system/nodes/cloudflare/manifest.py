@@ -14,6 +14,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _RECORD_TYPES = ["A", "AAAA", "CNAME", "TXT", "MX", "NS", "SRV", "CAA"]
@@ -30,7 +31,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="zone_id", label="Zone ID", type="string"),
+        FieldSpec(
+            name="zone_id",
+            label="Zone",
+            type="string",
+            remote=RemoteLookup(provider="cloudflare", resource="zones"),
+        ),
         FieldSpec(name="record_id", label="Record ID", type="string"),
         FieldSpec(
             name="record_type",

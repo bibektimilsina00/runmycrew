@@ -2857,6 +2857,13 @@
         },
         "label": "Index",
         "name": "index_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "algolia",
+          "resource": "indices"
+        },
         "required": true,
         "type": "string"
       },
@@ -11584,8 +11591,15 @@
             "purge_cache"
           ]
         },
-        "label": "Zone ID",
+        "label": "Zone",
         "name": "zone_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "cloudflare",
+          "resource": "zones"
+        },
         "type": "string"
       },
       {
@@ -14252,8 +14266,15 @@
             "run_sql"
           ]
         },
-        "label": "SQL Warehouse ID",
+        "label": "SQL Warehouse",
         "name": "warehouse_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "databricks",
+          "resource": "warehouses"
+        },
         "type": "string"
       },
       {
@@ -14287,11 +14308,29 @@
         },
         "label": "Catalog",
         "name": "catalog",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "databricks",
+          "resource": "catalogs"
+        },
         "type": "string"
       },
       {
         "label": "Schema",
         "name": "schema_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "catalog"
+          ],
+          "params": {
+            "catalog": "${catalog}"
+          },
+          "provider": "databricks",
+          "resource": "schemas"
+        },
         "type": "string"
       },
       {
@@ -78123,9 +78162,16 @@
             "add_team_member"
           ]
         },
-        "label": "Team ID (optional)",
+        "label": "Team",
         "mode": "advanced",
         "name": "team_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "vercel",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -78150,8 +78196,17 @@
             "get_env_var"
           ]
         },
-        "label": "Project ID or name",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {
+            "team_id": "${team_id}"
+          },
+          "provider": "vercel",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {

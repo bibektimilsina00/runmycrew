@@ -19,6 +19,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -33,8 +34,24 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="team_id", label="Team ID (optional)", type="string", mode="advanced"),
-        FieldSpec(name="project_id", label="Project ID or name", type="string"),
+        FieldSpec(
+            name="team_id",
+            label="Team",
+            type="string",
+            mode="advanced",
+            remote=RemoteLookup(provider="vercel", resource="teams"),
+        ),
+        FieldSpec(
+            name="project_id",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(
+                provider="vercel",
+                resource="projects",
+                params={"team_id": "${team_id}"},
+                depends_on=[],
+            ),
+        ),
         FieldSpec(name="deployment_id", label="Deployment ID", type="string"),
         FieldSpec(name="domain", label="Domain", type="string"),
         FieldSpec(name="limit", label="Limit", type="number", default=20, mode="advanced"),
