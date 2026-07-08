@@ -320,6 +320,7 @@ export function ExpressionEditor({
           selectedIndex={selectedIndex}
           onAccept={acceptCompletion}
           anchor={popupAnchor}
+          prefix={completionState.prefix}
         />
       )}
     </div>
