@@ -231,8 +231,11 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
             </div>
           </>
         ) : (
-          /* Connect form */
-          <div className="p-6 flex flex-col gap-5 overflow-y-auto">
+          /* Connect form — content scrolls; the Cancel/Connect row is
+             pinned to the modal's bottom so users always see the
+             primary action, no matter how many scope items render. */
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             {/* Provider info */}
             <div className="flex items-center gap-3 p-4 bg-[var(--bg)] border border-[var(--border-faint)] rounded-[10px]">
               {selected.icon_slug && (
@@ -294,7 +297,9 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
               </div>
             ))}
 
-            <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--border-faint)]">
+            </div>
+            {/* Pinned footer */}
+            <div className="shrink-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border-faint)] bg-[var(--bg-2)]">
               <button onClick={onClose} className="px-4 py-2 rounded-[9px] text-[13px] font-medium text-[var(--text-mute)] bg-[var(--surface)] border border-[var(--border-faint)] hover:bg-[var(--surface-2)] transition-colors">
                 Cancel
               </button>
