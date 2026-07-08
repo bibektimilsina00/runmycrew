@@ -17348,7 +17348,7 @@
     "allow_error": true,
     "brand": null,
     "category": "integration",
-    "color": "#ffffff",
+    "color": "#ff9900",
     "credential_type": null,
     "default_height": null,
     "default_width": null,
@@ -52147,7 +52147,7 @@
     "allow_error": true,
     "brand": null,
     "category": "integration",
-    "color": "#1c1c1c",
+    "color": "#ffffff",
     "credential_type": [
       "notion_oauth",
       "notion_api_key"
@@ -90418,7 +90418,7 @@
     "allow_error": true,
     "brand": null,
     "category": "trigger",
-    "color": "#1c1c1c",
+    "color": "#ffffff",
     "credential_type": null,
     "default_height": null,
     "default_width": null,
