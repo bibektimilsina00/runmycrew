@@ -1,4 +1,8 @@
-"""Discord remote-picker handlers — guilds (servers) + channels."""
+"""Discord remote-picker handlers — guilds (servers) + channels.
+
+Discord is hand-written (custom BaseNode) so no manifest annotations
+today, but the handlers stay ready for whenever those props migrate.
+"""
 
 from __future__ import annotations
 
