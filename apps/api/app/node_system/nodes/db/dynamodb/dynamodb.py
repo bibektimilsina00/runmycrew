@@ -35,7 +35,7 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
             name="DynamoDB",
             category="integration",
             description="Query or mutate an AWS DynamoDB table.",
-            icon="Database",
+            icon="dynamodb",
             color="#ff9900",
             properties=[
                 {"name": "region", "label": "AWS Region", "type": "string", "default": "us-east-1"},

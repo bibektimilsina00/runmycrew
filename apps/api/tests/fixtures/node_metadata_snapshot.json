@@ -16520,7 +16520,7 @@
     "default_width": null,
     "description": "Query or mutate an AWS DynamoDB table.",
     "dynamic_outputs_from": null,
-    "icon": "Database",
+    "icon": "dynamodb",
     "inputs": 1,
     "name": "DynamoDB",
     "operation_tool_map": null,
