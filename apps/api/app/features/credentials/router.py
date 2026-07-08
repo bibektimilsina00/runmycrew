@@ -1482,8 +1482,12 @@ async def oauth_callback(
         )
         from apps.api.app.core.config import settings
 
-        # Redirect back to frontend integrations settings page
-        return RedirectResponse(url=f"{settings.FRONTEND_URL}/settings/integrations")
+        # Redirect to the frontend's `/oauth/return` landing page. That
+        # component reads the return path the initiating tab stashed in
+        # `sessionStorage` and bounces the user back to it — so an
+        # inspector-triggered OAuth returns to the inspector, not the
+        # dashboard.
+        return RedirectResponse(url=f"{settings.FRONTEND_URL}/oauth/return")
     except ImportError as exc:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

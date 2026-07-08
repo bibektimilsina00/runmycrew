@@ -111,6 +111,16 @@ export function ConnectModal({ providers, onClose, initialProviderId, onCreated 
           service: selected.id.replace('_oauth', ''),
           name: connName || selected.name,
         })
+        // Remember the route the user started from so `/oauth/return`
+        // can bounce them back after the callback. Without this the
+        // backend's fallback redirect (`/settings/integrations`) hits
+        // the catch-all and dumps them on the dashboard.
+        try {
+          sessionStorage.setItem(
+            'oauth_return_to',
+            window.location.pathname + window.location.search + window.location.hash,
+          )
+        } catch { /* private-mode: silently fall back to dashboard */ }
         window.location.href = url
         return
       }

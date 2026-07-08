@@ -19,7 +19,7 @@ import { Knowledge, KnowledgeDetail, KnowledgeDocumentView } from '@/features/kn
 import { Skills, SkillEditor } from '@/features/skills'
 import { WorkflowEditor } from '@/features/workflow-editor'
 import { Variables } from '@/features/variables'
-import { Connections } from '@/features/connections'
+import { Connections, OAuthReturn } from '@/features/connections'
 import { WorkspaceSettings, InviteAccept } from '@/features/workspaces'
 
 export default function App() {
@@ -64,6 +64,13 @@ export default function App() {
 
         {/* Public invite accept — needs auth check inside the page */}
         <Route path="/invites/:token" element={<InviteAccept />} />
+
+        {/* OAuth landing page — protected so credentials rehydrate under
+             the correct user. The component reads the return path from
+             sessionStorage and bounces the user back to it. */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/oauth/return" element={<OAuthReturn />} />
+        </Route>
 
         {/* Workflow editor — app sidebar via EditorLayout, full-bleed canvas + right panel */}
         <Route element={<ProtectedRoute />}>

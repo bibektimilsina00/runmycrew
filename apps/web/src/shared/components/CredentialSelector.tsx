@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import {
-  Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator,
+  Dropdown, DropdownTrigger, DropdownContent, DropdownSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Icons } from './icons'
 import { useCredentials, useProviders } from '@/features/connections/hooks/useConnections'
@@ -132,39 +132,78 @@ export function CredentialSelector({
             <ChevronDown className="ml-auto shrink-0 w-3.5 h-3.5 text-text-faint" />
           </div>
         </DropdownTrigger>
-        <DropdownContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[var(--radix-dropdown-menu-trigger-width)]">
+        <DropdownContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-[9px] p-1.5">
+          {relevant.length > 0 && (
+            <div className="px-2 pb-1.5 pt-1 text-[9.5px] font-semibold uppercase tracking-widest text-[var(--text-dim)]">
+              {label} · {relevant.length}
+            </div>
+          )}
           {relevant.length === 0 && (
-            <div className="px-3 py-2 text-[12px] text-[var(--text-faint)]">
-              No {label} credentials yet.
+            <div className="flex flex-col items-center gap-2 px-3 py-6 text-center">
+              <ProviderTile
+                provider={providers.find(p => p.id === primaryType)}
+                size={28}
+              />
+              <div>
+                <p className="text-[12.5px] font-medium text-[var(--text)]">No {label} yet</p>
+                <p className="text-[11px] text-[var(--text-faint)]">Connect one to use this node.</p>
+              </div>
             </div>
           )}
           {relevant.map(c => {
             const rowProvider = providers.find(p => p.id === c.type)
+            const active = value === c.id
             return (
-              <DropdownItem
+              <button
                 key={c.id}
+                type="button"
                 onClick={() => onChange(c.id)}
-                leftIcon={<ProviderTile provider={rowProvider} size={18} />}
-                rightIcon={
-                  value === c.id
-                    ? <Icons.Check style={{ width: 13, height: 13, color: 'var(--accent)' }} />
-                    : undefined
-                }
                 className={cn(
-                  value === c.id ? 'bg-surface-2 font-medium text-text' : 'text-text-mute'
+                  'group flex w-full items-center gap-2.5 rounded-[7px] px-2 py-1.5 text-left transition-colors',
+                  active
+                    ? 'bg-[color-mix(in_oklab,var(--accent)_16%,transparent)]'
+                    : 'hover:bg-[var(--surface)]',
                 )}
               >
-                <span className="truncate">{c.name}</span>
-              </DropdownItem>
+                <ProviderTile provider={rowProvider} size={22} />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className={cn(
+                    'truncate text-[12.5px]',
+                    active ? 'font-semibold text-[var(--text)]' : 'font-medium text-[var(--text)]',
+                  )}>
+                    {c.name}
+                  </span>
+                  <span className="truncate text-[10.5px] font-mono text-[var(--text-faint)]">
+                    {rowProvider?.type === 'oauth' ? 'OAuth' : 'API Key'} · {c.type}
+                  </span>
+                </span>
+                {active && (
+                  <Icons.Check style={{ width: 14, height: 14, color: 'var(--accent)' }} />
+                )}
+              </button>
             )
           })}
-          {relevant.length > 0 && <DropdownSeparator />}
-          <DropdownItem
+          {relevant.length > 0 && <DropdownSeparator className="!my-1.5" />}
+          <button
+            type="button"
             onClick={() => setShowConnect(true)}
-            leftIcon={<Icons.Plus />}
+            className={cn(
+              'flex w-full items-center gap-2.5 rounded-[7px] px-2 py-1.5 text-left transition-colors',
+              'hover:bg-[color-mix(in_oklab,var(--accent)_10%,transparent)]',
+            )}
           >
-            <span className="text-[var(--accent)]">Create new {label} credential</span>
-          </DropdownItem>
+            <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-[5px] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent)]">
+              <Icons.Plus style={{ width: 12, height: 12 }} />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="text-[12.5px] font-medium text-[var(--accent)]">
+                Connect new {label}
+              </span>
+              <span className="text-[10.5px] font-mono text-[var(--text-faint)]">
+                Opens the provider picker
+              </span>
+            </span>
+          </button>
         </DropdownContent>
       </Dropdown>
 
