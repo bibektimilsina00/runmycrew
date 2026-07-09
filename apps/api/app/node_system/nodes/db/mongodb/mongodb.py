@@ -10,9 +10,11 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.db._credential_resolver import resolve_credential
 
 
 class MongoDBProperties(BaseModel):
+    credential: str = ""
     connectionString: str = ""
     database: str = ""
     collection: str = ""
@@ -38,23 +40,44 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
             color="#ffffff",
             properties=[
                 {
-                    "name": "connectionString",
-                    "label": "Connection String",
-                    "type": "string",
+                    "name": "credential",
+                    "label": "MongoDB Account",
+                    "type": "credential",
+                    "credentialType": "mongodb_credentials",
                     "required": True,
-                    "placeholder": "mongodb://user:pass@host:27017",
                 },
                 {
                     "name": "database",
                     "label": "Database",
                     "type": "string",
                     "required": True,
+                    "remote": {
+                        "provider": "mongodb",
+                        "resource": "databases",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                 },
                 {
                     "name": "collection",
                     "label": "Collection",
                     "type": "string",
                     "required": True,
+                    "remote": {
+                        "provider": "mongodb",
+                        "resource": "collections",
+                        "params": {"database": "${database}"},
+                        "depends_on": ["database"],
+                        "allow_manual": True,
+                    },
+                },
+                {
+                    "name": "connectionString",
+                    "label": "Connection String (legacy)",
+                    "type": "string",
+                    "mode": "advanced",
+                    "placeholder": "mongodb://user:pass@host:27017",
                 },
                 {
                     "name": "operation",
@@ -112,9 +135,25 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
                 return {}
         return raw or {}
 
+    async def _resolve_uri(self, context: NodeContext) -> str:
+        cred_id = (self.props.credential or "").strip()
+        if cred_id:
+            data = await resolve_credential(cred_id, context.workspace_id)
+            if not data:
+                raise ValueError("MongoDB credential not found for this workspace.")
+            if dsn := data.get("connectionString") or data.get("uri"):
+                return str(dsn)
+            host = data.get("host") or "localhost"
+            port = data.get("port") or 27017
+            user = data.get("user") or data.get("username") or ""
+            pw = data.get("password") or ""
+            auth = f"{user}:{pw}@" if user else ""
+            return f"mongodb://{auth}{host}:{port}"
+        if self.props.connectionString.strip():
+            return self.props.connectionString
+        raise ValueError("Select a credential or paste a connection string.")
+
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
-        if not self.props.connectionString.strip():
-            return NodeResult(success=False, error="connectionString is required")
         if not self.props.database.strip():
             return NodeResult(success=False, error="database is required")
         if not self.props.collection.strip():
@@ -125,11 +164,16 @@ class MongoDBNode(BaseNode[MongoDBProperties]):
         except ImportError:
             return NodeResult(success=False, error="motor not installed. Run: pip install motor")
 
+        try:
+            uri = await self._resolve_uri(context)
+        except ValueError as e:
+            return NodeResult(success=False, error=str(e))
+
         query = self._parse_json_prop(self.props.query)
         update = self._parse_json_prop(self.props.update)
 
         try:
-            client = motor.AsyncIOMotorClient(self.props.connectionString)
+            client = motor.AsyncIOMotorClient(uri)
             db = client[self.props.database]
             coll = db[self.props.collection]
 

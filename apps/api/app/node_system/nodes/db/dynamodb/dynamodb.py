@@ -38,20 +38,52 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
             icon="dynamodb",
             color="#ff9900",
             properties=[
-                {"name": "region", "label": "AWS Region", "type": "string", "default": "us-east-1"},
                 {
-                    "name": "accessKeyId",
-                    "label": "Access Key ID",
+                    "name": "credential",
+                    "label": "AWS Account",
+                    "type": "credential",
+                    "credentialType": "aws_credentials",
+                    "required": True,
+                },
+                {
+                    "name": "region",
+                    "label": "AWS Region",
+                    "type": "string",
+                    "default": "us-east-1",
+                    "remote": {
+                        "provider": "aws",
+                        "resource": "regions",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
+                },
+                {
+                    "name": "tableName",
+                    "label": "Table",
                     "type": "string",
                     "required": True,
+                    "remote": {
+                        "provider": "aws",
+                        "resource": "dynamodb_tables",
+                        "params": {"region": "${region}"},
+                        "depends_on": ["region"],
+                        "allow_manual": True,
+                    },
+                },
+                {
+                    "name": "accessKeyId",
+                    "label": "Access Key ID (legacy)",
+                    "type": "string",
+                    "mode": "advanced",
                 },
                 {
                     "name": "secretAccessKey",
-                    "label": "Secret Access Key",
+                    "label": "Secret Access Key (legacy)",
                     "type": "string",
-                    "required": True,
+                    "secret": True,
+                    "mode": "advanced",
                 },
-                {"name": "tableName", "label": "Table Name", "type": "string", "required": True},
                 {
                     "name": "operation",
                     "label": "Operation",
@@ -111,6 +143,27 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
                 return {}
         return raw or {}
 
+    async def _resolve_aws_creds(self, context: NodeContext) -> dict[str, str]:
+        from apps.api.app.node_system.nodes.db._credential_resolver import resolve_credential
+
+        cred_id = (self.props.credential or "").strip()
+        if cred_id:
+            data = await resolve_credential(cred_id, context.workspace_id)
+            if not data:
+                raise ValueError("AWS credential not found for this workspace.")
+            return {
+                "aws_access_key_id": data.get("access_key_id")
+                or data.get("aws_access_key_id")
+                or "",
+                "aws_secret_access_key": data.get("secret_access_key")
+                or data.get("aws_secret_access_key")
+                or "",
+            }
+        return {
+            "aws_access_key_id": self.props.accessKeyId,
+            "aws_secret_access_key": self.props.secretAccessKey,
+        }
+
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
         if not self.props.tableName.strip():
             return NodeResult(success=False, error="tableName is required")
@@ -122,9 +175,13 @@ class DynamoDBNode(BaseNode[DynamoDBProperties]):
                 success=False, error="aioboto3 not installed. Run: pip install aioboto3"
             )
 
+        try:
+            aws = await self._resolve_aws_creds(context)
+        except ValueError as e:
+            return NodeResult(success=False, error=str(e))
+
         session = aioboto3.Session(
-            aws_access_key_id=self.props.accessKeyId,
-            aws_secret_access_key=self.props.secretAccessKey,
+            **aws,
             region_name=self.props.region,
         )
         op = self.props.operation

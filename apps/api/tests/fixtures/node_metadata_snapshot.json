@@ -17611,27 +17611,53 @@
     ],
     "properties": [
       {
+        "credentialType": "aws_credentials",
+        "label": "AWS Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
         "default": "us-east-1",
         "label": "AWS Region",
         "name": "region",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "aws",
+          "resource": "regions"
+        },
         "type": "string"
       },
       {
-        "label": "Access Key ID",
-        "name": "accessKeyId",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "label": "Secret Access Key",
-        "name": "secretAccessKey",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "label": "Table Name",
+        "label": "Table",
         "name": "tableName",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "region"
+          ],
+          "params": {
+            "region": "${region}"
+          },
+          "provider": "aws",
+          "resource": "dynamodb_tables"
+        },
         "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Access Key ID (legacy)",
+        "mode": "advanced",
+        "name": "accessKeyId",
+        "type": "string"
+      },
+      {
+        "label": "Secret Access Key (legacy)",
+        "mode": "advanced",
+        "name": "secretAccessKey",
+        "secret": true,
         "type": "string"
       },
       {
@@ -51513,22 +51539,47 @@
     ],
     "properties": [
       {
-        "label": "Connection String",
-        "name": "connectionString",
-        "placeholder": "mongodb://user:pass@host:27017",
+        "credentialType": "mongodb_credentials",
+        "label": "MongoDB Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "label": "Database",
         "name": "database",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mongodb",
+          "resource": "databases"
+        },
         "required": true,
         "type": "string"
       },
       {
         "label": "Collection",
         "name": "collection",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "database"
+          ],
+          "params": {
+            "database": "${database}"
+          },
+          "provider": "mongodb",
+          "resource": "collections"
+        },
         "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Connection String (legacy)",
+        "mode": "advanced",
+        "name": "connectionString",
+        "placeholder": "mongodb://user:pass@host:27017",
         "type": "string"
       },
       {
@@ -51920,11 +51971,11 @@
     ],
     "properties": [
       {
-        "label": "Connection String",
-        "name": "connectionString",
-        "placeholder": "mysql://user:pass@host:3306/dbname",
+        "credentialType": "mysql_credentials",
+        "label": "MySQL Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "query",
@@ -51943,6 +51994,36 @@
         "type": "options"
       },
       {
+        "label": "Database / Schema",
+        "mode": "advanced",
+        "name": "schema",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mysql",
+          "resource": "schemas"
+        },
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "mode": "advanced",
+        "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "schema"
+          ],
+          "params": {
+            "schema": "${schema}"
+          },
+          "provider": "mysql",
+          "resource": "tables"
+        },
+        "type": "string"
+      },
+      {
         "label": "SQL",
         "name": "sql",
         "placeholder": "SELECT * FROM users WHERE id = %s",
@@ -51956,6 +52037,13 @@
         "mode": "advanced",
         "name": "params",
         "type": "json"
+      },
+      {
+        "label": "Connection String (legacy)",
+        "mode": "advanced",
+        "name": "connectionString",
+        "placeholder": "mysql://user:pass@host:3306/dbname",
+        "type": "string"
       },
       {
         "default": 0,
@@ -52016,27 +52104,36 @@
     ],
     "properties": [
       {
-        "default": "bolt://localhost:7687",
-        "label": "URI",
-        "name": "uri",
-        "type": "string"
-      },
-      {
-        "default": "neo4j",
-        "label": "Username",
-        "name": "username",
-        "type": "string"
-      },
-      {
-        "label": "Password",
-        "name": "password",
+        "credentialType": "neo4j_credentials",
+        "label": "Neo4j Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "neo4j",
         "label": "Database",
         "name": "database",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "neo4j",
+          "resource": "databases"
+        },
+        "type": "string"
+      },
+      {
+        "label": "Node Label",
+        "mode": "advanced",
+        "name": "label",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "neo4j",
+          "resource": "labels"
+        },
         "type": "string"
       },
       {
@@ -52053,6 +52150,26 @@
         "mode": "advanced",
         "name": "params",
         "type": "json"
+      },
+      {
+        "label": "URI (legacy)",
+        "mode": "advanced",
+        "name": "uri",
+        "placeholder": "bolt://localhost:7687",
+        "type": "string"
+      },
+      {
+        "label": "Username (legacy)",
+        "mode": "advanced",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Password (legacy)",
+        "mode": "advanced",
+        "name": "password",
+        "secret": true,
+        "type": "string"
       },
       {
         "default": 0,
