@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
+import { Loader2, PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { useAppConfig } from '../hooks/useAppConfig'
 import { useAppSession, useAppendMessage } from '../hooks/useAppSession'
 import { useSendMessage } from '../hooks/useSendMessage'
@@ -9,13 +9,16 @@ import { AppHeader } from '../components/AppHeader'
 import { MessageBubble } from '../components/MessageBubble'
 import { WelcomeState } from '../components/WelcomeState'
 import { InputBar } from '../components/InputBar'
+import { CanvasView } from '../components/CanvasView'
 import type { AppMessage } from '../types/publicAppTypes'
+import type { Artifact } from '../types/artifactTypes'
 
 /**
  * Public chat page for /apps/:workspaceSlug/:appSlug.
  *
- * Renders with zero app chrome — no sidebar, no editor UI. The workflow's
- * output owns the frame.
+ * Two-pane layout: chat left, artifact canvas right. Canvas collapses when
+ * empty (chat expands to full width) and pops open the moment any node
+ * emits an artifact. Mobile drops the canvas into a slide-up sheet.
  */
 export function PublicApp() {
   const params = useParams<{ workspaceSlug: string; appSlug: string }>()
@@ -27,19 +30,45 @@ export function PublicApp() {
   const append = useAppendMessage(ws, slug)
   const [pending, setPending] = useState<AppMessage | null>(null)
   const [draft, setDraft] = useState('')
+  // Canvas starts hidden and unlocks the first time an artifact arrives.
+  // We track a "user override" separately so once the visitor clicks the
+  // toggle, we respect that choice from then on.
+  const [canvasUserOpen, setCanvasUserOpen] = useState<boolean | null>(null)
 
   const { state: sendState, send, cancel } = useSendMessage(ws, slug, (finalMsg) => {
     append(finalMsg)
     setPending(null)
   })
 
-  // Add the user turn locally so the transcript renders it immediately
-  // (server already persisted it — we just need it in-view).
   const optimistic = useMemo(() => {
     const messages = sessionQuery.data?.messages ?? []
     if (!pending) return messages
     return [...messages, pending]
   }, [sessionQuery.data?.messages, pending])
+
+  // Every artifact across the transcript + the in-flight assistant message,
+  // deduped by id so a rerender doesn't duplicate stream frames.
+  const artifacts = useMemo<Artifact[]>(() => {
+    const seen = new Set<string>()
+    const out: Artifact[] = []
+    for (const m of optimistic) {
+      for (const a of (m.artifacts as Artifact[]) ?? []) {
+        if (a?.id && !seen.has(a.id)) {
+          seen.add(a.id)
+          out.push(a)
+        }
+      }
+    }
+    for (const a of (sendState.assistant?.artifacts as Artifact[]) ?? []) {
+      if (a?.id && !seen.has(a.id)) {
+        seen.add(a.id)
+        out.push(a)
+      }
+    }
+    return out
+  }, [optimistic, sendState.assistant?.artifacts])
+
+  const canvasOpen = canvasUserOpen ?? artifacts.length > 0
 
   const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -89,6 +118,7 @@ export function PublicApp() {
 
   const app = configQuery.data
   const isEmpty = optimistic.length === 0
+  const canvasVisible = canvasOpen && artifacts.length > 0
 
   return (
     <ThemeProvider config={app.config}>
@@ -104,43 +134,81 @@ export function PublicApp() {
         <AppHeader
           app={app}
           onNewChat={() => {
-            // Clears local view; the cookie session persists on server for history.
             sessionQuery.refetch()
             setPending(null)
           }}
         />
 
-        <main className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-4 pb-6 pt-4 sm:px-6">
-          <div ref={scrollRef} className="flex flex-1 flex-col gap-6 overflow-y-auto pb-24 pt-4">
-            {isEmpty ? (
-              <WelcomeState app={app} onPickPrompt={p => sendDraft(p)} />
-            ) : (
-              <>
-                {optimistic.map(m => (
-                  <MessageBubble key={m.id} message={m} />
-                ))}
-                {sendState.assistant && (
-                  <MessageBubble message={sendState.assistant} streaming />
+        {/* Two-pane body: chat + canvas. Canvas hides on mobile below lg
+            unless the user explicitly opens it, at which point it slides
+            up as a bottom sheet. */}
+        <div className="flex min-h-0 flex-1">
+          <section className="flex min-w-0 flex-1 flex-col">
+            <main className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-4 sm:px-6">
+              <div ref={scrollRef} className="flex flex-1 flex-col gap-6 overflow-y-auto pb-24 pt-4">
+                {isEmpty ? (
+                  <WelcomeState app={app} onPickPrompt={p => sendDraft(p)} />
+                ) : (
+                  <>
+                    {optimistic.map(m => (
+                      <MessageBubble key={m.id} message={m} />
+                    ))}
+                    {sendState.assistant && (
+                      <MessageBubble message={sendState.assistant} streaming />
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </div>
-        </main>
+              </div>
+            </main>
 
-        <div className="sticky bottom-0 z-20 border-t border-white/5 bg-[#0b0b0f]/85 px-4 py-3 backdrop-blur sm:px-6">
-          <InputBar
-            value={draft}
-            onChange={setDraft}
-            onSubmit={() => sendDraft()}
-            onCancel={cancel}
-            disabled={sessionQuery.isLoading}
-            isStreaming={sendState.status === 'streaming' || sendState.status === 'sending'}
-            placeholder={`Message ${app.title}…`}
-          />
-          {app.config.show_powered_by !== false && (
-            <p className="mt-2 text-center text-[10.5px] text-white/30">
-              Powered by <span className="text-white/50">Fuse</span>
-            </p>
+            <div className="sticky bottom-0 z-20 border-t border-white/5 bg-[#0b0b0f]/85 px-4 py-3 backdrop-blur sm:px-6">
+              <div className="mx-auto flex w-full max-w-[860px] items-end gap-2">
+                <div className="flex-1">
+                  <InputBar
+                    value={draft}
+                    onChange={setDraft}
+                    onSubmit={() => sendDraft()}
+                    onCancel={cancel}
+                    disabled={sessionQuery.isLoading}
+                    isStreaming={sendState.status === 'streaming' || sendState.status === 'sending'}
+                    placeholder={`Message ${app.title}…`}
+                  />
+                </div>
+                {artifacts.length > 0 && (
+                  <button
+                    onClick={() => setCanvasUserOpen(v => !(v ?? artifacts.length > 0))}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/70 transition hover:bg-white/[0.08] hover:text-white lg:hidden"
+                    title={canvasOpen ? 'Hide canvas' : 'Show canvas'}
+                  >
+                    {canvasOpen ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
+                  </button>
+                )}
+              </div>
+              {app.config.show_powered_by !== false && (
+                <p className="mt-2 text-center text-[10.5px] text-white/30">
+                  Powered by <span className="text-white/50">Fuse</span>
+                </p>
+              )}
+            </div>
+          </section>
+
+          {/* Canvas — desktop side pane */}
+          {canvasVisible && (
+            <CanvasView
+              artifacts={artifacts}
+              className="hidden w-[42%] max-w-[560px] lg:flex"
+            />
+          )}
+          {/* Canvas — mobile sheet */}
+          {canvasVisible && (
+            <div className="fixed inset-x-0 bottom-0 top-[64px] z-40 lg:hidden">
+              <CanvasView
+                artifacts={artifacts}
+                onClose={() => setCanvasUserOpen(false)}
+
+                className="h-full"
+              />
+            </div>
           )}
         </div>
       </div>

@@ -76,6 +76,10 @@ class WorkflowRunner:
         # nothing reads from this map; it's populated as nodes complete so
         # the data is ready when PR4 lights up the resolver.
         self._output_items: dict[str, list[NodeItem]] = {}
+        # Every artifact any node emitted during this run (explicit or
+        # detected). Accumulated so the terminal task can attach the full
+        # list to the assistant message even if the SSE stream disconnected.
+        self._collected_artifacts: list = []
         self._failed = asyncio.Event()
         self._error_message: str | None = None
         self._depth = _depth
@@ -440,6 +444,25 @@ class WorkflowRunner:
             async with self._lock:
                 self._outputs[node_id] = result.output_data
                 self._output_items[node_id] = items
+
+            # Merge explicit + detected artifacts, stamp source, then emit
+            # one `artifact.emitted` event per artifact so streaming clients
+            # (public app canvas, run-log inspector) can render them as
+            # they arrive rather than waiting for the run to finish.
+            from apps.api.app.features.apps.artifact_detection import detect_artifacts
+
+            explicit = list(getattr(result, "artifacts", []) or [])
+            detected = detect_artifacts(result.output_data or {}, source_node_id=node_id)
+            all_artifacts = [
+                a.with_source(node_id) if a.metadata.get("source_node_id") is None else a
+                for a in explicit
+            ] + detected
+            if all_artifacts:
+                self._collected_artifacts.extend(all_artifacts)
+                for art in all_artifacts:
+                    await self._emit(
+                        "artifact_emitted", {"node_id": node_id, "artifact": art.model_dump()}
+                    )
 
             await self._emit("node_completed", {"node_id": node_id, "output": result.output_data})
             await self._log(

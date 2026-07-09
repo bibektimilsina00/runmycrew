@@ -472,6 +472,7 @@ async def _run_app_message(
     }
 
     final_output: dict[str, Any] = {}
+    collected_artifacts: list[dict] = []
     error_msg: str | None = None
     tokens = 0
     cost_usd = 0.0
@@ -491,6 +492,12 @@ async def _run_app_message(
             if persona_id:
                 runner.variables["_persona_overlay_id"] = persona_id
             final_output = await runner.run(trigger_data) or {}
+            # Pull the runner's accumulated artifacts BEFORE the session
+            # closes — after we exit the async-with the runner is dead.
+            collected_artifacts = [
+                a.model_dump() if hasattr(a, "model_dump") else a
+                for a in runner._collected_artifacts
+            ]
 
         # Aggregate usage from any agent_usage snapshots the runner produced.
         for value in _walk_dict(final_output):
@@ -514,7 +521,19 @@ async def _run_app_message(
         await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
 
     latency_ms = int((time.time() - started_at) * 1000)
-    reply_text, artifacts = _extract_reply(final_output)
+    reply_text, inline_artifacts = _extract_reply(final_output)
+    # Merge: any artifacts a node explicitly returned in its output_data
+    # (rare) come last so runner-collected ones (which include auto-detected
+    # + node-attached) win the id de-dup.
+    seen_ids: set[str] = set()
+    artifacts: list[dict] = []
+    for a in collected_artifacts + inline_artifacts:
+        aid = a.get("id") if isinstance(a, dict) else None
+        if aid and aid in seen_ids:
+            continue
+        if aid:
+            seen_ids.add(aid)
+        artifacts.append(a)
 
     async with AsyncSessionLocal() as db:
         message_repo = AppMessageRepository(db)

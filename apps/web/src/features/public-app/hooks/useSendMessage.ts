@@ -94,12 +94,33 @@ export function useSendMessage(
 
       es.addEventListener('artifact', ev => {
         try {
-          const artifact = JSON.parse((ev as MessageEvent).data)
-          setState(s =>
-            s.assistant
-              ? { ...s, assistant: { ...s.assistant, artifacts: [...s.assistant.artifacts, artifact] } }
-              : s,
-          )
+          const parsed = JSON.parse((ev as MessageEvent).data)
+          // Runner emits `{node_id, artifact}`; older shape was the bare
+          // artifact — support both.
+          const artifact = parsed?.artifact ?? parsed
+          if (artifact) {
+            setState(s =>
+              s.assistant
+                ? { ...s, assistant: { ...s.assistant, artifacts: [...s.assistant.artifacts, artifact] } }
+                : s,
+            )
+          }
+        } catch {
+          // ignore
+        }
+      })
+
+      es.addEventListener('artifact_emitted', ev => {
+        try {
+          const parsed = JSON.parse((ev as MessageEvent).data)
+          const artifact = parsed?.artifact ?? parsed
+          if (artifact) {
+            setState(s =>
+              s.assistant
+                ? { ...s, assistant: { ...s.assistant, artifacts: [...s.assistant.artifacts, artifact] } }
+                : s,
+            )
+          }
         } catch {
           // ignore
         }
