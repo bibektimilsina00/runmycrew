@@ -363,3 +363,213 @@ async def _run_crew(
 
         await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
         raise
+
+
+@celery_app.task(name="execute_app_message")
+def execute_app_message(
+    execution_id: str,
+    published_app_id: str,
+    session_id: str,
+    assistant_message_id: str,
+    user_message: str,
+    form_data: dict | None = None,
+):
+    """Run one turn of a published-app chat.
+
+    Loads the pinned graph snapshot, injects the visitor's message +
+    session history + user_id as the trigger payload, streams events
+    over the same Redis pub/sub channel the SSE endpoint subscribes to,
+    then persists the final assistant reply + artifacts on the
+    AppMessage placeholder.
+    """
+    try:
+        asyncio.run(
+            _run_app_message(
+                execution_id,
+                published_app_id,
+                session_id,
+                assistant_message_id,
+                user_message,
+                form_data or {},
+            )
+        )
+    except Exception as e:
+        logger.error(f"execute_app_message task failed: {e}", exc_info=True)
+
+
+async def _run_app_message(
+    execution_id: str,
+    published_app_id: str,
+    session_id: str,
+    assistant_message_id: str,
+    user_message: str,
+    form_data: dict,
+):
+    import time
+
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.execution_engine.engine.event_emitter import RedisEventEmitter
+    from apps.api.app.execution_engine.engine.workflow_runner import (
+        CancelledException,
+        WorkflowRunner,
+    )
+    from apps.api.app.features.apps.repository import (
+        AppMessageRepository,
+        AppSessionRepository,
+        PublishedAppRepository,
+    )
+    from apps.api.app.features.credentials.service import CredentialService
+
+    started_at = time.time()
+
+    workspace_id_str: str | None = None
+    credentials_list: list[dict[str, Any]] = []
+    graph: dict[str, Any] = {}
+    history_messages: list[dict[str, Any]] = []
+    allow_history = True
+    persona_id: str | None = None
+    user_id_for_run: uuid.UUID | None = None
+
+    async with AsyncSessionLocal() as db:
+        app_repo = PublishedAppRepository(db)
+        session_repo = AppSessionRepository(db)
+        message_repo = AppMessageRepository(db)
+        app = await app_repo.get_by_id(uuid.UUID(published_app_id))
+        if not app:
+            logger.error(f"published app {published_app_id} not found")
+            return
+        session = await session_repo.get_by_id(uuid.UUID(session_id))
+        if not session:
+            logger.error(f"app session {session_id} not found")
+            return
+        workspace_id_str = str(app.workspace_id)
+        graph = app.graph_snapshot or {"nodes": [], "edges": []}
+        cfg = app.config or {}
+        allow_history = bool(cfg.get("allow_history", True))
+        persona_id = cfg.get("system_persona_id")
+        user_id_for_run = app.published_by  # crew/agent runs charge against publisher
+
+        # Load prior messages when history is on.
+        if allow_history:
+            prior = await message_repo.list_by_session(session.id, limit=20)
+            for m in prior:
+                if m.role in ("user", "assistant") and m.content:
+                    history_messages.append({"role": m.role, "content": m.content})
+
+        credential_service = CredentialService(db)
+        credentials_list = await credential_service.list_decrypted_for_user(user_id_for_run)
+
+    emitter = RedisEventEmitter(execution_id, workspace_id=workspace_id_str)
+    await emitter.emit("execution_started", {"kind": "app_message"})
+
+    trigger_data = {
+        "message": user_message,
+        "session_id": session_id,
+        "user_id": None,
+        "files": [],
+        "form_data": form_data,
+        "history": history_messages,
+    }
+
+    final_output: dict[str, Any] = {}
+    error_msg: str | None = None
+    tokens = 0
+    cost_usd = 0.0
+
+    try:
+        async with AsyncSessionLocal() as db:
+            runner = WorkflowRunner(
+                workflow_id=str(app.workflow_id),
+                execution_id=execution_id,
+                graph=graph,
+                db=db,
+                credentials=credentials_list,
+                emitter=emitter,
+                workspace_id=workspace_id_str,
+            )
+            # Persona overlay for the first agent node in the graph.
+            if persona_id:
+                runner.variables["_persona_overlay_id"] = persona_id
+            final_output = await runner.run(trigger_data) or {}
+
+        # Aggregate usage from any agent_usage snapshots the runner produced.
+        for value in _walk_dict(final_output):
+            if isinstance(value, dict) and "total_cost_usd" in value:
+                cost_usd += float(value.get("total_cost_usd") or 0.0)
+            if isinstance(value, dict) and "total_input_tokens" in value:
+                tokens += int(value.get("total_input_tokens") or 0) + int(
+                    value.get("total_output_tokens") or 0
+                )
+
+        await emitter.emit(
+            "execution_completed",
+            {"status": "completed", "output": final_output},
+        )
+    except CancelledException:
+        await emitter.emit("execution_cancelled", {"status": "cancelled"})
+        error_msg = "Cancelled"
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"app-message execution {execution_id} failed: {error_msg}")
+        await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
+
+    latency_ms = int((time.time() - started_at) * 1000)
+    reply_text, artifacts = _extract_reply(final_output)
+
+    async with AsyncSessionLocal() as db:
+        message_repo = AppMessageRepository(db)
+        session_repo = AppSessionRepository(db)
+        msg = await message_repo.get_by_id(uuid.UUID(assistant_message_id))
+        if msg:
+            await message_repo.update(
+                msg,
+                {
+                    "content": reply_text if reply_text else (error_msg or ""),
+                    "artifacts": artifacts,
+                    "tokens": tokens,
+                    "cost_usd": cost_usd,
+                    "latency_ms": latency_ms,
+                    "is_error": error_msg is not None,
+                },
+            )
+        session = await session_repo.get_by_id(uuid.UUID(session_id))
+        if session:
+            await session_repo.update(
+                session,
+                {
+                    "message_count": (session.message_count or 0) + 2,
+                    "total_cost_usd": (session.total_cost_usd or 0.0) + cost_usd,
+                    "total_tokens": (session.total_tokens or 0) + tokens,
+                },
+            )
+
+
+def _walk_dict(obj):
+    """Recursively yield every dict value in obj — for usage aggregation."""
+    if isinstance(obj, dict):
+        for v in obj.values():
+            yield v
+            yield from _walk_dict(v)
+    elif isinstance(obj, list):
+        for item in obj:
+            yield from _walk_dict(item)
+
+
+def _extract_reply(output: dict) -> tuple[str, list[dict]]:
+    """Pull a text reply + artifact list from a workflow's final output.
+
+    Nodes emit their final output under `output_data` on `NodeResult`.
+    We look for the most common assistant-reply shapes:
+    - agent nodes → `output.content` (str)
+    - evaluator/planner → `output.tasks` / `output.scores` (rendered as JSON)
+    - anything with `artifacts` list is forwarded
+    """
+    text = ""
+    artifacts: list[dict] = []
+    if isinstance(output, dict):
+        if isinstance(output.get("content"), str):
+            text = output["content"]
+        arts = output.get("artifacts")
+        if isinstance(arts, list):
+            artifacts = arts
+    return text, artifacts

@@ -3,6 +3,8 @@ from fastapi import APIRouter
 from apps.api.app.features.a2a.router import router as a2a_router
 from apps.api.app.features.ai.router import router as ai_router
 from apps.api.app.features.api_keys.router import router as api_keys_router
+from apps.api.app.features.apps.owner_router import router as apps_owner_router
+from apps.api.app.features.apps.public_router import router as apps_public_router
 from apps.api.app.features.assets.router import router as assets_router
 from apps.api.app.features.auth.router import router as auth_router
 from apps.api.app.features.collaboration.websocket import router as collaboration_ws_router
@@ -39,6 +41,8 @@ router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(users_router, prefix="/users", tags=["users"])
 router.include_router(api_keys_router, prefix="/api-keys", tags=["api-keys"])
 router.include_router(workflows_router, prefix="/workflows", tags=["workflows"])
+router.include_router(apps_owner_router, prefix="/workflows", tags=["apps"])
+router.include_router(apps_public_router, prefix="/apps", tags=["apps"])
 router.include_router(crews_router, prefix="/crews", tags=["crews"])
 router.include_router(personas_router, prefix="/personas", tags=["personas"])
 router.include_router(workspaces_router, prefix="/workspaces", tags=["workspaces"])

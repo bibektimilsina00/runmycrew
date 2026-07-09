@@ -86,6 +86,11 @@ export const API_ROUTES = {
   CREW_RUN: (id: string) => `/crews/${id}/run`,
   CREW_EXECUTIONS: (id: string) => `/crews/${id}/executions`,
 
+  // Publish-as-App — owner endpoints under /workflows/:id
+  WORKFLOW_PUBLISH: (id: string) => `/workflows/${id}/publish`,
+  WORKFLOW_APP: (id: string) => `/workflows/${id}/app`,
+  WORKFLOW_APP_VERSIONS: (id: string) => `/workflows/${id}/app/versions`,
+
   // Personas (reusable named agents that overlay onto action.agent nodes)
   PERSONAS: '/personas/',
   PERSONA_GET: (id: string) => `/personas/${id}`,

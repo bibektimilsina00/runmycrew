@@ -83,6 +83,7 @@ from apps.api.app.node_system.nodes.clerk.clerk_node import ClerkNode
 from apps.api.app.node_system.nodes.clickhouse.clickhouse_node import ClickHouseCloudNode
 from apps.api.app.node_system.nodes.cloudflare.cloudflare_node import CloudflareNode
 from apps.api.app.node_system.nodes.codepipeline.codepipeline_node import AWSCodePipelineNode
+from apps.api.app.node_system.nodes.common.chat_app_trigger.trigger import ChatAppTriggerNode
 from apps.api.app.node_system.nodes.common.condition.condition import ConditionNode
 from apps.api.app.node_system.nodes.common.cron.cron_node import CronTriggerNode
 from apps.api.app.node_system.nodes.common.delay.delay import DelayNode
@@ -444,6 +445,7 @@ node_registry = NodeRegistry()
 
 # Register builtin nodes
 node_registry.register(TriggerNode)
+node_registry.register(ChatAppTriggerNode)
 node_registry.register(CronTriggerNode)
 node_registry.register(AgentNode)
 node_registry.register(AgentCrewNode)
