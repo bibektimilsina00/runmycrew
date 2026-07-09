@@ -14,6 +14,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -30,7 +31,12 @@ MANIFEST = ProviderManifest(
     fields=[
         FieldSpec(name="candidate_id", label="Candidate ID", type="string"),
         FieldSpec(name="application_id", label="Application ID", type="string"),
-        FieldSpec(name="job_id", label="Job ID", type="string"),
+        FieldSpec(
+            name="job_id",
+            label="Job",
+            type="string",
+            remote=RemoteLookup(provider="ashby", resource="jobs"),
+        ),
         FieldSpec(name="first_name", label="First Name", type="string"),
         FieldSpec(name="last_name", label="Last Name", type="string"),
         FieldSpec(name="email", label="Email", type="string"),

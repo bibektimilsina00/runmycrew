@@ -9,6 +9,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -31,7 +32,13 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="password", label="Password", type="string", secret=True),
         FieldSpec(name="top", label="Top", type="number", default=25, mode="advanced"),
         FieldSpec(name="filter", label="Filter", type="string", mode="advanced"),
-        FieldSpec(name="entity", label="Entity (plural)", type="string", placeholder="accounts"),
+        FieldSpec(
+            name="entity",
+            label="Entity",
+            type="string",
+            placeholder="accounts",
+            remote=RemoteLookup(provider="dataverse", resource="entities"),
+        ),
         FieldSpec(name="record_id", label="Record GUID", type="string"),
         FieldSpec(name="select", label="Select", type="string", mode="advanced"),
         FieldSpec(name="data", label="Data (JSON)", type="json", default={}),

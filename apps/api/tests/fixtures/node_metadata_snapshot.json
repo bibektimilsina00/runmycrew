@@ -4879,8 +4879,15 @@
             "get_job"
           ]
         },
-        "label": "Job ID",
+        "label": "Job",
         "name": "job_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "ashby",
+          "resource": "jobs"
+        },
         "type": "string"
       },
       {
@@ -8641,8 +8648,15 @@
             "get_pipeline_run"
           ]
         },
-        "label": "Pipeline ID",
+        "label": "Pipeline",
         "name": "pipeline_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "azure_devops",
+          "resource": "pipelines"
+        },
         "type": "number"
       },
       {
@@ -32055,8 +32069,15 @@
             "list_applications"
           ]
         },
-        "label": "Job ID",
+        "label": "Job",
         "name": "job_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "greenhouse",
+          "resource": "jobs"
+        },
         "type": "string"
       },
       {
@@ -49274,9 +49295,16 @@
             "disassociate"
           ]
         },
-        "label": "Entity (plural)",
+        "label": "Entity",
         "name": "entity",
         "placeholder": "accounts",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "dataverse",
+          "resource": "entities"
+        },
         "type": "string"
       },
       {
