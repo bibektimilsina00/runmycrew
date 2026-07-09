@@ -143,7 +143,14 @@ class GoogleSheetsTriggerNode(BaseNode[GoogleSheetsTriggerProperties]):
                 {
                     "name": "sheet_name",
                     "label": "Sheet (tab)",
-                    "type": "gsheet-tab",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "sheet_tabs",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "typeOptions": {"valueAs": "title"},
                     "default": "Sheet1",
                     "required": True,

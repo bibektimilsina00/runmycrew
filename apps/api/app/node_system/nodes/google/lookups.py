@@ -227,6 +227,34 @@ async def _yt_channels(client, cred, _params, _cursor, q):  # noqa: ANN001
     return LookupResponse(items=items)
 
 
+async def _yt_videos(client, cred, _params, cursor, q):  # noqa: ANN001
+    # Own uploads playlist via `mine=true` on search endpoint.
+    r = await client.get(
+        "https://youtube.googleapis.com/youtube/v3/search",
+        headers=_headers(cred),
+        params={
+            "part": "snippet",
+            "forMine": "true",
+            "type": "video",
+            "maxResults": 50,
+            **({"pageToken": cursor} if cursor else {}),
+            **({"q": q} if q else {}),
+        },
+    )
+    r.raise_for_status()
+    payload = r.json()
+    items = [
+        LookupItem(
+            id=v["id"].get("videoId"),
+            label=(v.get("snippet") or {}).get("title") or v["id"].get("videoId"),
+            sublabel=(v.get("snippet") or {}).get("channelTitle"),
+        )
+        for v in payload.get("items", [])
+    ]
+    next_cursor = payload.get("nextPageToken")
+    return LookupResponse(items=items, cursor=next_cursor, has_more=bool(next_cursor))
+
+
 async def _yt_playlists(client, cred, _params, cursor, q):  # noqa: ANN001
     r = await client.get(
         "https://youtube.googleapis.com/youtube/v3/playlists",
@@ -373,6 +401,7 @@ LOOKUPS = {
     "tasklists": _tasklists,
     "yt_channels": _yt_channels,
     "yt_playlists": _yt_playlists,
+    "yt_videos": _yt_videos,
     "chat_spaces": _chat_spaces,
     "ga4_properties": _ga4_properties,
     "gsc_sites": _gsc_sites,

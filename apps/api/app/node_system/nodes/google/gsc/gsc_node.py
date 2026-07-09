@@ -312,7 +312,14 @@ class GoogleSearchConsoleNode(BaseNode[GoogleSearchConsoleProperties]):
                 {
                     "name": "site",
                     "label": "Site",
-                    "type": "gsc-site",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "gsc_sites",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(
                         "query_search_analytics",

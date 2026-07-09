@@ -110,7 +110,14 @@ class GoogleTasksTriggerNode(BaseNode[GoogleTasksTriggerProperties]):
                 {
                     "name": "tasklist_id",
                     "label": "Tasklist",
-                    "type": "gtasks-tasklist",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "tasklists",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                 },
                 {

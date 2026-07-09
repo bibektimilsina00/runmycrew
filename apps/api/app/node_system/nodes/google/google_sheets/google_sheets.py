@@ -304,7 +304,14 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 {
                     "name": "source_sheet_id",
                     "label": "Source sheet",
-                    "type": "gsheet-tab",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "sheet_tabs",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "typeOptions": {"valueAs": "sheet_id"},
                     "condition": _cond("duplicate_sheet"),
@@ -312,7 +319,14 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 {
                     "name": "sheet_id_num",
                     "label": "Sheet",
-                    "type": "gsheet-tab",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "sheet_tabs",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "typeOptions": {"valueAs": "sheet_id"},
                     "condition": _cond_any("delete_sheet", "rename_sheet"),
@@ -345,7 +359,14 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 {
                     "name": "sheet_name",
                     "label": "Scope to sheet",
-                    "type": "gsheet-tab",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "sheet_tabs",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "typeOptions": {"valueAs": "title"},
                     "description": "Leave blank to search every sheet.",
                     "condition": _cond("find_replace"),
@@ -373,7 +394,14 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 {
                     "name": "sheet_name",
                     "label": "Sheet (tab)",
-                    "type": "gsheet-tab",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "sheet_tabs",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "typeOptions": {"valueAs": "title"},
                     "required": True,
                     "condition": _cond_any(

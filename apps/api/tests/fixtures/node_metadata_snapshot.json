@@ -21221,8 +21221,15 @@
         },
         "label": "Property",
         "name": "property",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "ga4_properties"
+        },
         "required": true,
-        "type": "ga4-property"
+        "type": "string"
       },
       {
         "condition": {
@@ -22419,8 +22426,15 @@
         },
         "label": "Space",
         "name": "space",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "chat_spaces"
+        },
         "required": true,
-        "type": "gchat-space"
+        "type": "string"
       },
       {
         "condition": {
@@ -22767,8 +22781,15 @@
         },
         "label": "Bucket",
         "name": "bucket",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "gcs_buckets"
+        },
         "required": true,
-        "type": "gcs-bucket"
+        "type": "string"
       },
       {
         "condition": {
@@ -22976,8 +22997,15 @@
         },
         "label": "Destination bucket",
         "name": "destination_bucket",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "gcs_buckets"
+        },
         "required": true,
-        "type": "gcs-bucket"
+        "type": "string"
       },
       {
         "condition": {
@@ -29917,8 +29945,15 @@
         },
         "label": "Source sheet",
         "name": "source_sheet_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "sheet_id"
         }
@@ -29933,8 +29968,15 @@
         },
         "label": "Sheet",
         "name": "sheet_id_num",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "sheet_id"
         }
@@ -29980,7 +30022,14 @@
         "label": "Scope to sheet",
         "mode": "advanced",
         "name": "sheet_name",
-        "type": "gsheet-tab",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
+        "type": "string",
         "typeOptions": {
           "valueAs": "title"
         }
@@ -30020,8 +30069,15 @@
         },
         "label": "Sheet (tab)",
         "name": "sheet_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "title"
         }
@@ -31095,8 +31151,15 @@
         },
         "label": "Group",
         "name": "group_resource_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "people_groups"
+        },
         "required": true,
-        "type": "gpeople-group"
+        "type": "string"
       },
       {
         "condition": {
@@ -32663,8 +32726,15 @@
         },
         "label": "Site",
         "name": "site",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "gsc_sites"
+        },
         "required": true,
-        "type": "gsc-site"
+        "type": "string"
       },
       {
         "condition": {
@@ -34027,8 +34097,15 @@
         },
         "label": "Tasklist",
         "name": "tasklist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "tasklists"
+        },
         "required": true,
-        "type": "gtasks-tasklist"
+        "type": "string"
       },
       {
         "condition": {
@@ -34767,8 +34844,15 @@
         },
         "label": "Video",
         "name": "video_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_videos"
+        },
         "required": true,
-        "type": "youtube-video"
+        "type": "string"
       },
       {
         "condition": {
@@ -34782,8 +34866,15 @@
         },
         "label": "Playlist",
         "name": "playlist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_playlists"
+        },
         "required": true,
-        "type": "youtube-playlist"
+        "type": "string"
       },
       {
         "condition": {
@@ -34795,8 +34886,15 @@
         },
         "label": "Channel",
         "name": "channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_channels"
+        },
         "required": true,
-        "type": "youtube-channel"
+        "type": "string"
       },
       {
         "condition": {
@@ -35202,8 +35300,15 @@
         },
         "label": "Channel to subscribe to",
         "name": "target_channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_channels"
+        },
         "required": true,
-        "type": "youtube-channel"
+        "type": "string"
       },
       {
         "condition": {
@@ -52678,13 +52783,16 @@
             "query_database"
           ]
         },
-        "label": "Database ID",
-        "loadOptions": "/integrations/notion/databases",
-        "loadOptionsDependsOn": [
-          "credential"
-        ],
+        "label": "Database",
         "name": "database_id",
         "placeholder": "32-char database ID from Notion URL",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "notion",
+          "resource": "databases"
+        },
         "required": true,
         "type": "string"
       },
@@ -52698,9 +52806,16 @@
             "append_content"
           ]
         },
-        "label": "Page ID",
+        "label": "Page",
         "name": "page_id",
         "placeholder": "Page ID from Notion URL",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "notion",
+          "resource": "pages"
+        },
         "required": true,
         "type": "string"
       },
@@ -86903,8 +87018,15 @@
       {
         "label": "Space",
         "name": "space",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "chat_spaces"
+        },
         "required": true,
-        "type": "gchat-space"
+        "type": "string"
       },
       {
         "description": "Optional. Combined with the createTime cursor using `AND` before being sent to messages.list \u2014 e.g. only messages from a specific user.",
@@ -87973,8 +88095,15 @@
         "default": "Sheet1",
         "label": "Sheet (tab)",
         "name": "sheet_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "title"
         }
@@ -88481,8 +88610,15 @@
       {
         "label": "Tasklist",
         "name": "tasklist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "tasklists"
+        },
         "required": true,
-        "type": "gtasks-tasklist"
+        "type": "string"
       },
       {
         "default": 25,
@@ -88604,7 +88740,14 @@
         "label": "Video (optional)",
         "mode": "advanced",
         "name": "video_id",
-        "type": "youtube-video"
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_videos"
+        },
+        "type": "string"
       },
       {
         "condition": {

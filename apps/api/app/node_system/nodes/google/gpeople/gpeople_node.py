@@ -293,7 +293,14 @@ class GooglePeopleNode(BaseNode[GooglePeopleProperties]):
                 {
                     "name": "group_resource_name",
                     "label": "Group",
-                    "type": "gpeople-group",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "people_groups",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any("delete_group", "add_to_group", "remove_from_group"),
                 },
