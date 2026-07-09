@@ -115,6 +115,7 @@ export function PublishModal({ open, onClose, workflowId, workflowName }: Publis
       onClose={busy ? () => {} : onClose}
       title="Publish as app"
       description="Share this workflow as a hosted chat / form page. Graph is snapshotted so live edits don't affect the running app until you re-publish."
+      width="880px"
       footer={
         <div className="flex w-full items-center justify-between gap-2">
           {existing ? (
@@ -143,16 +144,18 @@ export function PublishModal({ open, onClose, workflowId, workflowName }: Publis
         </div>
       }
     >
-      <div className="grid grid-cols-[130px_1fr] gap-4">
-        <nav className="flex flex-col gap-1">
+      {/* Fixed-height grid so tab switches don't jump the modal size.
+          Sidebar spans the full body height, body scrolls internally. */}
+      <div className="grid h-[560px] grid-cols-[172px_1fr] gap-6">
+        <nav className="flex flex-col gap-0.5 border-r border-border-faint pr-4">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={
-                'rounded-[8px] px-3 py-1.5 text-left text-[13px] transition ' +
+                'rounded-[7px] px-3 py-2 text-left text-[13px] font-medium transition ' +
                 (tab === t.id
-                  ? 'bg-surface text-text'
+                  ? 'bg-surface text-text shadow-[inset_0_0_0_1px_var(--border-soft)]'
                   : 'text-text-mute hover:bg-surface/60 hover:text-text')
               }
             >
@@ -161,7 +164,7 @@ export function PublishModal({ open, onClose, workflowId, workflowName }: Publis
           ))}
         </nav>
 
-        <div className="flex min-w-0 flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-4 overflow-y-auto pr-2">
           {current.isLoading && (
             <div className="flex items-center gap-2 text-[12.5px] text-text-mute">
               <Loader2 size={12} className="animate-spin" />
