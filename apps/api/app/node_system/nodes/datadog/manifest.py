@@ -9,6 +9,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -36,7 +37,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="nrql", label="NRQL Query", type="string"),
         FieldSpec(name="account_id", label="Account ID", type="string"),
         FieldSpec(name="chart_id", label="Chart ID", type="string"),
-        FieldSpec(name="dashboard_id", label="Dashboard ID (numeric)", type="string"),
+        FieldSpec(
+            name="dashboard_id",
+            label="Dashboard (numeric)",
+            type="string",
+            remote=RemoteLookup(provider="datadog", resource="dashboards"),
+        ),
         FieldSpec(name="dashboard_uid", label="Dashboard UID", type="string"),
         FieldSpec(name="name", label="Name", type="string"),
         FieldSpec(name="run_type", label="Run Type (chain/llm/tool)", type="string"),

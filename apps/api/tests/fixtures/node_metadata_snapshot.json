@@ -1716,6 +1716,13 @@
         },
         "label": "Table",
         "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "agiloft",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -12252,8 +12259,15 @@
             "create_blog_post"
           ]
         },
-        "label": "Space ID",
+        "label": "Space",
         "name": "space_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "confluence",
+          "resource": "spaces"
+        },
         "type": "string"
       },
       {
@@ -14772,8 +14786,15 @@
         "type": "string"
       },
       {
-        "label": "Dashboard ID (numeric)",
+        "label": "Dashboard (numeric)",
         "name": "dashboard_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "datadog",
+          "resource": "dashboards"
+        },
         "type": "string"
       },
       {
@@ -40254,9 +40275,15 @@
             "create_version"
           ]
         },
-        "label": "Project ID",
-        "mode": "advanced",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "jira",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -52812,8 +52839,14 @@
           ]
         },
         "label": "Sources (CSV)",
-        "mode": "advanced",
         "name": "sources",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "newsapi",
+          "resource": "sources"
+        },
         "type": "string"
       },
       {

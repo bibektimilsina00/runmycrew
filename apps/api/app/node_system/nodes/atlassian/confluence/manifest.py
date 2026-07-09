@@ -57,7 +57,12 @@ MANIFEST = ProviderManifest(
                 depends_on=["space_key"],
             ),
         ),
-        FieldSpec(name="space_id", label="Space ID", type="string"),
+        FieldSpec(
+            name="space_id",
+            label="Space",
+            type="string",
+            remote=RemoteLookup(provider="confluence", resource="spaces"),
+        ),
         FieldSpec(
             name="space_key",
             label="Space",

@@ -14,6 +14,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _COMMON_FIELDS = ["q", "language", "page_size", "page"]
@@ -61,7 +62,12 @@ MANIFEST = ProviderManifest(
                 {"label": "technology", "value": "technology"},
             ],
         ),
-        FieldSpec(name="sources", label="Sources (CSV)", type="string", mode="advanced"),
+        FieldSpec(
+            name="sources",
+            label="Sources (CSV)",
+            type="string",
+            remote=RemoteLookup(provider="newsapi", resource="sources"),
+        ),
         FieldSpec(name="from_date", label="From (YYYY-MM-DD)", type="string", mode="advanced"),
         FieldSpec(name="to_date", label="To (YYYY-MM-DD)", type="string", mode="advanced"),
         FieldSpec(

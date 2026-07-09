@@ -5,7 +5,12 @@ REST at https://{host}/gui2/api/rest. See sim-parity roadmap Phase 4.32.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.agiloft",
@@ -19,7 +24,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="table", label="Table", type="string"),
+        FieldSpec(
+            name="table",
+            label="Table",
+            type="string",
+            remote=RemoteLookup(provider="agiloft", resource="tables"),
+        ),
         FieldSpec(name="record_id", label="Record ID", type="string"),
         FieldSpec(name="filter", label="Filter", type="string"),
         FieldSpec(name="data", label="Data (JSON)", type="json", default={}),

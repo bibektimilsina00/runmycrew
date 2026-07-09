@@ -37,7 +37,12 @@ MANIFEST = ProviderManifest(
             type="string",
             remote=RemoteLookup(provider="jira", resource="projects"),
         ),
-        FieldSpec(name="project_id", label="Project ID", type="string", mode="advanced"),
+        FieldSpec(
+            name="project_id",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(provider="jira", resource="projects"),
+        ),
         FieldSpec(name="summary", label="Summary", type="string"),
         FieldSpec(name="description", label="Description", type="string"),
         FieldSpec(
