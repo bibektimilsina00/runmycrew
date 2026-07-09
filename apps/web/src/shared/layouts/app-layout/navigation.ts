@@ -22,6 +22,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: 'home', label: 'Home', icon: Icons.Home, to: APP_ROUTES.DASHBOARD },
       { id: 'automations', label: 'Automations', icon: Icons.Flow, to: APP_ROUTES.AUTOMATIONS },
       { id: 'loops', label: 'Crews', icon: Icons.Bolt, to: APP_ROUTES.LOOPS },
+      { id: 'personas', label: 'Personas', icon: Icons.Users, to: APP_ROUTES.PERSONAS },
       { id: 'templates', label: 'Templates', icon: Icons.Layers, to: APP_ROUTES.TEMPLATES },
     ],
   },

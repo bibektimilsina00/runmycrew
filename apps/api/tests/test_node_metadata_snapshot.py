@@ -69,6 +69,7 @@ _VALID_FIELD_TYPES = {
     "meta-resource",
     "number",
     "options",
+    "persona-picker",
     "skill-selector",
     "string",
     "tool-selector",

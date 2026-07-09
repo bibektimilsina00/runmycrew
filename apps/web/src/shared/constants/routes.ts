@@ -11,6 +11,10 @@ export const APP_ROUTES = {
   SHOWCASE: '/showcase',
   AUTOMATIONS: '/automations',
   LOOPS: '/loops',
+  PERSONAS: '/loops/personas',
+  PERSONA_NEW: '/loops/personas/new',
+  PERSONA_EDIT: (id: string) => `/loops/personas/${id}`,
+  CREW_TEMPLATES: '/loops/templates',
   TEMPLATES: '/templates',
   TEMPLATE_DETAIL: (slug: string) => `/templates/${slug}`,
   MY_TEMPLATES: '/templates/mine',
@@ -81,6 +85,12 @@ export const API_ROUTES = {
   CREW_DUPLICATE: (id: string) => `/crews/${id}/duplicate`,
   CREW_RUN: (id: string) => `/crews/${id}/run`,
   CREW_EXECUTIONS: (id: string) => `/crews/${id}/executions`,
+
+  // Personas (reusable named agents that overlay onto action.agent nodes)
+  PERSONAS: '/personas/',
+  PERSONA_GET: (id: string) => `/personas/${id}`,
+  PERSONA_UPDATE: (id: string) => `/personas/${id}`,
+  PERSONA_DELETE: (id: string) => `/personas/${id}`,
 
   DASHBOARD_STATS: '/dashboard/stats',
   CRON_VALIDATE: '/cron/validate',

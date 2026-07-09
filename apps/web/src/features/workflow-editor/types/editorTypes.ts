@@ -63,7 +63,7 @@ export type SaveState = 'saved' | 'saving' | 'unsaved' | 'error'
 export type KnownNodePropertyType =
   | 'string' | 'number' | 'boolean' | 'json' | 'options' | 'multi-options'
   | 'credential' | 'key-value' | 'list' | 'messages' | 'schema' | 'file-list'
-  | 'tool-selector' | 'skill-selector' | 'meta-resource' | 'wa-template'
+  | 'tool-selector' | 'skill-selector' | 'persona-picker' | 'meta-resource' | 'wa-template'
   | 'code' | 'collection' | 'fixed-collection' | 'media' | 'gmail-query' | 'gdrive-folder'
   | 'google-file' | 'gsheet-tab' | 'gtasks-tasklist' | 'gpeople-group'
   | 'youtube-video' | 'youtube-playlist' | 'youtube-channel'

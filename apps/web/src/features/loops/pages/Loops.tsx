@@ -1,7 +1,11 @@
 import { useState, useMemo } from 'react'
+import { NavLink } from 'react-router-dom'
+import { Users as UsersIcon } from 'lucide-react'
 import { Icons } from '@/shared/components/icons'
+import { APP_ROUTES } from '@/shared/constants/routes'
 import { useLoops, useCreateLoop } from '../hooks/useLoops'
 import { LoopList } from '../components/LoopList'
+import { CrewTemplateGallery } from '../components/CrewTemplateGallery'
 import type { LoopKind } from '../types/loopsTypes'
 
 type FilterId = 'all' | LoopKind | 'paused'
@@ -79,6 +83,9 @@ export function Loops() {
           </p>
         </div>
         <div className="btn-group">
+          <NavLink to={APP_ROUTES.PERSONAS} className="btn btn-ghost">
+            <UsersIcon size={13} /> Personas
+          </NavLink>
           <button
             className="btn btn-primary"
             onClick={() => createLoop.mutate({ name: 'Untitled Loop' })}
@@ -88,6 +95,12 @@ export function Loops() {
           </button>
         </div>
       </div>
+
+      {/* Template gallery — collapsed to a single row of quick-starts until the
+          user clicks "See all templates". Cheap to render and only shows the
+          gallery inline when there are crews already; empty-state gets a
+          hero version. */}
+      {items.length > 0 && <CrewTemplateGallery variant="strip" />}
 
       {/* Filter bar */}
       <div className="filter-bar">

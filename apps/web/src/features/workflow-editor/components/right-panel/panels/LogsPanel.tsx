@@ -16,6 +16,7 @@ import {
   type NodeInfo,
   type Tab,
 } from './logs'
+import { CrewTimelinePanel } from './CrewTimelinePanel'
 import type { AgentTraceStep } from '@/features/runs/store/runsStore'
 
 /**
@@ -38,6 +39,8 @@ export function LogsPanel() {
   const nodes = useWorkflowEditorStore((s) => s.nodes)
   const nodeDefinitions = useWorkflowEditorStore((s) => s.nodeDefinitions)
   const selectNode = useWorkflowEditorStore((s) => s.setSelectedNodeId)
+  const mode = useWorkflowEditorStore((s) => s.mode)
+  const isCrewMode = mode === 'crew'
 
   useRunStream(workflowId, activeExecutionId)
 
@@ -174,7 +177,9 @@ export function LogsPanel() {
   }
 
   return (
-    <div className="flex h-full min-h-0">
+    <div className="flex h-full min-h-0 flex-col">
+      {isCrewMode && <CrewTimelinePanel runs={runs} nodeInfoById={nodeInfoById} />}
+      <div className="flex min-h-0 flex-1">
       <RunsList
         runs={runs}
         selectedLogId={selectedLogId}
@@ -198,6 +203,7 @@ export function LogsPanel() {
         payload={visible}
         agentTrace={agentTraceForSelected}
       />
+      </div>
     </div>
   )
 }

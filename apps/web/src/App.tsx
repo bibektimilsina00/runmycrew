@@ -17,6 +17,7 @@ import { Tables } from '@/features/tables'
 import { Files } from '@/features/files'
 import { Knowledge, KnowledgeDetail, KnowledgeDocumentView } from '@/features/knowledge'
 import { Skills, SkillEditor } from '@/features/skills'
+import { Personas } from '@/features/personas'
 import { WorkflowEditor } from '@/features/workflow-editor'
 import { Variables } from '@/features/variables'
 import { Connections } from '@/features/connections'
@@ -42,6 +43,7 @@ export default function App() {
             <Route path={APP_ROUTES.SETTINGS} element={<Settings />} />
             <Route path={APP_ROUTES.AUTOMATIONS} element={<Automations />} />
             <Route path={APP_ROUTES.LOOPS} element={<Loops />} />
+            <Route path={APP_ROUTES.PERSONAS} element={<Personas />} />
             <Route path={APP_ROUTES.TEMPLATES} element={<Templates />} />
             <Route path="/templates/mine" element={<MyTemplates />} />
             <Route path="/templates/:slug" element={<TemplateDetail />} />
