@@ -56,7 +56,12 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(name="business_partner_id", label="Business Partner ID", type="string"),
         FieldSpec(name="supergroup_id", label="Supergroup ID", type="string"),
-        FieldSpec(name="department_id", label="Department ID", type="string"),
+        FieldSpec(
+            name="department_id",
+            label="Department",
+            type="string",
+            remote=RemoteLookup(provider="rippling", resource="departments"),
+        ),
         FieldSpec(name="department_body", label="Department Body (JSON)", type="json", default={}),
         FieldSpec(name="employment_type_id", label="Employment Type ID", type="string"),
         FieldSpec(name="team_id", label="Team ID", type="string"),

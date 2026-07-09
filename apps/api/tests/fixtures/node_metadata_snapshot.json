@@ -5454,8 +5454,15 @@
             "delete_list_entry"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "attio",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
@@ -16251,8 +16258,15 @@
             "send_from_template"
           ]
         },
-        "label": "Template ID",
+        "label": "Template",
         "name": "template_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "docusign",
+          "resource": "templates"
+        },
         "type": "string"
       },
       {
@@ -42773,6 +42787,17 @@
         },
         "label": "Feature Flag Key",
         "name": "flag_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_key"
+          ],
+          "params": {
+            "project_key": "${project_key}"
+          },
+          "provider": "launchdarkly",
+          "resource": "flags"
+        },
         "type": "string"
       },
       {
@@ -42784,6 +42809,17 @@
         },
         "label": "Environment Key",
         "name": "environment_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_key"
+          ],
+          "params": {
+            "project_key": "${project_key}"
+          },
+          "provider": "launchdarkly",
+          "resource": "environments"
+        },
         "type": "string"
       },
       {
@@ -46928,8 +46964,15 @@
             "get_campaign"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailerlite",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -58695,8 +58738,19 @@
             "delete_insight"
           ]
         },
-        "label": "Insight ID",
+        "label": "Insight",
         "name": "insight_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_id"
+          ],
+          "params": {
+            "project_id": "${project_id}"
+          },
+          "provider": "posthog",
+          "resource": "insights"
+        },
         "type": "string"
       },
       {
@@ -63747,8 +63801,15 @@
             "update_department"
           ]
         },
-        "label": "Department ID",
+        "label": "Department",
         "name": "department_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "rippling",
+          "resource": "departments"
+        },
         "type": "string"
       },
       {
@@ -64675,8 +64736,15 @@
             "run_report"
           ]
         },
-        "label": "Report ID",
+        "label": "Report",
         "name": "report_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "salesforce",
+          "resource": "reports"
+        },
         "type": "string"
       },
       {
@@ -71224,8 +71292,15 @@
             "get_artist_top_tracks"
           ]
         },
-        "label": "Artist ID",
+        "label": "Artist",
         "name": "artist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "spotify",
+          "resource": "artists"
+        },
         "type": "string"
       },
       {
@@ -71380,8 +71455,15 @@
             "get_album_tracks"
           ]
         },
-        "label": "Album ID",
+        "label": "Album",
         "name": "album_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "spotify",
+          "resource": "albums"
+        },
         "type": "string"
       },
       {

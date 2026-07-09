@@ -13,6 +13,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _ACCOUNT = "{base_url}/accounts/{account_id}"
@@ -30,7 +31,12 @@ MANIFEST = ProviderManifest(
     auth="bearer",
     fields=[
         FieldSpec(name="envelope_id", label="Envelope ID", type="string"),
-        FieldSpec(name="template_id", label="Template ID", type="string"),
+        FieldSpec(
+            name="template_id",
+            label="Template",
+            type="string",
+            remote=RemoteLookup(provider="docusign", resource="templates"),
+        ),
         FieldSpec(name="email_subject", label="Email Subject", type="string"),
         FieldSpec(name="email_body", label="Email Body", type="string", mode="advanced"),
         FieldSpec(

@@ -37,7 +37,12 @@ MANIFEST = ProviderManifest(
             remote=RemoteLookup(provider="mailerlite", resource="groups"),
         ),
         FieldSpec(name="group_name", label="Group Name", type="string"),
-        FieldSpec(name="campaign_id", label="Campaign ID", type="string"),
+        FieldSpec(
+            name="campaign_id",
+            label="Campaign",
+            type="string",
+            remote=RemoteLookup(provider="mailerlite", resource="campaigns"),
+        ),
         FieldSpec(name="limit", label="Limit", type="number", default=25, mode="advanced"),
         FieldSpec(
             name="status",

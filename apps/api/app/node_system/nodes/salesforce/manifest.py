@@ -47,7 +47,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="external_id_value", label="External ID Value", type="string"),
         FieldSpec(name="search_sosl", label="SOSL", type="string"),
         FieldSpec(name="field_names", label="Field Names (comma-separated)", type="string"),
-        FieldSpec(name="report_id", label="Report ID", type="string"),
+        FieldSpec(
+            name="report_id",
+            label="Report",
+            type="string",
+            remote=RemoteLookup(provider="salesforce", resource="reports"),
+        ),
         FieldSpec(name="dashboard_id", label="Dashboard ID", type="string"),
         FieldSpec(name="user_id", label="User ID", type="string"),
         FieldSpec(name="apex_class", label="Apex Class Name (REST)", type="string"),
