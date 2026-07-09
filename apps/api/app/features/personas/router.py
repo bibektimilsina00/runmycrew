@@ -27,6 +27,32 @@ async def list_personas(
     return await PersonaService(db).list_personas(current_user, workspace)
 
 
+@router.get("/public", response_model=list[PersonaOut])
+async def list_public_personas(
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Publicly shared personas from other workspaces."""
+    return await PersonaService(db).list_public_personas(current_user, workspace)
+
+
+@router.post(
+    "/import/{source_id}",
+    response_model=PersonaOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_persona(
+    source_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Copy a public persona into this workspace as an editable duplicate."""
+    await WorkspaceService(db).require_edit(workspace.id, current_user)
+    return await PersonaService(db).import_persona(source_id, current_user, workspace)
+
+
 @router.post("/", response_model=PersonaOut, status_code=status.HTTP_201_CREATED)
 async def create_persona(
     data: PersonaCreate,

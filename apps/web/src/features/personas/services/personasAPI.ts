@@ -37,4 +37,17 @@ export const personasAPI = {
 
   delete: (id: string) =>
     requestJson(z.any(), { url: API_ROUTES.PERSONA_DELETE(id), method: 'DELETE' }),
+
+  listPublic: (signal?: AbortSignal): Promise<Persona[]> =>
+    requestJson(PersonaListSchema, {
+      url: API_ROUTES.PERSONAS_PUBLIC,
+      method: 'GET',
+      signal,
+    }),
+
+  import: (sourceId: string) =>
+    requestJson(PersonaSchema, {
+      url: API_ROUTES.PERSONA_IMPORT(sourceId),
+      method: 'POST',
+    }),
 }

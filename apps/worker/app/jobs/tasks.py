@@ -303,6 +303,11 @@ async def _run_crew(
             )
             runner.env = crew_env
             runner.secrets = secrets_dict
+            # Seed the crew-level cost gate. AgentNode reads these from
+            # context.variables to stop firing once the cap is hit.
+            if crew is not None and (crew.max_cost_usd or 0) > 0:
+                runner.variables["_crew_cost_cap"] = float(crew.max_cost_usd)
+                runner.variables["_crew_cost_used"] = 0.0
 
             output = await runner.run(trigger_data)
 

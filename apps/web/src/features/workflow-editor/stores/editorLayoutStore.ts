@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type EditorTab = 'copilot' | 'library' | 'config' | 'logs' | 'test'
+export type EditorTab = 'copilot' | 'library' | 'config' | 'logs' | 'test' | 'memory'
 export type PanelZone = 'right' | 'bottom'
 
 const TAB_LOCKED_ZONES: Partial<Record<EditorTab, PanelZone>> = {
@@ -14,6 +14,7 @@ const DEFAULT_ZONES: Record<EditorTab, PanelZone> = {
   config: 'right',
   test: 'right',
   logs: 'bottom',
+  memory: 'right',
 }
 
 const MIN_BOTTOM_HEIGHT = 140

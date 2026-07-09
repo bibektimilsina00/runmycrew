@@ -17,7 +17,9 @@ from apps.api.app.node_system.nodes.ai.llm.llm import LLMNode
 from apps.api.app.node_system.nodes.ai.memory.memory_node import MemoryNode
 from apps.api.app.node_system.nodes.ai.parallel.parallel import ParallelNode
 from apps.api.app.node_system.nodes.ai.perplexity.perplexity_node import PerplexityNode
+from apps.api.app.node_system.nodes.ai.route_to.route_to import RouteToNode
 from apps.api.app.node_system.nodes.ai.stt.stt_node import STTNode
+from apps.api.app.node_system.nodes.ai.subcrew.subcrew import SubCrewNode
 from apps.api.app.node_system.nodes.ai.task_planner.task_planner import TaskPlannerNode
 from apps.api.app.node_system.nodes.ai.thinking.thinking import ThinkingNode
 from apps.api.app.node_system.nodes.ai.tts.tts_node import TTSNode
@@ -447,6 +449,8 @@ node_registry.register(AgentNode)
 node_registry.register(AgentCrewNode)
 node_registry.register(TaskPlannerNode)
 node_registry.register(ParallelNode)
+node_registry.register(RouteToNode)
+node_registry.register(SubCrewNode)
 node_registry.register(VerifyNode)
 node_registry.register(LLMNode)
 node_registry.register(KnowledgeNode)

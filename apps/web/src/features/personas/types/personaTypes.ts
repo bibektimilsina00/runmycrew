@@ -15,6 +15,7 @@ export const PersonaSchema = z.object({
   icon_slug: z.string().nullable(),
   temperature: z.number(),
   max_iterations: z.number(),
+  is_public: z.boolean(),
   created_at: z.string(),
   updated_at: z.string(),
 })
@@ -33,6 +34,7 @@ export interface PersonaCreateRequest {
   icon_slug?: string | null
   temperature?: number
   max_iterations?: number
+  is_public?: boolean
 }
 
 export type PersonaUpdateRequest = Partial<PersonaCreateRequest>

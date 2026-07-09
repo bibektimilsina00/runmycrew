@@ -17,6 +17,7 @@ class PersonaCreate(SQLModel):
     icon_slug: str | None = None
     temperature: float = 0.3
     max_iterations: int = 10
+    is_public: bool = False
 
 
 class PersonaUpdate(SQLModel):
@@ -31,6 +32,7 @@ class PersonaUpdate(SQLModel):
     icon_slug: str | None = None
     temperature: float | None = None
     max_iterations: int | None = None
+    is_public: bool | None = None
 
 
 class PersonaOut(SQLModel):
@@ -48,5 +50,6 @@ class PersonaOut(SQLModel):
     icon_slug: str | None
     temperature: float
     max_iterations: int
+    is_public: bool
     created_at: datetime
     updated_at: datetime

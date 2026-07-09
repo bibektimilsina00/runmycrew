@@ -27,6 +27,9 @@ class Crew(SQLModelBase, table=True):
     is_active: bool = Field(default=False)
     position: int = Field(default=0)
     color: str | None = Field(default=None, max_length=50)
+    # Crew-level total-cost budget across all agent nodes in a single run.
+    # 0 = unlimited (still bounded by per-agent Budget caps in agent.py).
+    max_cost_usd: float = Field(default=0.0)
     user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
     workspace_id: uuid.UUID = Field(foreign_key="workspace.id", ondelete="CASCADE", index=True)
     created_at: datetime = created_at_field()

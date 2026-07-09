@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react'
-import { Plus, Search, Sparkles, Users as UsersIcon } from 'lucide-react'
+import { Globe, Plus, Search, Sparkles, Users as UsersIcon } from 'lucide-react'
 import { Button, useConfirm } from '@/shared/components'
-import { usePersonas, useDeletePersona, useCreatePersona } from '../hooks/usePersonas'
+import {
+  usePersonas,
+  useDeletePersona,
+  useCreatePersona,
+  useImportPersona,
+  usePublicPersonas,
+} from '../hooks/usePersonas'
 import { PERSONA_PRESETS, type Persona, type PersonaCreateRequest } from '../types/personaTypes'
 import { PersonaCard } from '../components/PersonaCard'
 import { PersonaEditor } from '../components/PersonaEditor'
@@ -14,6 +20,8 @@ export function Personas() {
   const [editorOpen, setEditorOpen] = useState(false)
   const del = useDeletePersona()
   const create = useCreatePersona()
+  const importPersona = useImportPersona()
+  const { data: publicPersonas = [] } = usePublicPersonas()
   const confirm = useConfirm()
 
   const filtered = useMemo(() => {
@@ -123,6 +131,42 @@ export function Personas() {
                 />
               ))}
             </div>
+          )}
+
+          {publicPersonas.length > 0 && (
+            <section className="mt-4 border-t border-border-faint pt-6">
+              <div className="mb-3 flex items-center gap-2">
+                <Globe size={14} className="text-text-mute" />
+                <h2 className="text-[13px] font-semibold text-text">Shared library</h2>
+                <span className="text-[11px] text-text-faint">
+                  personas other workspaces made public — tap to import a copy
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {publicPersonas.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => importPersona.mutate(p.id)}
+                    disabled={importPersona.isPending}
+                    className="flex items-start gap-3 rounded-[10px] border border-dashed border-border-faint bg-bg2/60 p-3 text-left transition-colors hover:border-border hover:bg-bg2 disabled:opacity-60"
+                  >
+                    <span
+                      className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-[7px] text-[12px]"
+                      style={{ background: `${p.color ?? '#8b5cf6'}22`, color: p.color ?? '#8b5cf6' }}
+                    >
+                      <Globe size={14} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-text">{p.name}</div>
+                      <div className="text-[10.5px] uppercase tracking-wider text-text-faint">{p.role}</div>
+                      {p.description && (
+                        <div className="mt-1 line-clamp-2 text-[11.5px] text-text-mute">{p.description}</div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
           )}
 
           {personas.length > 0 && suggestions.length > 0 && (

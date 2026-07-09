@@ -25,6 +25,7 @@ const emptyForm: PersonaCreateRequest = {
   icon_slug: 'Bot',
   temperature: 0.3,
   max_iterations: 10,
+  is_public: false,
 }
 
 export function PersonaEditor({ open, persona, seed, onClose, onSaved }: PersonaEditorProps) {
@@ -42,6 +43,7 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
         icon_slug: persona.icon_slug,
         temperature: persona.temperature,
         max_iterations: persona.max_iterations,
+        is_public: persona.is_public,
       }
     }
     if (seed) return { ...emptyForm, ...seed }
@@ -187,6 +189,21 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
             />
           </Field>
         </div>
+
+        <label className="flex items-start gap-3 rounded-[10px] border border-border-faint bg-bg2 p-3">
+          <input
+            type="checkbox"
+            checked={!!form.is_public}
+            onChange={e => patch('is_public', e.target.checked)}
+            className="mt-0.5"
+          />
+          <div>
+            <div className="text-[13px] font-medium text-text">Share publicly</div>
+            <div className="text-[11.5px] text-text-mute">
+              Other workspaces can import a copy from the shared library. Your original stays editable.
+            </div>
+          </div>
+        </label>
       </div>
     </Modal>
   )

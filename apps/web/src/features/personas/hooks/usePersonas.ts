@@ -49,3 +49,19 @@ export function useDeletePersona() {
     onSuccess: () => qc.invalidateQueries({ queryKey: KEYS.list }),
   })
 }
+
+export function usePublicPersonas() {
+  return useQuery({
+    queryKey: ['personas', 'public'],
+    queryFn: ({ signal }) => personasAPI.listPublic(signal),
+    staleTime: 1000 * 60,
+  })
+}
+
+export function useImportPersona() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (sourceId: string) => personasAPI.import(sourceId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEYS.list }),
+  })
+}

@@ -53,8 +53,39 @@ class PersonaService:
             icon_slug=data.icon_slug,
             temperature=data.temperature,
             max_iterations=data.max_iterations,
+            is_public=data.is_public,
         )
         return await self.repository.create(persona)
+
+    async def list_public_personas(self, user: User, workspace: Workspace) -> list[Persona]:
+        return await self.repository.list_public(exclude_workspace_id=workspace.id)
+
+    async def import_persona(
+        self, source_id: uuid.UUID, user: User, workspace: Workspace
+    ) -> Persona:
+        source = await self.repository.get_by_id(source_id)
+        if not source or not source.is_public:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Public persona not found",
+            )
+        copy = Persona(
+            user_id=user.id,
+            workspace_id=workspace.id,
+            name=source.name,
+            role=source.role,
+            description=source.description,
+            system_prompt=source.system_prompt,
+            default_provider=source.default_provider,
+            default_model=source.default_model,
+            tools=source.tools,
+            color=source.color,
+            icon_slug=source.icon_slug,
+            temperature=source.temperature,
+            max_iterations=source.max_iterations,
+            is_public=False,
+        )
+        return await self.repository.create(copy)
 
     async def update_persona(
         self,

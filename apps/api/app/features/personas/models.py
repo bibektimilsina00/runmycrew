@@ -38,6 +38,7 @@ class Persona(SQLModelBase, table=True):
     icon_slug: str | None = Field(default=None, max_length=128)
     temperature: float = Field(default=0.3)
     max_iterations: int = Field(default=10)
+    is_public: bool = Field(default=False, index=True)
     created_at: datetime = created_at_field()
     updated_at: datetime = updated_at_field()
 

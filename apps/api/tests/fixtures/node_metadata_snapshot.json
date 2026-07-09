@@ -84187,6 +84187,162 @@
     "tools": null,
     "type": "ai.parallel"
   },
+  "ai.route_to": {
+    "allow_error": true,
+    "brand": null,
+    "category": "ai",
+    "color": "#a855f7",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Explicit A\u2192B message routing. Emits {to_persona_id, to_role, message} for the next agent node to consume.",
+    "dynamic_outputs_from": null,
+    "icon": "Send",
+    "inputs": 1,
+    "name": "Route To",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "to_persona_id",
+        "type": "string"
+      },
+      {
+        "label": "to_role",
+        "type": "string"
+      },
+      {
+        "label": "message",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "description": "Persona that should handle the next round.",
+        "label": "Route To Persona",
+        "name": "to_persona_id",
+        "required": false,
+        "type": "persona-picker"
+      },
+      {
+        "description": "Fallback role tag when no persona is picked.",
+        "label": "Or Role",
+        "name": "to_role",
+        "placeholder": "reviewer",
+        "type": "string"
+      },
+      {
+        "description": "Message forwarded to the next agent.",
+        "label": "Message",
+        "name": "message",
+        "placeholder": "Please review the writeup and flag issues.",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.route_to"
+  },
+  "ai.subcrew": {
+    "allow_error": true,
+    "brand": null,
+    "category": "ai",
+    "color": "#7c3aed",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Compose crews. Run another crew as a step in this one \u2014 its final output flows into the next node.",
+    "dynamic_outputs_from": null,
+    "icon": "Users",
+    "inputs": 1,
+    "name": "Sub-Crew",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sub_crew_output",
+        "type": "object"
+      },
+      {
+        "label": "crew_id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "description": "The ID of the crew to run. Find it in the crew editor URL.",
+        "label": "Crew ID",
+        "name": "crew_id",
+        "placeholder": "UUID of the crew to call",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "description": "Optional extra fields merged into the trigger data passed to the sub-crew.",
+        "label": "Extra Input (JSON)",
+        "name": "input_data",
+        "required": false,
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.subcrew"
+  },
   "ai.task_planner": {
     "allow_error": true,
     "brand": null,
@@ -85312,6 +85468,24 @@
         "mode": "advanced",
         "name": "timeoutHours",
         "type": "number"
+      },
+      {
+        "default": false,
+        "description": "Send a message via the workspace's escalation handler (Slack / webhook / email) so someone knows to review.",
+        "label": "Notify a human",
+        "name": "notify",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "notify",
+          "value": true
+        },
+        "description": "Message body sent alongside the resume link.",
+        "label": "Notification message",
+        "name": "notifyMessage",
+        "placeholder": "A workflow is waiting on your approval.",
+        "type": "string"
       },
       {
         "default": 0,

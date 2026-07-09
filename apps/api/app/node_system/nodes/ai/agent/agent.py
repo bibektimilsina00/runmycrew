@@ -502,6 +502,22 @@ class AgentNode(BaseNode[AgentProperties]):
 
             await self._apply_persona_overlay(context)
 
+            # Crew-level cost cap: refuse to fire when the shared cost
+            # gate is already exhausted so subsequent agents in the crew
+            # don't keep spending after the wallet emptied.
+            crew_cap = float(context.variables.get("_crew_cost_cap") or 0.0)
+            crew_used = float(context.variables.get("_crew_cost_used") or 0.0)
+            if crew_cap > 0 and crew_used >= crew_cap:
+                return NodeResult(
+                    success=False,
+                    error=(f"Crew cost cap exhausted: ${crew_used:.4f} of ${crew_cap:.4f} spent."),
+                    output_data={
+                        "status": "budget_exhausted",
+                        "budget_exhausted_reason": "crew_cost_cap",
+                        "agent_usage": {"total_cost_usd": 0.0},
+                    },
+                )
+
             api_key = self._get_api_key(context)
             if not api_key:
                 provider_name = self._provider_name()
@@ -1061,6 +1077,12 @@ class AgentNode(BaseNode[AgentProperties]):
             output["status"] = "budget_exhausted" if budget_exhausted_reason else "success"
             if budget_exhausted_reason:
                 output["budget_exhausted_reason"] = budget_exhausted_reason
+            # Fold this agent's spend into the shared crew gate so the
+            # next node in the graph sees the updated total.
+            if crew_cap > 0:
+                snap = output.get("agent_usage") or {}
+                spend = float(snap.get("total_cost_usd") or 0.0)
+                context.variables["_crew_cost_used"] = crew_used + spend
             return NodeResult(success=True, output_data=output)
 
         except httpx.HTTPStatusError as e:

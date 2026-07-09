@@ -18,6 +18,16 @@ class PersonaRepository:
         )
         return list(result.scalars().all())
 
+    async def list_public(
+        self, exclude_workspace_id: uuid.UUID | None = None, limit: int = 100
+    ) -> list[Persona]:
+        stmt = select(Persona).where(Persona.is_public.is_(True))
+        if exclude_workspace_id is not None:
+            stmt = stmt.where(Persona.workspace_id != exclude_workspace_id)
+        stmt = stmt.order_by(Persona.created_at.desc()).limit(limit)
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
+
     async def get_by_id_and_workspace(
         self, persona_id: uuid.UUID, workspace_id: uuid.UUID
     ) -> Persona | None:

@@ -91,6 +91,8 @@ export const API_ROUTES = {
   PERSONA_GET: (id: string) => `/personas/${id}`,
   PERSONA_UPDATE: (id: string) => `/personas/${id}`,
   PERSONA_DELETE: (id: string) => `/personas/${id}`,
+  PERSONAS_PUBLIC: '/personas/public',
+  PERSONA_IMPORT: (sourceId: string) => `/personas/import/${sourceId}`,
 
   DASHBOARD_STATS: '/dashboard/stats',
   CRON_VALIDATE: '/cron/validate',

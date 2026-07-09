@@ -54,6 +54,7 @@ export const CrewOutSchema = z.object({
   is_active:   z.boolean(),
   position:    z.number().nullable().optional(),
   color:       z.string().nullable().optional(),
+  max_cost_usd: z.number().optional().default(0),
   created_at:  z.string(),
   updated_at:  z.string(),
 })
