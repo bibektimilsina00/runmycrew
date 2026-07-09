@@ -58138,12 +58138,11 @@
     ],
     "properties": [
       {
-        "description": "PostgreSQL connection string.",
-        "label": "Connection String",
-        "name": "connectionString",
-        "placeholder": "postgresql://user:pass@host:5432/dbname",
+        "credentialType": "postgres_credentials",
+        "label": "Postgres Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "query",
@@ -58162,6 +58161,37 @@
         "type": "options"
       },
       {
+        "default": "public",
+        "label": "Schema",
+        "mode": "advanced",
+        "name": "schema",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "postgres",
+          "resource": "schemas"
+        },
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "mode": "advanced",
+        "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "schema"
+          ],
+          "params": {
+            "schema": "${schema}"
+          },
+          "provider": "postgres",
+          "resource": "tables"
+        },
+        "type": "string"
+      },
+      {
         "label": "SQL",
         "name": "sql",
         "placeholder": "SELECT * FROM users WHERE id = $1",
@@ -58175,6 +58205,14 @@
         "mode": "advanced",
         "name": "params",
         "type": "json"
+      },
+      {
+        "description": "Direct connection string. Use only if not using a credential.",
+        "label": "Connection String (legacy)",
+        "mode": "advanced",
+        "name": "connectionString",
+        "placeholder": "postgresql://user:pass@host:5432/dbname",
+        "type": "string"
       },
       {
         "default": 0,
