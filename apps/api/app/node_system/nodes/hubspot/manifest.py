@@ -8,7 +8,12 @@ either OAuth (`access_token`) or a private-app token (`api_key`).
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.hubspot import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 
 def _contact_props(v):  # noqa: ANN001
@@ -43,7 +48,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="ticket_id", label="Ticket ID", type="string"),
         FieldSpec(name="engagement_id", label="Engagement ID", type="string"),
         FieldSpec(name="list_id", label="List ID", type="string"),
-        FieldSpec(name="owner_id", label="Owner ID", type="string"),
+        FieldSpec(
+            name="owner_id",
+            label="Owner",
+            type="string",
+            remote=RemoteLookup(provider="hubspot", resource="owners"),
+        ),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="first_name", label="First Name", type="string"),
         FieldSpec(name="last_name", label="Last Name", type="string"),
@@ -53,7 +63,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="deal_name", label="Deal Name", type="string"),
         FieldSpec(name="deal_stage", label="Deal Stage", type="string"),
         FieldSpec(name="deal_amount", label="Deal Amount", type="number"),
-        FieldSpec(name="pipeline", label="Pipeline", type="string"),
+        FieldSpec(
+            name="pipeline",
+            label="Pipeline",
+            type="string",
+            remote=RemoteLookup(provider="hubspot", resource="pipelines"),
+        ),
         FieldSpec(name="ticket_name", label="Ticket Name", type="string"),
         FieldSpec(name="ticket_pipeline", label="Ticket Pipeline", type="string"),
         FieldSpec(name="ticket_stage", label="Ticket Stage", type="string"),

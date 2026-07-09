@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, Check, ChevronDown, ListPlus, Loader2, Pencil, RefreshCw, Search } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import apiClient from '@/shared/utils/apiClient'
+import { BrandIcon } from '../../../../utils/BrandIcon'
 import { ExpressionEditor } from '../expression/ExpressionEditor'
 import type { RendererProps } from '../types'
 
@@ -311,6 +312,11 @@ function RemoteList({
                           : 'hover:bg-[var(--surface)]',
                       )}
                     >
+                      {item.icon_slug && (
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] bg-[var(--surface-2)] [&_img]:h-3.5 [&_img]:w-3.5 [&_img]:object-contain">
+                          <BrandIcon slug={item.icon_slug} />
+                        </span>
+                      )}
                       <span className="flex min-w-0 flex-1 flex-col">
                         <span className={cn('truncate text-[12.5px]', active ? 'font-semibold text-[var(--text)]' : 'text-[var(--text)]')}>
                           {item.label}

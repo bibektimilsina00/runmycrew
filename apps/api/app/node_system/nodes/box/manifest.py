@@ -10,6 +10,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -24,7 +25,13 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="folder_id", label="Folder ID", type="string", placeholder="0 (root)"),
+        FieldSpec(
+            name="folder_id",
+            label="Folder",
+            type="string",
+            placeholder="0 (root)",
+            remote=RemoteLookup(provider="box", resource="folders"),
+        ),
         FieldSpec(name="file_id", label="File ID", type="string"),
         FieldSpec(name="name", label="Name", type="string"),
         FieldSpec(name="parent_id", label="Parent Folder ID", type="string", default="0"),

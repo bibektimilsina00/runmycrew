@@ -5,7 +5,12 @@ REST at https://api.rippling.com. See sim-parity roadmap Phase 4.24.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.rippling",
@@ -19,7 +24,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="employee_id", label="Employee ID", type="string"),
+        FieldSpec(
+            name="employee_id",
+            label="Employee",
+            type="string",
+            remote=RemoteLookup(provider="rippling", resource="employees"),
+        ),
         FieldSpec(name="worker_id", label="Worker ID", type="string"),
         FieldSpec(name="user_id", label="User ID", type="string"),
         FieldSpec(name="contact_id", label="Contact ID", type="string"),
@@ -46,7 +56,12 @@ MANIFEST = ProviderManifest(
         ),
         FieldSpec(name="business_partner_id", label="Business Partner ID", type="string"),
         FieldSpec(name="supergroup_id", label="Supergroup ID", type="string"),
-        FieldSpec(name="department_id", label="Department ID", type="string"),
+        FieldSpec(
+            name="department_id",
+            label="Department",
+            type="string",
+            remote=RemoteLookup(provider="rippling", resource="departments"),
+        ),
         FieldSpec(name="department_body", label="Department Body (JSON)", type="json", default={}),
         FieldSpec(name="employment_type_id", label="Employment Type ID", type="string"),
         FieldSpec(name="team_id", label="Team ID", type="string"),

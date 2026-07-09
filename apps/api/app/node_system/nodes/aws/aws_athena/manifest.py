@@ -15,6 +15,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _HOST = "https://athena.{region}.amazonaws.com/"
@@ -35,8 +36,20 @@ MANIFEST = ProviderManifest(
     content_type="application/x-amz-json-1.1",
     fields=[
         FieldSpec(name="query", label="SQL Query", type="string"),
-        FieldSpec(name="database", label="Database", type="string", placeholder="default"),
-        FieldSpec(name="workgroup", label="Workgroup", type="string", default="primary"),
+        FieldSpec(
+            name="database",
+            label="Database",
+            type="string",
+            placeholder="default",
+            remote=RemoteLookup(provider="athena", resource="databases"),
+        ),
+        FieldSpec(
+            name="workgroup",
+            label="Workgroup",
+            type="string",
+            default="primary",
+            remote=RemoteLookup(provider="athena", resource="workgroups"),
+        ),
         FieldSpec(
             name="output_location",
             label="Output S3 Location",

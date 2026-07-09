@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -29,7 +30,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="organization", label="Organization URI", type="string"),
         FieldSpec(name="user_uri", label="User URI", type="string"),
         FieldSpec(name="event_uuid", label="Event UUID", type="string"),
-        FieldSpec(name="event_uri", label="Event URI", type="string"),
+        FieldSpec(
+            name="event_uri",
+            label="Event Type",
+            type="string",
+            remote=RemoteLookup(provider="calendly", resource="event_types"),
+        ),
         FieldSpec(
             name="status",
             label="Status",

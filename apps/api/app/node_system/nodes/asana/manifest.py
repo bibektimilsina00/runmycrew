@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -26,8 +27,23 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="workspace_id", label="Workspace ID", type="string"),
-        FieldSpec(name="project_id", label="Project ID", type="string"),
+        FieldSpec(
+            name="workspace_id",
+            label="Workspace",
+            type="string",
+            remote=RemoteLookup(provider="asana", resource="workspaces"),
+        ),
+        FieldSpec(
+            name="project_id",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(
+                provider="asana",
+                resource="projects",
+                params={"workspace_id": "${workspace_id}"},
+                depends_on=["workspace_id"],
+            ),
+        ),
         FieldSpec(name="task_id", label="Task ID", type="string"),
         FieldSpec(name="section_id", label="Section ID", type="string", mode="advanced"),
         FieldSpec(name="name", label="Name", type="string"),

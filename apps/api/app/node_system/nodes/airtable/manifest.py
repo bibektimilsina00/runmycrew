@@ -22,6 +22,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
     register_flatten,
 )
 
@@ -85,17 +86,24 @@ MANIFEST = ProviderManifest(
     fields=[
         FieldSpec(
             name="base_id",
-            label="Base ID",
+            label="Base",
             type="string",
             required=True,
             placeholder="appXXXXXXXX",
+            remote=RemoteLookup(provider="airtable", resource="bases"),
         ),
         FieldSpec(
             name="table_name",
-            label="Table Name",
+            label="Table",
             type="string",
             required=True,
             placeholder="Contacts",
+            remote=RemoteLookup(
+                provider="airtable",
+                resource="tables",
+                params={"base_id": "${base_id}"},
+                depends_on=["base_id"],
+            ),
         ),
         FieldSpec(
             name="record_id",

@@ -11,6 +11,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -25,7 +26,12 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="site_id", label="Site ID", type="string"),
+        FieldSpec(
+            name="site_id",
+            label="Site",
+            type="string",
+            remote=RemoteLookup(provider="microsoft", resource="sharepoint_sites"),
+        ),
         FieldSpec(name="list_id", label="List ID", type="string"),
         FieldSpec(name="item_id", label="Item ID", type="string"),
         FieldSpec(name="search_query", label="Search Sites", type="string"),

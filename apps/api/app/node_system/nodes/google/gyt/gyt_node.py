@@ -318,7 +318,14 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                 {
                     "name": "video_id",
                     "label": "Video",
-                    "type": "youtube-video",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "yt_videos",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(*_VIDEO_PICKER_OPS),
                 },
@@ -326,7 +333,14 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                 {
                     "name": "playlist_id",
                     "label": "Playlist",
-                    "type": "youtube-playlist",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "yt_playlists",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(*_PLAYLIST_PICKER_OPS),
                 },
@@ -334,7 +348,14 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                 {
                     "name": "channel_id",
                     "label": "Channel",
-                    "type": "youtube-channel",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "yt_channels",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(*_CHANNEL_PICKER_OPS),
                 },
@@ -551,7 +572,14 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                 {
                     "name": "target_channel_id",
                     "label": "Channel to subscribe to",
-                    "type": "youtube-channel",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "yt_channels",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond("subscribe_to_channel"),
                 },

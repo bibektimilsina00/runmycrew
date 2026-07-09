@@ -6,7 +6,12 @@ REST at https://api.circleback.ai/v1. See sim-parity roadmap Phase 4.23.
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.circleback import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.circleback",
@@ -20,7 +25,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="meeting_id", label="Meeting ID", type="string"),
+        FieldSpec(
+            name="meeting_id",
+            label="Meeting",
+            type="string",
+            remote=RemoteLookup(provider="circleback", resource="meetings"),
+        ),
         FieldSpec(name="note_id", label="Note ID", type="string"),
         FieldSpec(name="note_guid", label="Note GUID", type="string"),
         FieldSpec(name="notebook_guid", label="Notebook GUID", type="string"),

@@ -5,7 +5,12 @@ REST at https://oauth.reddit.com. See sim-parity roadmap Phase 4.29.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.reddit",
@@ -35,7 +40,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="text", label="Text", type="string"),
         FieldSpec(name="tweet_id", label="Tweet ID", type="string"),
         FieldSpec(name="username", label="Username", type="string"),
-        FieldSpec(name="subreddit", label="Subreddit", type="string"),
+        FieldSpec(
+            name="subreddit",
+            label="Subreddit",
+            type="string",
+            remote=RemoteLookup(provider="reddit", resource="subreddits"),
+        ),
         FieldSpec(name="sort", label="Sort", type="string", default="hot"),
         FieldSpec(name="limit", label="Limit", type="number", default=10, mode="advanced"),
         FieldSpec(name="url", label="URL", type="string"),

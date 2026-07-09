@@ -1716,6 +1716,13 @@
         },
         "label": "Table",
         "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "agiloft",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -2303,9 +2310,16 @@
             "search_records"
           ]
         },
-        "label": "Base ID",
+        "label": "Base",
         "name": "base_id",
         "placeholder": "appXXXXXXXX",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "airtable",
+          "resource": "bases"
+        },
         "required": true,
         "type": "string"
       },
@@ -2321,9 +2335,20 @@
             "search_records"
           ]
         },
-        "label": "Table Name",
+        "label": "Table",
         "name": "table_name",
         "placeholder": "Contacts",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "base_id"
+          ],
+          "params": {
+            "base_id": "${base_id}"
+          },
+          "provider": "airtable",
+          "resource": "tables"
+        },
         "required": true,
         "type": "string"
       },
@@ -2857,6 +2882,13 @@
         },
         "label": "Index",
         "name": "index_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "algolia",
+          "resource": "indices"
+        },
         "required": true,
         "type": "string"
       },
@@ -3579,9 +3611,16 @@
             "start_run"
           ]
         },
-        "label": "Actor ID",
+        "label": "Actor",
         "name": "actor_id",
         "placeholder": "username~actor-name or actorId",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "apify",
+          "resource": "actors"
+        },
         "type": "string"
       },
       {
@@ -3603,8 +3642,15 @@
             "get_dataset_items"
           ]
         },
-        "label": "Dataset ID",
+        "label": "Dataset",
         "name": "dataset_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "apify",
+          "resource": "datasets"
+        },
         "type": "string"
       },
       {
@@ -4011,8 +4057,15 @@
             "sequence_add"
           ]
         },
-        "label": "Sequence ID",
+        "label": "Sequence",
         "name": "sequence_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "apollo",
+          "resource": "sequences"
+        },
         "type": "string"
       },
       {
@@ -4475,8 +4528,15 @@
             "list_projects"
           ]
         },
-        "label": "Workspace ID",
+        "label": "Workspace",
         "name": "workspace_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "asana",
+          "resource": "workspaces"
+        },
         "type": "string"
       },
       {
@@ -4489,8 +4549,19 @@
             "list_sections"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "workspace_id"
+          ],
+          "params": {
+            "workspace_id": "${workspace_id}"
+          },
+          "provider": "asana",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -4833,8 +4904,15 @@
             "get_job"
           ]
         },
-        "label": "Job ID",
+        "label": "Job",
         "name": "job_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "ashby",
+          "resource": "jobs"
+        },
         "type": "string"
       },
       {
@@ -5297,6 +5375,13 @@
         "label": "Object",
         "name": "object_slug",
         "placeholder": "people | companies | deals | custom_slug",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "attio",
+          "resource": "objects"
+        },
         "type": "string"
       },
       {
@@ -5394,8 +5479,15 @@
             "delete_list_entry"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "attio",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
@@ -6423,6 +6515,13 @@
         "label": "Database",
         "name": "database",
         "placeholder": "default",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "athena",
+          "resource": "databases"
+        },
         "type": "string"
       },
       {
@@ -6435,6 +6534,13 @@
         "default": "primary",
         "label": "Workgroup",
         "name": "workgroup",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "athena",
+          "resource": "workgroups"
+        },
         "type": "string"
       },
       {
@@ -7536,6 +7642,13 @@
         },
         "label": "Bucket",
         "name": "bucket",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "aws",
+          "resource": "s3_buckets"
+        },
         "required": true,
         "type": "string"
       },
@@ -8150,8 +8263,15 @@
             "get_queue_attributes"
           ]
         },
-        "label": "Queue URL",
+        "label": "Queue",
         "name": "queue_url",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "aws",
+          "resource": "sqs_queues"
+        },
         "type": "string"
       },
       {
@@ -8560,8 +8680,15 @@
             "get_pipeline_run"
           ]
         },
-        "label": "Pipeline ID",
+        "label": "Pipeline",
         "name": "pipeline_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "azure_devops",
+          "resource": "pipelines"
+        },
         "type": "number"
       },
       {
@@ -8887,9 +9014,16 @@
             "delete_folder"
           ]
         },
-        "label": "Folder ID",
+        "label": "Folder",
         "name": "folder_id",
         "placeholder": "0 (root)",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "box",
+          "resource": "folders"
+        },
         "type": "string"
       },
       {
@@ -10479,8 +10613,15 @@
         "type": "string"
       },
       {
-        "label": "Event URI",
+        "label": "Event Type",
         "name": "event_uri",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "calendly",
+          "resource": "event_types"
+        },
         "type": "string"
       },
       {
@@ -10670,8 +10811,15 @@
             "list_action_items"
           ]
         },
-        "label": "Meeting ID",
+        "label": "Meeting",
         "name": "meeting_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "circleback",
+          "resource": "meetings"
+        },
         "type": "string"
       },
       {
@@ -11304,6 +11452,13 @@
         },
         "label": "Database",
         "name": "database",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "clickhouse",
+          "resource": "databases"
+        },
         "type": "string"
       },
       {
@@ -11323,6 +11478,17 @@
         },
         "label": "Table",
         "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "database"
+          ],
+          "params": {
+            "database": "${database}"
+          },
+          "provider": "clickhouse",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -11549,8 +11715,15 @@
             "purge_cache"
           ]
         },
-        "label": "Zone ID",
+        "label": "Zone",
         "name": "zone_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "cloudflare",
+          "resource": "zones"
+        },
         "type": "string"
       },
       {
@@ -12078,8 +12251,19 @@
             "list_comments"
           ]
         },
-        "label": "Page ID",
+        "label": "Page",
         "name": "page_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "space_key"
+          ],
+          "params": {
+            "space": "${space_key}"
+          },
+          "provider": "confluence",
+          "resource": "pages"
+        },
         "type": "string"
       },
       {
@@ -12093,13 +12277,27 @@
             "create_blog_post"
           ]
         },
-        "label": "Space ID",
+        "label": "Space",
         "name": "space_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "confluence",
+          "resource": "spaces"
+        },
         "type": "string"
       },
       {
-        "label": "Space Key",
+        "label": "Space",
         "name": "space_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "confluence",
+          "resource": "spaces"
+        },
         "type": "string"
       },
       {
@@ -14199,8 +14397,15 @@
             "run_sql"
           ]
         },
-        "label": "SQL Warehouse ID",
+        "label": "SQL Warehouse",
         "name": "warehouse_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "databricks",
+          "resource": "warehouses"
+        },
         "type": "string"
       },
       {
@@ -14234,11 +14439,29 @@
         },
         "label": "Catalog",
         "name": "catalog",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "databricks",
+          "resource": "catalogs"
+        },
         "type": "string"
       },
       {
         "label": "Schema",
         "name": "schema_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "catalog"
+          ],
+          "params": {
+            "catalog": "${catalog}"
+          },
+          "provider": "databricks",
+          "resource": "schemas"
+        },
         "type": "string"
       },
       {
@@ -14287,6 +14510,19 @@
       {
         "label": "Table",
         "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "catalog",
+            "schema_name"
+          ],
+          "params": {
+            "catalog": "${catalog}",
+            "schema": "${schema_name}"
+          },
+          "provider": "databricks",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -14568,8 +14804,15 @@
         "type": "string"
       },
       {
-        "label": "Dashboard ID (numeric)",
+        "label": "Dashboard (numeric)",
         "name": "dashboard_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "datadog",
+          "resource": "dashboards"
+        },
         "type": "string"
       },
       {
@@ -15670,8 +15913,19 @@
             "create_webhook"
           ]
         },
-        "label": "Channel ID",
+        "label": "Channel",
         "name": "channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "guild_id"
+          ],
+          "params": {
+            "guild_id": "${guild_id}"
+          },
+          "provider": "discord",
+          "resource": "channels"
+        },
         "type": "string"
       },
       {
@@ -15692,8 +15946,15 @@
             "delete_role"
           ]
         },
-        "label": "Guild ID",
+        "label": "Server",
         "name": "guild_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "discord",
+          "resource": "guilds"
+        },
         "type": "string"
       },
       {
@@ -16036,8 +16297,15 @@
             "send_from_template"
           ]
         },
-        "label": "Template ID",
+        "label": "Template",
         "name": "template_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "docusign",
+          "resource": "templates"
+        },
         "type": "string"
       },
       {
@@ -16284,9 +16552,16 @@
             "create_share_link"
           ]
         },
-        "label": "Path",
+        "label": "Folder",
         "name": "path",
         "placeholder": "/Documents/notes.txt",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "dropbox",
+          "resource": "folders"
+        },
         "type": "string"
       },
       {
@@ -17375,27 +17650,53 @@
     ],
     "properties": [
       {
+        "credentialType": "aws_credentials",
+        "label": "AWS Account",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
         "default": "us-east-1",
         "label": "AWS Region",
         "name": "region",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "aws",
+          "resource": "regions"
+        },
         "type": "string"
       },
       {
-        "label": "Access Key ID",
-        "name": "accessKeyId",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "label": "Secret Access Key",
-        "name": "secretAccessKey",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "label": "Table Name",
+        "label": "Table",
         "name": "tableName",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "region"
+          ],
+          "params": {
+            "region": "${region}"
+          },
+          "provider": "aws",
+          "resource": "dynamodb_tables"
+        },
         "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Access Key ID (legacy)",
+        "mode": "advanced",
+        "name": "accessKeyId",
+        "type": "string"
+      },
+      {
+        "label": "Secret Access Key (legacy)",
+        "mode": "advanced",
+        "name": "secretAccessKey",
+        "secret": true,
         "type": "string"
       },
       {
@@ -17657,6 +17958,13 @@
       {
         "label": "Index",
         "name": "index",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "elasticsearch",
+          "resource": "indices"
+        },
         "type": "string"
       },
       {
@@ -18393,8 +18701,15 @@
             "create_lead"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "emailbison",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -21030,8 +21345,15 @@
         },
         "label": "Property",
         "name": "property",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "ga4_properties"
+        },
         "required": true,
-        "type": "ga4-property"
+        "type": "string"
       },
       {
         "condition": {
@@ -22228,8 +22550,15 @@
         },
         "label": "Space",
         "name": "space",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "chat_spaces"
+        },
         "required": true,
-        "type": "gchat-space"
+        "type": "string"
       },
       {
         "condition": {
@@ -22576,8 +22905,15 @@
         },
         "label": "Bucket",
         "name": "bucket",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "gcs_buckets"
+        },
         "required": true,
-        "type": "gcs-bucket"
+        "type": "string"
       },
       {
         "condition": {
@@ -22785,8 +23121,15 @@
         },
         "label": "Destination bucket",
         "name": "destination_bucket",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "gcs_buckets"
+        },
         "required": true,
-        "type": "gcs-bucket"
+        "type": "string"
       },
       {
         "condition": {
@@ -22982,8 +23325,15 @@
         },
         "label": "Document",
         "name": "document_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new Doc\u2026",
           "mimeType": "application/vnd.google-apps.document",
@@ -23583,7 +23933,14 @@
         },
         "label": "Parent folder",
         "name": "parent_folder_id",
-        "type": "gdrive-folder"
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_folders"
+        },
+        "type": "string"
       },
       {
         "condition": {
@@ -24072,8 +24429,15 @@
         },
         "label": "Form",
         "name": "form_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new form\u2026",
           "mimeType": "application/vnd.google-apps.form",
@@ -25863,8 +26227,15 @@
             "remove_project_member"
           ]
         },
-        "label": "Project ID or url-encoded path",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "gitlab",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -26697,8 +27068,15 @@
             "get_user"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "gong",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -27154,8 +27532,19 @@
             "insert_all"
           ]
         },
-        "label": "Dataset ID",
+        "label": "Dataset",
         "name": "dataset_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_id"
+          ],
+          "params": {
+            "project_id": "${project_id}"
+          },
+          "provider": "bigquery",
+          "resource": "datasets"
+        },
         "type": "string"
       },
       {
@@ -27166,8 +27555,21 @@
             "insert_all"
           ]
         },
-        "label": "Table ID",
+        "label": "Table",
         "name": "table_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_id",
+            "dataset_id"
+          ],
+          "params": {
+            "dataset_id": "${dataset_id}",
+            "project_id": "${project_id}"
+          },
+          "provider": "bigquery",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -29585,8 +29987,15 @@
         },
         "label": "Spreadsheet",
         "name": "spreadsheet_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new spreadsheet\u2026",
           "mimeType": "application/vnd.google-apps.spreadsheet",
@@ -29695,8 +30104,15 @@
         },
         "label": "Source sheet",
         "name": "source_sheet_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "sheet_id"
         }
@@ -29711,8 +30127,15 @@
         },
         "label": "Sheet",
         "name": "sheet_id_num",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "sheet_id"
         }
@@ -29758,7 +30181,14 @@
         "label": "Scope to sheet",
         "mode": "advanced",
         "name": "sheet_name",
-        "type": "gsheet-tab",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
+        "type": "string",
         "typeOptions": {
           "valueAs": "title"
         }
@@ -29798,8 +30228,15 @@
         },
         "label": "Sheet (tab)",
         "name": "sheet_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "title"
         }
@@ -30873,8 +31310,15 @@
         },
         "label": "Group",
         "name": "group_resource_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "people_groups"
+        },
         "required": true,
-        "type": "gpeople-group"
+        "type": "string"
       },
       {
         "condition": {
@@ -31847,8 +32291,15 @@
             "list_applications"
           ]
         },
-        "label": "Job ID",
+        "label": "Job",
         "name": "job_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "greenhouse",
+          "resource": "jobs"
+        },
         "type": "string"
       },
       {
@@ -31887,9 +32338,16 @@
             "add_candidate_note"
           ]
         },
-        "label": "User ID (for note authoring)",
+        "label": "User (for note authoring)",
         "mode": "advanced",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "greenhouse",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -32434,8 +32892,15 @@
         },
         "label": "Site",
         "name": "site",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "gsc_sites"
+        },
         "required": true,
-        "type": "gsc-site"
+        "type": "string"
       },
       {
         "condition": {
@@ -32927,8 +33392,15 @@
         },
         "label": "Presentation",
         "name": "presentation_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new deck\u2026",
           "mimeType": "application/vnd.google-apps.presentation",
@@ -33798,8 +34270,15 @@
         },
         "label": "Tasklist",
         "name": "tasklist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "tasklists"
+        },
         "required": true,
-        "type": "gtasks-tasklist"
+        "type": "string"
       },
       {
         "condition": {
@@ -34538,8 +35017,15 @@
         },
         "label": "Video",
         "name": "video_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_videos"
+        },
         "required": true,
-        "type": "youtube-video"
+        "type": "string"
       },
       {
         "condition": {
@@ -34553,8 +35039,15 @@
         },
         "label": "Playlist",
         "name": "playlist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_playlists"
+        },
         "required": true,
-        "type": "youtube-playlist"
+        "type": "string"
       },
       {
         "condition": {
@@ -34566,8 +35059,15 @@
         },
         "label": "Channel",
         "name": "channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_channels"
+        },
         "required": true,
-        "type": "youtube-channel"
+        "type": "string"
       },
       {
         "condition": {
@@ -34973,8 +35473,15 @@
         },
         "label": "Channel to subscribe to",
         "name": "target_channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_channels"
+        },
         "required": true,
-        "type": "youtube-channel"
+        "type": "string"
       },
       {
         "condition": {
@@ -35418,8 +35925,15 @@
             "cancel_run"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "hex",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -36016,8 +36530,15 @@
             "get_owner"
           ]
         },
-        "label": "Owner ID",
+        "label": "Owner",
         "name": "owner_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "hubspot",
+          "resource": "owners"
+        },
         "type": "string"
       },
       {
@@ -36138,6 +36659,13 @@
         },
         "label": "Pipeline",
         "name": "pipeline",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "hubspot",
+          "resource": "pipelines"
+        },
         "type": "string"
       },
       {
@@ -38580,8 +39108,15 @@
             "list_leads"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "instantly",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -39807,9 +40342,15 @@
             "create_version"
           ]
         },
-        "label": "Project ID",
-        "mode": "advanced",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "jira",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -41534,13 +42075,27 @@
             "add_profile_to_list"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "klaviyo",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
-        "label": "Segment ID",
+        "label": "Segment",
         "name": "segment_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "klaviyo",
+          "resource": "segments"
+        },
         "type": "string"
       },
       {
@@ -42331,8 +42886,15 @@
             "toggle_flag"
           ]
         },
-        "label": "Project Key",
+        "label": "Project",
         "name": "project_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "launchdarkly",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -42345,6 +42907,17 @@
         },
         "label": "Feature Flag Key",
         "name": "flag_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_key"
+          ],
+          "params": {
+            "project_key": "${project_key}"
+          },
+          "provider": "launchdarkly",
+          "resource": "flags"
+        },
         "type": "string"
       },
       {
@@ -42356,6 +42929,17 @@
         },
         "label": "Environment Key",
         "name": "environment_key",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_key"
+          ],
+          "params": {
+            "project_key": "${project_key}"
+          },
+          "provider": "launchdarkly",
+          "resource": "environments"
+        },
         "type": "string"
       },
       {
@@ -42766,8 +43350,15 @@
             "list_activities"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "lemlist",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -45833,8 +46424,15 @@
             "get_list_clients"
           ]
         },
-        "label": "List (Audience) ID",
+        "label": "Audience",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailchimp",
+          "resource": "audiences"
+        },
         "type": "string"
       },
       {
@@ -46457,8 +47055,15 @@
             "assign_subscriber_to_group"
           ]
         },
-        "label": "Group ID",
+        "label": "Group",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailerlite",
+          "resource": "groups"
+        },
         "type": "string"
       },
       {
@@ -46479,8 +47084,15 @@
             "get_campaign"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailerlite",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -46650,6 +47262,13 @@
         "label": "Domain",
         "name": "domain",
         "placeholder": "mg.example.com",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailgun",
+          "resource": "domains"
+        },
         "required": true,
         "type": "string"
       },
@@ -48605,8 +49224,15 @@
             "add_group_member"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft_ad",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -48616,8 +49242,15 @@
             "add_group_member"
           ]
         },
-        "label": "Group ID",
+        "label": "Group",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft_ad",
+          "resource": "groups"
+        },
         "type": "string"
       },
       {
@@ -49003,9 +49636,16 @@
             "disassociate"
           ]
         },
-        "label": "Entity (plural)",
+        "label": "Entity",
         "name": "entity",
         "placeholder": "accounts",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "dataverse",
+          "resource": "entities"
+        },
         "type": "string"
       },
       {
@@ -49380,8 +50020,15 @@
             "get_cell"
           ]
         },
-        "label": "Workbook (Drive Item ID)",
+        "label": "Workbook",
         "name": "workbook_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "excel_workbooks"
+        },
         "type": "string"
       },
       {
@@ -49632,8 +50279,15 @@
             "create_plan"
           ]
         },
-        "label": "Group ID",
+        "label": "Team",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -49647,8 +50301,19 @@
             "create_task"
           ]
         },
-        "label": "Plan ID",
+        "label": "Plan",
         "name": "plan_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "group_id"
+          ],
+          "params": {
+            "group_id": "${group_id}"
+          },
+          "provider": "microsoft",
+          "resource": "planner_plans"
+        },
         "type": "string"
       },
       {
@@ -49870,8 +50535,15 @@
             "list_channel_messages"
           ]
         },
-        "label": "Team ID",
+        "label": "Team",
         "name": "team_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -49883,8 +50555,19 @@
             "list_channel_messages"
           ]
         },
-        "label": "Channel ID",
+        "label": "Channel",
         "name": "channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "team_id"
+          ],
+          "params": {
+            "team_id": "${team_id}"
+          },
+          "provider": "microsoft",
+          "resource": "channels"
+        },
         "type": "string"
       },
       {
@@ -50794,8 +51477,15 @@
             "update_item"
           ]
         },
-        "label": "Board ID",
+        "label": "Board",
         "name": "board_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "monday",
+          "resource": "boards"
+        },
         "type": "string"
       },
       {
@@ -50950,22 +51640,47 @@
     ],
     "properties": [
       {
-        "label": "Connection String",
-        "name": "connectionString",
-        "placeholder": "mongodb://user:pass@host:27017",
+        "credentialType": "mongodb_credentials",
+        "label": "MongoDB Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "label": "Database",
         "name": "database",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mongodb",
+          "resource": "databases"
+        },
         "required": true,
         "type": "string"
       },
       {
         "label": "Collection",
         "name": "collection",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "database"
+          ],
+          "params": {
+            "database": "${database}"
+          },
+          "provider": "mongodb",
+          "resource": "collections"
+        },
         "required": true,
+        "type": "string"
+      },
+      {
+        "label": "Connection String (legacy)",
+        "mode": "advanced",
+        "name": "connectionString",
+        "placeholder": "mongodb://user:pass@host:27017",
         "type": "string"
       },
       {
@@ -51357,11 +52072,11 @@
     ],
     "properties": [
       {
-        "label": "Connection String",
-        "name": "connectionString",
-        "placeholder": "mysql://user:pass@host:3306/dbname",
+        "credentialType": "mysql_credentials",
+        "label": "MySQL Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "query",
@@ -51380,6 +52095,36 @@
         "type": "options"
       },
       {
+        "label": "Database / Schema",
+        "mode": "advanced",
+        "name": "schema",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mysql",
+          "resource": "schemas"
+        },
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "mode": "advanced",
+        "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "schema"
+          ],
+          "params": {
+            "schema": "${schema}"
+          },
+          "provider": "mysql",
+          "resource": "tables"
+        },
+        "type": "string"
+      },
+      {
         "label": "SQL",
         "name": "sql",
         "placeholder": "SELECT * FROM users WHERE id = %s",
@@ -51393,6 +52138,13 @@
         "mode": "advanced",
         "name": "params",
         "type": "json"
+      },
+      {
+        "label": "Connection String (legacy)",
+        "mode": "advanced",
+        "name": "connectionString",
+        "placeholder": "mysql://user:pass@host:3306/dbname",
+        "type": "string"
       },
       {
         "default": 0,
@@ -51453,27 +52205,36 @@
     ],
     "properties": [
       {
-        "default": "bolt://localhost:7687",
-        "label": "URI",
-        "name": "uri",
-        "type": "string"
-      },
-      {
-        "default": "neo4j",
-        "label": "Username",
-        "name": "username",
-        "type": "string"
-      },
-      {
-        "label": "Password",
-        "name": "password",
+        "credentialType": "neo4j_credentials",
+        "label": "Neo4j Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "neo4j",
         "label": "Database",
         "name": "database",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "neo4j",
+          "resource": "databases"
+        },
+        "type": "string"
+      },
+      {
+        "label": "Node Label",
+        "mode": "advanced",
+        "name": "label",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "neo4j",
+          "resource": "labels"
+        },
         "type": "string"
       },
       {
@@ -51490,6 +52251,26 @@
         "mode": "advanced",
         "name": "params",
         "type": "json"
+      },
+      {
+        "label": "URI (legacy)",
+        "mode": "advanced",
+        "name": "uri",
+        "placeholder": "bolt://localhost:7687",
+        "type": "string"
+      },
+      {
+        "label": "Username (legacy)",
+        "mode": "advanced",
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "label": "Password (legacy)",
+        "mode": "advanced",
+        "name": "password",
+        "secret": true,
+        "type": "string"
       },
       {
         "default": 0,
@@ -52132,8 +52913,14 @@
           ]
         },
         "label": "Sources (CSV)",
-        "mode": "advanced",
         "name": "sources",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "newsapi",
+          "resource": "sources"
+        },
         "type": "string"
       },
       {
@@ -52329,13 +53116,16 @@
             "query_database"
           ]
         },
-        "label": "Database ID",
-        "loadOptions": "/integrations/notion/databases",
-        "loadOptionsDependsOn": [
-          "credential"
-        ],
+        "label": "Database",
         "name": "database_id",
         "placeholder": "32-char database ID from Notion URL",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "notion",
+          "resource": "databases"
+        },
         "required": true,
         "type": "string"
       },
@@ -52349,9 +53139,16 @@
             "append_content"
           ]
         },
-        "label": "Page ID",
+        "label": "Page",
         "name": "page_id",
         "placeholder": "Page ID from Notion URL",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "notion",
+          "resource": "pages"
+        },
         "required": true,
         "type": "string"
       },
@@ -52995,8 +53792,15 @@
             "remove_user_from_group"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "okta",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -53011,8 +53815,15 @@
             "list_group_members"
           ]
         },
-        "label": "Group ID",
+        "label": "Group",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "okta",
+          "resource": "groups"
+        },
         "type": "string"
       },
       {
@@ -53288,9 +54099,16 @@
             "create_folder"
           ]
         },
-        "label": "Folder ID",
+        "label": "Folder",
         "name": "folder_id",
         "placeholder": "root",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "onedrive_folders"
+        },
         "type": "string"
       },
       {
@@ -54386,9 +55204,16 @@
             "move_message"
           ]
         },
-        "label": "Folder ID",
+        "label": "Folder",
         "name": "folder_id",
         "placeholder": "inbox",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "outlook_folders"
+        },
         "type": "string"
       },
       {
@@ -56250,8 +57075,15 @@
             "delete_index"
           ]
         },
-        "label": "Index Name",
+        "label": "Index",
         "name": "index_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "pinecone",
+          "resource": "indexes"
+        },
         "type": "string"
       },
       {
@@ -56683,9 +57515,20 @@
             "update_deal"
           ]
         },
-        "label": "Stage ID",
+        "label": "Stage",
         "mode": "advanced",
         "name": "stage_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "pipeline_id"
+          ],
+          "params": {
+            "pipeline_id": "${pipeline_id}"
+          },
+          "provider": "pipedrive",
+          "resource": "stages"
+        },
         "type": "number"
       },
       {
@@ -56886,8 +57729,15 @@
             "get_pipeline_deals"
           ]
         },
-        "label": "Pipeline ID",
+        "label": "Pipeline",
         "name": "pipeline_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "pipedrive",
+          "resource": "pipelines"
+        },
         "type": "string"
       },
       {
@@ -57512,12 +58362,11 @@
     ],
     "properties": [
       {
-        "description": "PostgreSQL connection string.",
-        "label": "Connection String",
-        "name": "connectionString",
-        "placeholder": "postgresql://user:pass@host:5432/dbname",
+        "credentialType": "postgres_credentials",
+        "label": "Postgres Account",
+        "name": "credential",
         "required": true,
-        "type": "string"
+        "type": "credential"
       },
       {
         "default": "query",
@@ -57536,6 +58385,37 @@
         "type": "options"
       },
       {
+        "default": "public",
+        "label": "Schema",
+        "mode": "advanced",
+        "name": "schema",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "postgres",
+          "resource": "schemas"
+        },
+        "type": "string"
+      },
+      {
+        "label": "Table",
+        "mode": "advanced",
+        "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "schema"
+          ],
+          "params": {
+            "schema": "${schema}"
+          },
+          "provider": "postgres",
+          "resource": "tables"
+        },
+        "type": "string"
+      },
+      {
         "label": "SQL",
         "name": "sql",
         "placeholder": "SELECT * FROM users WHERE id = $1",
@@ -57549,6 +58429,14 @@
         "mode": "advanced",
         "name": "params",
         "type": "json"
+      },
+      {
+        "description": "Direct connection string. Use only if not using a credential.",
+        "label": "Connection String (legacy)",
+        "mode": "advanced",
+        "name": "connectionString",
+        "placeholder": "postgresql://user:pass@host:5432/dbname",
+        "type": "string"
       },
       {
         "default": 0,
@@ -57973,9 +58861,16 @@
             "get_property_definition"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
         "placeholder": "12345",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "posthog",
+          "resource": "projects"
+        },
         "required": true,
         "type": "string"
       },
@@ -58105,8 +59000,19 @@
             "delete_insight"
           ]
         },
-        "label": "Insight ID",
+        "label": "Insight",
         "name": "insight_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_id"
+          ],
+          "params": {
+            "project_id": "${project_id}"
+          },
+          "provider": "posthog",
+          "resource": "insights"
+        },
         "type": "string"
       },
       {
@@ -61516,6 +62422,13 @@
         },
         "label": "Subreddit",
         "name": "subreddit",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "reddit",
+          "resource": "subreddits"
+        },
         "type": "string"
       },
       {
@@ -62916,8 +63829,15 @@
             "get_employee"
           ]
         },
-        "label": "Employee ID",
+        "label": "Employee",
         "name": "employee_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "rippling",
+          "resource": "employees"
+        },
         "type": "string"
       },
       {
@@ -63143,8 +64063,15 @@
             "update_department"
           ]
         },
-        "label": "Department ID",
+        "label": "Department",
         "name": "department_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "rippling",
+          "resource": "departments"
+        },
         "type": "string"
       },
       {
@@ -63958,8 +64885,15 @@
             "upsert_composite"
           ]
         },
-        "label": "SObject (Lead|Contact|Account|Opportunity|Case|...)",
+        "label": "SObject",
         "name": "sobject",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "salesforce",
+          "resource": "objects"
+        },
         "type": "string"
       },
       {
@@ -64064,8 +64998,15 @@
             "run_report"
           ]
         },
-        "label": "Report ID",
+        "label": "Report",
         "name": "report_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "salesforce",
+          "resource": "reports"
+        },
         "type": "string"
       },
       {
@@ -65777,8 +66718,15 @@
             "remove_contacts_from_list"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "sendgrid",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
@@ -65861,8 +66809,15 @@
             "create_template_version"
           ]
         },
-        "label": "Template ID",
+        "label": "Template",
         "name": "template_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "sendgrid",
+          "resource": "templates"
+        },
         "type": "string"
       },
       {
@@ -66950,8 +67905,15 @@
             "delete_item"
           ]
         },
-        "label": "Site ID",
+        "label": "Site",
         "name": "site_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft",
+          "resource": "sharepoint_sites"
+        },
         "type": "string"
       },
       {
@@ -67242,8 +68204,15 @@
         "type": "string"
       },
       {
-        "label": "Product ID",
+        "label": "Product",
         "name": "product_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "shopify",
+          "resource": "products"
+        },
         "type": "string"
       },
       {
@@ -67423,8 +68392,15 @@
             "adjust_inventory"
           ]
         },
-        "label": "Location ID",
+        "label": "Location",
         "name": "location_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "shopify",
+          "resource": "locations"
+        },
         "type": "string"
       },
       {
@@ -67458,8 +68434,15 @@
             "get_collection"
           ]
         },
-        "label": "Collection ID",
+        "label": "Collection",
         "name": "collection_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "shopify",
+          "resource": "collections"
+        },
         "type": "string"
       },
       {
@@ -70444,8 +71427,15 @@
             "unfollow_playlist"
           ]
         },
-        "label": "Playlist ID",
+        "label": "Playlist",
         "name": "playlist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "spotify",
+          "resource": "playlists"
+        },
         "type": "string"
       },
       {
@@ -70564,8 +71554,15 @@
             "get_artist_top_tracks"
           ]
         },
-        "label": "Artist ID",
+        "label": "Artist",
         "name": "artist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "spotify",
+          "resource": "artists"
+        },
         "type": "string"
       },
       {
@@ -70720,8 +71717,15 @@
             "get_album_tracks"
           ]
         },
-        "label": "Album ID",
+        "label": "Album",
         "name": "album_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "spotify",
+          "resource": "albums"
+        },
         "type": "string"
       },
       {
@@ -72067,8 +73071,15 @@
             "create_setup_intent"
           ]
         },
-        "label": "Customer ID",
+        "label": "Customer",
         "name": "customer_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "stripe",
+          "resource": "customers"
+        },
         "type": "string"
       },
       {
@@ -72153,8 +73164,19 @@
             "create_checkout_session"
           ]
         },
-        "label": "Price ID",
+        "label": "Price",
         "name": "price_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "product_id"
+          ],
+          "params": {
+            "product_id": "${product_id}"
+          },
+          "provider": "stripe",
+          "resource": "prices"
+        },
         "type": "string"
       },
       {
@@ -72164,8 +73186,15 @@
             "create_price"
           ]
         },
-        "label": "Product ID",
+        "label": "Product",
         "name": "product_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "stripe",
+          "resource": "products"
+        },
         "type": "string"
       },
       {
@@ -74824,8 +75853,15 @@
             "create_list"
           ]
         },
-        "label": "Board ID",
+        "label": "Board",
         "name": "board_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "trello",
+          "resource": "boards"
+        },
         "type": "string"
       },
       {
@@ -74837,8 +75873,19 @@
             "update_card"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "board_id"
+          ],
+          "params": {
+            "board_id": "${board_id}"
+          },
+          "provider": "trello",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
@@ -76783,8 +77830,15 @@
             "delete_webhook"
           ]
         },
-        "label": "Form ID",
+        "label": "Form",
         "name": "form_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "typeform",
+          "resource": "forms"
+        },
         "type": "string"
       },
       {
@@ -77889,9 +78943,16 @@
             "add_team_member"
           ]
         },
-        "label": "Team ID (optional)",
+        "label": "Team",
         "mode": "advanced",
         "name": "team_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "vercel",
+          "resource": "teams"
+        },
         "type": "string"
       },
       {
@@ -77916,8 +78977,17 @@
             "get_env_var"
           ]
         },
-        "label": "Project ID or name",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {
+            "team_id": "${team_id}"
+          },
+          "provider": "vercel",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -79799,8 +80869,15 @@
             "get_user"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "wordpress",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -81336,8 +82413,15 @@
             "get_user"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "zendesk",
+          "resource": "users"
+        },
         "type": "number"
       },
       {
@@ -82422,8 +83506,15 @@
           ]
         },
         "default": "me",
-        "label": "User ID or 'me'",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "zoom",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -82436,8 +83527,15 @@
             "get_meeting_recordings"
           ]
         },
-        "label": "Meeting ID",
+        "label": "Meeting",
         "name": "meeting_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "zoom",
+          "resource": "meetings"
+        },
         "type": "string"
       },
       {
@@ -86337,8 +87435,15 @@
       {
         "label": "Space",
         "name": "space",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "chat_spaces"
+        },
         "required": true,
-        "type": "gchat-space"
+        "type": "string"
       },
       {
         "description": "Optional. Combined with the createTime cursor using `AND` before being sent to messages.list \u2014 e.g. only messages from a specific user.",
@@ -86587,7 +87692,14 @@
         "description": "Pick a Drive folder via Google's Picker. Drive's `drive.file` scope only surfaces files RunMyCrew created OR files inside a folder the user explicitly picked here \u2014 that's how RunMyCrew stays inside the non-sensitive scope that doesn't need Google's security review. Leave blank to fall back to whatever RunMyCrew created.",
         "label": "Folder to watch",
         "name": "parent_folder_id",
-        "type": "gdrive-folder"
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_folders"
+        },
+        "type": "string"
       },
       {
         "default": "",
@@ -86693,8 +87805,15 @@
       {
         "label": "Form",
         "name": "form_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new form\u2026",
           "mimeType": "application/vnd.google-apps.form",
@@ -87394,8 +88513,15 @@
       {
         "label": "Spreadsheet",
         "name": "spreadsheet_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new spreadsheet\u2026",
           "mimeType": "application/vnd.google-apps.spreadsheet",
@@ -87407,8 +88533,15 @@
         "default": "Sheet1",
         "label": "Sheet (tab)",
         "name": "sheet_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "sheet_tabs"
+        },
         "required": true,
-        "type": "gsheet-tab",
+        "type": "string",
         "typeOptions": {
           "valueAs": "title"
         }
@@ -87915,8 +89048,15 @@
       {
         "label": "Tasklist",
         "name": "tasklist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "tasklists"
+        },
         "required": true,
-        "type": "gtasks-tasklist"
+        "type": "string"
       },
       {
         "default": 25,
@@ -88038,7 +89178,14 @@
         "label": "Video (optional)",
         "mode": "advanced",
         "name": "video_id",
-        "type": "youtube-video"
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "yt_videos"
+        },
+        "type": "string"
       },
       {
         "condition": {

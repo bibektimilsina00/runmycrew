@@ -61,7 +61,7 @@ class NotionNode(BaseNode[NotionProperties]):
                 },
                 {
                     "name": "database_id",
-                    "label": "Database ID",
+                    "label": "Database",
                     "type": "string",
                     "required": True,
                     "placeholder": "32-char database ID from Notion URL",
@@ -69,18 +69,30 @@ class NotionNode(BaseNode[NotionProperties]):
                         "field": "operation",
                         "value": ["create_page", "query_database"],
                     },
-                    "loadOptions": "/integrations/notion/databases",
-                    "loadOptionsDependsOn": ["credential"],
+                    "remote": {
+                        "provider": "notion",
+                        "resource": "databases",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                 },
                 {
                     "name": "page_id",
-                    "label": "Page ID",
+                    "label": "Page",
                     "type": "string",
                     "required": True,
                     "placeholder": "Page ID from Notion URL",
                     "condition": {
                         "field": "operation",
                         "value": ["get_page", "update_page", "get_page_content", "append_content"],
+                    },
+                    "remote": {
+                        "provider": "notion",
+                        "resource": "pages",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
                     },
                 },
                 {

@@ -16,6 +16,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -32,7 +33,12 @@ MANIFEST = ProviderManifest(
     # Empty username → `Basic base64(:api_key)`, lemlist's convention.
     auth_basic_username="",
     fields=[
-        FieldSpec(name="campaign_id", label="Campaign ID", type="string"),
+        FieldSpec(
+            name="campaign_id",
+            label="Campaign",
+            type="string",
+            remote=RemoteLookup(provider="lemlist", resource="campaigns"),
+        ),
         FieldSpec(name="lead_email", label="Lead Email", type="string"),
         FieldSpec(name="first_name", label="First Name", type="string"),
         FieldSpec(name="last_name", label="Last Name", type="string"),

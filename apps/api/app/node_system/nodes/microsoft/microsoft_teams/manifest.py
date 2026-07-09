@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -26,8 +27,23 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="team_id", label="Team ID", type="string"),
-        FieldSpec(name="channel_id", label="Channel ID", type="string"),
+        FieldSpec(
+            name="team_id",
+            label="Team",
+            type="string",
+            remote=RemoteLookup(provider="microsoft", resource="teams"),
+        ),
+        FieldSpec(
+            name="channel_id",
+            label="Channel",
+            type="string",
+            remote=RemoteLookup(
+                provider="microsoft",
+                resource="channels",
+                params={"team_id": "${team_id}"},
+                depends_on=["team_id"],
+            ),
+        ),
         FieldSpec(name="chat_id", label="Chat ID", type="string"),
         FieldSpec(name="message_id", label="Message ID", type="string"),
         FieldSpec(name="content", label="Message Content", type="string"),

@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -26,15 +27,21 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="basic_token_only",
     fields=[
-        FieldSpec(name="job_id", label="Job ID", type="string"),
+        FieldSpec(
+            name="job_id",
+            label="Job",
+            type="string",
+            remote=RemoteLookup(provider="greenhouse", resource="jobs"),
+        ),
         FieldSpec(name="candidate_id", label="Candidate ID", type="string"),
         FieldSpec(name="application_id", label="Application ID", type="string"),
         FieldSpec(name="offer_id", label="Offer ID", type="string"),
         FieldSpec(
             name="user_id",
-            label="User ID (for note authoring)",
+            label="User (for note authoring)",
             type="string",
             mode="advanced",
+            remote=RemoteLookup(provider="greenhouse", resource="users"),
         ),
         FieldSpec(name="first_name", label="First Name", type="string"),
         FieldSpec(name="last_name", label="Last Name", type="string"),

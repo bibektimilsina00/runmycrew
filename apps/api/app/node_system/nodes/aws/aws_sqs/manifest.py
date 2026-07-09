@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _SQS_HOST = "https://sqs.{region}.amazonaws.com/"
@@ -31,7 +32,12 @@ MANIFEST = ProviderManifest(
     aws_default_region="us-east-1",
     content_type="application/x-amz-json-1.0",
     fields=[
-        FieldSpec(name="queue_url", label="Queue URL", type="string"),
+        FieldSpec(
+            name="queue_url",
+            label="Queue",
+            type="string",
+            remote=RemoteLookup(provider="aws", resource="sqs_queues"),
+        ),
         FieldSpec(name="queue_name", label="Queue Name", type="string"),
         FieldSpec(name="message_body", label="Message Body", type="string"),
         FieldSpec(

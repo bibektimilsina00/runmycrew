@@ -5,7 +5,12 @@ REST at https://bigquery.googleapis.com/bigquery/v2. See sim-parity roadmap Phas
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.google_bigquery",
@@ -23,8 +28,28 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="query", label="Query / GAQL / SQL", type="string"),
         FieldSpec(name="operations", label="Operations (JSON array)", type="json", default=[]),
         FieldSpec(name="project_id", label="Project ID", type="string"),
-        FieldSpec(name="dataset_id", label="Dataset ID", type="string"),
-        FieldSpec(name="table_id", label="Table ID", type="string"),
+        FieldSpec(
+            name="dataset_id",
+            label="Dataset",
+            type="string",
+            remote=RemoteLookup(
+                provider="bigquery",
+                resource="datasets",
+                params={"project_id": "${project_id}"},
+                depends_on=["project_id"],
+            ),
+        ),
+        FieldSpec(
+            name="table_id",
+            label="Table",
+            type="string",
+            remote=RemoteLookup(
+                provider="bigquery",
+                resource="tables",
+                params={"project_id": "${project_id}", "dataset_id": "${dataset_id}"},
+                depends_on=["project_id", "dataset_id"],
+            ),
+        ),
         FieldSpec(name="rows", label="Rows (JSON array)", type="json", default=[]),
         FieldSpec(
             name="use_legacy_sql",

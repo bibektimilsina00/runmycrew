@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -34,6 +35,7 @@ MANIFEST = ProviderManifest(
             type="string",
             required=True,
             placeholder="mg.example.com",
+            remote=RemoteLookup(provider="mailgun", resource="domains"),
         ),
         FieldSpec(name="from_", label="From", type="string", placeholder='"You" <you@example.com>'),
         FieldSpec(name="to", label="To", type="string"),

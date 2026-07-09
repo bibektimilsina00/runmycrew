@@ -149,7 +149,14 @@ class GoogleYouTubeTriggerNode(BaseNode[GoogleYouTubeTriggerProperties]):
                 {
                     "name": "video_id",
                     "label": "Video (optional)",
-                    "type": "youtube-video",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "yt_videos",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "description": "Leave blank to watch every comment thread on your channel.",
                     "condition": {"field": "event_type", "value": EVENT_NEW_COMMENT},
                     "mode": "advanced",

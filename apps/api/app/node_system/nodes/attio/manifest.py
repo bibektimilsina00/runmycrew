@@ -13,6 +13,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -32,6 +33,7 @@ MANIFEST = ProviderManifest(
             label="Object",
             type="string",
             placeholder="people | companies | deals | custom_slug",
+            remote=RemoteLookup(provider="attio", resource="objects"),
         ),
         FieldSpec(name="record_id", label="Record ID", type="string"),
         FieldSpec(name="data", label="Record values (JSON)", type="json"),
@@ -39,7 +41,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="sorts", label="Sorts (JSON)", type="json", mode="advanced"),
         FieldSpec(name="limit", label="Limit", type="number", default=25, mode="advanced"),
         FieldSpec(name="offset", label="Offset", type="number", default=0, mode="advanced"),
-        FieldSpec(name="list_id", label="List ID", type="string"),
+        FieldSpec(
+            name="list_id",
+            label="List",
+            type="string",
+            remote=RemoteLookup(provider="attio", resource="lists"),
+        ),
         FieldSpec(name="entry_data", label="Entry values (JSON)", type="json"),
         FieldSpec(name="entry_id", label="List Entry ID", type="string"),
         FieldSpec(name="note_id", label="Note ID", type="string"),

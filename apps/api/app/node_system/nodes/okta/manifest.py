@@ -5,7 +5,12 @@ REST at https://{domain}/api/v1. See sim-parity roadmap Phase 4.25.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.okta",
@@ -20,8 +25,18 @@ MANIFEST = ProviderManifest(
     auth="header_token",
     auth_header_name="Authorization",
     fields=[
-        FieldSpec(name="user_id", label="User ID", type="string"),
-        FieldSpec(name="group_id", label="Group ID", type="string"),
+        FieldSpec(
+            name="user_id",
+            label="User",
+            type="string",
+            remote=RemoteLookup(provider="okta", resource="users"),
+        ),
+        FieldSpec(
+            name="group_id",
+            label="Group",
+            type="string",
+            remote=RemoteLookup(provider="okta", resource="groups"),
+        ),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="password", label="Password", type="string", secret=True),
         FieldSpec(name="first_name", label="First Name", type="string"),

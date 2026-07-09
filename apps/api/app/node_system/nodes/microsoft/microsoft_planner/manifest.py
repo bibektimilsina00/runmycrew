@@ -15,6 +15,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -29,8 +30,23 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="group_id", label="Group ID", type="string"),
-        FieldSpec(name="plan_id", label="Plan ID", type="string"),
+        FieldSpec(
+            name="group_id",
+            label="Team",
+            type="string",
+            remote=RemoteLookup(provider="microsoft", resource="teams"),
+        ),
+        FieldSpec(
+            name="plan_id",
+            label="Plan",
+            type="string",
+            remote=RemoteLookup(
+                provider="microsoft",
+                resource="planner_plans",
+                params={"group_id": "${group_id}"},
+                depends_on=["group_id"],
+            ),
+        ),
         FieldSpec(name="bucket_id", label="Bucket ID", type="string"),
         FieldSpec(name="task_id", label="Task ID", type="string"),
         FieldSpec(name="title", label="Title", type="string"),

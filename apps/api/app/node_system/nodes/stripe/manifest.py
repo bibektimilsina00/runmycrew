@@ -14,7 +14,12 @@ that for the surface we ship).
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.stripe",
@@ -33,15 +38,35 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="currency", label="Currency", type="string", default="usd"),
         FieldSpec(name="description", label="Description", type="string"),
         FieldSpec(name="payment_intent_id", label="Payment Intent ID", type="string"),
-        FieldSpec(name="customer_id", label="Customer ID", type="string"),
+        FieldSpec(
+            name="customer_id",
+            label="Customer",
+            type="string",
+            remote=RemoteLookup(provider="stripe", resource="customers"),
+        ),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="name", label="Name", type="string"),
         FieldSpec(name="refund_amount", label="Refund Amount (cents)", type="number"),
         FieldSpec(name="invoice_id", label="Invoice ID", type="string"),
         FieldSpec(name="charge_id", label="Charge ID", type="string"),
         FieldSpec(name="subscription_id", label="Subscription ID", type="string"),
-        FieldSpec(name="price_id", label="Price ID", type="string"),
-        FieldSpec(name="product_id", label="Product ID", type="string"),
+        FieldSpec(
+            name="price_id",
+            label="Price",
+            type="string",
+            remote=RemoteLookup(
+                provider="stripe",
+                resource="prices",
+                params={"product_id": "${product_id}"},
+                depends_on=["product_id"],
+            ),
+        ),
+        FieldSpec(
+            name="product_id",
+            label="Product",
+            type="string",
+            remote=RemoteLookup(provider="stripe", resource="products"),
+        ),
         FieldSpec(name="product_name", label="Product Name", type="string"),
         FieldSpec(name="price_amount", label="Price Amount (cents)", type="number"),
         FieldSpec(

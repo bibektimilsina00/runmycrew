@@ -5,7 +5,12 @@ REST at https://{site}/wp-json/wp/v2. See sim-parity roadmap Phase 4.29.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.wordpress",
@@ -44,7 +49,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="article", label="Article ID", type="string"),
         FieldSpec(name="track_id", label="Track ID", type="string"),
         FieldSpec(name="artist_id", label="Artist ID", type="string"),
-        FieldSpec(name="user_id", label="User ID", type="string"),
+        FieldSpec(
+            name="user_id",
+            label="User",
+            type="string",
+            remote=RemoteLookup(provider="wordpress", resource="users"),
+        ),
         FieldSpec(name="playlist_name", label="Playlist Name", type="string"),
         FieldSpec(name="playlist_description", label="Playlist Description", type="string"),
         FieldSpec(name="public", label="Public Playlist", type="boolean", default=False),

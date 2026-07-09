@@ -292,7 +292,14 @@ class GoogleCloudStorageNode(BaseNode[GoogleCloudStorageProperties]):
                 {
                     "name": "bucket",
                     "label": "Bucket",
-                    "type": "gcs-bucket",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "gcs_buckets",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(
                         "get_bucket",
@@ -455,7 +462,14 @@ class GoogleCloudStorageNode(BaseNode[GoogleCloudStorageProperties]):
                 {
                     "name": "destination_bucket",
                     "label": "Destination bucket",
-                    "type": "gcs-bucket",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "gcs_buckets",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond("copy_object"),
                 },

@@ -18,6 +18,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 
@@ -48,8 +49,23 @@ MANIFEST = ProviderManifest(
     # to skip the scaffold's own Authorization header build.
     auth="none",
     fields=[
-        FieldSpec(name="board_id", label="Board ID", type="string"),
-        FieldSpec(name="list_id", label="List ID", type="string"),
+        FieldSpec(
+            name="board_id",
+            label="Board",
+            type="string",
+            remote=RemoteLookup(provider="trello", resource="boards"),
+        ),
+        FieldSpec(
+            name="list_id",
+            label="List",
+            type="string",
+            remote=RemoteLookup(
+                provider="trello",
+                resource="lists",
+                params={"board_id": "${board_id}"},
+                depends_on=["board_id"],
+            ),
+        ),
         FieldSpec(name="card_id", label="Card ID", type="string"),
         FieldSpec(name="name", label="Name", type="string"),
         FieldSpec(name="desc", label="Description", type="string", mode="advanced"),

@@ -23,6 +23,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -38,7 +39,12 @@ MANIFEST = ProviderManifest(
     auth="bearer",
     fields=[
         FieldSpec(
-            name="project_id", label="Project ID", type="string", required=True, placeholder="12345"
+            name="project_id",
+            label="Project",
+            type="string",
+            required=True,
+            placeholder="12345",
+            remote=RemoteLookup(provider="posthog", resource="projects"),
         ),
         FieldSpec(name="flag_id", label="Feature Flag ID", type="string"),
         FieldSpec(name="flag_key", label="Feature Flag Key", type="string"),
@@ -55,7 +61,17 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="limit", label="Limit", type="number", default=100, mode="advanced"),
         FieldSpec(name="batch", label="Batch (JSON array)", type="json", default=[]),
         FieldSpec(name="posthog_query", label="HogQL Query (JSON)", type="json", default={}),
-        FieldSpec(name="insight_id", label="Insight ID", type="string"),
+        FieldSpec(
+            name="insight_id",
+            label="Insight",
+            type="string",
+            remote=RemoteLookup(
+                provider="posthog",
+                resource="insights",
+                params={"project_id": "${project_id}"},
+                depends_on=["project_id"],
+            ),
+        ),
         FieldSpec(name="insight_body", label="Insight Body (JSON)", type="json", default={}),
         FieldSpec(name="dashboard_id", label="Dashboard ID", type="string"),
         FieldSpec(name="cohort_id", label="Cohort ID", type="string"),

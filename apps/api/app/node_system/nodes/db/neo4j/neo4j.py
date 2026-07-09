@@ -9,13 +9,16 @@ from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
+from apps.api.app.node_system.nodes.db._credential_resolver import resolve_credential
 
 
 class Neo4jProperties(BaseModel):
-    uri: str = "bolt://localhost:7687"
-    username: str = "neo4j"
+    credential: str = ""
+    uri: str = ""
+    username: str = ""
     password: str = ""
     database: str = "neo4j"
+    label: str = ""
     query: str = ""  # Cypher query
     params: Any = None  # Query parameters dict
 
@@ -36,14 +39,38 @@ class Neo4jNode(BaseNode[Neo4jProperties]):
             color="#ffffff",
             properties=[
                 {
-                    "name": "uri",
-                    "label": "URI",
-                    "type": "string",
-                    "default": "bolt://localhost:7687",
+                    "name": "credential",
+                    "label": "Neo4j Account",
+                    "type": "credential",
+                    "credentialType": "neo4j_credentials",
+                    "required": True,
                 },
-                {"name": "username", "label": "Username", "type": "string", "default": "neo4j"},
-                {"name": "password", "label": "Password", "type": "string", "required": True},
-                {"name": "database", "label": "Database", "type": "string", "default": "neo4j"},
+                {
+                    "name": "database",
+                    "label": "Database",
+                    "type": "string",
+                    "default": "neo4j",
+                    "remote": {
+                        "provider": "neo4j",
+                        "resource": "databases",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
+                },
+                {
+                    "name": "label",
+                    "label": "Node Label",
+                    "type": "string",
+                    "mode": "advanced",
+                    "remote": {
+                        "provider": "neo4j",
+                        "resource": "labels",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
+                },
                 {
                     "name": "query",
                     "label": "Cypher Query",
@@ -58,6 +85,26 @@ class Neo4jNode(BaseNode[Neo4jProperties]):
                     "default": {},
                     "mode": "advanced",
                     "description": "Dict of named parameters for the Cypher query.",
+                },
+                {
+                    "name": "uri",
+                    "label": "URI (legacy)",
+                    "type": "string",
+                    "mode": "advanced",
+                    "placeholder": "bolt://localhost:7687",
+                },
+                {
+                    "name": "username",
+                    "label": "Username (legacy)",
+                    "type": "string",
+                    "mode": "advanced",
+                },
+                {
+                    "name": "password",
+                    "label": "Password (legacy)",
+                    "type": "string",
+                    "secret": True,
+                    "mode": "advanced",
                 },
             ],
             inputs=1,
@@ -78,22 +125,42 @@ class Neo4jNode(BaseNode[Neo4jProperties]):
                 return {}
         return raw if isinstance(raw, dict) else {}
 
+    async def _resolve_uri_auth(self, context: NodeContext) -> tuple[str, tuple[str, str] | None]:
+        cred_id = (self.props.credential or "").strip()
+        if cred_id:
+            data = await resolve_credential(cred_id, context.workspace_id)
+            if not data:
+                raise ValueError("Neo4j credential not found for this workspace.")
+            uri = data.get("uri") or data.get("connectionString") or data.get("host")
+            if not uri:
+                raise ValueError("Neo4j credential missing uri.")
+            uri = str(uri)
+            if not uri.startswith(("bolt", "neo4j")):
+                uri = f"bolt://{uri}"
+            user = data.get("user") or data.get("username")
+            pw = data.get("password")
+            return uri, (user, pw) if user and pw else None
+        if self.props.uri.strip():
+            auth = (self.props.username, self.props.password) if self.props.password else None
+            return self.props.uri, auth
+        raise ValueError("Select a credential or paste URI + password.")
+
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
         if not self.props.query.strip():
             return NodeResult(success=False, error="query is required")
-        if not self.props.password.strip():
-            return NodeResult(success=False, error="password is required")
 
         try:
             from neo4j import AsyncGraphDatabase  # type: ignore[import]
         except ImportError:
             return NodeResult(success=False, error="neo4j not installed. Run: pip install neo4j")
 
+        try:
+            uri, auth = await self._resolve_uri_auth(context)
+        except ValueError as e:
+            return NodeResult(success=False, error=str(e))
+
         params = self._parse_params()
-        driver = AsyncGraphDatabase.driver(
-            self.props.uri,
-            auth=(self.props.username, self.props.password),
-        )
+        driver = AsyncGraphDatabase.driver(uri, auth=auth)
         try:
             async with driver.session(database=self.props.database) as session:
                 result = await session.run(self.props.query, params)

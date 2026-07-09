@@ -12,7 +12,12 @@ New action node — trigger + webhook already existed under
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.microsoft.azure_devops import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.azure_devops",
@@ -26,7 +31,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="basic_token_only",
     fields=[
-        FieldSpec(name="pipeline_id", label="Pipeline ID", type="number"),
+        FieldSpec(
+            name="pipeline_id",
+            label="Pipeline",
+            type="number",
+            remote=RemoteLookup(provider="azure_devops", resource="pipelines"),
+        ),
         FieldSpec(name="run_id", label="Pipeline Run ID", type="number"),
         FieldSpec(name="build_id", label="Build ID", type="number"),
         FieldSpec(name="log_id", label="Log ID", type="number"),

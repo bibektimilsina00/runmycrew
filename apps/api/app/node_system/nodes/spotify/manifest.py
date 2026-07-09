@@ -5,7 +5,12 @@ REST at https://api.spotify.com/v1. See sim-parity roadmap Phase 4.29.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.spotify",
@@ -26,7 +31,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="type", label="Type", type="string"),
         FieldSpec(name="video_id", label="Video ID", type="string"),
         FieldSpec(name="channel_id", label="Channel ID", type="string"),
-        FieldSpec(name="playlist_id", label="Playlist ID", type="string"),
+        FieldSpec(
+            name="playlist_id",
+            label="Playlist",
+            type="string",
+            remote=RemoteLookup(provider="spotify", resource="playlists"),
+        ),
         FieldSpec(name="post_id", label="Post ID", type="string"),
         FieldSpec(name="title", label="Title", type="string"),
         FieldSpec(name="content", label="Content (HTML)", type="string"),
@@ -42,7 +52,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="kind", label="Kind (self|link)", type="string", default="self"),
         FieldSpec(name="article", label="Article ID", type="string"),
         FieldSpec(name="track_id", label="Track ID", type="string"),
-        FieldSpec(name="artist_id", label="Artist ID", type="string"),
+        FieldSpec(
+            name="artist_id",
+            label="Artist",
+            type="string",
+            remote=RemoteLookup(provider="spotify", resource="artists"),
+        ),
         FieldSpec(name="user_id", label="User ID", type="string"),
         FieldSpec(name="playlist_name", label="Playlist Name", type="string"),
         FieldSpec(name="playlist_description", label="Playlist Description", type="string"),
@@ -59,7 +74,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="text_amount", label="Text Amount", type="string", default="detailed"),
         FieldSpec(name="generation_id", label="Generation ID", type="string"),
         FieldSpec(name="ids", label="Comma-separated IDs", type="string"),
-        FieldSpec(name="album_id", label="Album ID", type="string"),
+        FieldSpec(
+            name="album_id",
+            label="Album",
+            type="string",
+            remote=RemoteLookup(provider="spotify", resource="albums"),
+        ),
         FieldSpec(name="show_id", label="Show ID", type="string"),
         FieldSpec(name="episode_id", label="Episode ID", type="string"),
         FieldSpec(name="market", label="Market (ISO country)", type="string", default="US"),

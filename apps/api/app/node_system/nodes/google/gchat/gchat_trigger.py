@@ -111,7 +111,14 @@ class GoogleChatTriggerNode(BaseNode[GoogleChatTriggerProperties]):
                 {
                     "name": "space",
                     "label": "Space",
-                    "type": "gchat-space",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "chat_spaces",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                 },
                 {

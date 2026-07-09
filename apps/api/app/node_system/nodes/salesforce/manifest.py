@@ -10,7 +10,12 @@ read from the credential dict via `_PropCredView`.
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.salesforce import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.salesforce",
@@ -26,8 +31,9 @@ MANIFEST = ProviderManifest(
     fields=[
         FieldSpec(
             name="sobject",
-            label="SObject (Lead|Contact|Account|Opportunity|Case|...)",
+            label="SObject",
             type="string",
+            remote=RemoteLookup(provider="salesforce", resource="objects"),
         ),
         FieldSpec(name="record_id", label="Record ID", type="string"),
         FieldSpec(name="record_data", label="Record Data (JSON)", type="json", default={}),
@@ -41,7 +47,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="external_id_value", label="External ID Value", type="string"),
         FieldSpec(name="search_sosl", label="SOSL", type="string"),
         FieldSpec(name="field_names", label="Field Names (comma-separated)", type="string"),
-        FieldSpec(name="report_id", label="Report ID", type="string"),
+        FieldSpec(
+            name="report_id",
+            label="Report",
+            type="string",
+            remote=RemoteLookup(provider="salesforce", resource="reports"),
+        ),
         FieldSpec(name="dashboard_id", label="Dashboard ID", type="string"),
         FieldSpec(name="user_id", label="User ID", type="string"),
         FieldSpec(name="apex_class", label="Apex Class Name (REST)", type="string"),

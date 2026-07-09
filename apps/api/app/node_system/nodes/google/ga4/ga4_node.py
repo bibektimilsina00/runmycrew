@@ -333,7 +333,14 @@ class GoogleAnalyticsNode(BaseNode[GoogleAnalyticsProperties]):
                 {
                     "name": "property",
                     "label": "Property",
-                    "type": "ga4-property",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "ga4_properties",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(
                         "run_report",

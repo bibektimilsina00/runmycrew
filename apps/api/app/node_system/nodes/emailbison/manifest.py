@@ -19,6 +19,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -33,7 +34,12 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="campaign_id", label="Campaign ID", type="string"),
+        FieldSpec(
+            name="campaign_id",
+            label="Campaign",
+            type="string",
+            remote=RemoteLookup(provider="emailbison", resource="campaigns"),
+        ),
         FieldSpec(name="lead_id", label="Lead ID", type="string"),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="first_name", label="First Name", type="string"),

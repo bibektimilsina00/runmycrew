@@ -12,6 +12,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 
@@ -42,7 +43,13 @@ MANIFEST = ProviderManifest(
     auth="bearer",
     fields=[
         FieldSpec(name="message_id", label="Message ID", type="string"),
-        FieldSpec(name="folder_id", label="Folder ID", type="string", placeholder="inbox"),
+        FieldSpec(
+            name="folder_id",
+            label="Folder",
+            type="string",
+            placeholder="inbox",
+            remote=RemoteLookup(provider="microsoft", resource="outlook_folders"),
+        ),
         FieldSpec(name="to", label="To (CSV emails)", type="string"),
         FieldSpec(name="cc", label="CC", type="string", mode="advanced"),
         FieldSpec(name="bcc", label="BCC", type="string", mode="advanced"),

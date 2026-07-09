@@ -5,7 +5,12 @@ REST at https://graph.microsoft.com/v1.0. See sim-parity roadmap Phase 4.28.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.microsoft_ad",
@@ -19,8 +24,18 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="user_id", label="User ID", type="string"),
-        FieldSpec(name="group_id", label="Group ID", type="string"),
+        FieldSpec(
+            name="user_id",
+            label="User",
+            type="string",
+            remote=RemoteLookup(provider="microsoft_ad", resource="users"),
+        ),
+        FieldSpec(
+            name="group_id",
+            label="Group",
+            type="string",
+            remote=RemoteLookup(provider="microsoft_ad", resource="groups"),
+        ),
         FieldSpec(name="user_principal_name", label="User Principal Name", type="string"),
         FieldSpec(name="display_name", label="Display Name", type="string"),
         FieldSpec(name="mail_nickname", label="Mail Nickname", type="string"),

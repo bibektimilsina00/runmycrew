@@ -15,6 +15,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 _HOST = "https://{dc}.api.mailchimp.com/3.0"
@@ -34,7 +35,12 @@ MANIFEST = ProviderManifest(
     auth="basic",
     auth_basic_username="anystring",
     fields=[
-        FieldSpec(name="list_id", label="List (Audience) ID", type="string"),
+        FieldSpec(
+            name="list_id",
+            label="Audience",
+            type="string",
+            remote=RemoteLookup(provider="mailchimp", resource="audiences"),
+        ),
         FieldSpec(name="member_hash", label="Member Hash (MD5 of lowercased email)", type="string"),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(

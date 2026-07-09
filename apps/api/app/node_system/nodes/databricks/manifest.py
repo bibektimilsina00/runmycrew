@@ -5,7 +5,12 @@ REST at {workspace_url}/api/2.0. See sim-parity roadmap Phase 4.21.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.databricks",
@@ -19,17 +24,47 @@ MANIFEST = ProviderManifest(
     token_field=["api_key"],
     auth="bearer",
     fields=[
-        FieldSpec(name="warehouse_id", label="SQL Warehouse ID", type="string"),
+        FieldSpec(
+            name="warehouse_id",
+            label="SQL Warehouse",
+            type="string",
+            remote=RemoteLookup(provider="databricks", resource="warehouses"),
+        ),
         FieldSpec(name="statement", label="SQL Statement", type="string"),
         FieldSpec(name="statement_id", label="Statement ID", type="string"),
-        FieldSpec(name="catalog", label="Catalog", type="string"),
-        FieldSpec(name="schema_name", label="Schema", type="string"),
+        FieldSpec(
+            name="catalog",
+            label="Catalog",
+            type="string",
+            remote=RemoteLookup(provider="databricks", resource="catalogs"),
+        ),
+        FieldSpec(
+            name="schema_name",
+            label="Schema",
+            type="string",
+            remote=RemoteLookup(
+                provider="databricks",
+                resource="schemas",
+                params={"catalog": "${catalog}"},
+                depends_on=["catalog"],
+            ),
+        ),
         FieldSpec(name="job_id", label="Job ID", type="string"),
         FieldSpec(name="run_id", label="Run ID", type="string"),
         FieldSpec(name="parameters", label="Parameters (JSON)", type="json"),
         FieldSpec(name="sql", label="SQL", type="string"),
         FieldSpec(name="database", label="Database", type="string"),
-        FieldSpec(name="table", label="Table", type="string"),
+        FieldSpec(
+            name="table",
+            label="Table",
+            type="string",
+            remote=RemoteLookup(
+                provider="databricks",
+                resource="tables",
+                params={"catalog": "${catalog}", "schema": "${schema_name}"},
+                depends_on=["catalog", "schema_name"],
+            ),
+        ),
         FieldSpec(name="rows", label="Rows (JSONEachRow)", type="string"),
         FieldSpec(name="index", label="Index", type="string"),
         FieldSpec(name="doc_id", label="Doc ID", type="string"),

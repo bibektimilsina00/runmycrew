@@ -13,6 +13,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -37,8 +38,18 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="properties", label="Properties (JSON)", type="json", mode="advanced"),
         FieldSpec(name="event_name", label="Event Metric Name", type="string"),
         FieldSpec(name="event_properties", label="Event Properties (JSON)", type="json"),
-        FieldSpec(name="list_id", label="List ID", type="string"),
-        FieldSpec(name="segment_id", label="Segment ID", type="string"),
+        FieldSpec(
+            name="list_id",
+            label="List",
+            type="string",
+            remote=RemoteLookup(provider="klaviyo", resource="lists"),
+        ),
+        FieldSpec(
+            name="segment_id",
+            label="Segment",
+            type="string",
+            remote=RemoteLookup(provider="klaviyo", resource="segments"),
+        ),
         FieldSpec(name="page_size", label="Page Size", type="number", default=20, mode="advanced"),
     ],
     operations=[

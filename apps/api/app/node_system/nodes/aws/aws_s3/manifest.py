@@ -19,6 +19,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 # `{region}` resolves via _PropCredView from credential.region; if
@@ -43,7 +44,13 @@ MANIFEST = ProviderManifest(
     aws_service="s3",
     aws_default_region="us-east-1",
     fields=[
-        FieldSpec(name="bucket", label="Bucket", type="string", required=True),
+        FieldSpec(
+            name="bucket",
+            label="Bucket",
+            type="string",
+            required=True,
+            remote=RemoteLookup(provider="aws", resource="s3_buckets"),
+        ),
         FieldSpec(name="key", label="Object Key", type="string"),
         FieldSpec(name="body", label="Body (text)", type="string"),
         FieldSpec(

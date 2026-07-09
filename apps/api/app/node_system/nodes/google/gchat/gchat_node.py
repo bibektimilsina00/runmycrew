@@ -328,7 +328,14 @@ class GoogleChatNode(BaseNode[GoogleChatProperties]):
                 {
                     "name": "space",
                     "label": "Space",
-                    "type": "gchat-space",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "chat_spaces",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "condition": _cond_any(
                         "send_message",
