@@ -86,10 +86,13 @@ export const API_ROUTES = {
   CREW_RUN: (id: string) => `/crews/${id}/run`,
   CREW_EXECUTIONS: (id: string) => `/crews/${id}/executions`,
 
-  // Publish-as-App — owner endpoints under /workflows/:id
-  WORKFLOW_PUBLISH: (id: string) => `/workflows/${id}/publish`,
-  WORKFLOW_APP: (id: string) => `/workflows/${id}/app`,
-  WORKFLOW_APP_VERSIONS: (id: string) => `/workflows/${id}/app/versions`,
+  // Chat-app owner endpoints — password / api_key / analytics under
+  // /workflows/{id}/app. (No publish endpoint — activating the workflow
+  // is enough.)
+  WORKFLOW_APP_PASSWORD: (id: string) => `/workflows/${id}/app/password`,
+  WORKFLOW_APP_RESET_API_KEY: (id: string) => `/workflows/${id}/app/reset-api-key`,
+  WORKFLOW_APP_ANALYTICS: (id: string) => `/workflows/${id}/app/analytics`,
+  WORKFLOW_APP_SESSIONS: (id: string) => `/workflows/${id}/app/sessions`,
 
   // Personas (reusable named agents that overlay onto action.agent nodes)
   PERSONAS: '/personas/',

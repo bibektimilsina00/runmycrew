@@ -368,25 +368,25 @@ async def _run_crew(
 @celery_app.task(name="execute_app_message")
 def execute_app_message(
     execution_id: str,
-    published_app_id: str,
+    workflow_id: str,
     session_id: str,
     assistant_message_id: str,
     user_message: str,
     form_data: dict | None = None,
 ):
-    """Run one turn of a published-app chat.
+    """Run one turn of a chat-app workflow.
 
-    Loads the pinned graph snapshot, injects the visitor's message +
-    session history + user_id as the trigger payload, streams events
-    over the same Redis pub/sub channel the SSE endpoint subscribes to,
-    then persists the final assistant reply + artifacts on the
-    AppMessage placeholder.
+    Loads the workflow's current graph (no snapshot — always live),
+    injects the visitor's message + session history as the trigger
+    payload, streams events over the Redis pub/sub channel the SSE
+    endpoint subscribes to, then persists the final reply + artifacts
+    on the AppMessage placeholder.
     """
     try:
         asyncio.run(
             _run_app_message(
                 execution_id,
-                published_app_id,
+                workflow_id,
                 session_id,
                 assistant_message_id,
                 user_message,
@@ -399,7 +399,7 @@ def execute_app_message(
 
 async def _run_app_message(
     execution_id: str,
-    published_app_id: str,
+    workflow_id: str,
     session_id: str,
     assistant_message_id: str,
     user_message: str,
@@ -416,9 +416,9 @@ async def _run_app_message(
     from apps.api.app.features.apps.repository import (
         AppMessageRepository,
         AppSessionRepository,
-        PublishedAppRepository,
     )
     from apps.api.app.features.credentials.service import CredentialService
+    from apps.api.app.features.workflows.repository import WorkflowRepository
 
     started_at = time.time()
 
@@ -431,25 +431,29 @@ async def _run_app_message(
     user_id_for_run: uuid.UUID | None = None
 
     async with AsyncSessionLocal() as db:
-        app_repo = PublishedAppRepository(db)
+        wf_repo = WorkflowRepository(db)
         session_repo = AppSessionRepository(db)
         message_repo = AppMessageRepository(db)
-        app = await app_repo.get_by_id(uuid.UUID(published_app_id))
-        if not app:
-            logger.error(f"published app {published_app_id} not found")
+        workflow = await wf_repo.get_by_id(uuid.UUID(workflow_id))
+        if not workflow:
+            logger.error(f"workflow {workflow_id} not found")
             return
         session = await session_repo.get_by_id(uuid.UUID(session_id))
         if not session:
             logger.error(f"app session {session_id} not found")
             return
-        workspace_id_str = str(app.workspace_id)
-        graph = app.graph_snapshot or {"nodes": [], "edges": []}
-        cfg = app.config or {}
-        allow_history = bool(cfg.get("allow_history", True))
-        persona_id = cfg.get("system_persona_id")
-        user_id_for_run = app.published_by  # crew/agent runs charge against publisher
+        workspace_id_str = str(workflow.workspace_id)
+        graph = workflow.graph or {"nodes": [], "edges": []}
+        # Chat-app config lives on the trigger.chat_app node's data.properties.
+        trigger_props: dict[str, Any] = {}
+        for node in graph.get("nodes") or []:
+            if isinstance(node, dict) and node.get("type") == "trigger.chat_app":
+                trigger_props = (node.get("data") or {}).get("properties") or {}
+                break
+        allow_history = bool(trigger_props.get("allow_history", True))
+        persona_id = trigger_props.get("system_persona_id")
+        user_id_for_run = workflow.user_id  # runs charge against workflow owner
 
-        # Load prior messages when history is on.
         if allow_history:
             prior = await message_repo.list_by_session(session.id, limit=20)
             for m in prior:
@@ -480,7 +484,7 @@ async def _run_app_message(
     try:
         async with AsyncSessionLocal() as db:
             runner = WorkflowRunner(
-                workflow_id=str(app.workflow_id),
+                workflow_id=workflow_id,
                 execution_id=execution_id,
                 graph=graph,
                 db=db,
