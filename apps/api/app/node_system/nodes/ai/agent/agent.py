@@ -88,6 +88,11 @@ class AgentMessage(BaseModel):
 
 
 class AgentProperties(BaseModel):
+    # Persona overlay — when set, the persona's system_prompt / tools /
+    # provider / model / temperature / maxIterations act as defaults for
+    # any field the user did NOT explicitly set on the node. Node-level
+    # overrides always win.
+    persona_id: str | None = None
     provider: str = "openai"
     credential: str | None = None
     openaiCredential: str | None = None
@@ -172,6 +177,13 @@ class AgentNode(BaseNode[AgentProperties]):
             icon=ICON_SLUG,
             color=COLOR,
             properties=[
+                {
+                    "name": "persona_id",
+                    "label": "Persona",
+                    "type": "persona-picker",
+                    "required": False,
+                    "description": "Pick a saved persona to prefill system prompt, tools, and model.",
+                },
                 {
                     "name": "provider",
                     "label": "Provider",
@@ -487,6 +499,24 @@ class AgentNode(BaseNode[AgentProperties]):
             # Ensure tool modules are registered
             import apps.api.app.node_system.tools.loader  # noqa: F401
             from apps.api.app.node_system.tools.registry import tool_registry
+
+            await self._apply_persona_overlay(context)
+
+            # Crew-level cost cap: refuse to fire when the shared cost
+            # gate is already exhausted so subsequent agents in the crew
+            # don't keep spending after the wallet emptied.
+            crew_cap = float(context.variables.get("_crew_cost_cap") or 0.0)
+            crew_used = float(context.variables.get("_crew_cost_used") or 0.0)
+            if crew_cap > 0 and crew_used >= crew_cap:
+                return NodeResult(
+                    success=False,
+                    error=(f"Crew cost cap exhausted: ${crew_used:.4f} of ${crew_cap:.4f} spent."),
+                    output_data={
+                        "status": "budget_exhausted",
+                        "budget_exhausted_reason": "crew_cost_cap",
+                        "agent_usage": {"total_cost_usd": 0.0},
+                    },
+                )
 
             api_key = self._get_api_key(context)
             if not api_key:
@@ -1047,6 +1077,12 @@ class AgentNode(BaseNode[AgentProperties]):
             output["status"] = "budget_exhausted" if budget_exhausted_reason else "success"
             if budget_exhausted_reason:
                 output["budget_exhausted_reason"] = budget_exhausted_reason
+            # Fold this agent's spend into the shared crew gate so the
+            # next node in the graph sees the updated total.
+            if crew_cap > 0:
+                snap = output.get("agent_usage") or {}
+                spend = float(snap.get("total_cost_usd") or 0.0)
+                context.variables["_crew_cost_used"] = crew_used + spend
             return NodeResult(success=True, output_data=output)
 
         except httpx.HTTPStatusError as e:
@@ -1151,6 +1187,61 @@ class AgentNode(BaseNode[AgentProperties]):
 
         # No system message — prepend one
         return [{"role": "system", "content": skills_section}, *messages]
+
+    async def _apply_persona_overlay(self, context: NodeContext) -> None:
+        """Overlay saved persona defaults onto ``self.props``.
+
+        Overlaid only when the field is NOT present in ``raw_properties``
+        (i.e. the user didn't customize it on the node). That way per-node
+        overrides always win. Missing DB session or persona id → silent no-op
+        so the node still runs standalone in tests.
+        """
+        persona_id = self.props.persona_id
+        if not persona_id or not context.db:
+            return
+        import uuid as _uuid
+
+        from apps.api.app.features.personas.repository import PersonaRepository
+
+        try:
+            pid = _uuid.UUID(persona_id)
+        except (ValueError, TypeError):
+            return
+        persona = await PersonaRepository(context.db).get_by_id(pid)
+        if not persona:
+            return
+        raw = self.raw_properties or {}
+        overlays: dict[str, Any] = {}
+        if "provider" not in raw and persona.default_provider:
+            overlays["provider"] = persona.default_provider
+        if "model" not in raw and persona.default_model:
+            overlays["model"] = persona.default_model
+        if "temperature" not in raw and persona.temperature is not None:
+            overlays["temperature"] = persona.temperature
+        if "maxIterations" not in raw and persona.max_iterations:
+            overlays["maxIterations"] = persona.max_iterations
+        if "tools" not in raw and persona.tools:
+            overlays["tools"] = persona.tools
+        if "messages" not in raw and persona.system_prompt:
+            overlays["messages"] = [{"role": "system", "content": persona.system_prompt}]
+        else:
+            # If user provided messages but no system role, prepend persona's.
+            msgs = self.props.messages
+            if (
+                persona.system_prompt
+                and isinstance(msgs, list)
+                and not any(
+                    (isinstance(m, dict) and m.get("role") == "system")
+                    or (hasattr(m, "role") and m.role == "system")
+                    for m in msgs
+                )
+            ):
+                overlays["messages"] = [
+                    {"role": "system", "content": persona.system_prompt},
+                    *[m.model_dump() if hasattr(m, "model_dump") else m for m in msgs],
+                ]
+        for k, v in overlays.items():
+            setattr(self.props, k, v)
 
     def _ensure_agent_system_prompt(self, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Prepend a default system prompt if the user provided none.

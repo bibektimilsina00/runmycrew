@@ -11,6 +11,7 @@ class CrewCreate(SQLModel):
     position: int = 0
     color: str | None = None
     graph: dict[str, Any] = Field(default_factory=lambda: {"nodes": [], "edges": []})
+    max_cost_usd: float = 0.0
 
 
 class CrewUpdate(SQLModel):
@@ -20,6 +21,7 @@ class CrewUpdate(SQLModel):
     graph: dict[str, Any] | None = None
     is_active: bool | None = None
     color: str | None = None
+    max_cost_usd: float | None = None
 
 
 class CrewOut(SQLModel):
@@ -32,6 +34,7 @@ class CrewOut(SQLModel):
     is_active: bool
     position: int
     color: str | None = None
+    max_cost_usd: float = 0.0
     created_at: datetime
     updated_at: datetime
 

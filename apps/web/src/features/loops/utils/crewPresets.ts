@@ -106,6 +106,32 @@ export const CREW_PRESETS: CrewPreset[] = [
     },
   },
   {
+    id: 'task-planner',
+    label: 'Task Planner',
+    description: 'Decomposes a goal into a task DAG',
+    icon: 'ListChecks',
+    color: '#0ea5e9',
+    nodeType: 'ai.task_planner',
+    defaultProperties: {
+      goal: '{{$trigger.output.goal}}',
+      available_roles: ['researcher', 'writer', 'reviewer'],
+      max_tasks: 6,
+    },
+  },
+  {
+    id: 'parallel-agents',
+    label: 'Parallel Agents',
+    description: 'Fan-out one agent per task',
+    icon: 'GitBranch',
+    color: '#10b981',
+    nodeType: 'ai.parallel',
+    defaultProperties: {
+      tasks_input: '={{$previous_node.output.tasks}}',
+      persona_map: {},
+      max_concurrent: 4,
+    },
+  },
+  {
     id: 'human-approval',
     label: 'Human Approval',
     description: 'Gate irreversible steps',

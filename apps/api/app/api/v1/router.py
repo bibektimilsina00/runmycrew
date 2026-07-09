@@ -21,6 +21,7 @@ from apps.api.app.features.logs.router import router as logs_router
 from apps.api.app.features.logs.websocket import router as logs_ws_router
 from apps.api.app.features.meta.router import router as meta_router
 from apps.api.app.features.nodes.router import router as nodes_router
+from apps.api.app.features.personas.router import router as personas_router
 from apps.api.app.features.secrets.router import router as secrets_router
 from apps.api.app.features.skills.router import router as skills_router
 from apps.api.app.features.tables.router import router as tables_router
@@ -39,6 +40,7 @@ router.include_router(users_router, prefix="/users", tags=["users"])
 router.include_router(api_keys_router, prefix="/api-keys", tags=["api-keys"])
 router.include_router(workflows_router, prefix="/workflows", tags=["workflows"])
 router.include_router(crews_router, prefix="/crews", tags=["crews"])
+router.include_router(personas_router, prefix="/personas", tags=["personas"])
 router.include_router(workspaces_router, prefix="/workspaces", tags=["workspaces"])
 # Escalation config endpoints live under /workspaces/{id}/escalation-config —
 # they're declared in their own feature module but mounted at the workspaces

@@ -1,6 +1,7 @@
 import {
   Sparkles,
   Blocks,
+  Database,
   SlidersHorizontal,
   Play,
   Terminal,
@@ -22,6 +23,7 @@ export const PANEL_TABS: readonly PanelTabMeta[] = [
   { id: 'copilot', label: 'Copilot',   Icon: Sparkles },
   { id: 'library', label: 'Library',   Icon: Blocks },
   { id: 'config',  label: 'Inspector', Icon: SlidersHorizontal },
+  { id: 'memory',  label: 'Memory',    Icon: Database },
   { id: 'logs',    label: 'Logs',      Icon: Terminal, locked: true },
   { id: 'test',    label: 'Test',      Icon: Play },
 ] as const

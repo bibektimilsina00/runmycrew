@@ -205,6 +205,13 @@
     ],
     "properties": [
       {
+        "description": "Pick a saved persona to prefill system prompt, tools, and model.",
+        "label": "Persona",
+        "name": "persona_id",
+        "required": false,
+        "type": "persona-picker"
+      },
+      {
         "default": "openai",
         "label": "Provider",
         "loadOptions": "/ai/providers",
@@ -84083,6 +84090,469 @@
     "tools": null,
     "type": "ai.agent_crew"
   },
+  "ai.parallel": {
+    "allow_error": true,
+    "brand": null,
+    "category": "ai",
+    "color": "#10b981",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Run one agent per task in parallel. Each task is dispatched to the persona assigned in the map (or the fallback persona), then results are collected.",
+    "dynamic_outputs_from": null,
+    "icon": "GitBranch",
+    "inputs": 1,
+    "name": "Parallel Agents",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "results",
+        "type": "array"
+      },
+      {
+        "label": "success_count",
+        "type": "number"
+      },
+      {
+        "label": "failure_count",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "default": "={{$previous_node.output.tasks}}",
+        "description": "Array of {id, description, assignee_role} tasks \u2014 typically a Task Planner's output.",
+        "label": "Tasks",
+        "name": "tasks_input",
+        "type": "json"
+      },
+      {
+        "default": {},
+        "description": "Map each task role to the persona id that handles it.",
+        "label": "Role \u2192 Persona",
+        "name": "persona_map",
+        "type": "key-value"
+      },
+      {
+        "description": "Used when a task's role isn't in the map.",
+        "label": "Fallback Persona",
+        "name": "default_persona_id",
+        "required": false,
+        "type": "persona-picker"
+      },
+      {
+        "default": 4,
+        "label": "Max Concurrent",
+        "mode": "advanced",
+        "name": "max_concurrent",
+        "type": "number"
+      },
+      {
+        "description": "Prepended to every task's user message.",
+        "label": "Shared Context",
+        "mode": "advanced",
+        "name": "shared_context",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.parallel"
+  },
+  "ai.route_to": {
+    "allow_error": true,
+    "brand": null,
+    "category": "ai",
+    "color": "#a855f7",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Explicit A\u2192B message routing. Emits {to_persona_id, to_role, message} for the next agent node to consume.",
+    "dynamic_outputs_from": null,
+    "icon": "Send",
+    "inputs": 1,
+    "name": "Route To",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "to_persona_id",
+        "type": "string"
+      },
+      {
+        "label": "to_role",
+        "type": "string"
+      },
+      {
+        "label": "message",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "description": "Persona that should handle the next round.",
+        "label": "Route To Persona",
+        "name": "to_persona_id",
+        "required": false,
+        "type": "persona-picker"
+      },
+      {
+        "description": "Fallback role tag when no persona is picked.",
+        "label": "Or Role",
+        "name": "to_role",
+        "placeholder": "reviewer",
+        "type": "string"
+      },
+      {
+        "description": "Message forwarded to the next agent.",
+        "label": "Message",
+        "name": "message",
+        "placeholder": "Please review the writeup and flag issues.",
+        "type": "string"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.route_to"
+  },
+  "ai.subcrew": {
+    "allow_error": true,
+    "brand": null,
+    "category": "ai",
+    "color": "#7c3aed",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Compose crews. Run another crew as a step in this one \u2014 its final output flows into the next node.",
+    "dynamic_outputs_from": null,
+    "icon": "Users",
+    "inputs": 1,
+    "name": "Sub-Crew",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "sub_crew_output",
+        "type": "object"
+      },
+      {
+        "label": "crew_id",
+        "type": "string"
+      }
+    ],
+    "properties": [
+      {
+        "description": "The ID of the crew to run. Find it in the crew editor URL.",
+        "label": "Crew ID",
+        "name": "crew_id",
+        "placeholder": "UUID of the crew to call",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "description": "Optional extra fields merged into the trigger data passed to the sub-crew.",
+        "label": "Extra Input (JSON)",
+        "name": "input_data",
+        "required": false,
+        "type": "json"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.subcrew"
+  },
+  "ai.task_planner": {
+    "allow_error": true,
+    "brand": null,
+    "category": "ai",
+    "color": "#0ea5e9",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Decompose a goal into a task DAG. Each task gets an assignee role, expected output, and dependency list \u2014 feeds directly into a Parallel node.",
+    "dynamic_outputs_from": null,
+    "icon": "ListChecks",
+    "inputs": 1,
+    "name": "Task Planner",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "tasks",
+        "type": "array"
+      },
+      {
+        "label": "goal",
+        "type": "string"
+      },
+      {
+        "label": "count",
+        "type": "number"
+      }
+    ],
+    "properties": [
+      {
+        "default": "openai",
+        "label": "Provider",
+        "loadOptions": "/ai/providers",
+        "name": "provider",
+        "required": true,
+        "type": "options",
+        "typeOptions": {
+          "allowCustom": true,
+          "searchable": true
+        }
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "openai"
+        },
+        "credentialType": "openai_api_key",
+        "label": "OpenAI API Key",
+        "name": "openaiCredential",
+        "required": {
+          "field": "provider",
+          "value": "openai"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "anthropic"
+        },
+        "credentialType": "anthropic_api_key",
+        "label": "Anthropic API Key",
+        "name": "anthropicCredential",
+        "required": {
+          "field": "provider",
+          "value": "anthropic"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "google"
+        },
+        "credentialType": "google_api_key",
+        "label": "Google Gemini API Key",
+        "name": "googleCredential",
+        "required": {
+          "field": "provider",
+          "value": "google"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "condition": {
+          "field": "provider",
+          "value": "groq"
+        },
+        "credentialType": "groq_api_key",
+        "label": "Groq API Key",
+        "name": "groqCredential",
+        "required": {
+          "field": "provider",
+          "value": "groq"
+        },
+        "type": "credential",
+        "visibility": "hidden"
+      },
+      {
+        "credentialTypeByField": {
+          "field": "provider",
+          "values": {
+            "anthropic": "anthropic_api_key",
+            "deepseek": "deepseek_api_key",
+            "fireworks": "fireworks_api_key",
+            "google": "google_api_key",
+            "groq": "groq_api_key",
+            "mistral": "mistral_api_key",
+            "openai": "openai_api_key",
+            "openrouter": "openrouter_api_key",
+            "together": "together_api_key",
+            "xai": "xai_api_key"
+          }
+        },
+        "dependsOn": [
+          "provider"
+        ],
+        "label": "Provider Credential",
+        "name": "credential",
+        "required": true,
+        "type": "credential"
+      },
+      {
+        "label": "Model",
+        "loadOptions": "/ai/models",
+        "loadOptionsDependsOn": [
+          "provider",
+          "credential",
+          "openaiCredential",
+          "anthropicCredential",
+          "googleCredential",
+          "groqCredential"
+        ],
+        "name": "model",
+        "required": true,
+        "type": "options",
+        "typeOptions": {
+          "allowCustom": true,
+          "searchable": true
+        }
+      },
+      {
+        "description": "High-level goal to decompose into tasks.",
+        "label": "Goal",
+        "name": "goal",
+        "placeholder": "Research 3 competitors and write a comparison.",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "default": [
+          "researcher",
+          "writer",
+          "reviewer"
+        ],
+        "description": "Persona role tags the planner may assign tasks to.",
+        "label": "Available Roles",
+        "name": "available_roles",
+        "type": "list"
+      },
+      {
+        "default": 8,
+        "label": "Max Tasks",
+        "mode": "advanced",
+        "name": "max_tasks",
+        "type": "number"
+      },
+      {
+        "default": 0.2,
+        "label": "Temperature",
+        "mode": "advanced",
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "ai.task_planner"
+  },
   "ai.verify": {
     "allow_error": true,
     "brand": null,
@@ -84998,6 +85468,24 @@
         "mode": "advanced",
         "name": "timeoutHours",
         "type": "number"
+      },
+      {
+        "default": false,
+        "description": "Send a message via the workspace's escalation handler (Slack / webhook / email) so someone knows to review.",
+        "label": "Notify a human",
+        "name": "notify",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "notify",
+          "value": true
+        },
+        "description": "Message body sent alongside the resume link.",
+        "label": "Notification message",
+        "name": "notifyMessage",
+        "placeholder": "A workflow is waiting on your approval.",
+        "type": "string"
       },
       {
         "default": 0,
