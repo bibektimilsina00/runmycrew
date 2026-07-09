@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import JSON, Column
+from sqlalchemy import JSON, Column, Index, text
 from sqlmodel import Field, Relationship
 
 from apps.api.app.shared.sqlmodel import (
@@ -30,6 +30,18 @@ if TYPE_CHECKING:
 
 class PublishedApp(SQLModelBase, table=True):
     __tablename__ = "published_app"
+    __table_args__ = (
+        # Partial unique index: at most one active row per (workspace, slug).
+        # Inactive versions may share the slug (that's version history).
+        # Must match the DDL in migration ``d7a2c4b18e42``.
+        Index(
+            "uq_published_app_ws_slug_active",
+            "workspace_id",
+            "app_slug",
+            unique=True,
+            postgresql_where=text("is_active"),
+        ),
+    )
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     workspace_id: uuid.UUID = Field(foreign_key="workspace.id", ondelete="CASCADE", index=True)
