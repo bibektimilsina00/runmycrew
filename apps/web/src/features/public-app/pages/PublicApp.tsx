@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Loader2, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import axios from 'axios'
 import { useAppConfig } from '../hooks/useAppConfig'
 import { useAppSession, useAppendMessage } from '../hooks/useAppSession'
 import { useSendMessage } from '../hooks/useSendMessage'
@@ -10,6 +11,9 @@ import { MessageBubble } from '../components/MessageBubble'
 import { WelcomeState } from '../components/WelcomeState'
 import { InputBar } from '../components/InputBar'
 import { CanvasView } from '../components/CanvasView'
+import { PasswordGate } from '../components/PasswordGate'
+import { FormView } from '../components/FormView'
+import type { AttachedFile } from '../components/InputBar'
 import type { AppMessage } from '../types/publicAppTypes'
 import type { Artifact } from '../types/artifactTypes'
 
@@ -30,6 +34,27 @@ export function PublicApp() {
   const append = useAppendMessage(ws, slug)
   const [pending, setPending] = useState<AppMessage | null>(null)
   const [draft, setDraft] = useState('')
+  const [attachments, setAttachments] = useState<AttachedFile[]>([])
+  const [uploading, setUploading] = useState(false)
+
+  const attach = async (file: File) => {
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const base = import.meta.env.VITE_API_URL || '/api/v1'
+      const res = await axios.post(`${base}/apps/${ws}/${slug}/upload`, fd, {
+        withCredentials: true,
+      })
+      setAttachments(prev => [...prev, res.data as AttachedFile])
+    } catch {
+      /* ignored; upload errors surfaced via banner in future */
+    } finally {
+      setUploading(false)
+    }
+  }
+  const removeAttachment = (id: string) =>
+    setAttachments(prev => prev.filter(a => a.id !== id))
   // Canvas starts hidden and unlocks the first time an artifact arrives.
   // We track a "user override" separately so once the visitor clicks the
   // toggle, we respect that choice from then on.
@@ -120,6 +145,67 @@ export function PublicApp() {
   const isEmpty = optimistic.length === 0
   const canvasVisible = canvasOpen && artifacts.length > 0
 
+  // Password gate: /session returns 401 with detail=password_required, or
+  // for cross-origin dev may just be an error. Inspect the session
+  // query's error before rendering chat.
+  const sessionError = sessionQuery.error
+  const needsPassword =
+    app.auth_mode === 'password' &&
+    (sessionQuery.data == null || (axios.isAxiosError(sessionError) && sessionError.response?.status === 401))
+  if (needsPassword) {
+    return (
+      <ThemeProvider config={app.config}>
+        <PasswordGate
+          app={app}
+          workspaceSlug={ws}
+          appSlug={slug}
+          onUnlocked={() => void sessionQuery.refetch()}
+        />
+      </ThemeProvider>
+    )
+  }
+
+  // Form mode: no chat surface. One page in, one page out. Uses the
+  // same send-message pipeline so streaming + artifacts still flow.
+  if (app.mode === 'form') {
+    return (
+      <ThemeProvider config={app.config}>
+        <div className="flex min-h-screen flex-col bg-[#0b0b0f] text-white">
+          <AppHeader
+            app={app}
+            onNewChat={() => {
+              sessionQuery.refetch()
+              setPending(null)
+            }}
+          />
+          <main className="flex min-h-0 flex-1 flex-col">
+            {isEmpty ? (
+              <FormView
+                app={app}
+                disabled={sendState.status === 'streaming' || sendState.status === 'sending'}
+                onSubmit={(_values, summary) => sendDraft(summary || 'Submit')}
+              />
+            ) : (
+              <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col gap-6 px-4 py-6 sm:px-6">
+                {optimistic.map(m => (
+                  <MessageBubble key={m.id} message={m} />
+                ))}
+                {sendState.assistant && (
+                  <MessageBubble message={sendState.assistant} streaming />
+                )}
+                {canvasVisible && (
+                  <div className="mt-4 min-h-[420px] overflow-hidden rounded-[12px] border border-white/5">
+                    <CanvasView artifacts={artifacts} />
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+        </div>
+      </ThemeProvider>
+    )
+  }
+
   return (
     <ThemeProvider config={app.config}>
       <div
@@ -172,6 +258,11 @@ export function PublicApp() {
                     disabled={sessionQuery.isLoading}
                     isStreaming={sendState.status === 'streaming' || sendState.status === 'sending'}
                     placeholder={`Message ${app.title}…`}
+                    allowFileUpload={!!app.config.allow_file_upload}
+                    attachments={attachments}
+                    uploading={uploading}
+                    onAttach={attach}
+                    onRemoveAttachment={removeAttachment}
                   />
                 </div>
                 {artifacts.length > 0 && (

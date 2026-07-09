@@ -201,6 +201,72 @@ class PublishedAppService:
         except VerifyMismatchError:
             return False
 
+    @staticmethod
+    def make_api_key() -> tuple[str, str]:
+        """Return (plain, hash). Plain shown to owner once at generation."""
+        plain = secrets.token_urlsafe(32)
+        return plain, _ph.hash(plain)
+
+    def verify_api_key(self, app: PublishedApp, key: str) -> bool:
+        if not app.api_key_hash or not key:
+            return False
+        try:
+            return _ph.verify(app.api_key_hash, key)
+        except VerifyMismatchError:
+            return False
+
+    async def rollback_to_version(
+        self,
+        workflow_id: uuid.UUID,
+        version_num: int,
+        user: User,
+        workspace: Workspace,
+    ) -> PublishedApp:
+        """Activate a prior version by copying it forward as a new active row.
+
+        Rather than flipping is_active on the old row (which would let a
+        stale slug collide), we snapshot the historical config + graph
+        into a new PublishedApp with an incremented version_num.
+        """
+        wf_repo = WorkflowRepository(self.db)
+        workflow = await wf_repo.get_by_id_and_workspace(workflow_id, workspace.id)
+        if not workflow:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workflow not found")
+        versions = await self.repository.list_versions_for_workflow(workflow_id)
+        target = next((v for v in versions if v.version_num == version_num), None)
+        if target is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Version {version_num} not found",
+            )
+        next_version = (versions[0].version_num + 1) if versions else 1
+        await self.repository.deactivate_all_for_workflow(workflow_id)
+        rolled = PublishedApp(
+            workspace_id=workspace.id,
+            workflow_id=workflow_id,
+            published_by=user.id,
+            app_slug=target.app_slug,
+            title=target.title,
+            description=target.description,
+            mode=target.mode,
+            graph_snapshot=target.graph_snapshot,
+            version_num=next_version,
+            previous_version_id=target.id,
+            config=target.config,
+            auth_mode=target.auth_mode,
+            password_hash=target.password_hash,
+            api_key_hash=target.api_key_hash,
+            expires_at=target.expires_at,
+            is_active=True,
+        )
+        rolled = await self.repository.create(rolled)
+        await self.event_repo.emit(
+            rolled.id,
+            "app.rolled_back",
+            payload={"to_version": target.version_num, "new_version": next_version},
+        )
+        return rolled
+
     async def get_or_create_session(
         self,
         app: PublishedApp,

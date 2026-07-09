@@ -592,3 +592,46 @@ def _extract_reply(output: dict) -> tuple[str, list[dict]]:
         if isinstance(arts, list):
             artifacts = arts
     return text, artifacts
+
+
+@celery_app.task(name="sweep_app_sessions")
+def sweep_app_sessions():
+    """Nightly: drop AppSession rows with no messages in the last 60 days.
+
+    Keeps the analytics tab focused on active users and stops the sessions
+    table from ballooning. Cascade delete on session_id removes the
+    orphaned AppMessage rows automatically.
+    """
+    try:
+        asyncio.run(_sweep_app_sessions())
+    except Exception as e:
+        logger.error(f"sweep_app_sessions failed: {e}", exc_info=True)
+
+
+async def _sweep_app_sessions():
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import delete, select
+
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.features.apps.models import AppMessage, AppSession
+
+    cutoff = datetime.now(UTC) - timedelta(days=60)
+    async with AsyncSessionLocal() as db:
+        # Find candidate sessions whose last_seen_at is stale AND have zero
+        # recent messages. Two-step so we don't cascade an active thread by
+        # accident when `last_seen_at` lags message writes.
+        stale_ids: list[str] = []
+        result = await db.execute(select(AppSession.id).where(AppSession.last_seen_at < cutoff))
+        for row in result.scalars().all():
+            recent = await db.execute(
+                select(AppMessage.id)
+                .where(AppMessage.session_id == row, AppMessage.created_at >= cutoff)
+                .limit(1)
+            )
+            if recent.first() is None:
+                stale_ids.append(row)
+        if stale_ids:
+            await db.execute(delete(AppSession).where(AppSession.id.in_(stale_ids)))
+            await db.commit()
+            logger.info(f"sweep_app_sessions: dropped {len(stale_ids)} stale sessions")

@@ -106,3 +106,23 @@ class SendMessageOut(SQLModel):
     message_id: uuid.UUID
     execution_id: str
     stream_url: str
+
+
+class RollbackRequest(SQLModel):
+    version_num: int
+
+
+class ApiKeyOut(SQLModel):
+    api_key: str  # plain — shown ONCE at generation
+
+
+class AnalyticsOverview(SQLModel):
+    total_sessions: int
+    total_messages: int
+    total_cost_usd: float
+    active_today: int
+    messages_today: int
+    cost_today: float
+    top_prompts: list[dict[str, Any]]
+    session_cost_p50: float
+    session_cost_p95: float

@@ -43,3 +43,31 @@ export function useUnpublishApp(workflowId: string) {
     },
   })
 }
+
+export function useRollbackApp(workflowId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body: { version_num: number }) => appsOwnerAPI.rollback(workflowId, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEYS.current(workflowId) })
+      qc.invalidateQueries({ queryKey: KEYS.versions(workflowId) })
+    },
+  })
+}
+
+export function useResetApiKey(workflowId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () => appsOwnerAPI.resetApiKey(workflowId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEYS.current(workflowId) }),
+  })
+}
+
+export function useAnalytics(workflowId: string | undefined) {
+  return useQuery({
+    queryKey: workflowId ? ['workflow-app', workflowId, 'analytics'] : ['workflow-app', 'noop', 'analytics'],
+    queryFn: () => appsOwnerAPI.analytics(workflowId as string),
+    enabled: !!workflowId,
+    staleTime: 1000 * 30,
+  })
+}

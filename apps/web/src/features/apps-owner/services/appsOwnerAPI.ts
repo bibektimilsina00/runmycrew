@@ -2,7 +2,9 @@ import { z } from 'zod'
 import { requestJson } from '@/shared/utils/apiClient'
 import { API_ROUTES } from '@/shared/constants/routes'
 import {
+  AnalyticsOverviewSchema,
   PublishedAppOutSchema,
+  type AnalyticsOverview,
   type PublishedApp,
   type PublishAppRequest,
 } from '../types/appsOwnerTypes'
@@ -32,6 +34,25 @@ export const appsOwnerAPI = {
   versions: (workflowId: string): Promise<PublishedApp[]> =>
     requestJson(z.array(PublishedAppOutSchema), {
       url: API_ROUTES.WORKFLOW_APP_VERSIONS(workflowId),
+      method: 'GET',
+    }),
+
+  rollback: (workflowId: string, body: { version_num: number }): Promise<PublishedApp> =>
+    requestJson(PublishedAppOutSchema, {
+      url: `${API_ROUTES.WORKFLOW_APP(workflowId)}/rollback`,
+      method: 'POST',
+      data: body,
+    }),
+
+  resetApiKey: (workflowId: string): Promise<{ api_key: string }> =>
+    requestJson(z.object({ api_key: z.string() }), {
+      url: `${API_ROUTES.WORKFLOW_APP(workflowId)}/reset-api-key`,
+      method: 'POST',
+    }),
+
+  analytics: (workflowId: string): Promise<AnalyticsOverview> =>
+    requestJson(AnalyticsOverviewSchema, {
+      url: `${API_ROUTES.WORKFLOW_APP(workflowId)}/analytics`,
       method: 'GET',
     }),
 }
