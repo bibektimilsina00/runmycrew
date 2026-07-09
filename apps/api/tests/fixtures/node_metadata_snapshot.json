@@ -86930,6 +86930,300 @@
     "tools": null,
     "type": "trigger.calendly"
   },
+  "trigger.chat_app": {
+    "allow_error": false,
+    "brand": null,
+    "category": "trigger",
+    "color": "#8b5cf6",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Publish this workflow as a hosted chat or form app. Anyone with the link can talk to it \u2014 each user turn becomes a workflow run.",
+    "dynamic_outputs_from": null,
+    "icon": "MessagesSquare",
+    "inputs": 0,
+    "name": "Chat App",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "message",
+        "type": "string"
+      },
+      {
+        "label": "session_id",
+        "type": "string"
+      },
+      {
+        "label": "user_id",
+        "type": "string"
+      },
+      {
+        "label": "files",
+        "type": "array"
+      },
+      {
+        "label": "form_data",
+        "type": "object"
+      },
+      {
+        "label": "history",
+        "type": "array"
+      }
+    ],
+    "properties": [
+      {
+        "description": "Shown as the page title and header.",
+        "label": "App title",
+        "name": "title",
+        "placeholder": "Support Bot",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "description": "URL-safe identifier. Full URL: /apps/{workspace}/{slug}. Leave empty to auto-generate from the title on publish.",
+        "label": "URL slug",
+        "name": "app_slug",
+        "placeholder": "support-bot",
+        "type": "string"
+      },
+      {
+        "description": "Subtitle + social share meta description.",
+        "label": "Description",
+        "name": "description",
+        "placeholder": "Ask us anything about our product.",
+        "type": "string"
+      },
+      {
+        "default": "chat",
+        "description": "Chat = conversation. Form = one input page + one result page.",
+        "label": "Mode",
+        "name": "mode",
+        "options": [
+          {
+            "label": "Chat \u2014 multi-turn conversation",
+            "value": "chat"
+          },
+          {
+            "label": "Form \u2014 one-shot input \u2192 result page",
+            "value": "form"
+          },
+          {
+            "label": "Agent \u2014 chat with baked-in persona + tools",
+            "value": "agent"
+          }
+        ],
+        "required": true,
+        "type": "options"
+      },
+      {
+        "label": "Welcome headline",
+        "name": "welcome_headline",
+        "placeholder": "How can I help you today?",
+        "type": "string"
+      },
+      {
+        "label": "Welcome subtitle",
+        "name": "welcome_sub",
+        "placeholder": "Ask me anything.",
+        "type": "string"
+      },
+      {
+        "description": "Markdown supported. Rendered as the assistant's opening turn.",
+        "label": "First assistant message",
+        "name": "welcome_message",
+        "placeholder": "Hi! I'm here to answer questions about\u2026",
+        "type": "string",
+        "typeOptions": {
+          "multiline": true
+        }
+      },
+      {
+        "default": [],
+        "description": "Quick-start chips shown before the first message.",
+        "label": "Suggested prompts",
+        "name": "suggested_prompts",
+        "properties": [
+          {
+            "label": "Chip label",
+            "name": "label",
+            "placeholder": "Return policy",
+            "type": "string"
+          },
+          {
+            "label": "Prompt sent",
+            "name": "prompt",
+            "placeholder": "What is your return policy?",
+            "type": "string"
+          }
+        ],
+        "type": "collection",
+        "typeOptions": {
+          "addButtonText": "Add suggestion",
+          "multipleValues": true
+        }
+      },
+      {
+        "description": "Overlay this persona onto the first agent node in the graph.",
+        "label": "System persona",
+        "name": "system_persona_id",
+        "required": false,
+        "type": "persona-picker"
+      },
+      {
+        "default": true,
+        "description": "Injects prior messages as memory into the first agent node.",
+        "label": "Remember conversation history",
+        "mode": "advanced",
+        "name": "allow_history",
+        "type": "boolean"
+      },
+      {
+        "default": "both",
+        "label": "Where do artifacts render?",
+        "mode": "advanced",
+        "name": "output_target",
+        "options": [
+          {
+            "label": "Chat inline only",
+            "value": "chat"
+          },
+          {
+            "label": "Canvas panel only",
+            "value": "canvas"
+          },
+          {
+            "label": "Both \u2014 inline reference + canvas",
+            "value": "both"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": [],
+        "description": "Form fields (form mode) \u2014 also surface as chat attachments.",
+        "label": "Input fields",
+        "mode": "advanced",
+        "name": "input_fields",
+        "properties": [
+          {
+            "label": "Name",
+            "name": "name",
+            "placeholder": "field1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "label": "Label",
+            "name": "label",
+            "placeholder": "Company URL",
+            "type": "string"
+          },
+          {
+            "default": "text",
+            "label": "Type",
+            "name": "type",
+            "options": [
+              {
+                "label": "Text",
+                "value": "text"
+              },
+              {
+                "label": "Long text",
+                "value": "textarea"
+              },
+              {
+                "label": "Number",
+                "value": "number"
+              },
+              {
+                "label": "Yes / No",
+                "value": "boolean"
+              },
+              {
+                "label": "Select one",
+                "value": "select"
+              },
+              {
+                "label": "Select many",
+                "value": "multiselect"
+              },
+              {
+                "label": "Date",
+                "value": "date"
+              },
+              {
+                "label": "Email",
+                "value": "email"
+              },
+              {
+                "label": "URL",
+                "value": "url"
+              },
+              {
+                "label": "File upload",
+                "value": "file"
+              }
+            ],
+            "type": "options"
+          },
+          {
+            "default": false,
+            "label": "Required",
+            "name": "required",
+            "type": "boolean"
+          },
+          {
+            "label": "Placeholder",
+            "name": "placeholder",
+            "type": "string"
+          },
+          {
+            "label": "Help text",
+            "name": "help_text",
+            "type": "string"
+          }
+        ],
+        "type": "collection",
+        "typeOptions": {
+          "addButtonText": "Add field",
+          "autoIncrementField": "name",
+          "autoIncrementPrefix": "field",
+          "multipleValues": true
+        }
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.chat_app"
+  },
   "trigger.circleback_webhook": {
     "allow_error": true,
     "brand": null,

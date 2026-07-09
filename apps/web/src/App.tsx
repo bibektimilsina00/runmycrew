@@ -18,6 +18,7 @@ import { Files } from '@/features/files'
 import { Knowledge, KnowledgeDetail, KnowledgeDocumentView } from '@/features/knowledge'
 import { Skills, SkillEditor } from '@/features/skills'
 import { Personas } from '@/features/personas'
+import { PublicApp } from '@/features/public-app'
 import { WorkflowEditor } from '@/features/workflow-editor'
 import { Variables } from '@/features/variables'
 import { Connections } from '@/features/connections'
@@ -66,6 +67,9 @@ export default function App() {
 
         {/* Public invite accept — needs auth check inside the page */}
         <Route path="/invites/:token" element={<InviteAccept />} />
+
+        {/* Publish-as-App — public hosted chat / form page, no app shell */}
+        <Route path="/apps/:workspaceSlug/:appSlug" element={<PublicApp />} />
 
         {/* Workflow editor — app sidebar via EditorLayout, full-bleed canvas + right panel */}
         <Route element={<ProtectedRoute />}>

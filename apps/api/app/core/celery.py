@@ -50,5 +50,9 @@ celery_app.conf.update(
             "task": "sweep_polling_listens",
             "schedule": 60.0,
         },
+        "sweep-app-sessions": {
+            "task": "sweep_app_sessions",
+            "schedule": crontab(minute="30", hour="4"),  # daily 04:30 UTC
+        },
     },
 )

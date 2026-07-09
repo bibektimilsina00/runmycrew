@@ -4,13 +4,14 @@ import { useParams } from 'react-router-dom'
 import {
   MoreHorizontal, MessageCircle, Rocket, Power, Play, Loader2,
   LayoutDashboard, Lock, Download, Copy, Trash2, PanelRightClose,
-  Sparkles,
+  Globe, Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Button } from '@/shared/components'
 import { useEditorActionBar } from '../../hooks/useEditorActionBar'
 import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
 import { PublishTemplateModal } from '@/features/templates/components/PublishTemplateModal'
+import { PublishModal } from '@/features/apps-owner'
 
 interface EditorActionBarProps {
   onRun: () => void
@@ -80,7 +81,10 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
   } = useEditorActionBar()
   const { id: workflowId } = useParams<{ id: string }>()
   const workflowName = useWorkflowEditorStore((s) => s.workflow?.name ?? '')
+  const nodes = useWorkflowEditorStore((s) => s.nodes)
+  const hasChatAppTrigger = nodes.some(n => n.type === 'trigger.chat_app')
   const [publishOpen, setPublishOpen] = useState(false)
+  const [publishAppOpen, setPublishAppOpen] = useState(false)
 
   const menuItems: DropdownItem[] = [
     { label: 'Auto layout',        icon: <LayoutDashboard />, onClick: autoLayout },
@@ -89,6 +93,9 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
     { label: 'Export workflow',    icon: <Download />,        onClick: exportWorkflow },
     { label: 'Duplicate workflow', icon: <Copy />,            onClick: () => {} },
     { label: 'Publish as template', icon: <Sparkles />,       onClick: () => setPublishOpen(true) },
+    ...(hasChatAppTrigger
+      ? [{ label: 'Publish as app', icon: <Globe />, onClick: () => setPublishAppOpen(true) }]
+      : []),
     { label: 'Delete workflow',    icon: <Trash2 />,          onClick: deleteWorkflow, variant: 'danger', dividerBefore: true },
   ]
 
@@ -162,6 +169,15 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
         workflowId={workflowId ?? null}
         defaultTitle={workflowName}
       />
+      {workflowId && (
+        <PublishModal
+          key={`publish-${workflowId}-${publishAppOpen ? 'open' : 'closed'}`}
+          open={publishAppOpen}
+          onClose={() => setPublishAppOpen(false)}
+          workflowId={workflowId}
+          workflowName={workflowName}
+        />
+      )}
     </div>
     </div>
   )

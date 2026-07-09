@@ -70,6 +70,10 @@ class WorkspaceRepository:
         result = await self.db.execute(select(Workspace.id).where(Workspace.slug == slug))
         return result.scalar_one_or_none() is not None
 
+    async def get_by_slug(self, slug: str) -> Workspace | None:
+        result = await self.db.execute(select(Workspace).where(Workspace.slug == slug))
+        return result.scalar_one_or_none()
+
     async def list_members(self, workspace_id: uuid.UUID) -> list[WorkspaceMember]:
         result = await self.db.execute(
             select(WorkspaceMember)

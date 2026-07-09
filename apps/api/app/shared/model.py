@@ -1,6 +1,7 @@
 """Register SQLAlchemy feature models with the shared metadata registry."""
 
 import apps.api.app.features.api_keys.models  # noqa: F401
+import apps.api.app.features.apps.models  # noqa: F401
 import apps.api.app.features.assets.models  # noqa: F401
 import apps.api.app.features.copilot.models  # noqa: F401
 import apps.api.app.features.credentials.models  # noqa: F401

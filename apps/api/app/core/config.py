@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     # the Cloudflare tunnel / public hostname.
     PUBLIC_BASE_URL: str = ""
     FRONTEND_URL: str = "http://localhost:3001"
+    # Public origin the hosted-app pages live on (used to mint share URLs
+    # returned by /workflows/{id}/publish). Defaults to FRONTEND_URL when
+    # unset. In production, set to https://apps.myco.com or similar.
+    PUBLIC_APP_BASE_URL: str = ""
     # Default origins match the actual ports each frontend listens on in dev:
     # - web (apps/web Vite)  → :3001  (see apps/web/vite.config.ts)
     # - site (apps/site Next) → :3100 (see apps/site/package.json)
