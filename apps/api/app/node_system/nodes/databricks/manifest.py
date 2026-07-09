@@ -54,7 +54,17 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="parameters", label="Parameters (JSON)", type="json"),
         FieldSpec(name="sql", label="SQL", type="string"),
         FieldSpec(name="database", label="Database", type="string"),
-        FieldSpec(name="table", label="Table", type="string"),
+        FieldSpec(
+            name="table",
+            label="Table",
+            type="string",
+            remote=RemoteLookup(
+                provider="databricks",
+                resource="tables",
+                params={"catalog": "${catalog}", "schema": "${schema_name}"},
+                depends_on=["catalog", "schema_name"],
+            ),
+        ),
         FieldSpec(name="rows", label="Rows (JSONEachRow)", type="string"),
         FieldSpec(name="index", label="Index", type="string"),
         FieldSpec(name="doc_id", label="Doc ID", type="string"),

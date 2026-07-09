@@ -14471,6 +14471,19 @@
       {
         "label": "Table",
         "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "catalog",
+            "schema_name"
+          ],
+          "params": {
+            "catalog": "${catalog}",
+            "schema": "${schema_name}"
+          },
+          "provider": "databricks",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
