@@ -23,6 +23,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -38,7 +39,12 @@ MANIFEST = ProviderManifest(
     auth="bearer",
     fields=[
         FieldSpec(
-            name="project_id", label="Project ID", type="string", required=True, placeholder="12345"
+            name="project_id",
+            label="Project",
+            type="string",
+            required=True,
+            placeholder="12345",
+            remote=RemoteLookup(provider="posthog", resource="projects"),
         ),
         FieldSpec(name="flag_id", label="Feature Flag ID", type="string"),
         FieldSpec(name="flag_key", label="Feature Flag Key", type="string"),

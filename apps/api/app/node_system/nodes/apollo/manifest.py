@@ -6,7 +6,12 @@ REST API at https://api.apollo.io/v1. Auth via X-Api-Key header
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.apollo",
@@ -30,7 +35,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="last_name", label="Last Name", type="string"),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="domain", label="Domain (for org enrich)", type="string"),
-        FieldSpec(name="sequence_id", label="Sequence ID", type="string"),
+        FieldSpec(
+            name="sequence_id",
+            label="Sequence",
+            type="string",
+            remote=RemoteLookup(provider="apollo", resource="sequences"),
+        ),
         FieldSpec(name="contact_id", label="Contact ID", type="string"),
         FieldSpec(name="search_body", label="Search Body (JSON)", type="json", default={}),
         FieldSpec(name="bulk_details", label="Bulk Details (JSON array)", type="json", default=[]),

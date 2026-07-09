@@ -8,7 +8,12 @@ either OAuth (`access_token`) or a private-app token (`api_key`).
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.hubspot import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 
 def _contact_props(v):  # noqa: ANN001
@@ -43,7 +48,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="ticket_id", label="Ticket ID", type="string"),
         FieldSpec(name="engagement_id", label="Engagement ID", type="string"),
         FieldSpec(name="list_id", label="List ID", type="string"),
-        FieldSpec(name="owner_id", label="Owner ID", type="string"),
+        FieldSpec(
+            name="owner_id",
+            label="Owner",
+            type="string",
+            remote=RemoteLookup(provider="hubspot", resource="owners"),
+        ),
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="first_name", label="First Name", type="string"),
         FieldSpec(name="last_name", label="Last Name", type="string"),

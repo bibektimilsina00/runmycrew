@@ -12,7 +12,11 @@ New action node — trigger + webhook already existed under
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.microsoft.azure_devops import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+)
 
 MANIFEST = ProviderManifest(
     type="action.azure_devops",

@@ -11,6 +11,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -27,12 +28,18 @@ MANIFEST = ProviderManifest(
     fields=[
         FieldSpec(
             name="actor_id",
-            label="Actor ID",
+            label="Actor",
             type="string",
             placeholder="username~actor-name or actorId",
+            remote=RemoteLookup(provider="apify", resource="actors"),
         ),
         FieldSpec(name="run_id", label="Run ID", type="string"),
-        FieldSpec(name="dataset_id", label="Dataset ID", type="string"),
+        FieldSpec(
+            name="dataset_id",
+            label="Dataset",
+            type="string",
+            remote=RemoteLookup(provider="apify", resource="datasets"),
+        ),
         FieldSpec(name="store_id", label="Key-Value Store ID", type="string"),
         FieldSpec(name="key", label="Key", type="string"),
         FieldSpec(name="input", label="Actor Input (JSON)", type="json"),

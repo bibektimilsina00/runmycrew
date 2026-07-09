@@ -3586,9 +3586,16 @@
             "start_run"
           ]
         },
-        "label": "Actor ID",
+        "label": "Actor",
         "name": "actor_id",
         "placeholder": "username~actor-name or actorId",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "apify",
+          "resource": "actors"
+        },
         "type": "string"
       },
       {
@@ -3610,8 +3617,15 @@
             "get_dataset_items"
           ]
         },
-        "label": "Dataset ID",
+        "label": "Dataset",
         "name": "dataset_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "apify",
+          "resource": "datasets"
+        },
         "type": "string"
       },
       {
@@ -4018,8 +4032,15 @@
             "sequence_add"
           ]
         },
-        "label": "Sequence ID",
+        "label": "Sequence",
         "name": "sequence_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "apollo",
+          "resource": "sequences"
+        },
         "type": "string"
       },
       {
@@ -10744,8 +10765,15 @@
             "list_action_items"
           ]
         },
-        "label": "Meeting ID",
+        "label": "Meeting",
         "name": "meeting_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "circleback",
+          "resource": "meetings"
+        },
         "type": "string"
       },
       {
@@ -18535,8 +18563,15 @@
             "create_lead"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "emailbison",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -36196,8 +36231,15 @@
             "get_owner"
           ]
         },
-        "label": "Owner ID",
+        "label": "Owner",
         "name": "owner_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "hubspot",
+          "resource": "owners"
+        },
         "type": "string"
       },
       {
@@ -38760,8 +38802,15 @@
             "list_leads"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "instantly",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -42967,8 +43016,15 @@
             "list_activities"
           ]
         },
-        "label": "Campaign ID",
+        "label": "Campaign",
         "name": "campaign_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "lemlist",
+          "resource": "campaigns"
+        },
         "type": "string"
       },
       {
@@ -46665,8 +46721,15 @@
             "assign_subscriber_to_group"
           ]
         },
-        "label": "Group ID",
+        "label": "Group",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailerlite",
+          "resource": "groups"
+        },
         "type": "string"
       },
       {
@@ -58277,9 +58340,16 @@
             "get_property_definition"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
         "placeholder": "12345",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "posthog",
+          "resource": "projects"
+        },
         "required": true,
         "type": "string"
       },
@@ -61820,6 +61890,13 @@
         },
         "label": "Subreddit",
         "name": "subreddit",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "reddit",
+          "resource": "subreddits"
+        },
         "type": "string"
       },
       {
@@ -63220,8 +63297,15 @@
             "get_employee"
           ]
         },
-        "label": "Employee ID",
+        "label": "Employee",
         "name": "employee_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "rippling",
+          "resource": "employees"
+        },
         "type": "string"
       },
       {

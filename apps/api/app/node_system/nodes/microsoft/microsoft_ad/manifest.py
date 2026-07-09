@@ -5,7 +5,11 @@ REST at https://graph.microsoft.com/v1.0. See sim-parity roadmap Phase 4.28.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+)
 
 MANIFEST = ProviderManifest(
     type="action.microsoft_ad",

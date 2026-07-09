@@ -10,6 +10,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -29,7 +30,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="email", label="Email", type="string"),
         FieldSpec(name="fields", label="Fields (JSON)", type="json", mode="advanced"),
         FieldSpec(name="groups", label="Group IDs (JSON array)", type="json", mode="advanced"),
-        FieldSpec(name="group_id", label="Group ID", type="string"),
+        FieldSpec(
+            name="group_id",
+            label="Group",
+            type="string",
+            remote=RemoteLookup(provider="mailerlite", resource="groups"),
+        ),
         FieldSpec(name="group_name", label="Group Name", type="string"),
         FieldSpec(name="campaign_id", label="Campaign ID", type="string"),
         FieldSpec(name="limit", label="Limit", type="number", default=25, mode="advanced"),

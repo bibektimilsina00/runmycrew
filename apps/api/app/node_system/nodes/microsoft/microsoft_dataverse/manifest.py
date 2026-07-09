@@ -5,7 +5,11 @@ REST at https://{org}.crm.dynamics.com/api/data/v9.2. See sim-parity roadmap Pha
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+)
 
 MANIFEST = ProviderManifest(
     type="action.microsoft_dataverse",
