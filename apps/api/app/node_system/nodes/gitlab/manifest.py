@@ -12,7 +12,12 @@ files, releases, and members toward sim's 31-op parity.
 from __future__ import annotations
 
 from apps.api.app.node_system.nodes.gitlab import COLOR, ICON_SLUG, NAME
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.gitlab",
@@ -27,7 +32,12 @@ MANIFEST = ProviderManifest(
     auth="header_token",
     auth_header_name="PRIVATE-TOKEN",
     fields=[
-        FieldSpec(name="project_id", label="Project ID or url-encoded path", type="string"),
+        FieldSpec(
+            name="project_id",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(provider="gitlab", resource="projects"),
+        ),
         FieldSpec(name="group_id", label="Group ID", type="string"),
         FieldSpec(name="issue_iid", label="Issue IID", type="number"),
         FieldSpec(name="mr_iid", label="Merge Request IID", type="number"),

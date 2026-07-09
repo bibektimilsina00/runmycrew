@@ -16,6 +16,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 
@@ -62,14 +63,24 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="html", label="HTML body", type="string"),
         FieldSpec(name="text", label="Text body", type="string"),
         FieldSpec(name="contact_email", label="Contact email", type="string"),
-        FieldSpec(name="list_id", label="List ID", type="string"),
+        FieldSpec(
+            name="list_id",
+            label="List",
+            type="string",
+            remote=RemoteLookup(provider="sendgrid", resource="lists"),
+        ),
         FieldSpec(name="contacts", label="Contacts (JSON array)", type="json"),
         FieldSpec(name="mail_body", label="Mail Body (JSON)", type="json", default={}),
         FieldSpec(name="contact_body", label="Contact Body (JSON)", type="json", default={}),
         FieldSpec(name="contact_ids", label="Contact IDs (JSON array)", type="json", default=[]),
         FieldSpec(name="list_name", label="List Name", type="string"),
         FieldSpec(name="template_name", label="Template Name", type="string"),
-        FieldSpec(name="template_id", label="Template ID", type="string"),
+        FieldSpec(
+            name="template_id",
+            label="Template",
+            type="string",
+            remote=RemoteLookup(provider="sendgrid", resource="templates"),
+        ),
         FieldSpec(
             name="template_version_body",
             label="Template Version Body (JSON)",

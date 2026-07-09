@@ -8,7 +8,12 @@ scheme with a custom value template covers this.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.discord",
@@ -24,8 +29,23 @@ MANIFEST = ProviderManifest(
     auth_header_name="Authorization",
     auth_value_template="Bot {token}",
     fields=[
-        FieldSpec(name="channel_id", label="Channel ID", type="string"),
-        FieldSpec(name="guild_id", label="Guild ID", type="string"),
+        FieldSpec(
+            name="channel_id",
+            label="Channel",
+            type="string",
+            remote=RemoteLookup(
+                provider="discord",
+                resource="channels",
+                params={"guild_id": "${guild_id}"},
+                depends_on=["guild_id"],
+            ),
+        ),
+        FieldSpec(
+            name="guild_id",
+            label="Server",
+            type="string",
+            remote=RemoteLookup(provider="discord", resource="guilds"),
+        ),
         FieldSpec(name="user_id", label="User ID", type="string"),
         FieldSpec(name="message_id", label="Message ID", type="string"),
         FieldSpec(name="role_id", label="Role ID", type="string"),

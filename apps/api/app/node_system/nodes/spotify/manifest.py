@@ -9,6 +9,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -30,7 +31,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="type", label="Type", type="string"),
         FieldSpec(name="video_id", label="Video ID", type="string"),
         FieldSpec(name="channel_id", label="Channel ID", type="string"),
-        FieldSpec(name="playlist_id", label="Playlist ID", type="string"),
+        FieldSpec(
+            name="playlist_id",
+            label="Playlist",
+            type="string",
+            remote=RemoteLookup(provider="spotify", resource="playlists"),
+        ),
         FieldSpec(name="post_id", label="Post ID", type="string"),
         FieldSpec(name="title", label="Title", type="string"),
         FieldSpec(name="content", label="Content (HTML)", type="string"),

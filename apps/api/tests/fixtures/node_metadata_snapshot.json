@@ -4482,8 +4482,15 @@
             "list_projects"
           ]
         },
-        "label": "Workspace ID",
+        "label": "Workspace",
         "name": "workspace_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "asana",
+          "resource": "workspaces"
+        },
         "type": "string"
       },
       {
@@ -4496,8 +4503,19 @@
             "list_sections"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "workspace_id"
+          ],
+          "params": {
+            "workspace_id": "${workspace_id}"
+          },
+          "provider": "asana",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -6437,6 +6455,13 @@
         "label": "Database",
         "name": "database",
         "placeholder": "default",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "athena",
+          "resource": "databases"
+        },
         "type": "string"
       },
       {
@@ -6449,6 +6474,13 @@
         "default": "primary",
         "label": "Workgroup",
         "name": "workgroup",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "athena",
+          "resource": "workgroups"
+        },
         "type": "string"
       },
       {
@@ -15762,8 +15794,19 @@
             "create_webhook"
           ]
         },
-        "label": "Channel ID",
+        "label": "Channel",
         "name": "channel_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "guild_id"
+          ],
+          "params": {
+            "guild_id": "${guild_id}"
+          },
+          "provider": "discord",
+          "resource": "channels"
+        },
         "type": "string"
       },
       {
@@ -15784,8 +15827,15 @@
             "delete_role"
           ]
         },
-        "label": "Guild ID",
+        "label": "Server",
         "name": "guild_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "discord",
+          "resource": "guilds"
+        },
         "type": "string"
       },
       {
@@ -25955,8 +26005,15 @@
             "remove_project_member"
           ]
         },
-        "label": "Project ID or url-encoded path",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "gitlab",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -27246,8 +27303,19 @@
             "insert_all"
           ]
         },
-        "label": "Dataset ID",
+        "label": "Dataset",
         "name": "dataset_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_id"
+          ],
+          "params": {
+            "project_id": "${project_id}"
+          },
+          "provider": "bigquery",
+          "resource": "datasets"
+        },
         "type": "string"
       },
       {
@@ -27258,8 +27326,21 @@
             "insert_all"
           ]
         },
-        "label": "Table ID",
+        "label": "Table",
         "name": "table_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "project_id",
+            "dataset_id"
+          ],
+          "params": {
+            "dataset_id": "${dataset_id}",
+            "project_id": "${project_id}"
+          },
+          "provider": "bigquery",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -35510,8 +35591,15 @@
             "cancel_run"
           ]
         },
-        "label": "Project ID",
+        "label": "Project",
         "name": "project_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "hex",
+          "resource": "projects"
+        },
         "type": "string"
       },
       {
@@ -45946,8 +46034,15 @@
             "get_list_clients"
           ]
         },
-        "label": "List (Audience) ID",
+        "label": "Audience",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailchimp",
+          "resource": "audiences"
+        },
         "type": "string"
       },
       {
@@ -65993,8 +66088,15 @@
             "remove_contacts_from_list"
           ]
         },
-        "label": "List ID",
+        "label": "List",
         "name": "list_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "sendgrid",
+          "resource": "lists"
+        },
         "type": "string"
       },
       {
@@ -66077,8 +66179,15 @@
             "create_template_version"
           ]
         },
-        "label": "Template ID",
+        "label": "Template",
         "name": "template_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "sendgrid",
+          "resource": "templates"
+        },
         "type": "string"
       },
       {
@@ -70688,8 +70797,15 @@
             "unfollow_playlist"
           ]
         },
-        "label": "Playlist ID",
+        "label": "Playlist",
         "name": "playlist_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "spotify",
+          "resource": "playlists"
+        },
         "type": "string"
       },
       {
@@ -80109,8 +80225,15 @@
             "get_user"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "wordpress",
+          "resource": "users"
+        },
         "type": "string"
       },
       {

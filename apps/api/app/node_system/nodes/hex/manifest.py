@@ -5,7 +5,12 @@ REST at https://app.hex.tech/api/v1. See sim-parity roadmap Phase 4.20.
 
 from __future__ import annotations
 
-from apps.api.app.node_system.scaffolds import FieldSpec, OpSpec, ProviderManifest
+from apps.api.app.node_system.scaffolds import (
+    FieldSpec,
+    OpSpec,
+    ProviderManifest,
+    RemoteLookup,
+)
 
 MANIFEST = ProviderManifest(
     type="action.hex",
@@ -36,7 +41,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="run_type", label="Run Type (chain/llm/tool)", type="string"),
         FieldSpec(name="inputs", label="Inputs (JSON)", type="json"),
         FieldSpec(name="project_name", label="Project / Session Name", type="string"),
-        FieldSpec(name="project_id", label="Project ID", type="string"),
+        FieldSpec(
+            name="project_id",
+            label="Project",
+            type="string",
+            remote=RemoteLookup(provider="hex", resource="projects"),
+        ),
         FieldSpec(name="run_id", label="Run ID", type="string"),
         FieldSpec(name="key", label="Feedback Key", type="string"),
         FieldSpec(name="score", label="Score (float)", type="number"),
