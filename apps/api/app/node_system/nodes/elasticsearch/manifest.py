@@ -9,6 +9,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -36,7 +37,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="database", label="Database", type="string"),
         FieldSpec(name="table", label="Table", type="string"),
         FieldSpec(name="rows", label="Rows (JSONEachRow)", type="string"),
-        FieldSpec(name="index", label="Index", type="string"),
+        FieldSpec(
+            name="index",
+            label="Index",
+            type="string",
+            remote=RemoteLookup(provider="elasticsearch", resource="indices"),
+        ),
         FieldSpec(name="doc_id", label="Doc ID", type="string"),
         FieldSpec(name="document", label="Document (JSON)", type="json"),
         FieldSpec(name="query", label="Query (JSON / DSL / KQL)", type="json"),

@@ -14,6 +14,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -30,7 +31,12 @@ MANIFEST = ProviderManifest(
     auth_basic_username="{access_key}",
     fields=[
         FieldSpec(name="call_id", label="Call ID", type="string"),
-        FieldSpec(name="user_id", label="User ID", type="string"),
+        FieldSpec(
+            name="user_id",
+            label="User",
+            type="string",
+            remote=RemoteLookup(provider="gong", resource="users"),
+        ),
         FieldSpec(name="deal_id", label="Deal ID", type="string"),
         FieldSpec(name="from_date", label="From Date (ISO)", type="string"),
         FieldSpec(name="to_date", label="To Date (ISO)", type="string"),

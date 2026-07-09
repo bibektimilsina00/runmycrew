@@ -21,6 +21,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -36,7 +37,12 @@ MANIFEST = ProviderManifest(
     auth="header_token",
     auth_header_name="Api-Key",
     fields=[
-        FieldSpec(name="index_name", label="Index Name", type="string"),
+        FieldSpec(
+            name="index_name",
+            label="Index",
+            type="string",
+            remote=RemoteLookup(provider="pinecone", resource="indexes"),
+        ),
         FieldSpec(name="dimension", label="Dimension", type="number", mode="advanced"),
         FieldSpec(
             name="metric",

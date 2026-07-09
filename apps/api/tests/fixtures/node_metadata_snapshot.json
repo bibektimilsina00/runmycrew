@@ -11420,6 +11420,13 @@
         },
         "label": "Database",
         "name": "database",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "clickhouse",
+          "resource": "databases"
+        },
         "type": "string"
       },
       {
@@ -11439,6 +11446,17 @@
         },
         "label": "Table",
         "name": "table",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "database"
+          ],
+          "params": {
+            "database": "${database}"
+          },
+          "provider": "clickhouse",
+          "resource": "tables"
+        },
         "type": "string"
       },
       {
@@ -16468,9 +16486,16 @@
             "create_share_link"
           ]
         },
-        "label": "Path",
+        "label": "Folder",
         "name": "path",
         "placeholder": "/Documents/notes.txt",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "dropbox",
+          "resource": "folders"
+        },
         "type": "string"
       },
       {
@@ -17841,6 +17866,13 @@
       {
         "label": "Index",
         "name": "index",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "elasticsearch",
+          "resource": "indices"
+        },
         "type": "string"
       },
       {
@@ -26923,8 +26955,15 @@
             "get_user"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "gong",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -49002,8 +49041,15 @@
             "add_group_member"
           ]
         },
-        "label": "User ID",
+        "label": "User",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft_ad",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -49013,8 +49059,15 @@
             "add_group_member"
           ]
         },
-        "label": "Group ID",
+        "label": "Group",
         "name": "group_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "microsoft_ad",
+          "resource": "groups"
+        },
         "type": "string"
       },
       {
@@ -56742,8 +56795,15 @@
             "delete_index"
           ]
         },
-        "label": "Index Name",
+        "label": "Index",
         "name": "index_name",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "pinecone",
+          "resource": "indexes"
+        },
         "type": "string"
       },
       {

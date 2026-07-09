@@ -14,6 +14,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -28,7 +29,13 @@ MANIFEST = ProviderManifest(
     token_field=["access_token"],
     auth="bearer",
     fields=[
-        FieldSpec(name="path", label="Path", type="string", placeholder="/Documents/notes.txt"),
+        FieldSpec(
+            name="path",
+            label="Folder",
+            type="string",
+            placeholder="/Documents/notes.txt",
+            remote=RemoteLookup(provider="dropbox", resource="folders"),
+        ),
         FieldSpec(name="from_path", label="From Path", type="string"),
         FieldSpec(name="to_path", label="To Path", type="string"),
         FieldSpec(name="content", label="Content", type="string"),

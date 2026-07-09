@@ -9,6 +9,7 @@ from apps.api.app.node_system.scaffolds import (
     FieldSpec,
     OpSpec,
     ProviderManifest,
+    RemoteLookup,
 )
 
 MANIFEST = ProviderManifest(
@@ -33,8 +34,23 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="run_id", label="Run ID", type="string"),
         FieldSpec(name="parameters", label="Parameters (JSON)", type="json"),
         FieldSpec(name="sql", label="SQL", type="string"),
-        FieldSpec(name="database", label="Database", type="string"),
-        FieldSpec(name="table", label="Table", type="string"),
+        FieldSpec(
+            name="database",
+            label="Database",
+            type="string",
+            remote=RemoteLookup(provider="clickhouse", resource="databases"),
+        ),
+        FieldSpec(
+            name="table",
+            label="Table",
+            type="string",
+            remote=RemoteLookup(
+                provider="clickhouse",
+                resource="tables",
+                params={"database": "${database}"},
+                depends_on=["database"],
+            ),
+        ),
         FieldSpec(name="rows", label="Rows (JSONEachRow)", type="string"),
         FieldSpec(name="index", label="Index", type="string"),
         FieldSpec(name="doc_id", label="Doc ID", type="string"),
