@@ -174,7 +174,14 @@ class GDriveNode(BaseNode[GDriveProperties]):
                 {
                     "name": "parent_folder_id",
                     "label": "Parent folder",
-                    "type": "gdrive-folder",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "drive_folders",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "condition": _cond_any("upload_file", "create_folder"),
                 },
                 {

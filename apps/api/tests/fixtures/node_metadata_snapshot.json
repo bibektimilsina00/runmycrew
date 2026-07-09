@@ -2310,9 +2310,16 @@
             "search_records"
           ]
         },
-        "label": "Base ID",
+        "label": "Base",
         "name": "base_id",
         "placeholder": "appXXXXXXXX",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "airtable",
+          "resource": "bases"
+        },
         "required": true,
         "type": "string"
       },
@@ -2328,9 +2335,20 @@
             "search_records"
           ]
         },
-        "label": "Table Name",
+        "label": "Table",
         "name": "table_name",
         "placeholder": "Contacts",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [
+            "base_id"
+          ],
+          "params": {
+            "base_id": "${base_id}"
+          },
+          "provider": "airtable",
+          "resource": "tables"
+        },
         "required": true,
         "type": "string"
       },
@@ -23307,8 +23325,15 @@
         },
         "label": "Document",
         "name": "document_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new Doc\u2026",
           "mimeType": "application/vnd.google-apps.document",
@@ -23908,7 +23933,14 @@
         },
         "label": "Parent folder",
         "name": "parent_folder_id",
-        "type": "gdrive-folder"
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_folders"
+        },
+        "type": "string"
       },
       {
         "condition": {
@@ -24397,8 +24429,15 @@
         },
         "label": "Form",
         "name": "form_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new form\u2026",
           "mimeType": "application/vnd.google-apps.form",
@@ -29948,8 +29987,15 @@
         },
         "label": "Spreadsheet",
         "name": "spreadsheet_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new spreadsheet\u2026",
           "mimeType": "application/vnd.google-apps.spreadsheet",
@@ -32292,9 +32338,16 @@
             "add_candidate_note"
           ]
         },
-        "label": "User ID (for note authoring)",
+        "label": "User (for note authoring)",
         "mode": "advanced",
         "name": "user_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "greenhouse",
+          "resource": "users"
+        },
         "type": "string"
       },
       {
@@ -33339,8 +33392,15 @@
         },
         "label": "Presentation",
         "name": "presentation_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new deck\u2026",
           "mimeType": "application/vnd.google-apps.presentation",
@@ -36599,6 +36659,13 @@
         },
         "label": "Pipeline",
         "name": "pipeline",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "hubspot",
+          "resource": "pipelines"
+        },
         "type": "string"
       },
       {
@@ -47195,6 +47262,13 @@
         "label": "Domain",
         "name": "domain",
         "placeholder": "mg.example.com",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "mailgun",
+          "resource": "domains"
+        },
         "required": true,
         "type": "string"
       },
@@ -87618,7 +87692,14 @@
         "description": "Pick a Drive folder via Google's Picker. Drive's `drive.file` scope only surfaces files RunMyCrew created OR files inside a folder the user explicitly picked here \u2014 that's how RunMyCrew stays inside the non-sensitive scope that doesn't need Google's security review. Leave blank to fall back to whatever RunMyCrew created.",
         "label": "Folder to watch",
         "name": "parent_folder_id",
-        "type": "gdrive-folder"
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_folders"
+        },
+        "type": "string"
       },
       {
         "default": "",
@@ -87724,8 +87805,15 @@
       {
         "label": "Form",
         "name": "form_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new form\u2026",
           "mimeType": "application/vnd.google-apps.form",
@@ -88425,8 +88513,15 @@
       {
         "label": "Spreadsheet",
         "name": "spreadsheet_id",
+        "remote": {
+          "allow_manual": true,
+          "depends_on": [],
+          "params": {},
+          "provider": "google",
+          "resource": "drive_files"
+        },
         "required": true,
-        "type": "google-file",
+        "type": "string",
         "typeOptions": {
           "createPlaceholder": "Create new spreadsheet\u2026",
           "mimeType": "application/vnd.google-apps.spreadsheet",

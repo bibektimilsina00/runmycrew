@@ -204,7 +204,14 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                 {
                     "name": "spreadsheet_id",
                     "label": "Spreadsheet",
-                    "type": "google-file",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "drive_files",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "typeOptions": {
                         "mimeType": "application/vnd.google-apps.spreadsheet",

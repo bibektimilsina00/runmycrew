@@ -38,9 +38,10 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="offer_id", label="Offer ID", type="string"),
         FieldSpec(
             name="user_id",
-            label="User ID (for note authoring)",
+            label="User (for note authoring)",
             type="string",
             mode="advanced",
+            remote=RemoteLookup(provider="greenhouse", resource="users"),
         ),
         FieldSpec(name="first_name", label="First Name", type="string"),
         FieldSpec(name="last_name", label="Last Name", type="string"),

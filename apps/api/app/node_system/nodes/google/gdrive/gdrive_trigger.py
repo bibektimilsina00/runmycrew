@@ -179,7 +179,14 @@ class GDriveTriggerNode(BaseNode[GDriveTriggerProperties]):
                 {
                     "name": "parent_folder_id",
                     "label": "Folder to watch",
-                    "type": "gdrive-folder",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "drive_folders",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "default": "",
                     "description": (
                         "Pick a Drive folder via Google's Picker. Drive's "

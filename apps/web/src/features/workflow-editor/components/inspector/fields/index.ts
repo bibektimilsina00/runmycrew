@@ -18,8 +18,6 @@ import { MetaResourceRenderer } from './renderers/MetaResourceRenderer'
 import { WATemplateRenderer } from './renderers/WATemplateRenderer'
 import { MediaRenderer } from './renderers/MediaRenderer'
 import { GmailQueryRenderer } from './renderers/GmailQueryRenderer'
-import { GDrivePickerRenderer } from './renderers/GDrivePickerRenderer'
-import { GoogleFilePickerRenderer } from './renderers/GoogleFilePickerRenderer'
 import { DateTimeRenderer } from './renderers/DateTimeRenderer'
 
 export type { RendererProps, FieldRenderer } from './types'
@@ -46,8 +44,6 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'wa-template':      WATemplateRenderer,
   media:              MediaRenderer,
   'gmail-query':      GmailQueryRenderer,
-  'gdrive-folder':    GDrivePickerRenderer,
-  'google-file':      GoogleFilePickerRenderer,
   datetime:           DateTimeRenderer,
 }
 

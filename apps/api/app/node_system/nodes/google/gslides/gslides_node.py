@@ -406,7 +406,14 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                 {
                     "name": "presentation_id",
                     "label": "Presentation",
-                    "type": "google-file",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "drive_files",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "typeOptions": {
                         "mimeType": SLIDES_MIME,

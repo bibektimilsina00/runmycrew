@@ -63,7 +63,12 @@ MANIFEST = ProviderManifest(
         FieldSpec(name="deal_name", label="Deal Name", type="string"),
         FieldSpec(name="deal_stage", label="Deal Stage", type="string"),
         FieldSpec(name="deal_amount", label="Deal Amount", type="number"),
-        FieldSpec(name="pipeline", label="Pipeline", type="string"),
+        FieldSpec(
+            name="pipeline",
+            label="Pipeline",
+            type="string",
+            remote=RemoteLookup(provider="hubspot", resource="pipelines"),
+        ),
         FieldSpec(name="ticket_name", label="Ticket Name", type="string"),
         FieldSpec(name="ticket_pipeline", label="Ticket Pipeline", type="string"),
         FieldSpec(name="ticket_stage", label="Ticket Stage", type="string"),

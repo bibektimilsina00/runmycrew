@@ -222,7 +222,14 @@ class GoogleFormsNode(BaseNode[GoogleFormsProperties]):
                 {
                     "name": "form_id",
                     "label": "Form",
-                    "type": "google-file",
+                    "type": "string",
+                    "remote": {
+                        "provider": "google",
+                        "resource": "drive_files",
+                        "params": {},
+                        "depends_on": [],
+                        "allow_manual": True,
+                    },
                     "required": True,
                     "typeOptions": {
                         "mimeType": FORM_MIME,
