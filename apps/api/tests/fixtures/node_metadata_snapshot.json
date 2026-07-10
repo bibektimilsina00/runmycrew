@@ -86938,7 +86938,7 @@
     "credential_type": null,
     "default_height": null,
     "default_width": null,
-    "description": "Publish this workflow as a hosted chat or form app. Anyone with the link can talk to it \u2014 each user turn becomes a workflow run.",
+    "description": "Turn this workflow into a hosted chat / form product. Activate the workflow \u2192 URL goes live at /apps/{workspace}/{slug}. Each visitor message runs the graph.",
     "dynamic_outputs_from": null,
     "icon": "MessagesSquare",
     "inputs": 0,
@@ -86981,7 +86981,7 @@
         "type": "string"
       },
       {
-        "description": "URL-safe identifier. Full URL: /apps/{workspace}/{slug}. Leave empty to auto-generate from the title on publish.",
+        "description": "URL-safe identifier. Full URL: /apps/{workspace}/{slug}. Leave empty to auto-generate from the title.",
         "label": "URL slug",
         "name": "app_slug",
         "placeholder": "support-bot",
@@ -86996,7 +86996,6 @@
       },
       {
         "default": "chat",
-        "description": "Chat = conversation. Form = one input page + one result page.",
         "label": "Mode",
         "name": "mode",
         "options": [
@@ -87029,7 +87028,7 @@
         "type": "string"
       },
       {
-        "description": "Markdown supported. Rendered as the assistant's opening turn.",
+        "description": "Markdown supported.",
         "label": "First assistant message",
         "name": "welcome_message",
         "placeholder": "Hi! I'm here to answer questions about\u2026",
@@ -87040,20 +87039,17 @@
       },
       {
         "default": [],
-        "description": "Quick-start chips shown before the first message.",
         "label": "Suggested prompts",
         "name": "suggested_prompts",
         "properties": [
           {
             "label": "Chip label",
             "name": "label",
-            "placeholder": "Return policy",
             "type": "string"
           },
           {
             "label": "Prompt sent",
             "name": "prompt",
-            "placeholder": "What is your return policy?",
             "type": "string"
           }
         ],
@@ -87064,7 +87060,7 @@
         }
       },
       {
-        "description": "Overlay this persona onto the first agent node in the graph.",
+        "description": "Overlay this persona onto the first agent node.",
         "label": "System persona",
         "name": "system_persona_id",
         "required": false,
@@ -87072,7 +87068,6 @@
       },
       {
         "default": true,
-        "description": "Injects prior messages as memory into the first agent node.",
         "label": "Remember conversation history",
         "mode": "advanced",
         "name": "allow_history",
@@ -87101,7 +87096,7 @@
       },
       {
         "default": [],
-        "description": "Form fields (form mode) \u2014 also surface as chat attachments.",
+        "description": "Form fields (form mode). Also usable as chat attachments.",
         "label": "Input fields",
         "mode": "advanced",
         "name": "input_fields",
@@ -87109,14 +87104,12 @@
           {
             "label": "Name",
             "name": "name",
-            "placeholder": "field1",
             "required": true,
             "type": "string"
           },
           {
             "label": "Label",
             "name": "label",
-            "placeholder": "Company URL",
             "type": "string"
           },
           {
@@ -87191,6 +87184,128 @@
           "autoIncrementPrefix": "field",
           "multipleValues": true
         }
+      },
+      {
+        "default": false,
+        "label": "Allow file upload",
+        "mode": "advanced",
+        "name": "allow_file_upload",
+        "type": "boolean"
+      },
+      {
+        "condition": {
+          "field": "allow_file_upload",
+          "value": true
+        },
+        "default": [],
+        "label": "Allowed mime types (blank = any)",
+        "mode": "advanced",
+        "name": "allowed_file_types",
+        "type": "list"
+      },
+      {
+        "condition": {
+          "field": "allow_file_upload",
+          "value": true
+        },
+        "default": 10,
+        "label": "Max file size (MB)",
+        "mode": "advanced",
+        "name": "max_file_size_mb",
+        "type": "number"
+      },
+      {
+        "default": "public",
+        "description": "Password + API key values are set via the Share dialog \u2014 never stored in the graph.",
+        "label": "Access",
+        "name": "auth_mode",
+        "options": [
+          {
+            "label": "Public \u2014 anyone with the link",
+            "value": "public"
+          },
+          {
+            "label": "Password \u2014 one shared password",
+            "value": "password"
+          },
+          {
+            "label": "Login \u2014 Fuse account required",
+            "value": "login"
+          },
+          {
+            "label": "API key \u2014 X-App-Key header",
+            "value": "api_key"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": 20,
+        "label": "Rate limit (msgs/min per visitor)",
+        "mode": "advanced",
+        "name": "rate_limit_per_min",
+        "type": "number"
+      },
+      {
+        "default": 5.0,
+        "label": "Session cost cap ($)",
+        "mode": "advanced",
+        "name": "session_cost_cap_usd",
+        "type": "number"
+      },
+      {
+        "default": 50.0,
+        "label": "Daily cost cap ($)",
+        "mode": "advanced",
+        "name": "daily_cost_cap_usd",
+        "type": "number"
+      },
+      {
+        "default": "#8b5cf6",
+        "label": "Primary color",
+        "mode": "advanced",
+        "name": "primary_color",
+        "type": "string"
+      },
+      {
+        "label": "Logo URL",
+        "mode": "advanced",
+        "name": "logo_url",
+        "type": "string"
+      },
+      {
+        "default": "auto",
+        "label": "Dark mode",
+        "mode": "advanced",
+        "name": "dark_mode",
+        "options": [
+          {
+            "label": "Auto (follow visitor)",
+            "value": "auto"
+          },
+          {
+            "label": "Light",
+            "value": "light"
+          },
+          {
+            "label": "Dark",
+            "value": "dark"
+          }
+        ],
+        "type": "options"
+      },
+      {
+        "default": true,
+        "label": "Show 'Powered by Fuse'",
+        "mode": "advanced",
+        "name": "show_powered_by",
+        "type": "boolean"
+      },
+      {
+        "label": "Social share image",
+        "mode": "advanced",
+        "name": "og_image_url",
+        "type": "string"
       },
       {
         "default": 0,

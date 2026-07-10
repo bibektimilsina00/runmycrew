@@ -26,6 +26,13 @@ export const loopsAPI = {
       data: { name: data.name, description: data.description, graph: data.graph },
     }),
 
+  update: (id: string, data: { name?: string; description?: string; color?: string | null }) =>
+    requestJson(z.any(), {
+      url: API_ROUTES.CREW_UPDATE(id),
+      method: 'PUT',
+      data,
+    }),
+
   delete: (id: string) =>
     requestJson(z.any(), { url: API_ROUTES.CREW_DELETE(id), method: 'DELETE' }),
 
@@ -42,3 +49,6 @@ export const loopsAPI = {
       url: API_ROUTES.CREW_RUN(id), method: 'POST',
     }),
 }
+
+// Alias used by places that already speak "crews" instead of "loops".
+export const crewsService = loopsAPI

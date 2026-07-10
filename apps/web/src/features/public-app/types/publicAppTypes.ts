@@ -30,16 +30,15 @@ export const PublicAppConfigSchema = z.object({
 }).passthrough()
 
 export const PublicAppSchema = z.object({
-  id: z.string(),
+  workflow_id: z.string(),
+  workspace_slug: z.string(),
   app_slug: z.string(),
   title: z.string(),
   description: z.string().nullable(),
   mode: z.string(),
-  version_num: z.number(),
-  config: PublicAppConfigSchema,
   auth_mode: z.string(),
-  published_at: z.string(),
-  expires_at: z.string().nullable(),
+  config: PublicAppConfigSchema,
+  public_url: z.string().nullable().optional(),
 })
 export type PublicApp = z.infer<typeof PublicAppSchema>
 export type PublicAppConfig = z.infer<typeof PublicAppConfigSchema>
@@ -48,7 +47,7 @@ export type InputField = z.infer<typeof InputFieldSchema>
 
 export const SessionSchema = z.object({
   id: z.string(),
-  app_id: z.string(),
+  workflow_id: z.string(),
   cookie_id: z.string(),
   user_id: z.string().nullable(),
   first_seen_at: z.string(),

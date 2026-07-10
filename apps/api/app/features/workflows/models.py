@@ -60,6 +60,13 @@ class Workflow(SQLModelBase, table=True):
     #                nodes only). See docs/loop-engineering-plan.md.
     kind: str = Field(default="automation", max_length=16)
 
+    # Hashed secrets for the ``trigger.chat_app`` visitor auth flow. Kept
+    # here instead of in the graph JSON so they never leak in a workflow
+    # export. Nullable — populated only when the owner sets a password /
+    # generates an API key from the Share dialog.
+    app_password_hash: str | None = Field(default=None)
+    app_api_key_hash: str | None = Field(default=None)
+
     user: "User" = Relationship(back_populates="workflows")
     folder: "Folder" = Relationship(back_populates="workflows")
     executions: list["Execution"] = Relationship(

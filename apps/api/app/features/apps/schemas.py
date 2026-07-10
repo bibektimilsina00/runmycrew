@@ -5,61 +5,22 @@ from typing import Any
 from sqlmodel import Field, SQLModel
 
 
-class PublishAppRequest(SQLModel):
-    """Owner-side payload sent when publishing / re-publishing a workflow.
-
-    All fields except ``workflow_id`` (path arg) are optional — when a knob
-    is omitted, the trigger's stored value wins. This lets a "quick publish"
-    with defaults still work.
-    """
-
-    app_slug: str | None = Field(default=None, max_length=128)
-    title: str | None = Field(default=None, max_length=255)
-    description: str | None = None
-    mode: str | None = None
-    config: dict[str, Any] | None = None
-    auth_mode: str | None = None
-    password: str | None = None  # write-only; hashed server-side
-    expires_at: datetime | None = None
-
-
-class PublishedAppOut(SQLModel):
-    id: uuid.UUID
-    workspace_id: uuid.UUID
-    workflow_id: uuid.UUID
-    published_by: uuid.UUID
-    app_slug: str
-    title: str
-    description: str | None
-    mode: str
-    version_num: int
-    config: dict[str, Any]
-    auth_mode: str
-    is_active: bool
-    published_at: datetime
-    updated_at: datetime
-    expires_at: datetime | None
-    # Owner-only convenience — the full public URL for the app.
-    public_url: str | None = None
-
-
 class PublicAppOut(SQLModel):
-    """The safe subset a public visitor may fetch.
+    """Safe subset a visitor may fetch.
 
-    Notably excludes ``graph_snapshot``, ``password_hash``, ``api_key_hash``,
-    and workflow/workspace ids — only what the chat page needs to render.
+    Assembled from the workflow + trigger.chat_app node props at
+    request time — no PublishedApp row exists.
     """
 
-    id: uuid.UUID
+    workflow_id: uuid.UUID
+    workspace_slug: str
     app_slug: str
     title: str
     description: str | None
     mode: str
-    version_num: int
-    config: dict[str, Any]
     auth_mode: str
-    published_at: datetime
-    expires_at: datetime | None
+    config: dict[str, Any]
+    public_url: str | None = None
 
 
 class MessageIn(SQLModel):
@@ -84,7 +45,7 @@ class MessageOut(SQLModel):
 
 class SessionOut(SQLModel):
     id: uuid.UUID
-    app_id: uuid.UUID
+    workflow_id: uuid.UUID
     cookie_id: str
     user_id: uuid.UUID | None
     first_seen_at: datetime
@@ -96,8 +57,6 @@ class SessionOut(SQLModel):
 
 
 class SessionEnvelope(SQLModel):
-    """Session bundle returned by GET /session — session row + last N msgs."""
-
     session: SessionOut
     messages: list[MessageOut]
 
@@ -108,12 +67,12 @@ class SendMessageOut(SQLModel):
     stream_url: str
 
 
-class RollbackRequest(SQLModel):
-    version_num: int
-
-
 class ApiKeyOut(SQLModel):
     api_key: str  # plain — shown ONCE at generation
+
+
+class AppPasswordIn(SQLModel):
+    password: str | None = None  # None to clear
 
 
 class AnalyticsOverview(SQLModel):

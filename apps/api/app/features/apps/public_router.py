@@ -2,14 +2,19 @@
 
 Namespace: ``/api/v1/apps/{workspace_slug}/{app_slug}/...``
 
+Refactored: no ``PublishedApp`` row. Each request resolves the workflow
+with a matching ``trigger.chat_app`` slug + ``is_active=True`` and serves
+the current graph directly.
+
 Visitor identity:
-- Anonymous session cookie (``fuse_app_session``) for public / password apps
-- Standard Fuse ``Authorization: Bearer <token>`` for ``auth_mode=login``
-- ``X-App-Key: <token>`` header for ``auth_mode=api_key``
+- Anonymous session cookie (``fuse_app_session``) — public / password apps
+- Standard Fuse ``Authorization: Bearer`` — ``auth_mode=login``
+- ``X-App-Key`` header — ``auth_mode=api_key``
 """
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import mimetypes
 import uuid
@@ -41,15 +46,15 @@ from apps.api.app.features.apps.schemas import (
     SessionEnvelope,
     SessionOut,
 )
-from apps.api.app.features.apps.service import PublishedAppService, hash_ip
+from apps.api.app.features.apps.service import AppService, hash_ip
 from apps.api.app.features.apps.streaming import stream_execution_events
 
 router = APIRouter()
 
 SESSION_COOKIE = "fuse_app_session"
-SESSION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
+SESSION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 UNLOCK_COOKIE = "fuse_app_unlock"
-UNLOCK_COOKIE_MAX_AGE = 60 * 60 * 24 * 7  # 7 days
+UNLOCK_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 
 
 class UnlockRequest(BaseModel):
@@ -91,18 +96,12 @@ def _issue_unlock_cookie(
     )
 
 
-def _unlock_token_for(app_id: uuid.UUID, password_hash: str | None) -> str:
-    """Deterministic token tied to the current password hash.
-
-    Rotating the password invalidates every unlock token automatically —
-    we don't have to keep a server-side list.
-    """
-    seed = f"{app_id}:{password_hash or ''}"
+def _unlock_token_for(workflow_id: uuid.UUID, password_hash: str | None) -> str:
+    seed = f"{workflow_id}:{password_hash or ''}"
     return hashlib.sha256(seed.encode("utf-8")).hexdigest()
 
 
 async def _resolve_authenticated_user_id(request: Request, db: AsyncSession) -> uuid.UUID | None:
-    """Return the current user's id when a valid Bearer token is present."""
     auth = request.headers.get("authorization")
     if not auth or not auth.lower().startswith("bearer "):
         return None
@@ -124,48 +123,33 @@ async def _resolve_authenticated_user_id(request: Request, db: AsyncSession) -> 
 
 
 async def _enforce_auth(
-    app,
+    workflow: Any,
+    trigger_props: dict[str, Any],
     request: Request,
     unlock_cookie: str | None,
     db: AsyncSession,
 ) -> uuid.UUID | None:
-    """Raise 401 when the visitor doesn't satisfy the app's auth_mode.
-
-    Returns an optional user_id to attach to the session for ``login``
-    mode; otherwise returns None.
-    """
-    mode = app.auth_mode
+    mode = trigger_props.get("auth_mode") or "public"
     if mode == "public":
         return None
     if mode == "password":
-        expected = _unlock_token_for(app.id, app.password_hash)
+        expected = _unlock_token_for(workflow.id, workflow.app_password_hash)
         if unlock_cookie != expected:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="password_required",
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="password_required"
             )
         return None
     if mode == "login":
         user_id = await _resolve_authenticated_user_id(request, db)
         if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="login_required",
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="login_required")
         return user_id
     if mode == "api_key":
         provided = request.headers.get("x-app-key")
         if not provided:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="api_key_required",
-            )
-        from apps.api.app.features.apps.service import PublishedAppService as _S
-
-        # Use a throwaway service to reuse verify_api_key without needing a db
-        # binding; the call is pure hash math.
-        svc = _S.__new__(_S)
-        if not svc.verify_api_key(app, provided):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="api_key_required")
+        svc = AppService.__new__(AppService)
+        if not svc.verify_api_key(workflow, provided):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_api_key")
         return None
     raise HTTPException(
@@ -173,33 +157,50 @@ async def _enforce_auth(
     )
 
 
-@router.get(
-    "/{workspace_slug}/{app_slug}",
-    response_model=PublicAppOut,
-)
-async def get_public_app(
-    workspace_slug: str,
-    app_slug: str,
-    db: AsyncSession = Depends(get_db),
-):
-    """Public config used to render the chat page.
+_PUBLIC_CONFIG_KEYS = {
+    "welcome_headline",
+    "welcome_sub",
+    "welcome_message",
+    "suggested_prompts",
+    "input_fields",
+    "system_persona_id",
+    "allow_history",
+    "output_target",
+    "allow_file_upload",
+    "allowed_file_types",
+    "max_file_size_mb",
+    "primary_color",
+    "logo_url",
+    "dark_mode",
+    "show_powered_by",
+    "og_image_url",
+    "rate_limit_per_min",
+    "session_cost_cap_usd",
+    "daily_cost_cap_usd",
+}
 
-    Excludes ``graph_snapshot``, ``password_hash``, ``api_key_hash``. Safe
-    to expose to unauthenticated visitors.
-    """
-    app = await PublishedAppService(db).resolve_public_app(workspace_slug, app_slug)
+
+def _public_out(
+    workspace_slug: str, app_slug: str, workflow: Any, props: dict[str, Any]
+) -> PublicAppOut:
+    config = {k: v for k, v in props.items() if k in _PUBLIC_CONFIG_KEYS}
     return PublicAppOut(
-        id=app.id,
-        app_slug=app.app_slug,
-        title=app.title,
-        description=app.description,
-        mode=app.mode,
-        version_num=app.version_num,
-        config=app.config or {},
-        auth_mode=app.auth_mode,
-        published_at=app.published_at,
-        expires_at=app.expires_at,
+        workflow_id=workflow.id,
+        workspace_slug=workspace_slug,
+        app_slug=app_slug,
+        title=props.get("title") or workflow.name,
+        description=props.get("description") or workflow.description,
+        mode=props.get("mode") or "chat",
+        auth_mode=props.get("auth_mode") or "public",
+        config=config,
+        public_url=f"/apps/{workspace_slug}/{app_slug}",
     )
+
+
+@router.get("/{workspace_slug}/{app_slug}", response_model=PublicAppOut)
+async def get_public_app(workspace_slug: str, app_slug: str, db: AsyncSession = Depends(get_db)):
+    wf, props = await AppService(db).resolve_public_app(workspace_slug, app_slug)
+    return _public_out(workspace_slug, app_slug, wf, props)
 
 
 @router.post("/{workspace_slug}/{app_slug}/unlock")
@@ -211,31 +212,24 @@ async def unlock_password(
     response: Response,
     db: AsyncSession = Depends(get_db),
 ):
-    """Verify the shared password and set the unlock cookie."""
-    service = PublishedAppService(db)
-    app = await service.resolve_public_app(workspace_slug, app_slug)
-    if app.auth_mode != "password":
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    if (props.get("auth_mode") or "public") != "password":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="not_password_gated")
-
-    # Rate-limit password attempts per IP (foils brute force).
-    ip = _client_ip(request)
-    ok, retry = await check_rate_limit(app.id, "unlock", hash_ip(ip), max_per_minute=8)
+    ok, retry = await check_rate_limit(
+        wf.id, "unlock", hash_ip(_client_ip(request)), max_per_minute=8
+    )
     if not ok:
         response.headers["Retry-After"] = str(retry)
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="rate_limited")
-
-    if not service.verify_password(app, body.password):
+    if not service.verify_password(wf, body.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_password")
-
-    token = _unlock_token_for(app.id, app.password_hash)
+    token = _unlock_token_for(wf.id, wf.app_password_hash)
     _issue_unlock_cookie(response, workspace_slug, app_slug, token)
     return {"unlocked": True}
 
 
-@router.post(
-    "/{workspace_slug}/{app_slug}/session",
-    response_model=SessionEnvelope,
-)
+@router.post("/{workspace_slug}/{app_slug}/session", response_model=SessionEnvelope)
 async def get_or_create_session(
     workspace_slug: str,
     app_slug: str,
@@ -245,27 +239,18 @@ async def get_or_create_session(
     unlock_cookie: str | None = Cookie(default=None, alias=UNLOCK_COOKIE),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get-or-create the visitor's session and return the recent message history.
-
-    Enforces the app's ``auth_mode``. Sets the session cookie (30-day,
-    HttpOnly, SameSite=Lax) on first hit so subsequent turns route to
-    the same thread.
-    """
-    service = PublishedAppService(db)
-    app = await service.resolve_public_app(workspace_slug, app_slug)
-    user_id = await _enforce_auth(app, request, unlock_cookie, db)
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    user_id = await _enforce_auth(wf, props, request, unlock_cookie, db)
     session = await service.get_or_create_session(
-        app,
-        cookie_id=session_cookie,
-        user_id=user_id,
-        ip=_client_ip(request),
+        wf, cookie_id=session_cookie, user_id=user_id, ip=_client_ip(request)
     )
     _issue_session_cookie(response, workspace_slug, app_slug, session.cookie_id)
     messages = await service.list_messages(session, limit=50)
     return SessionEnvelope(
         session=SessionOut(
             id=session.id,
-            app_id=session.app_id,
+            workflow_id=session.workflow_id,
             cookie_id=session.cookie_id,
             user_id=session.user_id,
             first_seen_at=session.first_seen_at,
@@ -279,10 +264,7 @@ async def get_or_create_session(
     )
 
 
-@router.post(
-    "/{workspace_slug}/{app_slug}/message",
-    response_model=SendMessageOut,
-)
+@router.post("/{workspace_slug}/{app_slug}/message", response_model=SendMessageOut)
 async def send_message(
     workspace_slug: str,
     app_slug: str,
@@ -293,24 +275,16 @@ async def send_message(
     unlock_cookie: str | None = Cookie(default=None, alias=UNLOCK_COOKIE),
     db: AsyncSession = Depends(get_db),
 ):
-    """Enqueue a workflow execution for this turn.
-
-    Enforces auth + rate limit + session/day cost caps BEFORE spawning the
-    Celery task so we don't burn budget on rejected messages.
-    """
     if session_cookie is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Session cookie missing — call /session first.",
         )
-    service = PublishedAppService(db)
-    app = await service.resolve_public_app(workspace_slug, app_slug)
-    user_id = await _enforce_auth(app, request, unlock_cookie, db)
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    user_id = await _enforce_auth(wf, props, request, unlock_cookie, db)
     session = await service.get_or_create_session(
-        app,
-        cookie_id=session_cookie,
-        user_id=user_id,
-        ip=_client_ip(request),
+        wf, cookie_id=session_cookie, user_id=user_id, ip=_client_ip(request)
     )
     if session.is_blocked:
         raise HTTPException(
@@ -319,20 +293,15 @@ async def send_message(
         )
     if not payload.message and not payload.form_data:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Message body is required.",
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Message body is required."
         )
 
-    cfg = app.config or {}
-    max_per_min = int(cfg.get("rate_limit_per_min") or 20)
-    session_cap = float(cfg.get("session_cost_cap_usd") or 0.0)
-    daily_cap = float(cfg.get("daily_cost_cap_usd") or 0.0)
+    max_per_min = int(props.get("rate_limit_per_min") or 20)
+    session_cap = float(props.get("session_cost_cap_usd") or 0.0)
+    daily_cap = float(props.get("daily_cost_cap_usd") or 0.0)
 
     ok, retry = await check_rate_limit(
-        app.id,
-        str(session.id),
-        hash_ip(_client_ip(request)),
-        max_per_minute=max_per_min,
+        wf.id, str(session.id), hash_ip(_client_ip(request)), max_per_minute=max_per_min
     )
     if not ok:
         response.headers["Retry-After"] = str(retry)
@@ -340,21 +309,17 @@ async def send_message(
 
     if session_cap > 0 and (session.total_cost_usd or 0) >= session_cap:
         raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="session_cost_cap_reached",
+            status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="session_cost_cap_reached"
         )
     if daily_cap > 0:
-        # Simple daily-cost aggregate via sessions.last_seen_at — cheap
-        # approximation; full audit trail lives in AppEvent.
         from datetime import UTC, datetime
 
         from sqlalchemy import select
 
-        from apps.api.app.features.apps.models import AppSession
-        from apps.api.app.features.apps.repository import AppEventRepository as _AER  # noqa: F401
+        from apps.api.app.features.apps.models import AppSession as _S
 
         today = datetime.now(UTC).date()
-        rows = await db.execute(select(AppSession).where(AppSession.app_id == app.id))
+        rows = await db.execute(select(_S).where(_S.workflow_id == wf.id))
         spent_today = 0.0
         for r in rows.scalars().all():
             if r.last_seen_at and r.last_seen_at.date() == today:
@@ -373,7 +338,7 @@ async def send_message(
 
     execute_app_message.delay(
         execution_id=execution_id,
-        published_app_id=str(app.id),
+        workflow_id=str(wf.id),
         session_id=str(session.id),
         assistant_message_id=str(assistant_msg.id),
         user_message=payload.message,
@@ -383,7 +348,7 @@ async def send_message(
     return SendMessageOut(
         message_id=assistant_msg.id,
         execution_id=execution_id,
-        stream_url=(f"/api/v1/apps/{workspace_slug}/{app_slug}/stream/{execution_id}"),
+        stream_url=f"/api/v1/apps/{workspace_slug}/{app_slug}/stream/{execution_id}",
     )
 
 
@@ -395,19 +360,13 @@ async def stream(
     session_cookie: str | None = Cookie(default=None, alias=SESSION_COOKIE),
     db: AsyncSession = Depends(get_db),
 ):
-    """SSE — forwards workflow-runner events to the client.
-
-    Contract: `event: <type>\\ndata: <json>\\n\\n`. Terminal event
-    `stream_end` signals the client to close.
-    """
-    service = PublishedAppService(db)
-    app = await service.resolve_public_app(workspace_slug, app_slug)
+    service = AppService(db)
+    wf, _ = await service.resolve_public_app(workspace_slug, app_slug)
     if session_cookie is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
-    session = await service.session_repo.get_by_cookie(app.id, session_cookie)
+    session = await service.session_repo.get_by_cookie(wf.id, session_cookie)
     if not session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
-
     return StreamingResponse(
         stream_execution_events(execution_id),
         media_type="text/event-stream",
@@ -419,21 +378,18 @@ async def stream(
     )
 
 
-@router.get(
-    "/{workspace_slug}/{app_slug}/history",
-    response_model=list[MessageOut],
-)
+@router.get("/{workspace_slug}/{app_slug}/history", response_model=list[MessageOut])
 async def history(
     workspace_slug: str,
     app_slug: str,
     session_cookie: str | None = Cookie(default=None, alias=SESSION_COOKIE),
     db: AsyncSession = Depends(get_db),
 ):
-    service = PublishedAppService(db)
-    app = await service.resolve_public_app(workspace_slug, app_slug)
+    service = AppService(db)
+    wf, _ = await service.resolve_public_app(workspace_slug, app_slug)
     if session_cookie is None:
         return []
-    session = await service.session_repo.get_by_cookie(app.id, session_cookie)
+    session = await service.session_repo.get_by_cookie(wf.id, session_cookie)
     if not session:
         return []
     messages = await service.list_messages(session, limit=200)
@@ -450,26 +406,19 @@ async def upload_file(
     unlock_cookie: str | None = Cookie(default=None, alias=UNLOCK_COOKIE),
     db: AsyncSession = Depends(get_db),
 ):
-    """Store a visitor-uploaded file.
-
-    Enforces the app's mime + size caps and returns a data-URI (dev) or
-    external URL (prod) the trigger payload can attach to the next
-    message. Stripes the file as an AppFile row for owner audit.
-    """
     if session_cookie is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
-    service = PublishedAppService(db)
-    app = await service.resolve_public_app(workspace_slug, app_slug)
-    await _enforce_auth(app, request, unlock_cookie, db)
-    session = await service.session_repo.get_by_cookie(app.id, session_cookie)
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    await _enforce_auth(wf, props, request, unlock_cookie, db)
+    session = await service.session_repo.get_by_cookie(wf.id, session_cookie)
     if not session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
 
-    cfg = app.config or {}
-    if not cfg.get("allow_file_upload"):
+    if not props.get("allow_file_upload"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="file_upload_disabled")
-    allowed_mimes: list[str] = list(cfg.get("allowed_file_types") or [])
-    max_size_mb = int(cfg.get("max_file_size_mb") or 10)
+    allowed_mimes: list[str] = list(props.get("allowed_file_types") or [])
+    max_size_mb = int(props.get("max_file_size_mb") or 10)
 
     data = await file.read()
     if len(data) > max_size_mb * 1024 * 1024:
@@ -485,12 +434,7 @@ async def upload_file(
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
         )
-
     sha = hashlib.sha256(data).hexdigest()
-    # Dev-friendly: data-URI so the frontend can preview immediately.
-    # Production: swap for an object-storage put (see plan §4.14).
-    import base64
-
     b64 = base64.b64encode(data).decode("ascii")
     url = f"data:{mime};base64,{b64}"
 
