@@ -106,7 +106,12 @@ export function TemplateDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.55fr_1fr] gap-[28px] items-start">
           <DetailTabs template={template} missingCredentials={missingCredentials} />
-          <DetailSidebar template={template} missingCredentials={missingCredentials} />
+          <DetailSidebar
+            template={template}
+            missingCredentials={missingCredentials}
+            onInstall={handlePrimary}
+            installing={install.isPending}
+          />
         </div>
 
         <RelatedTemplates category={template.category} excludeId={template.id} />

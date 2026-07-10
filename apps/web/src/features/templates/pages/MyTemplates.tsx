@@ -5,7 +5,6 @@ import { Button } from '@/shared/components'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useMyTemplates, useDeleteTemplate } from '../hooks/useTemplates'
 import { TemplateCard } from '../components/TemplateCard'
-import { toCardShape } from '../utils/toCardShape'
 import { useToast } from '@/shared/components'
 import type { TemplateListItem } from '../types/templatesTypes'
 
@@ -72,11 +71,11 @@ export function MyTemplates() {
           </span>
         </div>
       ) : (
-        <div className="tpl-grid">
-          {items.map((item, idx) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {items.map((item) => (
             <div key={item.id} className="relative">
               <TemplateCard
-                template={toCardShape(item, idx)}
+                template={item}
                 onClick={() => navigate(APP_ROUTES.TEMPLATE_DETAIL(item.slug))}
               />
               {/* Creator-only delete affordance, floating on the card so
