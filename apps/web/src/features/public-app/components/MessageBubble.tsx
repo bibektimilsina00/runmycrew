@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { Check, Copy, Loader2 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { AppLogo } from './AppLogo'
 import type { AppMessage } from '../types/publicAppTypes'
 
 interface MessageBubbleProps {
   message: AppMessage
   streaming?: boolean
+  /** App logo for the assistant avatar (config.logo_url). */
+  logoUrl?: string
 }
 
 /**
@@ -15,7 +18,7 @@ interface MessageBubbleProps {
  * turn taking is still legible at a glance. Assistant content renders
  * as GFM markdown — agents speak markdown, plain text read as broken.
  */
-export function MessageBubble({ message, streaming }: MessageBubbleProps) {
+export function MessageBubble({ message, streaming, logoUrl }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
 
@@ -40,7 +43,8 @@ export function MessageBubble({ message, streaming }: MessageBubbleProps) {
   }
 
   return (
-    <div className="group flex w-full justify-start">
+    <div className="group flex w-full justify-start gap-3">
+      <AppLogo src={logoUrl} size={26} className="mt-0.5 shrink-0" />
       <div className="max-w-[100%] min-w-0 flex-1">
         {message.content ? (
           <div className="prose prose-invert max-w-none text-[15px] leading-[1.65] prose-p:my-2 prose-pre:my-3 prose-pre:rounded-[10px] prose-pre:border prose-pre:border-white/10 prose-pre:bg-black/40 prose-code:text-[13px] prose-headings:mt-4 prose-headings:mb-2 prose-li:my-0.5 prose-table:text-[13.5px]">

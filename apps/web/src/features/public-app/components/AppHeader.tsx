@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Check, Copy, Sparkles } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
+import { AppLogo } from './AppLogo'
 import type { PublicApp } from '../types/publicAppTypes'
 
 interface AppHeaderProps {
@@ -25,20 +26,10 @@ export function AppHeader({ app, onNewChat }: AppHeaderProps) {
     }
   }
 
-  const logo = app.config.logo_url
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/5 bg-[var(--bg,#0b0b0f)]/85 px-5 py-3 backdrop-blur">
       <div className="flex items-center gap-2.5 min-w-0">
-        {logo ? (
-          <img src={logo} alt="" className="h-7 w-7 rounded-md object-cover" />
-        ) : (
-          <span
-            className="flex h-7 w-7 items-center justify-center rounded-md text-white/80"
-            style={{ background: 'var(--app-accent, #8b5cf6)' }}
-          >
-            <Sparkles size={14} />
-          </span>
-        )}
+        <AppLogo src={app.config.logo_url as string | undefined} size={28} />
         <div className="min-w-0">
           <div className="truncate text-[14px] font-semibold leading-tight text-white/90">
             {app.title}

@@ -86924,11 +86924,16 @@
         "type": "string"
       },
       {
-        "description": "URL-safe identifier. Full URL: /apps/{workspace}/{slug}. Leave empty to auto-generate from the title.",
         "label": "URL slug",
         "name": "app_slug",
-        "placeholder": "support-bot",
-        "type": "string"
+        "type": "string",
+        "visibility": "hidden"
+      },
+      {
+        "label": "Public link",
+        "name": "app_url",
+        "type": "app-link",
+        "visibility": "user-only"
       },
       {
         "description": "Subtitle + social share meta description.",

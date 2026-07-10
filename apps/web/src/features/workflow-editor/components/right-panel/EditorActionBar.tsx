@@ -11,7 +11,6 @@ import { Button } from '@/shared/components'
 import { useEditorActionBar } from '../../hooks/useEditorActionBar'
 import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
 import { PublishTemplateModal } from '@/features/templates/components/PublishTemplateModal'
-import { ShareAppButton } from '@/features/public-app/components/ShareAppButton'
 import { slugifyAppUrl } from '@/features/public-app/utils/slug'
 import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
 import { useToast } from '@/shared/components'
@@ -145,12 +144,6 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Share URL surfaces only when the graph has a chat_app trigger
-            AND the workflow is active — mirrors how other triggers "just
-            work" once the workflow is switched on. */}
-        {hasChatAppTrigger && isActive && workflowId && (
-          <ShareAppButton workflowId={workflowId} appSlug={chatAppSlug} />
-        )}
         {/* Activate / Pause — toggles workflow.is_active. When active the
             cron / webhook triggers fire; pausing makes the runtime ignore
             them. Same control as the topbar's Active pill, surfaced here

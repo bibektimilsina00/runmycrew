@@ -1,5 +1,5 @@
-import { Sparkles } from 'lucide-react'
 import { SuggestedPrompts } from './SuggestedPrompts'
+import { AppLogo } from './AppLogo'
 import type { PublicApp } from '../types/publicAppTypes'
 
 interface WelcomeStateProps {
@@ -17,15 +17,13 @@ export function WelcomeState({ app, onPickPrompt }: WelcomeStateProps) {
   const suggestions = app.config.suggested_prompts ?? []
   return (
     <div className="mx-auto flex max-w-[720px] flex-1 flex-col items-center justify-center gap-5 px-6 py-16 text-center">
-      <span
-        className="flex h-11 w-11 items-center justify-center rounded-[14px]"
-        style={{
-          background: 'color-mix(in oklab, var(--app-accent, #8b5cf6) 15%, transparent)',
-          color: 'var(--app-accent, #8b5cf6)',
-        }}
-      >
-        <Sparkles size={20} />
-      </span>
+      <div className="relative">
+        <div
+          className="absolute -inset-4 rounded-full opacity-40 blur-2xl"
+          style={{ background: 'color-mix(in oklab, var(--app-accent, #8b5cf6) 35%, transparent)' }}
+        />
+        <AppLogo src={app.config.logo_url as string | undefined} size={56} className="relative shadow-[0_8px_24px_-8px_rgba(0,0,0,0.6)]" />
+      </div>
       <div>
         <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-white">
           {headline}

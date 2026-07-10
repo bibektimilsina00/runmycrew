@@ -188,10 +188,10 @@ export function PublicApp() {
             ) : (
               <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col gap-6 px-4 py-6 sm:px-6">
                 {optimistic.map(m => (
-                  <MessageBubble key={m.id} message={m} />
+                  <MessageBubble key={m.id} message={m} logoUrl={app.config.logo_url as string | undefined} />
                 ))}
                 {sendState.assistant && (
-                  <MessageBubble message={sendState.assistant} streaming />
+                  <MessageBubble message={sendState.assistant} streaming logoUrl={app.config.logo_url as string | undefined} />
                 )}
                 {canvasVisible && (
                   <div className="mt-4 min-h-[420px] overflow-hidden rounded-[12px] border border-white/5">
@@ -237,10 +237,10 @@ export function PublicApp() {
                 ) : (
                   <>
                     {optimistic.map(m => (
-                      <MessageBubble key={m.id} message={m} />
+                      <MessageBubble key={m.id} message={m} logoUrl={app.config.logo_url as string | undefined} />
                     ))}
                     {sendState.assistant && (
-                      <MessageBubble message={sendState.assistant} streaming />
+                      <MessageBubble message={sendState.assistant} streaming logoUrl={app.config.logo_url as string | undefined} />
                     )}
                   </>
                 )}
