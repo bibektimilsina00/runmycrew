@@ -293,8 +293,13 @@
 @keyframes template-edge-flow {
   to { stroke-dashoffset: -20; }
 }
-@keyframes collage-scroll {
-  to { transform: translateX(-50%); }
+@keyframes collage-float {
+  0%, 100% { transform: translateY(3px); }
+  50%      { transform: translateY(-3px); }
+}
+@keyframes collage-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
