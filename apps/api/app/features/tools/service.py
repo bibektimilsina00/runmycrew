@@ -242,11 +242,12 @@ class WorkflowToolsService:
         for node in nodes:
             if not isinstance(node, dict):
                 continue
-            if node.get("type") != "trigger.manual":
+            if node.get("type") != "trigger.form":
                 continue
             data = node.get("data") or {}
             properties = data.get("properties") or {}
-            input_schema = properties.get("input_schema") or []
+            # The Form trigger's field rows: {name, type, value}.
+            input_schema = properties.get("inputs") or []
             if not isinstance(input_schema, list):
                 continue
             for entry in input_schema:
