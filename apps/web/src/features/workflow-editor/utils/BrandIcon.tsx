@@ -24,17 +24,36 @@ interface BrandIconProps {
    *  pixel value computed at render time (Tailwind arbitrary values
    *  like `w-[12px]` only work for static strings the scanner sees). */
   style?: CSSProperties
+  /**
+   * Optional fallback text shown when the icon fails to load (missing SVG).
+   * Usually the first letter of the brand name. When omitted, we derive it
+   * from the slug so cards never render as a blank tile.
+   */
+  fallbackLabel?: string
 }
 
-export function BrandIcon({ slug, className, style }: BrandIconProps) {
+export function BrandIcon({ slug, className, style, fallbackLabel }: BrandIconProps) {
   const [errored, setErrored] = useState(false)
   if (errored) {
-    return <span className={className ?? 'inline-block'} style={style} />
+    const letter = (fallbackLabel ?? slug).replace(/[^a-zA-Z0-9]/g, '')[0] ?? '?'
+    return (
+      <span
+        className={
+          className
+            ? `${className} inline-flex items-center justify-center bg-white/5 text-text-mute font-semibold`
+            : 'inline-flex items-center justify-center bg-white/5 text-text-mute font-semibold'
+        }
+        style={style}
+        title={fallbackLabel ?? slug}
+      >
+        {letter.toUpperCase()}
+      </span>
+    )
   }
   return (
     <img
       src={`${ICON_BASE}/${slug.toLowerCase()}`}
-      alt={slug}
+      alt={fallbackLabel ?? slug}
       loading="lazy"
       decoding="async"
       className={className ?? 'object-contain'}
