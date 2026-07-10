@@ -215,7 +215,25 @@ export function PublicApp() {
               <FormView
                 app={app}
                 disabled={sendState.status === 'streaming' || sendState.status === 'sending'}
-                onSubmit={(_values, summary) => sendDraft(summary || 'Submit')}
+                onSubmit={(values, summary) => {
+                  // The summary is the visible transcript entry; the raw
+                  // values ride as form_data and land on the trigger.
+                  const label = summary || 'Submitted'
+                  append({
+                    id: `local-${Date.now()}`,
+                    session_id: sessionQuery.data?.session.id ?? '',
+                    role: 'user',
+                    content: label,
+                    artifacts: [],
+                    execution_id: null,
+                    tokens: 0,
+                    cost_usd: 0,
+                    latency_ms: 0,
+                    is_error: false,
+                    created_at: new Date().toISOString(),
+                  })
+                  void send(label, values, currentSessionId ?? undefined)
+                }}
               />
             ) : (
               <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col gap-6 px-4 py-6 sm:px-6">

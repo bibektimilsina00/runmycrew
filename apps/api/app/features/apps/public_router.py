@@ -182,9 +182,46 @@ _PUBLIC_CONFIG_KEYS = {
 }
 
 
+# The Form trigger's field rows are {name, type, value}; the hosted page
+# renders FormView controls keyed by these types.
+_FORM_FIELD_CONTROL = {
+    "string": "text",
+    "number": "number",
+    "boolean": "boolean",
+    "object": "textarea",
+    "array": "textarea",
+    "files": "textarea",
+}
+
+
 def _public_out(
     workspace_slug: str, app_slug: str, workflow: Any, props: dict[str, Any]
 ) -> PublicAppOut:
+    if props.get("_trigger_type") == "trigger.form":
+        # Hosted form: one-shot input page. Fields derive from the Form
+        # trigger's schema; the page stays on the form until submitted.
+        input_fields = [
+            {
+                "name": str(row.get("name") or f"input{i + 1}"),
+                "label": str(row.get("name") or f"input{i + 1}"),
+                "type": _FORM_FIELD_CONTROL.get(str(row.get("type") or "string"), "text"),
+                "required": False,
+            }
+            for i, row in enumerate(props.get("inputs") or [])
+            if isinstance(row, dict)
+        ]
+        return PublicAppOut(
+            workflow_id=workflow.id,
+            workspace_slug=workspace_slug,
+            app_slug=app_slug,
+            title=workflow.name,
+            description=workflow.description,
+            mode="form",
+            auth_mode="public",
+            config={"input_fields": input_fields},
+            public_url=f"/apps/{workspace_slug}/{app_slug}",
+        )
+
     config = {k: v for k, v in props.items() if k in _PUBLIC_CONFIG_KEYS}
     return PublicAppOut(
         workflow_id=workflow.id,

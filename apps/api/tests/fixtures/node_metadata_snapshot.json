@@ -88074,6 +88074,12 @@
     ],
     "properties": [
       {
+        "label": "Public link",
+        "name": "app_url",
+        "type": "app-link",
+        "visibility": "user-only"
+      },
+      {
         "default": [
           {
             "name": "input1",

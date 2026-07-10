@@ -51,13 +51,15 @@ export function useEditorActionBar() {
     onError: () => toast('Failed to update state', { variant: 'err' }),
   })
 
-  // ── Chat-trigger test loop ─────────────────────────────────────────
-  // A chat_app trigger has no payload to Run with — the graph fires per
-  // visitor message. Run therefore opens the hosted page and stays
-  // "listening": the chat tab posts each execution id back (same-origin
+  // ── Hosted-trigger test loop ───────────────────────────────────────
+  // Chat App and Form triggers fire per visitor interaction — a bare Run
+  // has no payload. Run opens the hosted page (chat or form) and stays
+  // "listening": the page posts each execution id back (same-origin
   // postMessage) and the log panel attaches to it live, exactly like a
   // webhook trigger's listen mode.
-  const chatAppNode = nodes.find(n => n.type === 'trigger.chat_app')
+  const chatAppNode = nodes.find(
+    n => n.type === 'trigger.chat_app' || n.type === 'trigger.form',
+  )
   const hasChatAppTrigger = Boolean(chatAppNode)
   const [chatListening, setChatListening] = useState(false)
   const wsSlug = useWorkspaceStore(s => s.currentWorkspace?.slug ?? '')
@@ -77,17 +79,32 @@ export function useEditorActionBar() {
 
   const startChatListening = async () => {
     if (!workflow) return
+    // Open the tab synchronously inside the click — awaiting activation
+    // first would detach the user gesture and popup blockers eat the
+    // window. Navigate it once the page is actually live.
+    // (No 'noreferrer': it severs window.opener, which the hosted page
+    // uses to post execution ids back. Same-origin page we own — safe.)
+    const win = window.open('', '_blank')
     if (!workflow.is_active) {
-      // The hosted page only resolves active graphs — flip it on first.
-      await activateMutation.mutateAsync()
+      try {
+        await activateMutation.mutateAsync()
+      } catch {
+        win?.close()
+        return
+      }
     }
     const props = (chatAppNode?.data?.properties ?? {}) as Record<string, unknown>
     const raw = (props.app_slug as string) || (props.title as string) || workflow.name
-    // No 'noreferrer': it severs window.opener, which the chat tab uses
-    // to post execution ids back. Same-origin page we own — safe.
-    window.open(`/apps/${wsSlug}/${slugifyAppUrl(raw)}`, '_blank')
+    const href = `/apps/${wsSlug}/${slugifyAppUrl(raw)}`
+    if (win) win.location.href = href
+    else window.open(href, '_blank')
     setChatListening(true)
-    toast('Listening — each chat message runs the graph live', { variant: 'ok' })
+    toast(
+      chatAppNode?.type === 'trigger.form'
+        ? 'Listening — the graph runs when the form is submitted'
+        : 'Listening — each chat message runs the graph live',
+      { variant: 'ok' },
+    )
   }
 
   const stopChatListening = () => setChatListening(false)
