@@ -58,6 +58,14 @@ class FormTriggerNode(BaseNode[FormTriggerProperties]):
             color="#10b981",
             properties=[
                 {
+                    # Virtual, read-only public link (same renderer the
+                    # Chat App trigger uses) — the hosted form page URL.
+                    "name": "app_url",
+                    "label": "Public link",
+                    "type": "app-link",
+                    "visibility": "user-only",
+                },
+                {
                     "name": "inputs",
                     "label": "Fields",
                     "type": "collection",
@@ -133,7 +141,14 @@ class FormTriggerNode(BaseNode[FormTriggerProperties]):
             raw_value = row.get("value")
             out[name] = _coerce(raw_value, declared_type)
         if isinstance(input_data, dict):
-            out.update(input_data)
+            # Hosted form submissions arrive wrapped as trigger_data
+            # {message, session_id, form_data, …}; the field values live
+            # in form_data. Editor runs pass the values directly.
+            form_data = input_data.get("form_data")
+            if isinstance(form_data, dict) and form_data:
+                out.update(form_data)
+            else:
+                out.update(input_data)
         return NodeResult(success=True, output_data=out)
 
 

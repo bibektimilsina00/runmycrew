@@ -11,7 +11,6 @@ import { useEditorLayoutStore } from '../stores/editorLayoutStore'
 import { EditorCanvas } from '../components/canvas/EditorCanvas'
 import { EditorRightPanel } from '../components/right-panel/EditorRightPanel'
 import { BottomPanel } from '../components/bottom-panel/BottomPanel'
-import { RunFormModal } from '../components/RunFormModal'
 import { EditorLoading } from '../components/overlays/EditorLoading'
 import { EditorError } from '../components/overlays/EditorError'
 
@@ -105,16 +104,6 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
     })
   }, [diffActive, proposed, baseline, edges])
 
-  // Form-trigger graphs collect input before running: Run opens a modal
-  // built from the trigger's field schema; submit passes the values as
-  // the run's input_data.
-  const [runFormOpen, setRunFormOpen] = useState(false)
-  const formNode = useMemo(() => nodes.find(n => n.type === 'trigger.form') ?? null, [nodes])
-  const handleRun = () => {
-    if (formNode) setRunFormOpen(true)
-    else run()
-  }
-
   const hasPending = useCopilotPendingStore(s => !!s.prompt)
   useEffect(() => {
     if (hasPending && workflow?.id) {
@@ -152,7 +141,7 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
             <BottomPanel
               nodes={nodes}
               updateNodeData={updateNodeData}
-              onRun={handleRun}
+              onRun={() => run()}
               isRunning={isRunning}
             />
           </div>
@@ -161,21 +150,10 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
           <EditorRightPanel
             nodes={nodes}
             updateNodeData={updateNodeData}
-            onRun={handleRun}
+            onRun={() => run()}
             isRunning={isRunning}
           />
         </div>
-
-        {runFormOpen && formNode && (
-          <RunFormModal
-            formNode={formNode}
-            onClose={() => setRunFormOpen(false)}
-            onSubmit={values => {
-              setRunFormOpen(false)
-              run(values)
-            }}
-          />
-        )}
       </div>
     </ReactFlowProvider>
   )

@@ -15,11 +15,13 @@ import type { RendererProps } from '../types'
 export function AppLinkRenderer({ properties }: RendererProps) {
   const wsSlug = useWorkspaceStore(s => s.currentWorkspace?.slug ?? '')
   const isActive = useWorkflowEditorStore(s => Boolean(s.workflow?.is_active))
+  const workflowName = useWorkflowEditorStore(s => s.workflow?.name ?? '')
   const [copied, setCopied] = useState(false)
 
   const raw =
     (properties.app_slug as string) ||
     (properties.title as string) ||
+    workflowName ||
     'app'
   const href = `/apps/${wsSlug}/${slugifyAppUrl(raw)}`
   const absolute = typeof window !== 'undefined'

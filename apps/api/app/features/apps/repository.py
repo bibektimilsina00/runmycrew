@@ -131,6 +131,7 @@ async def find_active_chat_app_workflow(
     contains a ``trigger.chat_app`` node with the given slug. Workflows are
     checked first so an accidental slug collision keeps prior behaviour.
     """
+    hosted_types = {"trigger.chat_app", "trigger.form"}
     for model in (Workflow, Crew):
         result = await db.execute(
             select(model).where(
@@ -141,9 +142,12 @@ async def find_active_chat_app_workflow(
         for row in result.scalars().all():
             graph = row.graph or {}
             for node in graph.get("nodes") or []:
-                if not isinstance(node, dict) or node.get("type") != "trigger.chat_app":
+                if not isinstance(node, dict) or node.get("type") not in hosted_types:
                     continue
-                props = (node.get("data") or {}).get("properties") or {}
+                props = dict((node.get("data") or {}).get("properties") or {})
+                # Callers shape the public payload differently per trigger
+                # kind (a Form node has field rows, not chat config).
+                props["_trigger_type"] = node.get("type")
                 slug = _slugify(props.get("app_slug") or props.get("title") or row.name)
                 if slug == app_slug:
                     return row, props
