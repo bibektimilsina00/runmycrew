@@ -23,8 +23,10 @@ from apps.api.app.features.apps.models import AppMessage, AppSession
 from apps.api.app.features.apps.repository import (
     AppMessageRepository,
     AppSessionRepository,
+    ChatAppSource,
     find_active_chat_app_workflow,
 )
+from apps.api.app.features.crews.models import Crew
 from apps.api.app.features.workflows.models import Workflow
 from apps.api.app.features.workspaces.repository import WorkspaceRepository
 
@@ -54,10 +56,10 @@ class AppService:
 
     async def resolve_public_app(
         self, workspace_slug: str, app_slug: str
-    ) -> tuple[Workflow, dict[str, Any]]:
-        """Return (workflow, trigger_props) for a live app URL.
+    ) -> tuple[ChatAppSource, dict[str, Any]]:
+        """Return (workflow-or-crew, trigger_props) for a live app URL.
 
-        Raises 404 when either the workspace, the workflow, or the
+        Raises 404 when either the workspace, the source row, or the
         trigger.chat_app node with a matching slug is missing / inactive.
         """
         ws = await WorkspaceRepository(self.db).get_by_slug(workspace_slug)
@@ -70,8 +72,10 @@ class AppService:
 
     # ── Auth secrets ──────────────────────────────────────────────
 
-    def verify_password(self, workflow: Workflow, password: str) -> bool:
-        if not workflow.app_password_hash:
+    def verify_password(self, workflow: ChatAppSource, password: str) -> bool:
+        # Crews carry no auth-secret columns yet — password mode is a
+        # workflow-only feature until they do.
+        if not getattr(workflow, "app_password_hash", None):
             return False
         try:
             return _ph.verify(workflow.app_password_hash, password)
@@ -83,8 +87,8 @@ class AppService:
         plain = secrets.token_urlsafe(32)
         return plain, _ph.hash(plain)
 
-    def verify_api_key(self, workflow: Workflow, key: str) -> bool:
-        if not workflow.app_api_key_hash or not key:
+    def verify_api_key(self, workflow: ChatAppSource, key: str) -> bool:
+        if not getattr(workflow, "app_api_key_hash", None) or not key:
             return False
         try:
             return _ph.verify(workflow.app_api_key_hash, key)
@@ -105,19 +109,21 @@ class AppService:
 
     async def get_or_create_session(
         self,
-        workflow: Workflow,
+        workflow: ChatAppSource,
         cookie_id: str | None,
         user_id: uuid.UUID | None,
         ip: str | None,
     ) -> AppSession:
         if cookie_id:
-            existing = await self.session_repo.get_by_cookie(workflow.id, cookie_id)
+            existing = await self.session_repo.get_by_cookie(workflow, cookie_id)
             if existing:
                 await self.session_repo.update(existing, {"last_seen_at": datetime.now(UTC)})
                 return existing
         new_cookie = cookie_id or secrets.token_urlsafe(24)
+        is_crew = isinstance(workflow, Crew)
         session = AppSession(
-            workflow_id=workflow.id,
+            workflow_id=None if is_crew else workflow.id,
+            crew_id=workflow.id if is_crew else None,
             cookie_id=new_cookie,
             user_id=user_id,
             ip_hash=hash_ip(ip),

@@ -368,11 +368,12 @@ async def _run_crew(
 @celery_app.task(name="execute_app_message")
 def execute_app_message(
     execution_id: str,
-    workflow_id: str,
+    workflow_id: str | None,
     session_id: str,
     assistant_message_id: str,
     user_message: str,
     form_data: dict | None = None,
+    crew_id: str | None = None,
 ):
     """Run one turn of a chat-app workflow.
 
@@ -391,6 +392,7 @@ def execute_app_message(
                 assistant_message_id,
                 user_message,
                 form_data or {},
+                crew_id,
             )
         )
     except Exception as e:
@@ -399,11 +401,12 @@ def execute_app_message(
 
 async def _run_app_message(
     execution_id: str,
-    workflow_id: str,
+    workflow_id: str | None,
     session_id: str,
     assistant_message_id: str,
     user_message: str,
     form_data: dict,
+    crew_id: str | None = None,
 ):
     import time
 
@@ -431,12 +434,19 @@ async def _run_app_message(
     user_id_for_run: uuid.UUID | None = None
 
     async with AsyncSessionLocal() as db:
-        wf_repo = WorkflowRepository(db)
         session_repo = AppSessionRepository(db)
         message_repo = AppMessageRepository(db)
-        workflow = await wf_repo.get_by_id(uuid.UUID(workflow_id))
+        # The chat-app source is a workflow OR a crew — same graph shape,
+        # same runner; only the row it's loaded from differs.
+        if crew_id:
+            from apps.api.app.features.crews.models import Crew
+
+            workflow = await db.get(Crew, uuid.UUID(crew_id))
+        else:
+            wf_repo = WorkflowRepository(db)
+            workflow = await wf_repo.get_by_id(uuid.UUID(workflow_id))
         if not workflow:
-            logger.error(f"workflow {workflow_id} not found")
+            logger.error(f"chat-app source {crew_id or workflow_id} not found")
             return
         session = await session_repo.get_by_id(uuid.UUID(session_id))
         if not session:

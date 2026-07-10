@@ -133,7 +133,7 @@ async def _enforce_auth(
     if mode == "public":
         return None
     if mode == "password":
-        expected = _unlock_token_for(workflow.id, workflow.app_password_hash)
+        expected = _unlock_token_for(workflow.id, getattr(workflow, "app_password_hash", None))
         if unlock_cookie != expected:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="password_required"
@@ -224,7 +224,7 @@ async def unlock_password(
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="rate_limited")
     if not service.verify_password(wf, body.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_password")
-    token = _unlock_token_for(wf.id, wf.app_password_hash)
+    token = _unlock_token_for(wf.id, getattr(wf, "app_password_hash", None))
     _issue_unlock_cookie(response, workspace_slug, app_slug, token)
     return {"unlocked": True}
 
@@ -251,6 +251,7 @@ async def get_or_create_session(
         session=SessionOut(
             id=session.id,
             workflow_id=session.workflow_id,
+            crew_id=session.crew_id,
             cookie_id=session.cookie_id,
             user_id=session.user_id,
             first_seen_at=session.first_seen_at,
@@ -319,7 +320,10 @@ async def send_message(
         from apps.api.app.features.apps.models import AppSession as _S
 
         today = datetime.now(UTC).date()
-        rows = await db.execute(select(_S).where(_S.workflow_id == wf.id))
+        from apps.api.app.features.crews.models import Crew as _Crew
+
+        source_col = _S.crew_id if isinstance(wf, _Crew) else _S.workflow_id
+        rows = await db.execute(select(_S).where(source_col == wf.id))
         spent_today = 0.0
         for r in rows.scalars().all():
             if r.last_seen_at and r.last_seen_at.date() == today:
@@ -334,11 +338,13 @@ async def send_message(
     execution_id = f"app-{uuid.uuid4()}"
     assistant_msg = await service.create_assistant_placeholder(session, execution_id)
 
+    from apps.api.app.features.crews.models import Crew as _CrewKind
     from apps.worker.app.jobs.tasks import execute_app_message
 
     execute_app_message.delay(
         execution_id=execution_id,
-        workflow_id=str(wf.id),
+        workflow_id=None if isinstance(wf, _CrewKind) else str(wf.id),
+        crew_id=str(wf.id) if isinstance(wf, _CrewKind) else None,
         session_id=str(session.id),
         assistant_message_id=str(assistant_msg.id),
         user_message=payload.message,

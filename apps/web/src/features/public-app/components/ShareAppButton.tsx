@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
+import { slugifyAppUrl } from '../utils/slug'
 
 interface ShareAppButtonProps {
   workflowId: string
@@ -17,7 +18,7 @@ export function ShareAppButton({ appSlug }: ShareAppButtonProps) {
   const [copied, setCopied] = useState(false)
 
   const wsSlug = workspace?.slug || ''
-  const slug = appSlug || 'app'
+  const slug = slugifyAppUrl(appSlug)
   const href = `/apps/${wsSlug}/${slug}`
   const absolute = typeof window !== 'undefined'
     ? new URL(href, window.location.origin).toString()
