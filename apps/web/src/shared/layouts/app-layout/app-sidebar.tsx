@@ -3,6 +3,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { NavLink } from 'react-router-dom'
 import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { EXTERNAL_URLS } from '@/shared/constants/routes'
 import { SidebarFolderItem } from '@/features/folders'
 import { SidebarWorkflowItem, WorkflowDragOverlay } from '@/features/workflows'
 import { SidebarCrewItem } from '@/features/loops/components/SidebarCrewItem'
@@ -292,20 +293,24 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="shrink-0 h-[36px] px-[6px] border-t border-[var(--border-faint)] flex items-center gap-1 group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:h-[48px] group-data-[collapsed=true]/shell:px-0">
         <div className="flex w-full gap-1 group-data-[collapsed=true]/shell:hidden">
-          <button
-            className="flex-1 h-[24px] inline-flex items-center justify-center gap-1 px-1 rounded-[7px] text-[11px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px] whitespace-nowrap"
-            type="button"
+          <a
+            href={EXTERNAL_URLS.DOCS}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 h-[24px] inline-flex items-center justify-center gap-1 px-1 rounded-[7px] text-[11px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] no-underline [&_svg]:w-[13px] [&_svg]:h-[13px] whitespace-nowrap"
           >
             <Icons.Help />
             <span>Help & docs</span>
-          </button>
-          <button
-            className="flex-1 h-[24px] inline-flex items-center justify-center gap-1 px-1 rounded-[7px] text-[11px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[13px] [&_svg]:h-[13px] whitespace-nowrap"
-            type="button"
+          </a>
+          <a
+            href={EXTERNAL_URLS.FEEDBACK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 h-[24px] inline-flex items-center justify-center gap-1 px-1 rounded-[7px] text-[11px] text-[var(--text-faint)] font-medium transition-colors duration-100 hover:bg-[var(--surface)] hover:text-[var(--text)] no-underline [&_svg]:w-[13px] [&_svg]:h-[13px] whitespace-nowrap"
           >
             <Icons.Feedback />
             <span>Feedback</span>
-          </button>
+          </a>
         </div>
 
         <button
@@ -326,20 +331,26 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
             className="fixed z-[9999] w-[160px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[11px] p-[5px] shadow-[0_24px_56px_-20px_oklch(0_0_0/0.7)] animate-in fade-in slide-in-from-bottom-2 duration-100 flex flex-col gap-[2px]"
             style={{ top: helpPos.top, left: helpPos.left }}
           >
-            <button
-              className="flex items-center gap-[9px] py-[7px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] bg-transparent border-none cursor-pointer"
+            <a
+              href={EXTERNAL_URLS.DOCS}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-[9px] py-[7px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] no-underline [&_svg]:w-[14px] [&_svg]:h-[14px]"
               onClick={() => setHelpOpen(false)}
             >
               <Icons.Help />
               Help & docs
-            </button>
-            <button
-              className="flex items-center gap-[9px] py-[7px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] [&_svg]:w-[14px] [&_svg]:h-[14px] bg-transparent border-none cursor-pointer"
+            </a>
+            <a
+              href={EXTERNAL_URLS.FEEDBACK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-[9px] py-[7px] px-[10px] rounded-[7px] text-[13px] text-[var(--text-mute)] w-full text-left transition-colors font-medium hover:bg-[var(--surface)] hover:text-[var(--text)] no-underline [&_svg]:w-[14px] [&_svg]:h-[14px]"
               onClick={() => setHelpOpen(false)}
             >
               <Icons.Feedback />
               Feedback
-            </button>
+            </a>
           </div>
         </>,
         document.body

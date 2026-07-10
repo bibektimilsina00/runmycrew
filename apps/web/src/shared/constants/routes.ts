@@ -1,4 +1,15 @@
 /**
+ * External URLs (marketing site, docs, etc.).
+ * Overridable via ``VITE_DOCS_URL`` / ``VITE_MARKETING_URL`` so dev
+ * points at localhost:3100 while prod hits the deployed marketing site.
+ */
+export const EXTERNAL_URLS = {
+  DOCS: import.meta.env.VITE_DOCS_URL || 'https://runmycrew.com/docs',
+  MARKETING: import.meta.env.VITE_MARKETING_URL || 'https://runmycrew.com',
+  FEEDBACK: import.meta.env.VITE_FEEDBACK_URL || 'https://runmycrew.com/feedback',
+} as const
+
+/**
  * Centralized Application Routes (Frontend)
  */
 export const APP_ROUTES = {
