@@ -1,97 +1,82 @@
-import { BadgeCheck, Bolt } from 'lucide-react'
-import { CreatorChip } from './CreatorChip'
-import { PremiumBadge } from './PremiumBadge'
-import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
-import { TEMPLATE_CATEGORIES } from '../types/templatesTypes'
+import { ArrowUpRight, BadgeCheck, Download } from 'lucide-react'
+import { MiniGraph } from './MiniGraph'
+import { cn } from '@/lib/cn'
 import type { TemplateListItem } from '../types/templatesTypes'
 
 interface Props {
   template: TemplateListItem
   onClick?: () => void
+  /** Wide hero tile: spans two grid columns, shorter preview, shows the summary. */
+  featured?: boolean
 }
 
 /**
- * n8n-style template card. Header strip is the theme colour (from
- * bg_variant → subtle radial gradient); below it we lay out title,
- * summary, integration icons row, and creator + install count.
- * Hover lifts the card + darkens the border for tactile feedback.
+ * Template card with a real workflow preview as the hero: the graph's
+ * own node layout rendered as icon chips + bezier edges on a dot-grid
+ * canvas (see MiniGraph). Text lives below on a solid surface — never
+ * on top of the preview — so nothing reads muddy. On hover the edges
+ * animate a dash-flow, as if the workflow were running.
  */
-export function TemplateCard({ template, onClick }: Props) {
-  const integrations = deriveIntegrations(template)
-  const categoryLabel =
-    TEMPLATE_CATEGORIES.find((c) => c.id === template.category)?.label ?? template.category
-
+export function TemplateCard({ template: t, onClick, featured = false }: Props) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group flex h-full flex-col overflow-hidden rounded-[14px] border border-border-faint bg-bg2 text-left transition-all hover:-translate-y-0.5 hover:border-border hover:shadow-[0_18px_36px_-24px_rgba(0,0,0,0.5)]"
+      className={cn(
+        'group flex w-full cursor-pointer flex-col overflow-hidden rounded-[14px] border border-[var(--border-faint)] bg-[var(--surface)] text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--accent-line)] hover:shadow-[0_0_0_1px_var(--accent-soft),0_24px_48px_-24px_rgba(0,0,0,0.6)]',
+        featured && 'sm:col-span-2',
+      )}
     >
-      {/* Colored header strip — subtle gradient so it never overwhelms
-          the content but still gives the card a personality. */}
+      {/* ── Preview ── */}
       <div
-        className={`relative h-[86px] w-full overflow-hidden ${template.bg_variant}`}
-      >
-        {template.is_premium && (template.price_cents ?? 0) > 0 ? (
-          <PremiumBadge priceCents={template.price_cents ?? 0} />
-        ) : (
-          <span className="absolute right-3 top-3 rounded-[6px] border border-white/15 bg-black/25 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-white/85 backdrop-blur">
-            Free
-          </span>
+        className={cn(
+          'relative w-full overflow-hidden border-b border-[var(--border-faint)] bg-[var(--bg)]',
+          featured ? 'aspect-[16/6.5]' : 'aspect-[16/10]',
         )}
-        <div className="absolute bottom-3 left-4 flex items-center gap-1.5 rounded-[6px] bg-black/35 px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wider text-white/85 backdrop-blur">
-          {categoryLabel}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(var(--border-faint)_1px,transparent_1px)] [background-size:14px_14px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_45%,var(--accent-soft),transparent_70%)] opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="absolute inset-0 transition-transform duration-300 motion-safe:group-hover:scale-[1.045]">
+          <MiniGraph graph={t.graph} chipSize={featured ? 40 : undefined} />
         </div>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-1 flex-col gap-3 px-4 py-4">
-        <div className="flex-1">
-          <h3 className="line-clamp-2 text-[14.5px] font-semibold leading-snug text-text">
-            {template.title}
+      {/* ── Body ── */}
+      <div className="flex flex-1 flex-col gap-2.5 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3
+            className={cn(
+              'line-clamp-2 font-semibold leading-snug tracking-tight text-[var(--text)]',
+              featured ? 'text-[17px]' : 'text-[14.5px]',
+            )}
+          >
+            {t.title}
           </h3>
-          {template.summary && (
-            <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-text-mute">
-              {template.summary}
-            </p>
-          )}
+          <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-faint)] opacity-0 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--text)] group-hover:opacity-100" />
         </div>
 
-        {/* Integrations */}
-        {integrations.length > 0 && (
-          <div className="flex items-center gap-1">
-            {integrations.slice(0, 6).map((slug) => (
-              <span
-                key={slug}
-                className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-[6px] bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] [&_img]:h-4 [&_img]:w-4 [&_img]:object-contain"
-                title={slug}
-              >
-                <BrandIcon slug={slug} />
-              </span>
-            ))}
-            {integrations.length > 6 && (
-              <span className="ml-1 text-[10.5px] text-text-faint">
-                +{integrations.length - 6}
-              </span>
-            )}
-          </div>
+        {featured && t.summary && (
+          <p className="line-clamp-2 max-w-[640px] text-[12.5px] leading-relaxed text-[var(--text-mute)]">
+            {t.summary}
+          </p>
         )}
 
-        {/* Footer meta */}
-        <div className="flex items-center justify-between gap-2 border-t border-border-faint pt-2.5 text-[11px] text-text-faint">
-          {template.is_official ? (
-            <span className="flex items-center gap-1 font-mono uppercase tracking-[0.06em] text-accent">
-              <BadgeCheck className="h-[12px] w-[12px]" />
-              Official
+        <div className="mt-auto flex items-center gap-2 text-[11.5px] text-[var(--text-mute)]">
+          <span className="rounded-full border border-[var(--border-faint)] bg-[var(--bg)] px-2 py-0.5 text-[10.5px] font-medium text-[var(--text-mute)]">
+            {humanCategory(t.category)}
+          </span>
+          {t.steps > 0 && (
+            <span className="text-[var(--text-faint)]">
+              {t.steps} {t.steps === 1 ? 'step' : 'steps'}
             </span>
-          ) : template.creator ? (
-            <CreatorChip creator={template.creator} />
-          ) : (
-            <span className="font-mono uppercase tracking-[0.06em]">Community</span>
           )}
-          <span className="flex items-center gap-1 tabular-nums">
-            <Bolt className="h-[11px] w-[11px]" />
-            {template.download_count.toLocaleString()}
+          <span className="flex items-center gap-1 text-[var(--text-faint)]">
+            <Download className="h-3 w-3" />
+            {t.download_count.toLocaleString()}
+          </span>
+          <span className="ml-auto flex items-center gap-1.5 truncate">
+            <CreatorAvatar t={t} />
+            {t.is_official && <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" />}
           </span>
         </div>
       </div>
@@ -99,20 +84,24 @@ export function TemplateCard({ template, onClick }: Props) {
   )
 }
 
-/**
- * Pulls brand slugs off the template. Backend already gives us
- * ``tools_required`` + ``credentials_required`` — merge + dedup.
- * Fallback to graph node types when both lists are empty.
- */
-function deriveIntegrations(t: TemplateListItem): string[] {
-  const s = new Set<string>()
-  for (const id of t.tools_required ?? []) s.add(id.toLowerCase())
-  for (const node of t.graph?.nodes ?? []) {
-    const type = node.type ?? ''
-    const brand = type.split('.').pop()
-    if (brand && brand !== 'chat_app' && brand !== 'manual' && brand !== 'cron' && brand !== 'webhook') {
-      s.add(brand.toLowerCase())
-    }
-  }
-  return Array.from(s)
+function CreatorAvatar({ t }: { t: TemplateListItem }) {
+  const label =
+    t.creator?.full_name || t.creator?.email?.split('@')[0] || (t.is_official ? 'Official' : 'Community')
+  const initial = label.trim().charAt(0).toUpperCase() || '?'
+  return (
+    <>
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--border-faint)] bg-[var(--bg)] text-[9.5px] font-semibold text-[var(--text-mute)]">
+        {t.creator?.avatar_url ? (
+          <img src={t.creator.avatar_url} alt={label} className="h-full w-full object-cover" />
+        ) : (
+          initial
+        )}
+      </span>
+      <span className="truncate text-[var(--text-faint)]">{label}</span>
+    </>
+  )
+}
+
+function humanCategory(c: string): string {
+  return c.split('-').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')
 }

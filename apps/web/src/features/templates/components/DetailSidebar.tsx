@@ -96,15 +96,6 @@ export function DetailSidebar({
         </Block>
       )}
 
-      {/* ── Categories ────────────────────────────────────── */}
-      <Block>
-        <BlockTitle>Categories</BlockTitle>
-        <div className="flex flex-wrap gap-1.5">
-          <Pill>{humanCategory(template.category)}</Pill>
-          <Pill>{template.kind}</Pill>
-        </div>
-      </Block>
-
       {/* ── Creator ───────────────────────────────────────── */}
       {!template.is_official && template.creator && (
         <Block>
@@ -204,14 +195,6 @@ function BlockTitle({ icon, children }: { icon?: React.ReactNode; children: Reac
   )
 }
 
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-[6px] border border-border-faint bg-bg px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-mute">
-      {children}
-    </span>
-  )
-}
-
 function ResourceLink({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
     <button
@@ -244,29 +227,18 @@ function formatPrice(cents: number): string {
   return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`
 }
 
-function humanCategory(cat: string): string {
-  return cat
-    .split('-')
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ')
-}
-
 function formatDate(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return iso
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+// Server-derived truth only (publish derives both from the graph).
+// Guessing extra brands from node-type suffixes produced fake
+// integrations like "agent" with 404 icons.
 function deriveIntegrations(t: TemplateDetail): string[] {
   const s = new Set<string>()
   for (const id of t.tools_required ?? []) s.add(id.toLowerCase())
   for (const id of t.credentials_required ?? []) s.add(id.toLowerCase())
-  for (const node of t.graph?.nodes ?? []) {
-    const type = node.type ?? ''
-    const brand = type.split('.').pop()
-    if (brand && !['chat_app', 'manual', 'cron', 'webhook', 'set_variable', 'merge', 'switch', 'condition', 'delay', 'wait', 'json_transform', 'code', 'trigger'].includes(brand)) {
-      s.add(brand.toLowerCase())
-    }
-  }
   return Array.from(s).slice(0, 15)
 }

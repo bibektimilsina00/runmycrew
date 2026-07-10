@@ -1,14 +1,12 @@
+import { Download, GitBranch, Workflow as WorkflowIcon } from 'lucide-react'
+import { MiniGraph } from './MiniGraph'
 import type { TemplateDetail } from '../types/templatesTypes'
-import { TemplateGraphPreview } from './TemplateGraphPreview'
 
 /**
- * Big preview block at the top of the detail page — Vercel-style hero
- * with the template's gradient background and an enlarged workflow
- * graph render rendered over it.
- *
- * Below the preview: eyebrow + h1 + summary line. The h1 matches the
- * dashboard's `text-[27px] font-semibold tracking-[-0.022em]` so the
- * detail page reads as part of the product, not a one-off page.
+ * Detail-page hero: eyebrow + h1 + summary, then a wide MiniGraph
+ * render of the workflow — same visual language as the gallery cards
+ * (icon chips + bezier edges on a dot grid), just bigger. Stats sit
+ * in a quiet row under the preview instead of overlaying it.
  */
 
 interface DetailHeroProps {
@@ -16,6 +14,9 @@ interface DetailHeroProps {
 }
 
 export function DetailHero({ template }: DetailHeroProps) {
+  const nodeCount = template.graph?.nodes?.length ?? template.steps ?? 0
+  const edgeCount = template.graph?.edges?.length ?? 0
+
   return (
     <div className="flex flex-col gap-[18px]">
       <div className="flex items-center gap-[8px]">
@@ -50,16 +51,32 @@ export function DetailHero({ template }: DetailHeroProps) {
         )}
       </div>
 
-      {/* 16:9 preview tile — real editor widgets, read-only */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[12px] border border-[var(--border-faint)] bg-[var(--bg)]">
-        {template.graph?.nodes?.length ? (
-          <TemplateGraphPreview graph={template.graph} />
-        ) : null}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-[oklch(0_0_0/0.55)] to-transparent p-4 text-[11px] font-mono uppercase tracking-[0.08em] text-white/85">
-          <span>{(template.graph?.nodes?.length ?? template.steps) || 0} nodes</span>
-          <span className="opacity-50">·</span>
-          <span>{template.graph?.edges?.length ?? 0} connections</span>
-        </div>
+      {/* Wide preview — gallery-card language at hero scale */}
+      <div className="relative aspect-[21/9] w-full overflow-hidden rounded-[14px] border border-[var(--border-faint)] bg-[var(--bg)]">
+        <div className="absolute inset-0 bg-[radial-gradient(var(--border-faint)_1px,transparent_1px)] [background-size:16px_16px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_65%_at_50%_45%,var(--accent-soft),transparent_70%)] opacity-70" />
+        {nodeCount > 0 ? (
+          <MiniGraph graph={template.graph} chipSize={46} />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-[12px] text-[var(--text-faint)]">
+            No graph data
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-5 text-[12px] text-[var(--text-mute)]">
+        <span className="flex items-center gap-1.5">
+          <WorkflowIcon className="h-3.5 w-3.5 text-[var(--text-faint)]" />
+          {nodeCount} {nodeCount === 1 ? 'node' : 'nodes'}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <GitBranch className="h-3.5 w-3.5 text-[var(--text-faint)]" />
+          {edgeCount} {edgeCount === 1 ? 'connection' : 'connections'}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Download className="h-3.5 w-3.5 text-[var(--text-faint)]" />
+          {template.download_count.toLocaleString()} installs
+        </span>
       </div>
     </div>
   )

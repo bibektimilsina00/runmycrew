@@ -360,6 +360,13 @@ def _prepare_graph_snapshot(
     `credentials_required` + `tools_required` lists so the install-time
     check has accurate metadata without scanning the graph again.
     """
+    # Imported lazily: this service sits on the celery import path, and a
+    # module-level registry import re-enters the scheduler's
+    # integration_polling module while it is still initializing — the
+    # polling factory's register_poller back-import then fails and pollers
+    # are silently skipped (see polling_node_factory's try/except).
+    from apps.api.app.node_system.registry.registry import node_registry
+
     snapshot = copy.deepcopy(graph) if graph else {"nodes": [], "edges": []}
     creds: set[str] = set()
     tools: set[str] = set()
@@ -368,10 +375,17 @@ def _prepare_graph_snapshot(
         if not isinstance(node, dict):
             continue
         node_type = str(node.get("type") or "")
-        if node_type.startswith("action."):
-            # action.slack → slack, action.github → github, etc. Used to
-            # surface required-integrations chips on the detail page.
-            tools.add(node_type.split(".", 1)[1])
+        # A node is an integration iff its definition declares a
+        # credential type — core nodes (agent, http_request, condition…)
+        # don't. `tools_required` is presentational (the install-time
+        # check reads `credentials_required`), so store the brand-icon
+        # slug when the node has one, else the type suffix.
+        node_cls = node_registry.find(node_type)
+        meta = node_cls.get_metadata() if node_cls else None
+        if meta and meta.credential_type:
+            icon = (meta.icon or "").strip()
+            is_brand_slug = bool(icon) and icon == icon.lower()
+            tools.add(icon if is_brand_slug else node_type.split(".", 1)[-1])
         data = node.get("data") or {}
         props = data.get("properties") if isinstance(data, dict) else None
         if not isinstance(props, dict):

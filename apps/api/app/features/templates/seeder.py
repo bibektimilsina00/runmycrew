@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Template
 from .registry import TemplateRegistry
-from .service import _slugify
+from .service import _prepare_graph_snapshot, _slugify
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,10 @@ async def seed_official_templates(db: AsyncSession) -> int:
         existing = result.scalar_one_or_none()
         graph = _extract_graph(raw)
         creds_required = list(raw.get("credentials_required") or [])
-        tools_required = _derive_tools(graph)
+        # Same derivation the publish flow uses — one source of truth
+        # for what counts as an integration. Scrub is a no-op on
+        # hand-authored seeds (no credential ids in them).
+        _, _, tools_required = _prepare_graph_snapshot(graph)
 
         if existing is not None:
             # Keep authoring-time fields (graph, summary, description,
@@ -132,14 +135,3 @@ def _extract_graph(raw: dict[str, Any]) -> dict[str, Any]:
     if isinstance(raw.get("graph"), dict):
         return raw["graph"]
     return {"nodes": [], "edges": []}
-
-
-def _derive_tools(graph: dict[str, Any]) -> list[str]:
-    tools: set[str] = set()
-    for node in graph.get("nodes") or []:
-        if not isinstance(node, dict):
-            continue
-        node_type = str(node.get("type") or "")
-        if node_type.startswith("action."):
-            tools.add(node_type.split(".", 1)[1])
-    return sorted(tools)

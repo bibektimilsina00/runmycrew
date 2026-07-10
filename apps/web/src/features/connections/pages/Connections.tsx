@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Loader2, Search, X } from 'lucide-react'
-import { useWorkspaceStore } from '@/features/workspaces'
 import { useCredentials, useProviders } from '../hooks/useConnections'
 import { ConnectModal } from '../components/ConnectModal'
 import { AuditLogPanel } from '../components/AuditLogPanel'
@@ -62,7 +61,6 @@ const FEATURED_IDS = new Set([
 export function Connections() {
   const { data: credentials = [], isLoading: loadingCreds } = useCredentials()
   const { data: providers = [], isLoading: loadingProviders } = useProviders()
-  const canManage = useWorkspaceStore(s => s.canManageMembers())
   const navigate = useNavigate()
 
   const [search, setSearch] = useState('')
@@ -150,15 +148,6 @@ export function Connections() {
           >
             Audit log
           </button>
-          {canManage && (
-            <button
-              onClick={() => openConnect()}
-              className="rounded-[7px] px-3 py-1.5 text-[12px] font-medium text-white hover:brightness-110"
-              style={{ background: 'var(--accent, #8b5cf6)' }}
-            >
-              + Add integration
-            </button>
-          )}
         </div>
       </div>
 
@@ -166,7 +155,7 @@ export function Connections() {
       <div className="flex-1 overflow-y-auto px-8 py-6">
         <div className="mx-auto flex max-w-[1080px] flex-col gap-6">
           {/* Hero collage */}
-          <HeroCollage providers={providers} onExplore={() => openConnect()} />
+          <HeroCollage providers={providers} />
 
           {/* Search + filter */}
           <div className="flex items-center gap-3">
@@ -337,21 +326,57 @@ function ConnectedCard({
   )
 }
 
-function HeroCollage({ providers, onExplore }: { providers: Provider[]; onExplore: () => void }) {
-  const withIcons = providers.filter(p => p.icon_slug).slice(0, 14)
+// The handful of household names shown in the hero — a marketing
+// shelf, not a directory (the full searchable list sits right below).
+const HERO_SLUGS = [
+  'slack', 'github', 'google', 'notion', 'linear',
+  'discord', 'telegram', 'whatsapp', 'stripe', 'airtable',
+]
+
+/**
+ * Quiet hero: copy on the left, a loose cluster of famous brand tiles
+ * on the right. Tiles fade-in staggered, then idle on a slow float —
+ * alternating phase so neighbours drift out of sync. No motion at all
+ * for reduced-motion users.
+ */
+function HeroCollage({ providers }: { providers: Provider[] }) {
+  const bySlug = new Map(providers.filter(p => p.icon_slug).map(p => [p.icon_slug as string, p]))
+  const featured = HERO_SLUGS.map(s => bySlug.get(s)).filter((p): p is Provider => Boolean(p))
+  const tiles = featured.length >= 6 ? featured : Array.from(bySlug.values()).slice(0, 10)
+  if (tiles.length === 0) return null
+
   return (
-    <div className="relative overflow-hidden rounded-[14px] border border-border-faint bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.10),transparent_70%)] bg-bg2 px-5 py-4">
-      <div className="grid grid-cols-7 gap-3">
-        {withIcons.map(p => (
-          <BrandTile key={p.id} slug={p.icon_slug} label={p.name} />
+    <div className="relative flex items-center justify-between gap-8 overflow-hidden rounded-[14px] border border-border-faint bg-[radial-gradient(circle_at_70%_20%,rgba(139,92,246,0.12),transparent_60%)] bg-bg2 px-6 py-6">
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <h2 className="text-[17px] font-semibold tracking-tight text-text">
+          Connect your stack
+        </h2>
+        <p className="text-[12.5px] leading-relaxed text-text-mute">
+          {providers.length}+ integrations — search below and connect in a couple of clicks.
+        </p>
+      </div>
+
+      <div className="hidden shrink-0 items-center gap-3 sm:flex">
+        {tiles.map((p, i) => (
+          <div
+            key={p.id}
+            style={{ animationDelay: `${i * 70}ms` }}
+            className={cn(
+              'motion-safe:animate-[collage-in_0.5s_cubic-bezier(0.22,1,0.36,1)_both]',
+              i % 2 === 0 ? 'sm:-translate-y-1.5' : 'sm:translate-y-1.5',
+            )}
+          >
+            <div
+              style={{ animationDelay: `${(i % 5) * 700}ms` }}
+              className="motion-safe:animate-[collage-float_5s_ease-in-out_infinite]"
+            >
+              <div className="transition-transform duration-200 hover:scale-110" title={p.name}>
+                <BrandTile slug={p.icon_slug} label={p.name} />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
-      <button
-        onClick={onExplore}
-        className="absolute bottom-3 right-3 flex items-center gap-1 rounded-[7px] border border-border-faint bg-bg2 px-3 py-1.5 text-[11.5px] font-medium text-text-mute hover:border-border hover:text-text"
-      >
-        Add integration <ArrowRight size={11} />
-      </button>
     </div>
   )
 }

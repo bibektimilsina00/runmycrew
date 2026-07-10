@@ -82,7 +82,10 @@ const ACTION_FIELD_NAMES = new Set(['operation', 'resource', 'action', 'method']
 
 function propertyPriority(prop: NodeProperty): number {
   if (prop.type === 'options' && ACTION_FIELD_NAMES.has(prop.name)) return 0
-  if (prop.type === 'credential') return 1
+  // A credential whose type depends on another field (e.g. the Agent
+  // node's credential keyed off `provider`) must stay AFTER the field
+  // that drives it — hoisting it above its driver reads backwards.
+  if (prop.type === 'credential' && !prop.credentialTypeByField && !prop.dependsOn) return 1
   return 2
 }
 

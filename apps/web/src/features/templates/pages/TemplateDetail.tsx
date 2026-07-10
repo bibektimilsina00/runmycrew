@@ -104,7 +104,7 @@ export function TemplateDetail() {
       <div className="max-w-[1160px] mx-auto px-[28px] sm:px-[48px] pt-[32px] pb-[80px] flex flex-col gap-[32px]">
         <DetailHero template={template} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1.55fr_1fr] gap-[28px] items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] gap-[28px] items-start">
           <DetailTabs template={template} missingCredentials={missingCredentials} />
           <DetailSidebar
             template={template}

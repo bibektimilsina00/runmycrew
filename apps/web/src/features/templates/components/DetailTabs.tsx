@@ -7,7 +7,6 @@ import { useCredentials } from '@/features/connections/hooks/useConnections'
 import type { TemplateDetail } from '../types/templatesTypes'
 import { IntegrationRow } from './IntegrationRow'
 import { ToolRow } from './ToolRow'
-import { TemplateGraphPreview } from './TemplateGraphPreview'
 
 /**
  * Stacked content sections for the main column.
@@ -45,19 +44,8 @@ export function DetailTabs({ template }: DetailTabsProps) {
 
       <Divider />
 
-      <section className="flex flex-col gap-4">
-        <SectionHeading>Workflow graph</SectionHeading>
-        <div className="relative aspect-[2/1] w-full overflow-hidden rounded-[10px] border border-[var(--border-faint)] bg-[var(--bg)]">
-          {template.graph?.nodes?.length ? (
-            <TemplateGraphPreview graph={template.graph} />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-[12px] text-[var(--text-faint)]">
-              No graph data
-            </div>
-          )}
-        </div>
-        <NodeList template={template} />
-      </section>
+      {/* Graph render lives in the hero — here we list the steps. */}
+      <NodeList template={template} />
 
       <Divider />
 
@@ -163,14 +151,17 @@ function NodeList({ template }: { template: TemplateDetail }) {
   if (nodes.length === 0) return null
 
   return (
-    <div className="flex flex-col gap-2.5">
-      <SectionHeading>Nodes ({nodes.length})</SectionHeading>
-      <div className="flex flex-col divide-y divide-[var(--border-faint)] rounded-[8px] border border-[var(--border-faint)] bg-[var(--surface)]">
+    <section className="flex flex-col gap-4">
+      <SectionHeading>Workflow steps</SectionHeading>
+      <div className="flex flex-col divide-y divide-[var(--border-faint)] rounded-[10px] border border-[var(--border-faint)] bg-[var(--surface)]">
         {nodes.map((n, idx) => {
           const def = defByType.get(n.type ?? '')
-          const colour = def?.color ?? '#5e6ad2'
+          const colour = def?.color ?? 'var(--accent)'
           return (
             <div key={n.id ?? idx} className="flex items-center gap-3 px-4 py-3">
+              <span className="w-5 shrink-0 text-right font-mono text-[11px] text-[var(--text-faint)]">
+                {idx + 1}
+              </span>
               <div
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-white [&_svg]:h-4 [&_svg]:w-4 [&_img]:h-4 [&_img]:w-4 [&_img]:object-contain"
                 style={{ background: colour }}
@@ -181,14 +172,14 @@ function NodeList({ template }: { template: TemplateDetail }) {
                 <span className="truncate text-[13.5px] font-medium text-[var(--text)]">
                   {def?.name ?? n.type ?? 'Node'}
                 </span>
-                <span className="truncate font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--text-faint)]">
-                  {n.type}
+                <span className="truncate text-[11.5px] text-[var(--text-faint)]">
+                  {def?.description ?? n.type}
                 </span>
               </div>
             </div>
           )
         })}
       </div>
-    </div>
+    </section>
   )
 }

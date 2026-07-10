@@ -28,14 +28,7 @@ def test_agent_model_field_uses_generic_dynamic_options_contract():
     assert model_property["type"] == "options"
     assert model_property["typeOptions"] == {"searchable": True, "allowCustom": True}
     assert model_property["loadOptions"] == "/ai/models"
-    assert model_property["loadOptionsDependsOn"] == [
-        "provider",
-        "credential",
-        "openaiCredential",
-        "anthropicCredential",
-        "googleCredential",
-        "groqCredential",
-    ]
+    assert model_property["loadOptionsDependsOn"] == ["provider", "credential"]
     assert not any(prop["name"].endswith("Model") for prop in metadata.properties)
 
 
