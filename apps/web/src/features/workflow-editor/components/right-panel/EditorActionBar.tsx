@@ -11,9 +11,6 @@ import { Button } from '@/shared/components'
 import { useEditorActionBar } from '../../hooks/useEditorActionBar'
 import { useWorkflowEditorStore } from '../../stores/workflowEditorStore'
 import { PublishTemplateModal } from '@/features/templates/components/PublishTemplateModal'
-import { slugifyAppUrl } from '@/features/public-app/utils/slug'
-import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
-import { useToast } from '@/shared/components'
 
 interface EditorActionBarProps {
   onRun: () => void
@@ -83,28 +80,6 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
   } = useEditorActionBar()
   const { id: workflowId } = useParams<{ id: string }>()
   const workflowName = useWorkflowEditorStore((s) => s.workflow?.name ?? '')
-  const nodes = useWorkflowEditorStore((s) => s.nodes)
-  const chatAppNode = nodes.find(n => n.type === 'trigger.chat_app')
-  const hasChatAppTrigger = Boolean(chatAppNode)
-  // Mirror the backend's slug fallback (app_slug → title → name) so the
-  // URL chip appears even before the user sets an explicit slug.
-  const chatAppSlug =
-    (chatAppNode?.data?.properties?.app_slug as string) ||
-    (chatAppNode?.data?.properties?.title as string) ||
-    workflowName
-  const wsSlug = useWorkspaceStore(s => s.currentWorkspace?.slug ?? '')
-  const { toast } = useToast()
-
-  // A chat-app graph runs when a visitor sends a message — a bare Run
-  // with an empty trigger payload is meaningless. Route Run to the
-  // hosted page instead (activating first if needed).
-  const runViaChat = () => {
-    if (!isActive) {
-      toast('Activate first — a chat app runs when a visitor sends a message', { variant: 'warn' })
-      return
-    }
-    window.open(`/apps/${wsSlug}/${slugifyAppUrl(chatAppSlug)}`, '_blank', 'noreferrer')
-  }
   const [publishOpen, setPublishOpen] = useState(false)
 
   const menuItems: DropdownItem[] = [
@@ -169,20 +144,11 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
         <Button
           variant="primary"
           size="sm"
-          onClick={hasChatAppTrigger ? runViaChat : onRun}
+          onClick={onRun}
           disabled={isRunning}
-          leftIcon={
-            isRunning
-              ? <Loader2 className="animate-spin" />
-              : hasChatAppTrigger
-                ? <MessageCircle />
-                : <Play className="fill-current" />
-          }
-          title={hasChatAppTrigger
-            ? 'Open the hosted chat page — the graph runs on each visitor message'
-            : undefined}
+          leftIcon={isRunning ? <Loader2 className="animate-spin" /> : <Play className="fill-current" />}
         >
-          {isRunning ? 'Running' : hasChatAppTrigger ? 'Open chat' : 'Run'}
+          {isRunning ? 'Running' : 'Run'}
         </Button>
       </div>
 
