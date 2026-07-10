@@ -89,6 +89,18 @@ export function useSendMessage(
       assistantRef.current = placeholder
       setState({ status: 'streaming', assistant: placeholder, error: null, activity: null })
 
+      // Editor test loop: when this tab was opened from the workflow
+      // editor ("Run" on a chat-trigger graph), hand it each execution id
+      // so it can attach its log panel to the run. Same-origin only.
+      try {
+        window.opener?.postMessage(
+          { type: 'fuse-app-execution', executionId: stream.execution_id },
+          window.location.origin,
+        )
+      } catch {
+        /* opener gone or cross-origin — nothing to notify */
+      }
+
       const es = new EventSource(publicAppAPI.streamUrl(stream.stream_url), {
         withCredentials: true,
       })

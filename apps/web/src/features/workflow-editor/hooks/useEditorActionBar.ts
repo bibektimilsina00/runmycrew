@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useReactFlow } from 'reactflow'
@@ -6,6 +6,9 @@ import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../stores/editorLayoutStore'
 import { editorAPI } from '../services/editorAPI'
 import { useToast } from '@/shared/components'
+import { useRunsStore } from '@/features/runs/store/runsStore'
+import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
+import { slugifyAppUrl } from '@/features/public-app/utils/slug'
 
 export interface ActionMenuItem {
   label: string
@@ -48,6 +51,47 @@ export function useEditorActionBar() {
     onError: () => toast('Failed to update state', { variant: 'err' }),
   })
 
+  // ── Chat-trigger test loop ─────────────────────────────────────────
+  // A chat_app trigger has no payload to Run with — the graph fires per
+  // visitor message. Run therefore opens the hosted page and stays
+  // "listening": the chat tab posts each execution id back (same-origin
+  // postMessage) and the log panel attaches to it live, exactly like a
+  // webhook trigger's listen mode.
+  const chatAppNode = nodes.find(n => n.type === 'trigger.chat_app')
+  const hasChatAppTrigger = Boolean(chatAppNode)
+  const [chatListening, setChatListening] = useState(false)
+  const wsSlug = useWorkspaceStore(s => s.currentWorkspace?.slug ?? '')
+
+  useEffect(() => {
+    if (!chatListening || !workflowId) return
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return
+      const data = e.data as { type?: string; executionId?: string } | null
+      if (data?.type !== 'fuse-app-execution' || !data.executionId) return
+      useRunsStore.getState().startRun(workflowId, data.executionId)
+      focusTab('logs')
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [chatListening, workflowId, focusTab])
+
+  const startChatListening = async () => {
+    if (!workflow) return
+    if (!workflow.is_active) {
+      // The hosted page only resolves active graphs — flip it on first.
+      await activateMutation.mutateAsync()
+    }
+    const props = (chatAppNode?.data?.properties ?? {}) as Record<string, unknown>
+    const raw = (props.app_slug as string) || (props.title as string) || workflow.name
+    // No 'noreferrer': it severs window.opener, which the chat tab uses
+    // to post execution ids back. Same-origin page we own — safe.
+    window.open(`/apps/${wsSlug}/${slugifyAppUrl(raw)}`, '_blank')
+    setChatListening(true)
+    toast('Listening — each chat message runs the graph live', { variant: 'ok' })
+  }
+
+  const stopChatListening = () => setChatListening(false)
+
   const openMenu = () => setAnchorRect(btnRef.current?.getBoundingClientRect() ?? null)
   const closeMenu = () => setAnchorRect(null)
   const openCopilot = () => focusTab('copilot')
@@ -85,5 +129,9 @@ export function useEditorActionBar() {
     isActive: !!workflow?.is_active,
     isToggling: activateMutation.isPending,
     toggleActive: () => activateMutation.mutate(),
+    hasChatAppTrigger,
+    chatListening,
+    startChatListening,
+    stopChatListening,
   }
 }
