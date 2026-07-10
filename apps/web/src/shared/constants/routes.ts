@@ -10,7 +10,6 @@ export const APP_ROUTES = {
   SETTINGS: '/settings',
   SHOWCASE: '/showcase',
   AUTOMATIONS: '/automations',
-  LOOPS: '/loops',
   PERSONAS: '/loops/personas',
   PERSONA_NEW: '/loops/personas/new',
   PERSONA_EDIT: (id: string) => `/loops/personas/${id}`,

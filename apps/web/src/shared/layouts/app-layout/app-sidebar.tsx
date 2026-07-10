@@ -5,6 +5,7 @@ import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { SidebarFolderItem } from '@/features/folders'
 import { SidebarWorkflowItem, WorkflowDragOverlay } from '@/features/workflows'
+import { SidebarCrewItem } from '@/features/loops/components/SidebarCrewItem'
 import { WorkspaceSelector } from '@/features/workspaces'
 import { cn } from '@/lib/cn'
 import { Spinner } from '@/shared/components'
@@ -75,6 +76,13 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
     deleteWorkflowWithConfirm,
     duplicateWorkflowWithToast,
     toggleWorkflowActive,
+    crews,
+    isLoadingCrews,
+    openCreateCrew,
+    renameCrew,
+    duplicateCrewWithToast,
+    deleteCrewWithConfirm,
+    toggleCrewActive,
     showPendingFeature,
   } = controller
 
@@ -99,6 +107,7 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
             className={cn(
               'flex flex-col',
               section.isWorkflows && 'relative flex-1',
+              section.isCrews && 'relative',
               index > 0 && 'mt-[4px] pt-[8px] border-t border-[var(--border-faint)] group-data-[collapsed=true]/shell:mt-[10px] group-data-[collapsed=true]/shell:pt-[10px] group-data-[collapsed=true]/shell:border-t group-data-[collapsed=true]/shell:border-[var(--border-faint)]'
             )}
           >
@@ -159,6 +168,29 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
                   </span>
                 </>
               )}
+              {section.isCrews && (
+                <>
+                  <span className="font-mono text-[10.5px] text-[var(--text-faint)] font-medium">
+                    {crews.length}
+                  </span>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className={ACTION_BTN}
+                    title="New crew"
+                    aria-label="Create new crew"
+                    onClick={event => {
+                      event.stopPropagation()
+                      openCreateCrew()
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') { e.stopPropagation(); openCreateCrew() }
+                    }}
+                  >
+                    <Icons.Plus />
+                  </span>
+                </>
+              )}
             </button>
 
             {/* Nav items */}
@@ -169,7 +201,7 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
               )}
             >
               <div className="overflow-hidden min-h-0 pl-[14px] group-data-[collapsed=true]/shell:pl-0 flex flex-col gap-[2px]">
-                {!section.isWorkflows && section.items?.map(item => (
+                {!section.isWorkflows && !section.isCrews && section.items?.map(item => (
                   <NavLink
                     key={item.id}
                     to={item.to}
@@ -224,6 +256,18 @@ export function AppSidebar({ controller, variant = 'floating' }: AppSidebarProps
                     />
                     <WorkflowDragOverlay activeWorkflow={workflowDnd.activeWorkflowForOverlay} />
                   </DndContext>
+                )}
+                {section.isCrews && (
+                  <CrewList
+                    crews={crews}
+                    isLoading={isLoadingCrews}
+                    menuOpen={menuOpen}
+                    setMenuOpen={setMenuOpen}
+                    onRename={renameCrew}
+                    onDelete={deleteCrewWithConfirm}
+                    onDuplicate={duplicateCrewWithToast}
+                    onToggleActive={toggleCrewActive}
+                  />
                 )}
               </div>
             </div>
@@ -446,6 +490,49 @@ function WorkflowTree({
           )}
         </>
       )}
+    </div>
+  )
+}
+
+/* ── Crew list ──────────────────────────────────────────────────────────────── */
+interface CrewListProps {
+  crews: AppLayoutController['crews']
+  isLoading: boolean
+  menuOpen: string | null
+  setMenuOpen: (id: string | null) => void
+  onRename: (id: string, name: string) => void
+  onDelete: (id: string, name: string) => void
+  onDuplicate: (id: string) => void
+  onToggleActive: (id: string) => void
+}
+
+function CrewList({ crews, isLoading, menuOpen, setMenuOpen, onRename, onDelete, onDuplicate, onToggleActive }: CrewListProps) {
+  if (isLoading) {
+    return <div className="flex items-center justify-center py-4"><Spinner /></div>
+  }
+  if (crews.length === 0) {
+    return (
+      <div className="mx-[2px] mt-[2px] flex flex-col items-center justify-center gap-[6px] py-[16px] px-[12px] rounded-[8px] border border-dashed border-[var(--border-faint)]">
+        <span className="text-[11px] text-[var(--text-faint)] text-center leading-relaxed">
+          No crews yet
+        </span>
+      </div>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-[1px] group-data-[collapsed=true]/shell:hidden">
+      {crews.map(c => (
+        <SidebarCrewItem
+          key={c.id}
+          crew={c}
+          onRename={onRename}
+          onDelete={onDelete}
+          onDuplicate={onDuplicate}
+          onToggleActive={onToggleActive}
+          openMenuId={menuOpen}
+          setOpenMenuId={setMenuOpen}
+        />
+      ))}
     </div>
   )
 }

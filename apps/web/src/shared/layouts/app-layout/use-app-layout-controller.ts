@@ -18,6 +18,14 @@ import {
   useWorkflowDnD,
   useWorkflows,
 } from '@/features/workflows'
+import {
+  useLoops,
+  useCreateLoop,
+  useDeleteLoop,
+  useDuplicateLoop,
+  useToggleLoop,
+} from '@/features/loops/hooks/useLoops'
+import { crewsService } from '@/features/loops/services/loopsAPI'
 import { useFileStats } from '@/features/files/hooks/useFiles'
 import { useKBList } from '@/features/knowledge/hooks/useKnowledge'
 import { useRunsCount } from '@/features/runs/hooks/useRunsCount'
@@ -48,6 +56,11 @@ export function useAppLayoutController() {
   const { data: schedules = [] } = useSchedules()
   const { data: credentials = [] } = useCredentials()
   const { data: runsCount } = useRunsCount()
+  const { data: crews = [], isLoading: isLoadingCrews } = useLoops()
+  const createCrew = useCreateLoop()
+  const deleteCrew = useDeleteLoop()
+  const duplicateCrew = useDuplicateLoop()
+  const toggleCrew = useToggleLoop()
   const createFolder = useCreateFolder()
   const updateFolder = useUpdateFolder()
   const deleteFolder = useDeleteFolder()
@@ -236,6 +249,47 @@ export function useAppLayoutController() {
     )
   }
 
+  // ── Crews (sidebar, mirroring workflow controls) ────────────────
+  const openCreateCrew = useCallback(() => {
+    createCrew.mutate({ name: 'Untitled Crew' })
+  }, [createCrew])
+
+  const deleteCrewWithConfirm = async (id: string, name: string) => {
+    const confirmed = await confirm({
+      title: 'Delete Crew',
+      message: `Are you sure you want to delete the crew "${name || 'Untitled Crew'}"?`,
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!confirmed) return
+    deleteCrew.mutate(id, {
+      onSuccess: () => toast('Crew deleted', { variant: 'ok' }),
+      onError: () => toast('Failed to delete crew', { variant: 'err' }),
+    })
+  }
+
+  const duplicateCrewWithToast = (id: string) => {
+    duplicateCrew.mutate(id, {
+      onSuccess: () => toast('Crew duplicated', { variant: 'ok' }),
+      onError: () => toast('Failed to duplicate crew', { variant: 'err' }),
+    })
+  }
+
+  const toggleCrewActive = (id: string) => {
+    toggleCrew.mutate(id, {
+      onError: () => toast('Failed to update crew state', { variant: 'err' }),
+    })
+  }
+
+  const renameCrew = async (id: string, name: string) => {
+    try {
+      await crewsService.update(id, { name })
+      toast('Crew renamed', { variant: 'ok' })
+    } catch {
+      toast('Failed to rename crew', { variant: 'err' })
+    }
+  }
+
   const submitCreateFolder = (event: React.FormEvent) => {
     event.preventDefault()
     if (!createFolderName.trim()) return
@@ -356,6 +410,14 @@ export function useAppLayoutController() {
     deleteWorkflowWithConfirm,
     duplicateWorkflowWithToast,
     toggleWorkflowActive,
+    // Crews
+    crews,
+    isLoadingCrews,
+    openCreateCrew,
+    renameCrew,
+    duplicateCrewWithToast,
+    deleteCrewWithConfirm,
+    toggleCrewActive,
     showPendingFeature,
     modalState: {
       isCreateFolderOpen,
