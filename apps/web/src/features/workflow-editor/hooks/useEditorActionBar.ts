@@ -29,21 +29,23 @@ export function useEditorActionBar() {
   const edges       = useWorkflowEditorStore(s => s.edges)
   const workflow    = useWorkflowEditorStore(s => s.workflow)
   const setWorkflow = useWorkflowEditorStore(s => s.setWorkflow)
+  const mode        = useWorkflowEditorStore(s => s.mode)
   const { toast }   = useToast()
 
-  // Toggle the workflow's deployed state. When active, cron + webhook
-  // triggers fire; when paused they're ignored. The editor's Activate
-  // button is a thin wrapper over this mutation so the user can deploy
-  // without leaving the canvas.
+  // Toggle the deployed state. When active, cron + webhook triggers fire;
+  // when paused they're ignored. Crews live in their own table with their
+  // own toggle endpoint, so the store's `mode` (set from the /crews/:id
+  // route) must ride along — a crew id against the workflows toggle 404s.
   const activateMutation = useMutation({
-    mutationFn: () => editorAPI.toggleActive(workflowId ?? ''),
+    mutationFn: () => editorAPI.toggleActive(workflowId ?? '', mode === 'crew' ? 'crew' : 'workflow'),
     onSuccess: (res) => {
       if (workflow) setWorkflow({ ...workflow, is_active: res.is_active })
-      toast(res.is_active ? 'Workflow activated — triggers are live' : 'Workflow paused', {
+      const noun = mode === 'crew' ? 'Crew' : 'Workflow'
+      toast(res.is_active ? `${noun} activated — triggers are live` : `${noun} paused`, {
         variant: 'ok',
       })
     },
-    onError: () => toast('Failed to update workflow state', { variant: 'err' }),
+    onError: () => toast('Failed to update state', { variant: 'err' }),
   })
 
   const openMenu = () => setAnchorRect(btnRef.current?.getBoundingClientRect() ?? null)
