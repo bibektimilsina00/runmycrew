@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Loader2, Search, X } from 'lucide-react'
-import { useWorkspaceStore } from '@/features/workspaces'
 import { useCredentials, useProviders } from '../hooks/useConnections'
 import { ConnectModal } from '../components/ConnectModal'
 import { AuditLogPanel } from '../components/AuditLogPanel'
@@ -62,7 +61,6 @@ const FEATURED_IDS = new Set([
 export function Connections() {
   const { data: credentials = [], isLoading: loadingCreds } = useCredentials()
   const { data: providers = [], isLoading: loadingProviders } = useProviders()
-  const canManage = useWorkspaceStore(s => s.canManageMembers())
   const navigate = useNavigate()
 
   const [search, setSearch] = useState('')
@@ -150,15 +148,6 @@ export function Connections() {
           >
             Audit log
           </button>
-          {canManage && (
-            <button
-              onClick={() => openConnect()}
-              className="rounded-[7px] px-3 py-1.5 text-[12px] font-medium text-white hover:brightness-110"
-              style={{ background: 'var(--accent, #8b5cf6)' }}
-            >
-              + Add integration
-            </button>
-          )}
         </div>
       </div>
 
@@ -166,7 +155,7 @@ export function Connections() {
       <div className="flex-1 overflow-y-auto px-8 py-6">
         <div className="mx-auto flex max-w-[1080px] flex-col gap-6">
           {/* Hero collage */}
-          <HeroCollage providers={providers} onExplore={() => openConnect()} />
+          <HeroCollage providers={providers} />
 
           {/* Search + filter */}
           <div className="flex items-center gap-3">
@@ -337,7 +326,7 @@ function ConnectedCard({
   )
 }
 
-function HeroCollage({ providers, onExplore }: { providers: Provider[]; onExplore: () => void }) {
+function HeroCollage({ providers }: { providers: Provider[] }) {
   const withIcons = providers.filter(p => p.icon_slug).slice(0, 14)
   return (
     <div className="relative overflow-hidden rounded-[14px] border border-border-faint bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.10),transparent_70%)] bg-bg2 px-5 py-4">
@@ -346,12 +335,6 @@ function HeroCollage({ providers, onExplore }: { providers: Provider[]; onExplor
           <BrandTile key={p.id} slug={p.icon_slug} label={p.name} />
         ))}
       </div>
-      <button
-        onClick={onExplore}
-        className="absolute bottom-3 right-3 flex items-center gap-1 rounded-[7px] border border-border-faint bg-bg2 px-3 py-1.5 text-[11.5px] font-medium text-text-mute hover:border-border hover:text-text"
-      >
-        Add integration <ArrowRight size={11} />
-      </button>
     </div>
   )
 }
