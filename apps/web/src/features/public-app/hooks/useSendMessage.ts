@@ -6,9 +6,21 @@ interface StreamState {
   status: 'idle' | 'sending' | 'streaming' | 'done' | 'error'
   assistant: AppMessage | null
   error: string | null
+  /** Human label of the node currently executing ("Agent", "Slack"…). */
+  activity: string | null
 }
 
-const EMPTY: StreamState = { status: 'idle', assistant: null, error: null }
+const EMPTY: StreamState = { status: 'idle', assistant: null, error: null, activity: null }
+
+/** "action.agent" → "Agent", "trigger.chat_app" → "Chat App". */
+function humanNodeType(t: unknown): string | null {
+  if (typeof t !== 'string' || !t) return null
+  const tail = t.split('.').pop() ?? ''
+  return tail.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || null
+}
+
+/** No events for this long while streaming → give up and say so. */
+const STREAM_TIMEOUT_MS = 120_000
 
 /**
  * Owns one turn of the chat: POST the message → open SSE → merge deltas
@@ -25,18 +37,24 @@ export function useSendMessage(
 ) {
   const [state, setState] = useState<StreamState>(EMPTY)
   const esRef = useRef<EventSource | null>(null)
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Mirror of state.assistant so stream_end can hand the final message to
+  // onComplete OUTSIDE a setState updater — side effects in updaters run
+  // twice under StrictMode and duplicated every reply.
+  const assistantRef = useRef<AppMessage | null>(null)
 
   useEffect(() => {
     return () => {
       esRef.current?.close()
       esRef.current = null
+      if (watchdogRef.current) clearTimeout(watchdogRef.current)
     }
   }, [])
 
   const send = useCallback(
     async (message: string, formData?: Record<string, unknown>) => {
       esRef.current?.close()
-      setState({ status: 'sending', assistant: null, error: null })
+      setState({ status: 'sending', assistant: null, error: null, activity: null })
 
       let stream: Awaited<ReturnType<typeof publicAppAPI.sendMessage>>
       try {
@@ -49,6 +67,7 @@ export function useSendMessage(
           status: 'error',
           assistant: null,
           error: e instanceof Error ? e.message : 'Send failed',
+          activity: null,
         })
         return
       }
@@ -66,26 +85,69 @@ export function useSendMessage(
         is_error: false,
         created_at: new Date().toISOString(),
       }
-      setState({ status: 'streaming', assistant: placeholder, error: null })
+      assistantRef.current = placeholder
+      setState({ status: 'streaming', assistant: placeholder, error: null, activity: null })
 
       const es = new EventSource(publicAppAPI.streamUrl(stream.stream_url), {
         withCredentials: true,
       })
       esRef.current = es
 
-      const applyDelta = (patch: Partial<AppMessage>) => {
-        setState(s => (s.assistant ? { ...s, assistant: { ...s.assistant, ...patch } } : s))
+      // A crashed worker or lost task means no events, ever — without a
+      // watchdog the visitor stares at a spinner forever. Any event
+      // (including heartbeats handled by EventSource) resets the clock.
+      const armWatchdog = () => {
+        if (watchdogRef.current) clearTimeout(watchdogRef.current)
+        watchdogRef.current = setTimeout(() => {
+          es.close()
+          esRef.current = null
+          const msg = 'The run timed out with no response. Please try again.'
+          if (assistantRef.current) {
+            assistantRef.current = {
+              ...assistantRef.current,
+              is_error: true,
+              content: assistantRef.current.content || msg,
+            }
+          }
+          const snapshot = assistantRef.current
+          setState({ status: 'error', assistant: snapshot, error: msg, activity: null })
+        }, STREAM_TIMEOUT_MS)
+      }
+      armWatchdog()
+      es.addEventListener('stream_open', armWatchdog)
+
+      es.addEventListener('node_started', ev => {
+        armWatchdog()
+        try {
+          const data = JSON.parse((ev as MessageEvent).data) as { node_type?: string }
+          const label = humanNodeType(data.node_type)
+          // The trigger firing isn't interesting; show real work.
+          if (label && !label.includes('Chat App')) {
+            setState(s => (s.status === 'streaming' ? { ...s, activity: label } : s))
+          }
+        } catch {
+          /* ignore */
+        }
+      })
+
+      es.addEventListener('node_completed', () => armWatchdog())
+
+      // Ref-first: the ref mutates synchronously with event arrival (setState
+      // updaters are deferred, so syncing the ref inside them races
+      // stream_end reading it), then state renders the snapshot.
+      const patchAssistant = (patch: Partial<AppMessage>) => {
+        if (!assistantRef.current) return
+        assistantRef.current = { ...assistantRef.current, ...patch }
+        const snapshot = assistantRef.current
+        setState(s => ({ ...s, assistant: snapshot }))
       }
 
       es.addEventListener('token', ev => {
+        armWatchdog()
         try {
           const data = JSON.parse((ev as MessageEvent).data) as { text?: string }
-          if (data.text) {
-            setState(s =>
-              s.assistant
-                ? { ...s, assistant: { ...s.assistant, content: s.assistant.content + data.text } }
-                : s,
-            )
+          if (data.text && assistantRef.current) {
+            patchAssistant({ content: assistantRef.current.content + data.text })
           }
         } catch {
           // ignore malformed frames
@@ -98,12 +160,8 @@ export function useSendMessage(
           // Runner emits `{node_id, artifact}`; older shape was the bare
           // artifact — support both.
           const artifact = parsed?.artifact ?? parsed
-          if (artifact) {
-            setState(s =>
-              s.assistant
-                ? { ...s, assistant: { ...s.assistant, artifacts: [...s.assistant.artifacts, artifact] } }
-                : s,
-            )
+          if (artifact && assistantRef.current) {
+            patchAssistant({ artifacts: [...assistantRef.current.artifacts, artifact] })
           }
         } catch {
           // ignore
@@ -114,12 +172,8 @@ export function useSendMessage(
         try {
           const parsed = JSON.parse((ev as MessageEvent).data)
           const artifact = parsed?.artifact ?? parsed
-          if (artifact) {
-            setState(s =>
-              s.assistant
-                ? { ...s, assistant: { ...s.assistant, artifacts: [...s.assistant.artifacts, artifact] } }
-                : s,
-            )
+          if (artifact && assistantRef.current) {
+            patchAssistant({ artifacts: [...assistantRef.current.artifacts, artifact] })
           }
         } catch {
           // ignore
@@ -132,10 +186,10 @@ export function useSendMessage(
           const output = data.output ?? {}
           // Prefer whatever text the runner emitted at the end.
           if (typeof output.content === 'string' && output.content) {
-            applyDelta({ content: output.content })
+            patchAssistant({ content: output.content })
           }
           if (Array.isArray(output.artifacts)) {
-            applyDelta({ artifacts: output.artifacts })
+            patchAssistant({ artifacts: output.artifacts })
           }
         } catch {
           // ignore
@@ -143,6 +197,7 @@ export function useSendMessage(
       })
 
       es.addEventListener('execution_failed', ev => {
+        if (watchdogRef.current) clearTimeout(watchdogRef.current)
         let msg = 'Execution failed'
         try {
           const data = JSON.parse((ev as MessageEvent).data)
@@ -150,18 +205,19 @@ export function useSendMessage(
         } catch {
           /* noop */
         }
-        setState(s => ({
-          status: 'error',
-          assistant: s.assistant ? { ...s.assistant, is_error: true, content: msg } : null,
-          error: msg,
-        }))
+        if (assistantRef.current) {
+          assistantRef.current = { ...assistantRef.current, is_error: true, content: msg }
+        }
+        const snapshot = assistantRef.current
+        setState({ status: 'error', assistant: snapshot, error: msg, activity: null })
       })
 
       es.addEventListener('stream_end', () => {
-        setState(s => {
-          if (s.assistant) onComplete(s.assistant)
-          return { status: 'done', assistant: null, error: null }
-        })
+        if (watchdogRef.current) clearTimeout(watchdogRef.current)
+        const final = assistantRef.current
+        assistantRef.current = null
+        if (final) onComplete(final)
+        setState({ status: 'done', assistant: null, error: null, activity: null })
         es.close()
         esRef.current = null
       })
@@ -173,6 +229,7 @@ export function useSendMessage(
             status: 'error',
             assistant: s.assistant,
             error: 'Connection closed unexpectedly.',
+            activity: null,
           }))
         }
       }
@@ -183,6 +240,7 @@ export function useSendMessage(
   const cancel = useCallback(() => {
     esRef.current?.close()
     esRef.current = null
+    if (watchdogRef.current) clearTimeout(watchdogRef.current)
     setState(EMPTY)
   }, [])
 

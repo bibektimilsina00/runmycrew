@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, Copy, Loader2 } from 'lucide-react'
+import { AlertTriangle, Check, Copy, Loader2 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { AppLogo } from './AppLogo'
@@ -10,6 +10,8 @@ interface MessageBubbleProps {
   streaming?: boolean
   /** App logo for the assistant avatar (config.logo_url). */
   logoUrl?: string
+  /** Node currently executing — shown while waiting for tokens. */
+  activity?: string | null
 }
 
 /**
@@ -18,7 +20,7 @@ interface MessageBubbleProps {
  * turn taking is still legible at a glance. Assistant content renders
  * as GFM markdown — agents speak markdown, plain text read as broken.
  */
-export function MessageBubble({ message, streaming, logoUrl }: MessageBubbleProps) {
+export function MessageBubble({ message, streaming, logoUrl, activity }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
 
@@ -46,23 +48,26 @@ export function MessageBubble({ message, streaming, logoUrl }: MessageBubbleProp
     <div className="group flex w-full justify-start gap-3">
       <AppLogo src={logoUrl} size={26} className="mt-0.5 shrink-0" />
       <div className="max-w-[100%] min-w-0 flex-1">
-        {message.content ? (
+        {message.is_error ? (
+          <div className="flex items-start gap-2 rounded-[10px] border border-red-500/25 bg-red-500/[0.08] px-3 py-2.5 text-[13px] leading-relaxed text-red-300/90">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+            <span className="whitespace-pre-wrap">{message.content || 'Something went wrong.'}</span>
+          </div>
+        ) : message.content ? (
           <div className="prose prose-invert max-w-none text-[15px] leading-[1.65] prose-p:my-2 prose-pre:my-3 prose-pre:rounded-[10px] prose-pre:border prose-pre:border-white/10 prose-pre:bg-black/40 prose-code:text-[13px] prose-headings:mt-4 prose-headings:mb-2 prose-li:my-0.5 prose-table:text-[13.5px]">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
           </div>
         ) : streaming ? (
           <span className="inline-flex items-center gap-2 text-[13px] text-white/40">
             <Loader2 size={12} className="animate-spin" />
-            Thinking…
+            {activity ? `Running ${activity}…` : 'Thinking…'}
           </span>
-        ) : null}
-
-        {streaming && message.content && (
-          <span className="mt-1 inline-block h-[13px] w-[7px] animate-pulse bg-[var(--app-accent,#8b5cf6)]" />
+        ) : (
+          <span className="text-[13px] italic text-white/30">No response produced.</span>
         )}
 
-        {message.is_error && (
-          <span className="mt-1 block text-[12px] text-red-400/80">Something went wrong.</span>
+        {streaming && !message.is_error && message.content && (
+          <span className="mt-1 inline-block h-[13px] w-[7px] animate-pulse bg-[var(--app-accent,#8b5cf6)]" />
         )}
 
         {!streaming && message.content && (

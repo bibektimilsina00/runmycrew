@@ -47,7 +47,9 @@ export type InputField = z.infer<typeof InputFieldSchema>
 
 export const SessionSchema = z.object({
   id: z.string(),
-  workflow_id: z.string(),
+  // Exactly one of the two is set — the session's chat-app source.
+  workflow_id: z.string().nullable().optional(),
+  crew_id: z.string().nullable().optional(),
   cookie_id: z.string(),
   user_id: z.string().nullable(),
   first_seen_at: z.string(),
