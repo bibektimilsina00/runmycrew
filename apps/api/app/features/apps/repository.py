@@ -5,19 +5,25 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.features.apps.models import AppMessage, AppSession
+from apps.api.app.features.crews.models import Crew
 from apps.api.app.features.workflows.models import Workflow
+
+# Either row type can host a trigger.chat_app node.
+ChatAppSource = Workflow | Crew
 
 
 class AppSessionRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_cookie(self, workflow_id: uuid.UUID, cookie_id: str) -> AppSession | None:
+    async def get_by_cookie(self, source: ChatAppSource, cookie_id: str) -> AppSession | None:
+        source_filter = (
+            AppSession.crew_id == source.id
+            if isinstance(source, Crew)
+            else AppSession.workflow_id == source.id
+        )
         result = await self.db.execute(
-            select(AppSession).where(
-                AppSession.workflow_id == workflow_id,
-                AppSession.cookie_id == cookie_id,
-            )
+            select(AppSession).where(source_filter, AppSession.cookie_id == cookie_id)
         )
         return result.scalar_one_or_none()
 
@@ -87,29 +93,30 @@ class AppMessageRepository:
 
 async def find_active_chat_app_workflow(
     db: AsyncSession, workspace_id: uuid.UUID, app_slug: str
-) -> tuple[Workflow, dict] | None:
-    """Locate the live workflow matching /apps/{workspace}/{app_slug}.
+) -> tuple[ChatAppSource, dict] | None:
+    """Locate the live workflow OR crew matching /apps/{workspace}/{app_slug}.
 
-    Returns the Workflow row + the trigger.chat_app node's `data.properties`
-    dict for config lookup. Filters to ``is_active=True`` workflows and to
-    those whose graph contains a ``trigger.chat_app`` node with the given
-    slug.
+    Returns the source row + the trigger.chat_app node's `data.properties`
+    dict for config lookup. Filters to ``is_active=True`` rows whose graph
+    contains a ``trigger.chat_app`` node with the given slug. Workflows are
+    checked first so an accidental slug collision keeps prior behaviour.
     """
-    result = await db.execute(
-        select(Workflow).where(
-            Workflow.workspace_id == workspace_id,
-            Workflow.is_active.is_(True),
+    for model in (Workflow, Crew):
+        result = await db.execute(
+            select(model).where(
+                model.workspace_id == workspace_id,
+                model.is_active.is_(True),
+            )
         )
-    )
-    for wf in result.scalars().all():
-        graph = wf.graph or {}
-        for node in graph.get("nodes") or []:
-            if not isinstance(node, dict) or node.get("type") != "trigger.chat_app":
-                continue
-            props = (node.get("data") or {}).get("properties") or {}
-            slug = _slugify(props.get("app_slug") or props.get("title") or wf.name)
-            if slug == app_slug:
-                return wf, props
+        for row in result.scalars().all():
+            graph = row.graph or {}
+            for node in graph.get("nodes") or []:
+                if not isinstance(node, dict) or node.get("type") != "trigger.chat_app":
+                    continue
+                props = (node.get("data") or {}).get("properties") or {}
+                slug = _slugify(props.get("app_slug") or props.get("title") or row.name)
+                if slug == app_slug:
+                    return row, props
     return None
 
 

@@ -12,12 +12,18 @@ interface ShareAppButtonProps {
  * workflow has a ``trigger.chat_app`` node AND is active. No modal —
  * the URL is inferred from the workspace slug + trigger's ``app_slug``.
  */
+/** Mirror of the backend's `_slugify` in apps/repository.py — the public
+ *  URL is derived, not stored, so both sides must agree. */
+export function slugifyAppUrl(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || 'app'
+}
+
 export function ShareAppButton({ appSlug }: ShareAppButtonProps) {
   const workspace = useWorkspaceStore(s => s.currentWorkspace)
   const [copied, setCopied] = useState(false)
 
   const wsSlug = workspace?.slug || ''
-  const slug = appSlug || 'app'
+  const slug = slugifyAppUrl(appSlug)
   const href = `/apps/${wsSlug}/${slug}`
   const absolute = typeof window !== 'undefined'
     ? new URL(href, window.location.origin).toString()

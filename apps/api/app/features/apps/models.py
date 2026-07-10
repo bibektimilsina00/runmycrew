@@ -30,7 +30,14 @@ class AppSession(SQLModelBase, table=True):
     __tablename__ = "app_session"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    workflow_id: uuid.UUID = Field(foreign_key="workflow.id", ondelete="CASCADE", index=True)
+    # A session belongs to exactly one chat-app source: a workflow OR a
+    # crew (both can carry a trigger.chat_app node). One of the two is set.
+    workflow_id: uuid.UUID | None = Field(
+        default=None, foreign_key="workflow.id", ondelete="CASCADE", index=True
+    )
+    crew_id: uuid.UUID | None = Field(
+        default=None, foreign_key="crew.id", ondelete="CASCADE", index=True
+    )
     cookie_id: str = Field(max_length=64, index=True)
     user_id: uuid.UUID | None = Field(default=None, foreign_key="user.id", index=True)
     ip_hash: str | None = Field(default=None, max_length=64)

@@ -45,7 +45,9 @@ class MessageOut(SQLModel):
 
 class SessionOut(SQLModel):
     id: uuid.UUID
-    workflow_id: uuid.UUID
+    # One of the two is set — the session's chat-app source.
+    workflow_id: uuid.UUID | None = None
+    crew_id: uuid.UUID | None = None
     cookie_id: str
     user_id: uuid.UUID | None
     first_seen_at: datetime
