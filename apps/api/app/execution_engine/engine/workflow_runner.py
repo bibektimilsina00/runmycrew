@@ -66,6 +66,10 @@ class WorkflowRunner:
         self.env: dict[str, str] = {}
         self.secrets: dict[str, str] = {}
         self.loop_data: dict[str, Any] = {}  # populated by loop nodes for {{loop.*}}
+        # Trigger payload for {{$trigger.*}} bindings. run() overwrites it;
+        # initialized here because sub-runners built by run_downstream call
+        # _execute_subgraph directly and never pass through run().
+        self._trigger_data: dict[str, Any] = {}
 
         # Parallel-safe shared state
         self._lock = asyncio.Lock()
@@ -368,6 +372,9 @@ class WorkflowRunner:
                 sub_runner.env = self.env
                 sub_runner.secrets = self.secrets
                 sub_runner.loop_data = loop_data or item_input  # expose as {{loop.*}}
+                # Crew/loop rounds still resolve {{$trigger.*}} against the
+                # original trigger payload, not an empty dict.
+                sub_runner._trigger_data = self._trigger_data
                 sub_runner._outputs = dict(self._outputs)
                 sub_runner._output_items = dict(self._output_items)
                 result = await sub_runner._execute_subgraph(start_id, item_input)
