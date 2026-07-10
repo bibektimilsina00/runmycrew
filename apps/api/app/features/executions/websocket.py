@@ -23,7 +23,7 @@ router = APIRouter()
 @router.websocket("/executions/{execution_id}")
 async def execution_websocket(
     websocket: WebSocket,
-    execution_id: UUID,
+    execution_id: str,
     token: str = Query(...),
     db: AsyncSession = Depends(get_db),
 ):
@@ -31,6 +31,10 @@ async def execution_websocket(
     WebSocket endpoint for streaming execution events.
     Verifies the user via JWT token before accepting.
     Subscribes to Redis pub/sub for the specific execution.
+
+    `execution_id` is a string, not a UUID: chat-app runs use synthetic
+    `app-<uuid>` ids with no execution row — they stream fine from Redis,
+    they just have no DB catch-up.
     """
     try:
         # 1. Verify token
@@ -63,8 +67,14 @@ async def execution_websocket(
             # window (the client navigated away, dev double-mount closed
             # the prior socket, etc) are benign — log at debug and bail.
             try:
-                repo = ExecutionRepository(db)
-                execution = await repo.get_by_id(execution_id)
+                execution = None
+                try:
+                    execution_uuid = UUID(execution_id)
+                except ValueError:
+                    execution_uuid = None  # synthetic id (app-…) — Redis-only
+                if execution_uuid is not None:
+                    repo = ExecutionRepository(db)
+                    execution = await repo.get_by_id(execution_uuid)
                 if execution:
                     terminal_status = (
                         execution.status if execution.status in ("completed", "failed") else None

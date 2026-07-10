@@ -77,6 +77,7 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
     openMenu, closeMenu, openCopilot,
     exportWorkflow, autoLayout, deleteWorkflow, collapseRightPanel,
     isActive, isToggling, toggleActive,
+    hasChatAppTrigger, chatListening, startChatListening, stopChatListening,
   } = useEditorActionBar()
   const { id: workflowId } = useParams<{ id: string }>()
   const workflowName = useWorkflowEditorStore((s) => s.workflow?.name ?? '')
@@ -141,15 +142,36 @@ export function EditorActionBar({ onRun, isRunning }: EditorActionBarProps) {
         >
           {isToggling ? '…' : isActive ? 'Active' : 'Activate'}
         </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={onRun}
-          disabled={isRunning}
-          leftIcon={isRunning ? <Loader2 className="animate-spin" /> : <Play className="fill-current" />}
-        >
-          {isRunning ? 'Running' : 'Run'}
-        </Button>
+        {hasChatAppTrigger ? (
+          // Chat-trigger graphs run per visitor message: Run opens the
+          // hosted chat and keeps listening; each prompt streams its run
+          // into the log panel live. Click again to stop watching.
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={chatListening ? stopChatListening : () => void startChatListening()}
+            leftIcon={
+              chatListening
+                ? <MessageCircle className="animate-pulse" />
+                : <Play className="fill-current" />
+            }
+            title={chatListening
+              ? 'Listening — messages sent in the chat tab run the graph. Click to stop.'
+              : 'Open the chat and run the graph on every message you send'}
+          >
+            {chatListening ? 'Listening…' : 'Run'}
+          </Button>
+        ) : (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onRun}
+            disabled={isRunning}
+            leftIcon={isRunning ? <Loader2 className="animate-spin" /> : <Play className="fill-current" />}
+          >
+            {isRunning ? 'Running' : 'Run'}
+          </Button>
+        )}
       </div>
 
       {anchorRect && (
