@@ -88,6 +88,12 @@ export function MiniGraph({ graph, chipSize }: MiniGraphProps) {
   const iconByType = useNodeIconMap()
   const nodes = useMemo(() => layoutNodes(graph), [graph])
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
+  // Entry points: nodes nothing flows into. They get the accent ring so
+  // the card telegraphs where the workflow starts.
+  const targets = useMemo(
+    () => new Set((graph?.edges ?? []).map((e) => e.target)),
+    [graph],
+  )
 
   if (nodes.length === 0) return null
 
@@ -113,6 +119,7 @@ export function MiniGraph({ graph, chipSize }: MiniGraphProps) {
               stroke="var(--border-soft)"
               strokeWidth={1.5}
               vectorEffect="non-scaling-stroke"
+              className="motion-safe:group-hover:[stroke:var(--accent-line)] motion-safe:group-hover:[stroke-dasharray:5_5] motion-safe:group-hover:animate-[template-edge-flow_0.6s_linear_infinite]"
             />
           )
         })}
@@ -122,11 +129,16 @@ export function MiniGraph({ graph, chipSize }: MiniGraphProps) {
         const def = iconByType?.get(n.type)
         const icon = iconByType ? getIcon(def?.icon ?? n.type.split('.').pop() ?? '?') : null
         const iconSize = size - 14
+        const isEntry = !targets.has(n.id)
         return (
           <span
             key={n.id}
             style={{ left: `${n.x}%`, top: `${n.y}%`, width: size, height: size, color: def?.color }}
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[9px] border border-[var(--border-faint)] bg-[var(--surface-2)] text-[var(--text-mute)] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.5)]"
+            className={`absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[9px] border bg-[var(--surface-2)] text-[var(--text-mute)] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.5)] ${
+              isEntry
+                ? 'border-[var(--accent-line)] shadow-[0_0_12px_-2px_var(--accent-soft),0_2px_8px_-2px_rgba(0,0,0,0.5)]'
+                : 'border-[var(--border-faint)]'
+            }`}
             title={n.type}
           >
             {isValidElement<{ style?: React.CSSProperties }>(icon)

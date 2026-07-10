@@ -290,6 +290,9 @@
 @keyframes fuseDash {
   to { stroke-dashoffset: -28; }
 }
+@keyframes template-edge-flow {
+  to { stroke-dashoffset: -20; }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    BASE RESET
