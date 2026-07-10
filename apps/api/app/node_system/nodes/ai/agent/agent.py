@@ -176,30 +176,29 @@ class AgentNode(BaseNode[AgentProperties]):
             description="Run an AI agent with provider selection, tools, memory, and structured output.",
             icon=ICON_SLUG,
             color=COLOR,
+            # Inspector reads this order + `group` labels verbatim:
+            # Model (provider → credential → model) → Prompt → Capabilities.
+            # The legacy per-provider credential fields (openaiCredential…)
+            # are runtime-only fallbacks now — see _legacy_selected_credential —
+            # and no longer rendered.
             properties=[
-                {
-                    "name": "persona_id",
-                    "label": "Persona",
-                    "type": "persona-picker",
-                    "required": False,
-                    "description": "Pick a saved persona to prefill system prompt, tools, and model.",
-                },
                 {
                     "name": "provider",
                     "label": "Provider",
                     "type": "options",
                     "default": "openai",
                     "required": True,
+                    "group": "Model",
                     "placeholder": "Type or select an AI provider",
                     "loadOptions": "/ai/providers",
                     "typeOptions": {"searchable": True, "allowCustom": True},
                 },
-                *cls._provider_credential_properties(),
                 {
                     "name": "credential",
-                    "label": "Provider Credential",
+                    "label": "Credential",
                     "type": "credential",
                     "required": True,
+                    "group": "Model",
                     "dependsOn": ["provider"],
                     "credentialTypeByField": {
                         "field": "provider",
@@ -211,23 +210,26 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Model",
                     "type": "options",
                     "required": True,
+                    "group": "Model",
                     "placeholder": "Type or select a model ID",
                     "loadOptions": "/ai/models",
-                    "loadOptionsDependsOn": [
-                        "provider",
-                        "credential",
-                        "openaiCredential",
-                        "anthropicCredential",
-                        "googleCredential",
-                        "groqCredential",
-                    ],
+                    "loadOptionsDependsOn": ["provider", "credential"],
                     "typeOptions": {"searchable": True, "allowCustom": True},
+                },
+                {
+                    "name": "persona_id",
+                    "label": "Persona",
+                    "type": "persona-picker",
+                    "required": False,
+                    "group": "Prompt",
+                    "description": "Pick a saved persona to prefill system prompt, tools, and model.",
                 },
                 {
                     "name": "messages",
                     "label": "Messages",
                     "type": "messages",
                     "required": True,
+                    "group": "Prompt",
                     "default": [
                         {"role": "user", "content": "{{$trigger.output}}"},
                     ],
@@ -238,7 +240,17 @@ class AgentNode(BaseNode[AgentProperties]):
                     "label": "Tools",
                     "type": "tool-selector",
                     "default": [],
+                    "group": "Capabilities",
                     "description": "Tools the agent can use. Select from built-in nodes or integration tools.",
+                },
+                {
+                    "name": "skills",
+                    "label": "Skills",
+                    "type": "skill-selector",
+                    "required": False,
+                    "default": [],
+                    "group": "Capabilities",
+                    "description": "Markdown skill files the agent can load on demand.",
                 },
                 {
                     "name": "toolChoice",
@@ -412,14 +424,6 @@ class AgentNode(BaseNode[AgentProperties]):
                     "mode": "advanced",
                     "description": "Stream LLM tokens in real-time via WebSocket.",
                 },
-                {
-                    "name": "skills",
-                    "label": "Skills",
-                    "type": "skill-selector",
-                    "required": False,
-                    "default": [],
-                    "description": "Markdown skill files the agent can load on demand.",
-                },
             ],
             inputs=1,
             outputs=1,
@@ -435,52 +439,6 @@ class AgentNode(BaseNode[AgentProperties]):
             ],
             allow_error=True,
         )
-
-    @classmethod
-    def _provider_credential_properties(cls) -> list[dict[str, Any]]:
-        credential_properties = [
-            {
-                "name": "openaiCredential",
-                "label": "OpenAI API Key",
-                "type": "credential",
-                "credentialType": "openai_api_key",
-                "required": {"field": "provider", "value": "openai"},
-                "condition": {"field": "provider", "value": "openai"},
-            },
-            {
-                "name": "anthropicCredential",
-                "label": "Anthropic API Key",
-                "type": "credential",
-                "credentialType": "anthropic_api_key",
-                "required": {"field": "provider", "value": "anthropic"},
-                "condition": {"field": "provider", "value": "anthropic"},
-            },
-            {
-                "name": "googleCredential",
-                "label": "Google API Key",
-                "type": "credential",
-                "credentialType": "google_api_key",
-                "required": {"field": "provider", "value": "google"},
-                "condition": {"field": "provider", "value": "google"},
-            },
-            {
-                "name": "groqCredential",
-                "label": "Groq API Key",
-                "type": "credential",
-                "credentialType": "groq_api_key",
-                "required": {"field": "provider", "value": "groq"},
-                "condition": {"field": "provider", "value": "groq"},
-            },
-        ]
-        catalog_by_provider = {provider.ai_provider_id: provider for provider in get_ai_providers()}
-        for prop in credential_properties:
-            provider_id = prop["condition"]["value"]
-            catalog_provider = catalog_by_provider.get(provider_id)
-            if catalog_provider:
-                prop["label"] = f"{catalog_provider.name} API Key"
-                prop["credentialType"] = catalog_provider.id
-            prop["visibility"] = "hidden"
-        return credential_properties
 
     @classmethod
     def _credential_type_by_provider(cls) -> dict[str, str]:

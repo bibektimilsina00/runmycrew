@@ -11,8 +11,10 @@ export function CredentialRenderer({ prop, definition, properties, value, onChan
 
   if (credentialTypes.length === 0) {
     return (
-      <p className="text-[11px] text-text-faint">
-        This node does not declare a credential type.
+      <p className="rounded-[7px] border border-dashed border-border-faint px-2.5 py-2 text-[11px] text-text-faint">
+        {prop.credentialTypeByField
+          ? 'No stored credential type for this provider — the workspace default key is used.'
+          : 'This node does not declare a credential type.'}
       </p>
     )
   }
