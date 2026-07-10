@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/cn'
 import { Icons } from '@/shared/components/icons'
-import { APP_ROUTES } from '@/shared/constants/routes'
+import { APP_ROUTES, EXTERNAL_URLS } from '@/shared/constants/routes'
 import type { AppLayoutController } from './use-app-layout-controller'
 import { MENU_ITEM_CLASS } from './navigation'
 
@@ -79,7 +79,7 @@ export function AppTopBarActions({ controller }: AppTopBarActionsProps) {
               <button className={MENU_ITEM_CLASS} onClick={() => { setProfileOpen(false); setShortcutsOpen(true) }}>
                 <Icons.Cmd /> Keyboard shortcuts <span className="ml-auto kbd">?</span>
               </button>
-              <button className={MENU_ITEM_CLASS} onClick={() => { setProfileOpen(false); window.open('https://runmycrew.com/docs', '_blank', 'noopener') }}>
+              <button className={MENU_ITEM_CLASS} onClick={() => { setProfileOpen(false); window.open(EXTERNAL_URLS.DOCS, '_blank', 'noopener') }}>
                 <Icons.Doc /> Documentation
               </button>
               <button className={MENU_ITEM_CLASS} onClick={() => { setProfileOpen(false); setFeedbackOpen(true) }}>

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/cn'
 import { Icons } from '@/shared/components'
+import { EXTERNAL_URLS } from '@/shared/constants/routes'
 import { useEditorLayoutStore } from '../../stores/editorLayoutStore'
 
 interface CanvasFloatingButtonsProps {
@@ -68,7 +69,7 @@ export function CanvasFloatingButtons({
 
       {/* Documentation */}
       <button
-        onClick={() => window.open('https://docs.n8n.io', '_blank')}
+        onClick={() => window.open(EXTERNAL_URLS.DOCS, '_blank', 'noopener')}
         className={cn(btnBase, 'pointer-events-auto')}
         title="Documentation"
       >
