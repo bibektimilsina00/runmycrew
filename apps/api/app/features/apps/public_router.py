@@ -370,7 +370,7 @@ async def stream(
     wf, _ = await service.resolve_public_app(workspace_slug, app_slug)
     if session_cookie is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
-    session = await service.session_repo.get_by_cookie(wf.id, session_cookie)
+    session = await service.session_repo.get_by_cookie(wf, session_cookie)
     if not session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
     return StreamingResponse(
@@ -395,7 +395,7 @@ async def history(
     wf, _ = await service.resolve_public_app(workspace_slug, app_slug)
     if session_cookie is None:
         return []
-    session = await service.session_repo.get_by_cookie(wf.id, session_cookie)
+    session = await service.session_repo.get_by_cookie(wf, session_cookie)
     if not session:
         return []
     messages = await service.list_messages(session, limit=200)
@@ -417,7 +417,7 @@ async def upload_file(
     service = AppService(db)
     wf, props = await service.resolve_public_app(workspace_slug, app_slug)
     await _enforce_auth(wf, props, request, unlock_cookie, db)
-    session = await service.session_repo.get_by_cookie(wf.id, session_cookie)
+    session = await service.session_repo.get_by_cookie(wf, session_cookie)
     if not session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
 
