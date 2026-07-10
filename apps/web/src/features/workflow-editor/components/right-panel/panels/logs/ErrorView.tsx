@@ -1,10 +1,11 @@
-import { AlertOctagon, Bot, SlidersHorizontal, Copy } from 'lucide-react'
+import { AlertOctagon, Bot, SlidersHorizontal, Copy, Check } from 'lucide-react'
+import { useState } from 'react'
 import type { RunLog } from '@/features/runs/store/runsStore'
 import { useWorkflowEditorStore } from '../../../../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../../../../stores/editorLayoutStore'
 import { JsonInspector } from './JsonInspector'
 import { StructuredErrorCard } from './StructuredErrorCard'
-import { parseStructuredError } from './structuredError'
+import { parseStructuredError, type StructuredError } from './structuredError'
 import { stringifyJson } from './json-utils'
 import type { NodeInfo, Tab } from './types'
 
@@ -15,30 +16,67 @@ interface Props {
   onTabChange: (t: Tab) => void
 }
 
+/** Pull the human message out of whatever shape the error payload has. */
+function extractMessage(raw: unknown): string {
+  if (typeof raw === 'string') return raw
+  if (raw && typeof raw === 'object' && 'message' in raw) {
+    const m = (raw as { message?: unknown }).message
+    if (typeof m === 'string' && m) return m
+  }
+  return ''
+}
+
+/** Presentational hints for the most common failure families. */
+function actionsFor(message: string): string[] {
+  const m = message.toLowerCase()
+  if (m.includes('credential') || m.includes('api key') || m.includes('unauthorized') || m.includes('401')) {
+    return [
+      'Open the node and pick a credential in its Credential field.',
+      'No credential yet? Connect one under Settings → Integrations.',
+    ]
+  }
+  if (m.includes('rate limit') || m.includes('429')) {
+    return ['The provider is throttling requests — wait a moment and run again.']
+  }
+  if (m.includes('timeout') || m.includes('timed out')) {
+    return ['Increase the node’s timeout in Advanced Settings, or simplify the request.']
+  }
+  if (m.includes('not found') || m.includes('404')) {
+    return ['Check the resource id / URL configured on this node — the target no longer exists.']
+  }
+  return []
+}
+
 /**
- * Failed-node view: renders the standard `JsonInspector` for the error
- * payload so the Output/Input tab row and the toolbar stay at the same Y
- * position they do for successful nodes. The error headline drops in as
- * `headerBanner` (between toolbar and body) and the action buttons drop in
- * as `footer` — `JsonInspector` owns the layout.
+ * Failed-node view. Structured payloads (backend sentinel) render the
+ * StructuredErrorCard directly. Plain errors get the SAME card,
+ * synthesized: message as the headline, suggested next steps, and the
+ * raw payload folded away — never a bare JSON dump duplicating the
+ * banner. The slim banner keeps the node identity; the card owns the
+ * message.
  */
 export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
   const rawError = log.payload?.error
   const errorText = stringifyJson(rawError, true)
+  const [copied, setCopied] = useState(false)
 
-  // Nodes can opt into a structured error payload (title + summary +
-  // bulleted actions + collapsible raw response) via the sentinel
-  // prefix emitted by `make_structured_error` on the backend. Falls
-  // back to the legacy headline + JSON tree for anything else.
   const structured = parseStructuredError(rawError)
 
-  const headline =
-    structured?.title ||
-    (typeof rawError === 'object' && rawError && 'message' in rawError
-      ? String((rawError as { message?: unknown }).message ?? '')
-      : '') ||
-    (typeof rawError === 'string' ? rawError : '') ||
-    'Node execution failed'
+  const message = extractMessage(rawError)
+  const synthesized: StructuredError | null = structured
+    ? null
+    : {
+        title: message || 'Node execution failed',
+        summary: '',
+        actions: actionsFor(message),
+        // Only offer the raw payload when it carries more than the
+        // message we're already showing.
+        raw:
+          typeof rawError === 'object' && rawError && Object.keys(rawError).length > 1
+            ? errorText
+            : '',
+        severity: 'error',
+      }
 
   const fixWithCopilot = () => {
     if (!log.nodeId) return
@@ -59,12 +97,11 @@ export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
     useWorkflowEditorStore.getState().setSelectedNodeId(log.nodeId)
     useEditorLayoutStore.getState().focusTab('config')
   }
-  const copyError = () => { void navigator.clipboard.writeText(errorText) }
-
-  // Inspector body — structured card when the backend opted in,
-  // raw JSON tree otherwise. The header banner + footer wrap both
-  // paths identically so the toolbar stays put across error styles.
-  const body = structured ? <StructuredErrorCard data={structured} /> : undefined
+  const copyError = () => {
+    void navigator.clipboard.writeText(errorText)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   return (
     <JsonInspector
@@ -73,41 +110,44 @@ export function ErrorView({ log, nodeInfo, tab, onTabChange }: Props) {
       tab={tab}
       onTabChange={onTabChange}
       downloadName={`${log.nodeId || 'error'}-error`}
-      bodyOverride={body}
+      bodyOverride={<StructuredErrorCard data={structured ?? synthesized!} />}
       headerBanner={
-        <div className="flex shrink-0 items-start gap-2.5 border-b border-[var(--border-faint)] bg-[rgba(239,68,68,0.06)] px-3 py-2.5">
-          <AlertOctagon className="mt-[1px] h-4 w-4 shrink-0 text-[var(--err)]" />
-          <div className="min-w-0 flex-1">
-            <div className="text-[12px] font-semibold text-[var(--text)]">
-              {nodeInfo.label} failed
-            </div>
-            <div className="mt-0.5 truncate text-[11px] text-[var(--text-mute)]" title={headline}>
-              {headline}
-            </div>
-          </div>
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-[var(--border-faint)] bg-[rgba(239,68,68,0.05)] px-3 py-2">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[7px] bg-[rgba(239,68,68,0.12)]">
+            <AlertOctagon className="h-3.5 w-3.5 text-[var(--err)]" />
+          </span>
+          <span className="min-w-0 truncate text-[12.5px] font-semibold text-[var(--text)]">
+            {nodeInfo.label} failed
+          </span>
+          {log.nodeId && (
+            <span className="ml-auto shrink-0 rounded-full border border-[var(--border-faint)] bg-[var(--bg)] px-2 py-0.5 font-mono text-[10px] text-[var(--text-faint)]">
+              {log.nodeId}
+            </span>
+          )}
         </div>
       }
       footer={
-        <div className="flex shrink-0 items-center gap-1.5 border-t border-[var(--border-faint)] px-2 py-2">
+        <div className="flex shrink-0 items-center gap-1.5 border-t border-[var(--border-faint)] px-2.5 py-2">
           <button
             onClick={fixWithCopilot}
             disabled={!log.nodeId}
-            className="inline-flex items-center gap-1.5 rounded-[7px] bg-[var(--text)] px-2.5 py-1.5 text-[11.5px] font-medium text-[var(--bg)] transition-colors hover:opacity-90 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-[8px] bg-[var(--accent)] px-2.5 py-1.5 text-[11.5px] font-semibold text-white transition-all hover:brightness-110 disabled:opacity-40"
           >
             <Bot className="h-3.5 w-3.5" /> Fix with Copilot
           </button>
           <button
             onClick={inspectNode}
             disabled={!log.nodeId}
-            className="inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-[11.5px] font-medium text-[var(--text-mute)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-[8px] border border-[var(--border-faint)] px-2.5 py-1.5 text-[11.5px] font-medium text-[var(--text-mute)] transition-colors hover:border-[var(--border)] hover:text-[var(--text)] disabled:opacity-40"
           >
             <SlidersHorizontal className="h-3.5 w-3.5" /> Inspect node
           </button>
           <button
             onClick={copyError}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-[11.5px] font-medium text-[var(--text-mute)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-[11.5px] font-medium text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
-            <Copy className="h-3.5 w-3.5" /> Copy
+            {copied ? <Check className="h-3.5 w-3.5 text-[var(--ok)]" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
       }
