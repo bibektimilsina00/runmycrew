@@ -1,18 +1,17 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, Search, Users } from 'lucide-react'
+import { Loader2, Search, Users, X } from 'lucide-react'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useTemplates, useTemplateCategories } from '../hooks/useTemplates'
 import { TemplateCard } from '../components/TemplateCard'
-import { toCardShape } from '../utils/toCardShape'
+import { cn } from '@/lib/cn'
 import type { TemplateSort } from '../types/templatesTypes'
 
 /**
- * Marketplace listing page.
+ * n8n-style marketplace listing.
  *
- * Layout chrome mirrors the dashboard — same max-width, same paddings,
- * same eyebrow + h1 type scale — so the templates page reads as part of
- * the product instead of a one-off page.
+ * Left rail: category list + sort. Main area: hero + search + card grid.
+ * Cards click through to the detail page.
  */
 
 const SORT_OPTIONS: { id: TemplateSort; label: string }[] = [
@@ -25,7 +24,7 @@ const SORT_OPTIONS: { id: TemplateSort; label: string }[] = [
 export function Templates() {
   const navigate = useNavigate()
   const [cat, setCat] = useState<string>('all')
-  const [sort, setSort] = useState<TemplateSort>('newest')
+  const [sort, setSort] = useState<TemplateSort>('popular')
   const [search, setSearch] = useState('')
 
   const params = useMemo(
@@ -33,7 +32,7 @@ export function Templates() {
       category: cat === 'all' ? undefined : cat,
       sort,
       q: search.trim() || undefined,
-      limit: 36,
+      limit: 48,
       offset: 0,
     }),
     [cat, sort, search],
@@ -41,121 +40,195 @@ export function Templates() {
 
   const { data, isLoading } = useTemplates(params)
   const { data: categoriesData } = useTemplateCategories()
-
   const categories = categoriesData?.categories ?? []
   const items = data?.items ?? []
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-[1160px] mx-auto px-[28px] sm:px-[48px] pt-[40px] sm:pt-[56px] pb-[80px] flex flex-col gap-[32px]">
-        {/* Header — matches dashboard's GreetingRow visual rhythm */}
-        <div className="flex flex-col gap-[18px]">
-          <div className="flex items-center gap-[8px]">
-            <span className="relative inline-flex w-[8px] h-[8px]">
-              <span className="absolute inset-0 rounded-full bg-[var(--accent)]" />
-            </span>
-            <span className="text-[11px] font-semibold tracking-[0.08em] text-[var(--text-faint)]">
-              MARKETPLACE
-            </span>
-            <span className="text-[var(--text-dim)]">·</span>
-            <span className="text-[11px] font-semibold tracking-[0.08em] text-[var(--text-dim)]">
-              {data?.total ?? 0} TEMPLATES
-            </span>
-          </div>
-
-          <div className="flex items-end justify-between gap-[16px] flex-wrap">
-            <div className="flex flex-col gap-[6px] flex-1 min-w-[280px]">
-              <h1 className="m-0 text-[27px] font-semibold tracking-[-0.022em] text-[var(--text)]">
-                Templates
-              </h1>
-              <p className="m-0 text-[13.5px] leading-[1.55] text-[var(--text-mute)] max-w-[560px]">
-                Browse community + official workflows. Install one to get a
-                ready-made graph in your workspace, or publish your own from any
-                workflow you've built.
-              </p>
-            </div>
-            <div className="flex items-center gap-[9px] shrink-0">
-              <button
-                onClick={() => navigate(APP_ROUTES.MY_TEMPLATES)}
-                className="inline-flex items-center gap-[7px] py-[8px] px-[14px] rounded-[6px] text-[13px] font-medium text-[var(--text)] bg-[rgba(255,255,255,0.02)] border border-[var(--border-soft)] transition-colors hover:bg-[rgba(255,255,255,0.05)] hover:border-[var(--border)]"
-              >
-                <Users className="h-[15px] w-[15px]" /> My templates
-              </button>
+      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-8 px-6 pt-10 pb-24 sm:px-10 lg:grid-cols-[220px_1fr]">
+        {/* ── Sidebar ─────────────────────────────────────── */}
+        <aside className="hidden flex-col gap-6 lg:flex">
+          <div>
+            <h2 className="mb-2 text-[10.5px] font-semibold uppercase tracking-wider text-text-faint">
+              Categories
+            </h2>
+            <div className="flex flex-col gap-0.5">
+              <CategoryLink
+                label="All templates"
+                count={data?.total ?? 0}
+                active={cat === 'all'}
+                onClick={() => setCat('all')}
+              />
+              {categories.map((c) => (
+                <CategoryLink
+                  key={c.id}
+                  label={c.label}
+                  count={c.count}
+                  active={cat === c.id}
+                  onClick={() => setCat(c.id)}
+                />
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Filter / search row — uses the project's standard .filter-bar /
-            .filter-tabs vocabulary so the templates page matches the rest
-            of the product. */}
-        <div className="filter-bar">
-          <div className="filter-tabs">
-            <button
-              className={`filter-tab${cat === 'all' ? ' active' : ''}`}
-              onClick={() => setCat('all')}
-            >
+          <div>
+            <h2 className="mb-2 text-[10.5px] font-semibold uppercase tracking-wider text-text-faint">
+              Sort by
+            </h2>
+            <div className="flex flex-col gap-0.5">
+              {SORT_OPTIONS.map((o) => (
+                <CategoryLink
+                  key={o.id}
+                  label={o.label}
+                  active={sort === o.id}
+                  onClick={() => setSort(o.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate(APP_ROUTES.MY_TEMPLATES)}
+            className="flex items-center gap-2 rounded-[8px] border border-border-faint bg-bg2 px-3 py-2 text-[12.5px] font-medium text-text-mute hover:border-border hover:text-text"
+          >
+            <Users className="h-[13px] w-[13px]" />
+            My templates
+          </button>
+        </aside>
+
+        {/* ── Main ───────────────────────────────────────── */}
+        <main className="flex flex-col gap-6">
+          {/* Hero */}
+          <header className="flex flex-col gap-3">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-faint">
+              <span className="inline-flex h-2 w-2 rounded-full bg-accent" />
+              Marketplace · {data?.total ?? 0} templates
+            </div>
+            <h1 className="text-[32px] font-semibold leading-tight tracking-tight text-text sm:text-[38px]">
+              Discover ready-made workflows &<br className="hidden sm:block" /> AI agents
+            </h1>
+            <p className="max-w-[560px] text-[13.5px] leading-relaxed text-text-mute">
+              Browse community + official templates. Install one in a click,
+              or publish your own to share with the workspace.
+            </p>
+
+            {/* Big search bar */}
+            <div className="mt-3 flex h-12 items-center gap-2 rounded-[12px] border border-border-faint bg-bg2 px-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] focus-within:border-border">
+              <Search className="h-4 w-4 text-text-faint" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search 4,590+ templates by name, tool, or use case…"
+                className="flex-1 bg-transparent text-[14px] text-text outline-none placeholder:text-text-faint"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="rounded-[6px] p-1 text-text-faint hover:bg-surface hover:text-text"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+          </header>
+
+          {/* Mobile category chips */}
+          <div className="flex flex-wrap gap-1.5 lg:hidden">
+            <ChipButton active={cat === 'all'} onClick={() => setCat('all')}>
               All
-            </button>
+            </ChipButton>
             {categories.map((c) => (
-              <button
+              <ChipButton
                 key={c.id}
-                className={`filter-tab${cat === c.id ? ' active' : ''}`}
+                active={cat === c.id}
                 onClick={() => setCat(c.id)}
               >
                 {c.label}
-              </button>
+              </ChipButton>
             ))}
           </div>
-          <div className="filter-tools">
-            <div className="cmd-search inline-search">
-              <Search className="h-3.5 w-3.5" />
-              <input
-                placeholder="Search templates"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <select
-              className="h-[30px] rounded-[7px] border border-[var(--border-faint)] bg-[var(--bg-2)] px-2.5 text-[12px] text-[var(--text)] outline-none transition-colors hover:border-[var(--border-soft)] focus:border-[var(--border)]"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as TemplateSort)}
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
 
-        {/* Body */}
-        {isLoading ? (
-          <div className="flex items-center gap-3 py-8 text-[13px] text-[var(--text-faint)]">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading templates…
-          </div>
-        ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-1.5 py-16 text-center text-[var(--text-faint)]">
-            <span className="text-[14px] font-semibold text-[var(--text)]">
-              No templates yet
-            </span>
-            <span className="text-[12px]">
-              Publish one from a workflow to seed this gallery.
-            </span>
-          </div>
-        ) : (
-          <div className="tpl-grid">
-            {items.map((item, idx) => (
-              <TemplateCard
-                key={item.id}
-                template={toCardShape(item, idx)}
-                onClick={() => navigate(APP_ROUTES.TEMPLATE_DETAIL(item.slug))}
-              />
-            ))}
-          </div>
-        )}
+          {/* Grid */}
+          {isLoading ? (
+            <div className="flex items-center gap-3 py-8 text-[13px] text-text-faint">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading templates…
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-border-faint py-16 text-center">
+              <span className="text-[14px] font-semibold text-text">
+                No templates match
+              </span>
+              <span className="text-[12.5px] text-text-mute">
+                Try clearing the search or picking a different category.
+              </span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {items.map((item) => (
+                <TemplateCard
+                  key={item.id}
+                  template={item}
+                  onClick={() => navigate(APP_ROUTES.TEMPLATE_DETAIL(item.slug))}
+                />
+              ))}
+            </div>
+          )}
+        </main>
       </div>
     </div>
+  )
+}
+
+function CategoryLink({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string
+  count?: number
+  active?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'flex w-full items-center justify-between rounded-[7px] px-3 py-1.5 text-[13px] transition',
+        active
+          ? 'bg-surface text-text'
+          : 'text-text-mute hover:bg-surface/60 hover:text-text',
+      )}
+    >
+      <span>{label}</span>
+      {count !== undefined && (
+        <span className="font-mono text-[10.5px] text-text-faint">{count}</span>
+      )}
+    </button>
+  )
+}
+
+function ChipButton({
+  active,
+  onClick,
+  children,
+}: {
+  active?: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'rounded-full border px-3 py-1 text-[11.5px] font-medium transition',
+        active
+          ? 'border-accent bg-accent/10 text-text'
+          : 'border-border-faint text-text-mute hover:border-border hover:text-text',
+      )}
+    >
+      {children}
+    </button>
   )
 }

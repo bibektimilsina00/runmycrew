@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { APP_ROUTES } from '@/shared/constants/routes'
 import { useTemplates } from '../hooks/useTemplates'
 import { TemplateCard } from './TemplateCard'
-import { toCardShape } from '../utils/toCardShape'
 
 /**
  * Bottom strip of 3 same-category templates on the detail page.
@@ -35,11 +34,11 @@ export function RelatedTemplates({ category, excludeId }: RelatedTemplatesProps)
       <h2 className="m-0 text-[13.5px] font-semibold text-[var(--text)]">
         Related templates
       </h2>
-      <div className="tpl-grid">
-        {items.map((item, idx) => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((item) => (
           <TemplateCard
             key={item.id}
-            template={toCardShape(item, idx)}
+            template={item}
             onClick={() => navigate(APP_ROUTES.TEMPLATE_DETAIL(item.slug))}
           />
         ))}
