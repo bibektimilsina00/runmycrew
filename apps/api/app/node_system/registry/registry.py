@@ -427,6 +427,10 @@ class NodeRegistry:
             raise ValueError(f"Node type '{node_type}' not registered")
         return self._nodes[node_type]
 
+    def find(self, node_type: str) -> type[BaseNode] | None:
+        """Like get_node, but None for unknown types (stale graphs)."""
+        return self._nodes.get(node_type)
+
     def list_nodes(self) -> list[dict[str, Any]]:
         out = []
         for cls in self._nodes.values():
