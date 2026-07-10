@@ -294,11 +294,7 @@ function ProviderCard({ provider, onOpen }: { provider: Provider; onOpen: () => 
       onClick={onOpen}
       className="group flex items-center gap-3 rounded-[11px] border border-border-faint bg-bg2 px-4 py-3 text-left transition-colors hover:border-border hover:bg-bg2/80"
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-bg [&_img]:h-6 [&_img]:w-6 [&_img]:object-contain">
-        {provider.icon_slug ? <BrandIcon slug={provider.icon_slug} /> : (
-          <span className="text-[13px] font-semibold text-text-mute">{provider.name[0]}</span>
-        )}
-      </span>
+      <BrandTile slug={provider.icon_slug} label={provider.name} />
       <div className="min-w-0 flex-1">
         <div className="truncate text-[13.5px] font-semibold text-text">{provider.name}</div>
         <div className="truncate text-[11.5px] text-text-mute">
@@ -319,10 +315,8 @@ function ConnectedCard({
       onClick={onOpen}
       className="group flex items-center gap-3 rounded-[11px] border border-border-faint bg-bg2 px-4 py-3 text-left transition-colors hover:border-border"
     >
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-bg [&_img]:h-6 [&_img]:w-6 [&_img]:object-contain">
-        {provider?.icon_slug ? <BrandIcon slug={provider.icon_slug} /> : (
-          <span className="text-[13px] font-semibold text-text-mute">{(provider?.name ?? '?')[0]}</span>
-        )}
+      <div className="relative shrink-0">
+        <BrandTile slug={provider?.icon_slug ?? null} label={provider?.name ?? credential.name} />
         <span
           className={cn(
             'absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg2',
@@ -331,7 +325,7 @@ function ConnectedCard({
             status === 'err'  && 'bg-[var(--err)]',
           )}
         />
-      </span>
+      </div>
       <div className="min-w-0 flex-1">
         <div className="truncate text-[13.5px] font-semibold text-text">{credential.name}</div>
         <div className="truncate text-[11.5px] text-text-mute">
@@ -349,13 +343,7 @@ function HeroCollage({ providers, onExplore }: { providers: Provider[]; onExplor
     <div className="relative overflow-hidden rounded-[14px] border border-border-faint bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.10),transparent_70%)] bg-bg2 px-5 py-4">
       <div className="grid grid-cols-7 gap-3">
         {withIcons.map(p => (
-          <div
-            key={p.id}
-            className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-[7px] bg-bg [&_img]:h-6 [&_img]:w-6 [&_img]:object-contain"
-            title={p.name}
-          >
-            <BrandIcon slug={p.icon_slug as string} />
-          </div>
+          <BrandTile key={p.id} slug={p.icon_slug} label={p.name} />
         ))}
       </div>
       <button
@@ -365,5 +353,26 @@ function HeroCollage({ providers, onExplore }: { providers: Provider[]; onExplor
         Add integration <ArrowRight size={11} />
       </button>
     </div>
+  )
+}
+
+/**
+ * Icon tile with a white backdrop so full-colour brand SVGs stand out
+ * (Slack purple, GitHub black, Google red/green/blue). Falls back to a
+ * neutral letter tile when the slug 404s.
+ */
+function BrandTile({ slug, label }: { slug: string | null | undefined; label: string }) {
+  const letter = label.replace(/[^a-zA-Z0-9]/g, '')[0]?.toUpperCase() ?? '?'
+  if (!slug) {
+    return (
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-white/[0.07] text-[13px] font-semibold text-text-mute">
+        {letter}
+      </span>
+    )
+  }
+  return (
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)] [&_img]:h-6 [&_img]:w-6 [&_img]:object-contain [&>span]:flex [&>span]:h-full [&>span]:w-full [&>span]:items-center [&>span]:justify-center [&>span]:bg-white/[0.07] [&>span]:text-text-mute">
+      <BrandIcon slug={slug} fallbackLabel={label} />
+    </span>
   )
 }
