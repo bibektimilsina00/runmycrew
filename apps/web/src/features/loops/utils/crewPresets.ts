@@ -4,6 +4,7 @@
 // configured crew member rather than an empty node.
 //
 // Resolved node types (verified against the backend node registry):
+//   trigger.chat_app — Chat App    (category trigger)
 //   ai.agent_crew   — Agent Crew   (category ai)
 //   action.agent    — Agent        (category ai)
 //   action.evaluator— Evaluator    (category ai)  — model-judge checker (ladder L4)
@@ -26,6 +27,17 @@ export interface CrewPreset {
 }
 
 export const CREW_PRESETS: CrewPreset[] = [
+  {
+    id: 'chat-app',
+    label: 'Chat App',
+    description: 'Hosted chat entry point',
+    icon: 'MessagesSquare',
+    color: '#8b5cf6',
+    nodeType: 'trigger.chat_app',
+    // Node defaults (title, mode, rate limits…) come from the backend
+    // properties model — nothing crew-specific to seed here.
+    defaultProperties: {},
+  },
   {
     id: 'crew',
     label: 'Crew',
