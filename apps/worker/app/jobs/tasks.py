@@ -397,6 +397,27 @@ def execute_app_message(
         )
     except Exception as e:
         logger.error(f"execute_app_message task failed: {e}", exc_info=True)
+        # The visitor is watching an SSE stream and a spinner. A silent
+        # crash here left the placeholder empty forever — persist the
+        # failure and emit a terminal event so the page can say so.
+        try:
+            asyncio.run(_fail_app_message(execution_id, assistant_message_id, str(e)))
+        except Exception:
+            logger.error("could not persist app-message failure", exc_info=True)
+
+
+async def _fail_app_message(execution_id: str, assistant_message_id: str, error: str) -> None:
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.execution_engine.engine.event_emitter import RedisEventEmitter
+    from apps.api.app.features.apps.repository import AppMessageRepository
+
+    async with AsyncSessionLocal() as db:
+        repo = AppMessageRepository(db)
+        msg = await repo.get_by_id(uuid.UUID(assistant_message_id))
+        if msg and not msg.content:
+            await repo.update(msg, {"content": f"Something went wrong: {error}", "is_error": True})
+    emitter = RedisEventEmitter(execution_id)
+    await emitter.emit("execution_failed", {"status": "failed", "error": error})
 
 
 async def _run_app_message(

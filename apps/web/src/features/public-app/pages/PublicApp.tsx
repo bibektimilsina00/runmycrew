@@ -32,7 +32,6 @@ export function PublicApp() {
   const configQuery = useAppConfig(ws, slug)
   const sessionQuery = useAppSession(ws, slug, !!configQuery.data)
   const append = useAppendMessage(ws, slug)
-  const [pending, setPending] = useState<AppMessage | null>(null)
   const [draft, setDraft] = useState('')
   const [attachments, setAttachments] = useState<AttachedFile[]>([])
   const [uploading, setUploading] = useState(false)
@@ -62,14 +61,12 @@ export function PublicApp() {
 
   const { state: sendState, send, cancel } = useSendMessage(ws, slug, (finalMsg) => {
     append(finalMsg)
-    setPending(null)
   })
 
-  const optimistic = useMemo(() => {
-    const messages = sessionQuery.data?.messages ?? []
-    if (!pending) return messages
-    return [...messages, pending]
-  }, [sessionQuery.data?.messages, pending])
+  const optimistic = useMemo(
+    () => sessionQuery.data?.messages ?? [],
+    [sessionQuery.data?.messages],
+  )
 
   // Every artifact across the transcript + the in-flight assistant message,
   // deduped by id so a rerender doesn't duplicate stream frames.
@@ -117,7 +114,6 @@ export function PublicApp() {
       is_error: false,
       created_at: new Date().toISOString(),
     }
-    setPending(userMsg)
     append(userMsg)
     setDraft('')
     void send(value)
@@ -165,6 +161,27 @@ export function PublicApp() {
     )
   }
 
+  // A broken session is unrecoverable for the visitor — say so instead
+  // of silently rendering an empty chat that eats their messages.
+  if (sessionQuery.isError) {
+    return (
+      <ThemeProvider config={app.config}>
+        <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#0b0b0f] px-6 text-center">
+          <h1 className="text-[20px] font-semibold text-white">Couldn't start a session</h1>
+          <p className="max-w-sm text-[13px] text-white/50">
+            Something went wrong connecting to this app. Refresh to try again.
+          </p>
+          <button
+            onClick={() => void sessionQuery.refetch()}
+            className="rounded-[8px] border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[12.5px] text-white/80 transition hover:bg-white/[0.1]"
+          >
+            Retry
+          </button>
+        </div>
+      </ThemeProvider>
+    )
+  }
+
   // Form mode: no chat surface. One page in, one page out. Uses the
   // same send-message pipeline so streaming + artifacts still flow.
   if (app.mode === 'form') {
@@ -175,7 +192,6 @@ export function PublicApp() {
             app={app}
             onNewChat={() => {
               sessionQuery.refetch()
-              setPending(null)
             }}
           />
           <main className="flex min-h-0 flex-1 flex-col">
@@ -191,7 +207,7 @@ export function PublicApp() {
                   <MessageBubble key={m.id} message={m} logoUrl={app.config.logo_url as string | undefined} />
                 ))}
                 {sendState.assistant && (
-                  <MessageBubble message={sendState.assistant} streaming logoUrl={app.config.logo_url as string | undefined} />
+                  <MessageBubble message={sendState.assistant} streaming logoUrl={app.config.logo_url as string | undefined} activity={sendState.activity} />
                 )}
                 {canvasVisible && (
                   <div className="mt-4 min-h-[420px] overflow-hidden rounded-[12px] border border-white/5">
@@ -221,7 +237,6 @@ export function PublicApp() {
           app={app}
           onNewChat={() => {
             sessionQuery.refetch()
-            setPending(null)
           }}
         />
 
@@ -240,7 +255,7 @@ export function PublicApp() {
                       <MessageBubble key={m.id} message={m} logoUrl={app.config.logo_url as string | undefined} />
                     ))}
                     {sendState.assistant && (
-                      <MessageBubble message={sendState.assistant} streaming logoUrl={app.config.logo_url as string | undefined} />
+                      <MessageBubble message={sendState.assistant} streaming logoUrl={app.config.logo_url as string | undefined} activity={sendState.activity} />
                     )}
                   </>
                 )}
