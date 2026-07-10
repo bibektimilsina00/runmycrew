@@ -1,118 +1,142 @@
-import { BadgeCheck, Bolt } from 'lucide-react'
-import { CreatorChip } from './CreatorChip'
-import { PremiumBadge } from './PremiumBadge'
+import { BadgeCheck, Bot } from 'lucide-react'
 import { BrandIcon } from '@/features/workflow-editor/utils/BrandIcon'
-import { TEMPLATE_CATEGORIES } from '../types/templatesTypes'
 import type { TemplateListItem } from '../types/templatesTypes'
 
 interface Props {
   template: TemplateListItem
   onClick?: () => void
+  /** Featured / hero variant — larger padding, coloured backdrop, big preview slot. */
+  variant?: 'grid' | 'featured'
 }
 
 /**
- * n8n-style template card. Header strip is the theme colour (from
- * bg_variant → subtle radial gradient); below it we lay out title,
- * summary, integration icons row, and creator + install count.
- * Hover lifts the card + darkens the border for tactile feedback.
+ * n8n workflows-page card. Title dominates. Bottom row = integration
+ * icon strip + "+N" overflow chip. Creator avatar floats at the
+ * bottom-right with a small verified pip. No summary text (matches n8n
+ * — the title carries the meaning).
  */
-export function TemplateCard({ template, onClick }: Props) {
+export function TemplateCard({ template, onClick, variant = 'grid' }: Props) {
   const integrations = deriveIntegrations(template)
-  const categoryLabel =
-    TEMPLATE_CATEGORIES.find((c) => c.id === template.category)?.label ?? template.category
+  const overflow = Math.max(0, integrations.length - 3)
+  const shown = integrations.slice(0, 3)
+  const bg = template.bg_variant || 'inspo-bg-1'
+
+  if (variant === 'featured') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`group relative flex w-full items-center overflow-hidden rounded-[16px] border border-border-faint text-left transition-transform hover:-translate-y-0.5 ${bg}`}
+      >
+        {/* Text side */}
+        <div className="relative z-10 flex-1 px-8 py-8">
+          <div className="mb-4 flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-wider text-white/70">
+            {template.is_official && <span className="rounded-full bg-white/15 px-2 py-0.5">Featured</span>}
+          </div>
+          <h3 className="max-w-[520px] text-[24px] font-semibold leading-tight tracking-tight text-white">
+            {template.title}
+          </h3>
+          <div className="mt-6 flex items-center gap-2">
+            <IntegrationStrip integrations={shown} overflow={overflow} onDark />
+          </div>
+        </div>
+        {/* Preview side — muted mini-graph illustration */}
+        <div className="relative z-10 mr-8 hidden h-[160px] w-[280px] items-center justify-center rounded-[10px] bg-black/25 backdrop-blur sm:flex">
+          <Bot className="h-14 w-14 text-white/60" />
+        </div>
+        {/* Creator pip */}
+        <CreatorPip creator={template.creator} isOfficial={template.is_official} />
+      </button>
+    )
+  }
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group flex h-full flex-col overflow-hidden rounded-[14px] border border-border-faint bg-bg2 text-left transition-all hover:-translate-y-0.5 hover:border-border hover:shadow-[0_18px_36px_-24px_rgba(0,0,0,0.5)]"
+      className="group relative flex h-[172px] w-full flex-col justify-between overflow-hidden rounded-[14px] border border-border-faint bg-bg2 p-5 text-left transition-all hover:-translate-y-0.5 hover:border-border hover:bg-bg2/80"
     >
-      {/* Colored header strip — subtle gradient so it never overwhelms
-          the content but still gives the card a personality. */}
-      <div
-        className={`relative h-[86px] w-full overflow-hidden ${template.bg_variant}`}
-      >
-        {template.is_premium && (template.price_cents ?? 0) > 0 ? (
-          <PremiumBadge priceCents={template.price_cents ?? 0} />
-        ) : (
-          <span className="absolute right-3 top-3 rounded-[6px] border border-white/15 bg-black/25 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-white/85 backdrop-blur">
-            Free
-          </span>
-        )}
-        <div className="absolute bottom-3 left-4 flex items-center gap-1.5 rounded-[6px] bg-black/35 px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wider text-white/85 backdrop-blur">
-          {categoryLabel}
-        </div>
-      </div>
+      <h3 className="line-clamp-3 pr-8 text-[15.5px] font-semibold leading-snug text-text">
+        {template.title}
+      </h3>
 
-      {/* Body */}
-      <div className="flex flex-1 flex-col gap-3 px-4 py-4">
-        <div className="flex-1">
-          <h3 className="line-clamp-2 text-[14.5px] font-semibold leading-snug text-text">
-            {template.title}
-          </h3>
-          {template.summary && (
-            <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-text-mute">
-              {template.summary}
-            </p>
-          )}
-        </div>
-
-        {/* Integrations */}
-        {integrations.length > 0 && (
-          <div className="flex items-center gap-1">
-            {integrations.slice(0, 6).map((slug) => (
-              <span
-                key={slug}
-                className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-[6px] bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] [&_img]:h-4 [&_img]:w-4 [&_img]:object-contain"
-                title={slug}
-              >
-                <BrandIcon slug={slug} />
-              </span>
-            ))}
-            {integrations.length > 6 && (
-              <span className="ml-1 text-[10.5px] text-text-faint">
-                +{integrations.length - 6}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Footer meta */}
-        <div className="flex items-center justify-between gap-2 border-t border-border-faint pt-2.5 text-[11px] text-text-faint">
-          {template.is_official ? (
-            <span className="flex items-center gap-1 font-mono uppercase tracking-[0.06em] text-accent">
-              <BadgeCheck className="h-[12px] w-[12px]" />
-              Official
-            </span>
-          ) : template.creator ? (
-            <CreatorChip creator={template.creator} />
-          ) : (
-            <span className="font-mono uppercase tracking-[0.06em]">Community</span>
-          )}
-          <span className="flex items-center gap-1 tabular-nums">
-            <Bolt className="h-[11px] w-[11px]" />
-            {template.download_count.toLocaleString()}
-          </span>
-        </div>
+      <div className="flex items-end justify-between gap-3">
+        <IntegrationStrip integrations={shown} overflow={overflow} />
+        <CreatorPip creator={template.creator} isOfficial={template.is_official} />
       </div>
     </button>
   )
 }
 
-/**
- * Pulls brand slugs off the template. Backend already gives us
- * ``tools_required`` + ``credentials_required`` — merge + dedup.
- * Fallback to graph node types when both lists are empty.
- */
+// ── Bits ─────────────────────────────────────────────────────────
+
+function IntegrationStrip({
+  integrations,
+  overflow,
+  onDark,
+}: {
+  integrations: string[]
+  overflow: number
+  onDark?: boolean
+}) {
+  const tileCls = onDark
+    ? 'flex h-8 w-8 items-center justify-center overflow-hidden rounded-[7px] bg-black/40 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] [&_img]:h-5 [&_img]:w-5 [&_img]:object-contain'
+    : 'flex h-8 w-8 items-center justify-center overflow-hidden rounded-[7px] bg-white/[0.04] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] [&_img]:h-5 [&_img]:w-5 [&_img]:object-contain'
+  const overflowCls = onDark
+    ? 'flex h-8 min-w-[36px] items-center justify-center rounded-[7px] bg-black/40 px-2 text-[11.5px] font-semibold text-white/70'
+    : 'flex h-8 min-w-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] px-2 text-[11.5px] font-semibold text-text-mute'
+  return (
+    <div className="flex items-center gap-1.5">
+      {integrations.map((slug) => (
+        <span key={slug} className={tileCls} title={slug}>
+          <BrandIcon slug={slug} />
+        </span>
+      ))}
+      {overflow > 0 && <span className={overflowCls}>+{overflow}</span>}
+    </div>
+  )
+}
+
+function CreatorPip({
+  creator,
+  isOfficial,
+}: {
+  creator: TemplateListItem['creator']
+  isOfficial: boolean
+}) {
+  const label = creator?.full_name || creator?.email?.split('@')[0] || (isOfficial ? 'Official' : 'Community')
+  const initial = (label ?? '?').trim().charAt(0).toUpperCase()
+  return (
+    <div className="relative shrink-0" title={label ?? ''}>
+      <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border-faint bg-surface text-[12px] font-semibold text-text-mute">
+        {creator?.avatar_url ? (
+          <img src={creator.avatar_url} alt={label ?? ''} className="h-full w-full object-cover" />
+        ) : (
+          initial
+        )}
+      </span>
+      {isOfficial && (
+        <BadgeCheck className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-bg2 text-accent" />
+      )}
+    </div>
+  )
+}
+
+// ── Helpers ─────────────────────────────────────────────────────
+
+const TRIGGER_TYPES = new Set([
+  'chat_app', 'manual', 'cron', 'webhook', 'trigger',
+  'set_variable', 'merge', 'switch', 'condition', 'delay', 'wait',
+  'json_transform', 'code', 'sub_workflow',
+])
+
 function deriveIntegrations(t: TemplateListItem): string[] {
   const s = new Set<string>()
   for (const id of t.tools_required ?? []) s.add(id.toLowerCase())
   for (const node of t.graph?.nodes ?? []) {
     const type = node.type ?? ''
     const brand = type.split('.').pop()
-    if (brand && brand !== 'chat_app' && brand !== 'manual' && brand !== 'cron' && brand !== 'webhook') {
-      s.add(brand.toLowerCase())
-    }
+    if (brand && !TRIGGER_TYPES.has(brand)) s.add(brand.toLowerCase())
   }
   return Array.from(s)
 }
