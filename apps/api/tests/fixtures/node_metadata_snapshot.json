@@ -88051,6 +88051,125 @@
     "tools": null,
     "type": "trigger.fireflies_webhook"
   },
+  "trigger.form": {
+    "allow_error": false,
+    "brand": null,
+    "category": "trigger",
+    "color": "#10b981",
+    "credential_type": null,
+    "default_height": null,
+    "default_width": null,
+    "description": "Start the workflow from a form \u2014 define fields, fill them at run time.",
+    "dynamic_outputs_from": "inputs",
+    "icon": "ClipboardList",
+    "inputs": 0,
+    "name": "Form",
+    "operation_tool_map": null,
+    "outputs": 1,
+    "outputs_schema": [
+      {
+        "label": "input_data",
+        "type": "object"
+      }
+    ],
+    "properties": [
+      {
+        "default": [
+          {
+            "name": "input1",
+            "type": "string",
+            "value": ""
+          }
+        ],
+        "label": "Fields",
+        "name": "inputs",
+        "properties": [
+          {
+            "label": "Name",
+            "name": "name",
+            "placeholder": "input1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "default": "string",
+            "label": "Type",
+            "name": "type",
+            "options": [
+              {
+                "label": "String",
+                "value": "string"
+              },
+              {
+                "label": "Number",
+                "value": "number"
+              },
+              {
+                "label": "Boolean",
+                "value": "boolean"
+              },
+              {
+                "label": "Object",
+                "value": "object"
+              },
+              {
+                "label": "Array",
+                "value": "array"
+              },
+              {
+                "label": "Files",
+                "value": "files"
+              }
+            ],
+            "type": "options"
+          },
+          {
+            "label": "Value",
+            "name": "value",
+            "placeholder": "Enter default value",
+            "type": "string"
+          }
+        ],
+        "type": "collection",
+        "typeOptions": {
+          "addButtonText": "Add field",
+          "autoIncrementField": "name",
+          "autoIncrementPrefix": "input",
+          "multipleValues": true
+        }
+      },
+      {
+        "default": 0,
+        "description": "Number of times to retry this node on failure (0 = no retries).",
+        "group": "Retry",
+        "label": "Retries",
+        "mode": "advanced",
+        "name": "retries",
+        "type": "number"
+      },
+      {
+        "condition": {
+          "field": "retries",
+          "value": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "default": 1000,
+        "description": "Milliseconds to wait between retries.",
+        "group": "Retry",
+        "label": "Retry Delay (ms)",
+        "mode": "advanced",
+        "name": "retry_delay_ms",
+        "type": "number"
+      }
+    ],
+    "tools": null,
+    "type": "trigger.form"
+  },
   "trigger.gcal_event": {
     "allow_error": true,
     "brand": null,
@@ -91426,11 +91545,11 @@
     "credential_type": null,
     "default_height": null,
     "default_width": null,
-    "description": "Initiate workflow execution manually",
-    "dynamic_outputs_from": "inputs",
+    "description": "Start the workflow manually. No configuration, no inputs.",
+    "dynamic_outputs_from": null,
     "icon": "Play",
     "inputs": 0,
-    "name": "Start",
+    "name": "Manual",
     "operation_tool_map": null,
     "outputs": 1,
     "outputs_schema": [
@@ -91440,78 +91559,6 @@
       }
     ],
     "properties": [
-      {
-        "default": "manual",
-        "label": "Start Workflow",
-        "name": "startWorkflow",
-        "type": "string",
-        "visibility": "hidden"
-      },
-      {
-        "default": [
-          {
-            "name": "input1",
-            "type": "string",
-            "value": ""
-          }
-        ],
-        "label": "Inputs",
-        "name": "inputs",
-        "properties": [
-          {
-            "label": "Name",
-            "name": "name",
-            "placeholder": "input1",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "default": "string",
-            "label": "Type",
-            "name": "type",
-            "options": [
-              {
-                "label": "String",
-                "value": "string"
-              },
-              {
-                "label": "Number",
-                "value": "number"
-              },
-              {
-                "label": "Boolean",
-                "value": "boolean"
-              },
-              {
-                "label": "Object",
-                "value": "object"
-              },
-              {
-                "label": "Array",
-                "value": "array"
-              },
-              {
-                "label": "Files",
-                "value": "files"
-              }
-            ],
-            "type": "options"
-          },
-          {
-            "label": "Value",
-            "name": "value",
-            "placeholder": "Enter default value",
-            "type": "string"
-          }
-        ],
-        "type": "collection",
-        "typeOptions": {
-          "addButtonText": "Add input",
-          "autoIncrementField": "name",
-          "autoIncrementPrefix": "input",
-          "multipleValues": true
-        }
-      },
       {
         "default": 0,
         "description": "Number of times to retry this node on failure (0 = no retries).",

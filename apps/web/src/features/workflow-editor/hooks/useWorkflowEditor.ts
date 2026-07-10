@@ -238,7 +238,7 @@ export function useWorkflowEditor(workflowId: string, entity: EditorEntity = 'wo
   }, [])
 
   const runMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (inputData?: Record<string, unknown>) => {
       // Crews only expose POST /crews/{id}/run — no listen-slot path.
       if (entity === 'crew') {
         const res = await editorAPI.run(workflowId, 'crew')
@@ -262,7 +262,7 @@ export function useWorkflowEditor(workflowId: string, entity: EditorEntity = 'wo
           mode: 'listen' as const,
         }
       }
-      const res = await editorAPI.run(workflowId)
+      const res = await editorAPI.run(workflowId, 'workflow', inputData)
       return {
         execution_id: res.execution_id,
         waiting_for: null,
@@ -355,7 +355,7 @@ export function useWorkflowEditor(workflowId: string, entity: EditorEntity = 'wo
     renameNode,
     selectNode,
     // Actions
-    run: runMutation.mutate,
+    run: (inputData?: Record<string, unknown>) => runMutation.mutate(inputData),
     cancelListen: cancelListenMutation.mutate,
     rename: renameMutation.mutate,
     updateDescription: descriptionMutation.mutate,

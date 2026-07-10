@@ -54,10 +54,13 @@ export const editorAPI = {
       method: entity === 'crew' ? 'POST' : 'PATCH', // crew toggle is POST
     }),
 
-  run: (id: string, entity: EditorEntity = 'workflow') =>
+  run: (id: string, entity: EditorEntity = 'workflow', inputData?: Record<string, unknown>) =>
     requestJson(z.object({ execution_id: z.string() }), {
       url: entity === 'crew' ? API_ROUTES.CREW_RUN(id) : API_ROUTES.WORKFLOW_RUN(id),
       method: 'POST',
+      // Crews' run endpoint takes no body; workflows accept {input_data}
+      // for the Form trigger's run dialog.
+      ...(entity === 'workflow' && inputData ? { data: { input_data: inputData } } : {}),
     }),
 
   /**

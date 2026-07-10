@@ -1,48 +1,23 @@
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from apps.api.app.node_system.base.base_node import BaseNode
 from apps.api.app.node_system.base.node_context import NodeContext
 from apps.api.app.node_system.base.node_metadata import NodeMetadata
 from apps.api.app.node_system.base.node_result import NodeResult
 
-# Type catalog exposed to the inspector — also the universe of values the
-# coercer below understands. Keep in lockstep with the runtime coercion.
-_INPUT_TYPE_OPTIONS: list[dict[str, str]] = [
-    {"label": "String", "value": "string"},
-    {"label": "Number", "value": "number"},
-    {"label": "Boolean", "value": "boolean"},
-    {"label": "Object", "value": "object"},
-    {"label": "Array", "value": "array"},
-    {"label": "Files", "value": "files"},
-]
-
-_DEFAULT_INPUTS: list[dict[str, Any]] = [
-    {"name": "input1", "type": "string", "value": ""},
-]
-
 
 class TriggerProperties(BaseModel):
-    startWorkflow: str = "manual"
-    # User-defined input schema. The inspector renders this as the
-    # editable list of fields shown in the design mock — each row has
-    # name + type + default value.
-    inputs: list[dict[str, Any]] = Field(
-        # Start node ships with one ready-to-edit row so a fresh
-        # workflow doesn't open a totally blank inputs panel.
-        default_factory=lambda: [dict(row) for row in _DEFAULT_INPUTS]
-    )
+    """No config — the Manual trigger only starts the workflow."""
 
 
 class TriggerNode(BaseNode[TriggerProperties]):
-    """Manual "Start" trigger that lets users define a typed input schema.
+    """Bare manual trigger: fires the workflow, nothing else.
 
-    Each entry in ``inputs`` becomes a top-level field on this node's
-    ``output_data``, so downstream nodes can reach the value via
-    ``{{ $step.<name> }}`` or ``{{ $node('Start').<name> }}``. The
-    workflow's "Run" dialog can override defaults by passing the same
-    field names through ``input_data`` at execution time.
+    Workflows that need typed user inputs at run time use the Form
+    trigger (``trigger.form``) instead — this node deliberately has no
+    configuration.
     """
 
     @classmethod
@@ -53,152 +28,22 @@ class TriggerNode(BaseNode[TriggerProperties]):
     def get_metadata(cls) -> NodeMetadata:
         return NodeMetadata(
             type="trigger.manual",
-            name="Start",
+            name="Manual",
             category="trigger",
-            description="Initiate workflow execution manually",
+            description="Start the workflow manually. No configuration, no inputs.",
             icon="Play",
             color="#10b981",
-            properties=[
-                {
-                    "name": "startWorkflow",
-                    "label": "Start Workflow",
-                    "type": "string",
-                    "default": "manual",
-                    "visibility": "hidden",
-                },
-                {
-                    "name": "inputs",
-                    "label": "Inputs",
-                    "type": "collection",
-                    "default": [dict(row) for row in _DEFAULT_INPUTS],
-                    "typeOptions": {
-                        "multipleValues": True,
-                        "addButtonText": "Add input",
-                        # CollectionRenderer reads these to auto-fill the
-                        # `name` sub-field with `input1`, `input2`, …
-                        # each time the user adds a row. Generic — any
-                        # collection can opt in.
-                        "autoIncrementField": "name",
-                        "autoIncrementPrefix": "input",
-                    },
-                    "properties": [
-                        {
-                            "name": "name",
-                            "label": "Name",
-                            "type": "string",
-                            "placeholder": "input1",
-                            "required": True,
-                        },
-                        {
-                            "name": "type",
-                            "label": "Type",
-                            "type": "options",
-                            "default": "string",
-                            "options": _INPUT_TYPE_OPTIONS,
-                        },
-                        {
-                            "name": "value",
-                            "label": "Value",
-                            "type": "string",
-                            "placeholder": "Enter default value",
-                        },
-                    ],
-                },
-            ],
+            properties=[],
             inputs=0,
             outputs=1,
             outputs_schema=[
-                # Acts as a fallback when the user hasn't added any
-                # inputs yet — the inspector falls back to this static
-                # entry. Once `inputs` is populated, `dynamic_outputs_from`
-                # below takes over and exposes the user-defined names.
                 {"label": "input_data", "type": "object"},
             ],
-            dynamic_outputs_from="inputs",
         )
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
-        # Build the output dict from the user-defined schema, coercing
-        # each default to the declared type so downstream `{{ $step.x }}`
-        # references get a real number/bool/object instead of a stringy
-        # one. Anything that the workflow run-dialog passes in via
-        # ``input_data`` wins — that's how "run with values" overrides
-        # the defaults set in the editor.
-        #
-        # Defensive: rows with an empty or whitespace-only `name` (user
-        # added the row but never typed) and rows whose name collides
-        # with one already used are auto-recovered to `inputN` instead
-        # of being silently dropped. Dropping rows was the cause of the
-        # "only my first input shows up" report from the editor.
-        out: dict[str, Any] = {}
-        used: set[str] = set()
-        for idx, row in enumerate(self.props.inputs or [], start=1):
-            raw_name = row.get("name")
-            name = (raw_name if isinstance(raw_name, str) else "").strip()
-            if not name or name in used:
-                candidate = f"input{idx}"
-                bump = idx
-                while candidate in used:
-                    bump += 1
-                    candidate = f"input{bump}"
-                name = candidate
-            used.add(name)
-            declared_type = (row.get("type") or "string").lower()
-            raw_value = row.get("value")
-            out[name] = _coerce(raw_value, declared_type)
-        if isinstance(input_data, dict):
-            out.update(input_data)
-        return NodeResult(success=True, output_data=out)
-
-
-def _coerce(value: Any, declared_type: str) -> Any:
-    """Best-effort cast of a user-entered default into the declared type.
-
-    Returns the value untouched when it's already the right shape or
-    when conversion fails — runtime templates can still consume the raw
-    string in that case, which is friendlier than a hard failure on
-    workflow start.
-    """
-    if value is None or value == "":
-        # An unset default stays unset — the workflow run dialog can
-        # still fill it in via ``input_data`` overrides.
-        if declared_type == "string":
-            return ""
-        return None
-
-    if declared_type == "string":
-        return value if isinstance(value, str) else str(value)
-
-    if declared_type == "number":
-        if isinstance(value, int | float) and not isinstance(value, bool):
-            return value
-        try:
-            text = str(value).strip()
-            return float(text) if "." in text else int(text)
-        except (TypeError, ValueError):
-            return value
-
-    if declared_type == "boolean":
-        if isinstance(value, bool):
-            return value
-        text = str(value).strip().lower()
-        if text in {"true", "1", "yes", "y", "on"}:
-            return True
-        if text in {"false", "0", "no", "n", "off"}:
-            return False
-        return value
-
-    # "json" is the legacy alias used before the type catalog gained the
-    # object / array / files split — coerce identically so saved graphs
-    # from the previous PR don't break.
-    if declared_type in {"object", "array", "files", "json"}:
-        if isinstance(value, dict | list):
-            return value
-        import json
-
-        try:
-            return json.loads(str(value))
-        except (TypeError, ValueError, json.JSONDecodeError):
-            return value
-
-    return value
+        # Pass through whatever the run carried (usually {}), so callers
+        # that inject data programmatically still reach downstream nodes.
+        return NodeResult(
+            success=True, output_data=input_data if isinstance(input_data, dict) else {}
+        )

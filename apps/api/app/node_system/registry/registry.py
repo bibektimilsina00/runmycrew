@@ -92,6 +92,7 @@ from apps.api.app.node_system.nodes.common.json_transform.json_transform import 
 from apps.api.app.node_system.nodes.common.merge.merge import MergeNode
 from apps.api.app.node_system.nodes.common.set_variable.set_variable import SetVariableNode
 from apps.api.app.node_system.nodes.common.switch.switch import SwitchNode
+from apps.api.app.node_system.nodes.common.trigger.form import FormTriggerNode
 from apps.api.app.node_system.nodes.common.trigger.manual import TriggerNode
 from apps.api.app.node_system.nodes.common.wait.wait import WaitNode
 from apps.api.app.node_system.nodes.context_dev.context_dev_node import ContextNode
@@ -449,6 +450,7 @@ node_registry = NodeRegistry()
 
 # Register builtin nodes
 node_registry.register(TriggerNode)
+node_registry.register(FormTriggerNode)
 node_registry.register(ChatAppTriggerNode)
 node_registry.register(CronTriggerNode)
 node_registry.register(AgentNode)

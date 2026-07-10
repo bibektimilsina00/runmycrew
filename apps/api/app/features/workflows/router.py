@@ -3,6 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, Body, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import SQLModel
 
 from apps.api.app.core.database import get_db
 from apps.api.app.features.users.models import User
@@ -383,13 +384,21 @@ async def duplicate_workflow(
     return await service.create_workflow(data, current_user, workspace)
 
 
+class RunWorkflowIn(SQLModel):
+    # Client-provided graph avoids the auto-save race; omitted → persisted.
+    graph: dict[str, Any] | None = None
+    # Values collected by the Form trigger's run dialog. Reaches the
+    # trigger node as `input_data` and overrides its field defaults.
+    input_data: dict[str, Any] | None = None
+
+
 @router.post("/{workflow_id}/run")
 async def run_workflow(
     workflow_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
-    graph: dict[str, Any] | None = Body(default=None),
+    body: RunWorkflowIn | None = Body(default=None),
 ):
     service = WorkflowService(db)
     await WorkspaceService(db).require_edit(workspace.id, current_user)
@@ -399,9 +408,8 @@ async def run_workflow(
 
     execution_id = await execution_engine.trigger_workflow(
         workflow_id=workflow.id,
-        # Use client-provided graph if present (avoids auto-save race condition),
-        # fall back to persisted graph otherwise.
-        graph=graph if graph is not None else workflow.graph,
+        graph=(body.graph if body else None) or workflow.graph,
         trigger_type="manual",
+        input_data=(body.input_data if body else None) or None,
     )
     return {"execution_id": str(execution_id)}
