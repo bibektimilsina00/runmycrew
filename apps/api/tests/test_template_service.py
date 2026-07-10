@@ -64,8 +64,9 @@ def test_prepare_graph_strips_credential_ids():
     # Snapshot has the secrets scrubbed.
     assert snapshot["nodes"][0]["data"]["properties"]["credential"] == ""
     assert snapshot["nodes"][1]["data"]["properties"]["credential_id"] == ""
-    # Required lists derived from the graph.
-    assert "agent" in tools and "slack" in tools
+    # Required lists derived from the graph. Only credentialed nodes count
+    # as integrations — action.agent is a core node, not a tool chip.
+    assert "slack" in tools and "agent" not in tools
     assert len(creds) >= 1
 
 

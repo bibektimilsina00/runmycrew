@@ -22,7 +22,6 @@ from apps.api.app.features.users.models import User
 from apps.api.app.features.workflows.models import Workflow
 from apps.api.app.features.workflows.repository import WorkflowRepository
 from apps.api.app.features.workspaces.models import Workspace
-from apps.api.app.node_system.registry.registry import node_registry
 
 from .models import Template, TemplatePurchase
 from .repository import SortKey, TemplatePurchaseRepository, TemplateRepository
@@ -361,6 +360,13 @@ def _prepare_graph_snapshot(
     `credentials_required` + `tools_required` lists so the install-time
     check has accurate metadata without scanning the graph again.
     """
+    # Imported lazily: this service sits on the celery import path, and a
+    # module-level registry import re-enters the scheduler's
+    # integration_polling module while it is still initializing — the
+    # polling factory's register_poller back-import then fails and pollers
+    # are silently skipped (see polling_node_factory's try/except).
+    from apps.api.app.node_system.registry.registry import node_registry
+
     snapshot = copy.deepcopy(graph) if graph else {"nodes": [], "edges": []}
     creds: set[str] = set()
     tools: set[str] = set()

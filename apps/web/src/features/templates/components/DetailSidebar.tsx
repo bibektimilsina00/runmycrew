@@ -195,14 +195,6 @@ function BlockTitle({ icon, children }: { icon?: React.ReactNode; children: Reac
   )
 }
 
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-[6px] border border-border-faint bg-bg px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-mute">
-      {children}
-    </span>
-  )
-}
-
 function ResourceLink({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
     <button
@@ -233,13 +225,6 @@ function formatPrice(cents: number): string {
   if (cents <= 0) return 'Free'
   const dollars = cents / 100
   return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`
-}
-
-function humanCategory(cat: string): string {
-  return cat
-    .split('-')
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ')
 }
 
 function formatDate(iso: string): string {
