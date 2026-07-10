@@ -326,15 +326,38 @@ function ConnectedCard({
   )
 }
 
+/**
+ * Two marquee rows drifting in opposite directions, seamless loop
+ * (content rendered twice, keyframe slides -50%). Pauses on hover so
+ * tooltips/titles are readable; static grid when the user prefers
+ * reduced motion. Edge fade via mask so tiles dissolve instead of
+ * clipping at the border.
+ */
 function HeroCollage({ providers }: { providers: Provider[] }) {
-  const withIcons = providers.filter(p => p.icon_slug).slice(0, 14)
+  const withIcons = providers.filter(p => p.icon_slug)
+  if (withIcons.length === 0) return null
+  const mid = Math.ceil(withIcons.length / 2)
+  const rows: [Provider[], string][] = [
+    [withIcons.slice(0, mid), 'motion-safe:animate-[collage-scroll_45s_linear_infinite]'],
+    [withIcons.slice(mid), 'motion-safe:animate-[collage-scroll_60s_linear_infinite_reverse]'],
+  ]
   return (
-    <div className="relative overflow-hidden rounded-[14px] border border-border-faint bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.10),transparent_70%)] bg-bg2 px-5 py-4">
-      <div className="grid grid-cols-7 gap-3">
-        {withIcons.map(p => (
-          <BrandTile key={p.id} slug={p.icon_slug} label={p.name} />
-        ))}
-      </div>
+    <div className="relative flex flex-col gap-3 overflow-hidden rounded-[14px] border border-border-faint bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.10),transparent_70%)] bg-bg2 py-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      {rows.map(([row, anim], i) =>
+        row.length > 0 && (
+          <div key={i} className="flex w-max">
+            <div className={cn('flex w-max shrink-0 gap-3 pr-3 hover:[animation-play-state:paused]', anim)}>
+              {[0, 1].map(copy => (
+                <div key={copy} className="flex shrink-0 gap-3" aria-hidden={copy === 1}>
+                  {row.map(p => (
+                    <BrandTile key={`${p.id}-${copy}`} slug={p.icon_slug} label={p.name} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+      )}
     </div>
   )
 }

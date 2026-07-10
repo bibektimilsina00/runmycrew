@@ -293,6 +293,9 @@
 @keyframes template-edge-flow {
   to { stroke-dashoffset: -20; }
 }
+@keyframes collage-scroll {
+  to { transform: translateX(-50%); }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    BASE RESET
