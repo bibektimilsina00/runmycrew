@@ -378,6 +378,11 @@ class WorkflowRunner:
                 sub_runner._outputs = dict(self._outputs)
                 sub_runner._output_items = dict(self._output_items)
                 result = await sub_runner._execute_subgraph(start_id, item_input)
+                # A failed sub-run yields {} — surface the failure instead
+                # of discarding it, so orchestrators (Crew, ForEach) can
+                # report WHY a round died rather than silently retrying.
+                if sub_runner._failed.is_set() and not result:
+                    result = {"status": "failed", "error": sub_runner._error_message}
                 results.append(result)
                 async with self._lock:
                     self._outputs.update(sub_runner._outputs)

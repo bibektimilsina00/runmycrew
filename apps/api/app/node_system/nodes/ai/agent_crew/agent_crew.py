@@ -211,6 +211,18 @@ class AgentCrewNode(BaseNode[AgentCrewProperties]):
         accepted_changes = 1 if terminal == "success" else 0
         cost_per_accepted_change = (total_cost / accepted_changes) if accepted_changes else None
 
+        # Every round hard-failed (crew member node crashed — bad config,
+        # missing credential, …). Retrying can't help and there is no
+        # output; fail the node so the real reason reaches the user
+        # instead of a silent "no_op" success with empty content.
+        round_error = iteration_result.get("error") if isinstance(iteration_result, dict) else None
+        if terminal == "blocked" and round_error:
+            return NodeResult(
+                success=False,
+                error=f"Crew round {rounds_done} failed: {round_error}",
+                handled_successors=True,
+            )
+
         return NodeResult(
             success=True,
             output_data={
