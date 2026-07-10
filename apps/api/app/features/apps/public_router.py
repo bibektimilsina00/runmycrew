@@ -44,7 +44,9 @@ from apps.api.app.features.apps.schemas import (
     PublicAppOut,
     SendMessageOut,
     SessionEnvelope,
+    SessionListOut,
     SessionOut,
+    SessionSummaryOut,
 )
 from apps.api.app.features.apps.service import AppService, hash_ip
 from apps.api.app.features.apps.streaming import stream_execution_events
@@ -229,6 +231,95 @@ async def unlock_password(
     return {"unlocked": True}
 
 
+def _session_out(session) -> SessionOut:
+    return SessionOut(
+        id=session.id,
+        workflow_id=session.workflow_id,
+        crew_id=session.crew_id,
+        cookie_id=session.cookie_id,
+        user_id=session.user_id,
+        first_seen_at=session.first_seen_at,
+        last_seen_at=session.last_seen_at,
+        message_count=session.message_count,
+        total_cost_usd=session.total_cost_usd,
+        total_tokens=session.total_tokens,
+        is_blocked=session.is_blocked,
+    )
+
+
+@router.get("/{workspace_slug}/{app_slug}/sessions", response_model=SessionListOut)
+async def list_sessions(
+    workspace_slug: str,
+    app_slug: str,
+    request: Request,
+    session_cookie: str | None = Cookie(default=None, alias=SESSION_COOKIE),
+    unlock_cookie: str | None = Cookie(default=None, alias=UNLOCK_COOKIE),
+    db: AsyncSession = Depends(get_db),
+):
+    """The visitor's conversation history for the sidebar."""
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    await _enforce_auth(wf, props, request, unlock_cookie, db)
+    if session_cookie is None:
+        return SessionListOut(sessions=[])
+    rows = await service.list_sessions_with_titles(wf, session_cookie)
+    return SessionListOut(
+        sessions=[
+            SessionSummaryOut(
+                id=sess.id,
+                title=title,
+                message_count=sess.message_count,
+                last_seen_at=sess.last_seen_at,
+            )
+            for sess, title in rows
+        ]
+    )
+
+
+@router.post("/{workspace_slug}/{app_slug}/sessions", response_model=SessionEnvelope)
+async def new_session(
+    workspace_slug: str,
+    app_slug: str,
+    request: Request,
+    response: Response,
+    session_cookie: str | None = Cookie(default=None, alias=SESSION_COOKIE),
+    unlock_cookie: str | None = Cookie(default=None, alias=UNLOCK_COOKIE),
+    db: AsyncSession = Depends(get_db),
+):
+    """Start a fresh conversation (New chat)."""
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    user_id = await _enforce_auth(wf, props, request, unlock_cookie, db)
+    session = await service.create_session(
+        wf, cookie_id=session_cookie, user_id=user_id, ip=_client_ip(request)
+    )
+    _issue_session_cookie(response, workspace_slug, app_slug, session.cookie_id)
+    return SessionEnvelope(session=_session_out(session), messages=[])
+
+
+@router.get("/{workspace_slug}/{app_slug}/sessions/{session_id}", response_model=SessionEnvelope)
+async def get_session_by_id(
+    workspace_slug: str,
+    app_slug: str,
+    session_id: uuid.UUID,
+    request: Request,
+    session_cookie: str | None = Cookie(default=None, alias=SESSION_COOKIE),
+    unlock_cookie: str | None = Cookie(default=None, alias=UNLOCK_COOKIE),
+    db: AsyncSession = Depends(get_db),
+):
+    """Load one conversation's transcript (sidebar click)."""
+    service = AppService(db)
+    wf, props = await service.resolve_public_app(workspace_slug, app_slug)
+    await _enforce_auth(wf, props, request, unlock_cookie, db)
+    if session_cookie is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
+    session = await service.session_repo.get_by_id_for_cookie(wf, session_id, session_cookie)
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+    messages = await service.list_messages(session, limit=200)
+    return SessionEnvelope(session=_session_out(session), messages=[_msg_out(m) for m in messages])
+
+
 @router.post("/{workspace_slug}/{app_slug}/session", response_model=SessionEnvelope)
 async def get_or_create_session(
     workspace_slug: str,
@@ -284,9 +375,16 @@ async def send_message(
     service = AppService(db)
     wf, props = await service.resolve_public_app(workspace_slug, app_slug)
     user_id = await _enforce_auth(wf, props, request, unlock_cookie, db)
-    session = await service.get_or_create_session(
-        wf, cookie_id=session_cookie, user_id=user_id, ip=_client_ip(request)
-    )
+    if payload.session_id is not None:
+        session = await service.session_repo.get_by_id_for_cookie(
+            wf, payload.session_id, session_cookie
+        )
+        if not session:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+    else:
+        session = await service.get_or_create_session(
+            wf, cookie_id=session_cookie, user_id=user_id, ip=_client_ip(request)
+        )
     if session.is_blocked:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

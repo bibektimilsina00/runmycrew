@@ -16,14 +16,44 @@ class AppSessionRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_cookie(self, source: ChatAppSource, cookie_id: str) -> AppSession | None:
-        source_filter = (
+    @staticmethod
+    def _source_filter(source: ChatAppSource):
+        return (
             AppSession.crew_id == source.id
             if isinstance(source, Crew)
             else AppSession.workflow_id == source.id
         )
+
+    async def get_by_cookie(self, source: ChatAppSource, cookie_id: str) -> AppSession | None:
+        """Most recent session for this visitor — a cookie can own many."""
         result = await self.db.execute(
-            select(AppSession).where(source_filter, AppSession.cookie_id == cookie_id)
+            select(AppSession)
+            .where(self._source_filter(source), AppSession.cookie_id == cookie_id)
+            .order_by(AppSession.last_seen_at.desc())
+            .limit(1)
+        )
+        return result.scalars().first()
+
+    async def list_by_cookie(
+        self, source: ChatAppSource, cookie_id: str, limit: int = 50
+    ) -> list[AppSession]:
+        result = await self.db.execute(
+            select(AppSession)
+            .where(self._source_filter(source), AppSession.cookie_id == cookie_id)
+            .order_by(AppSession.last_seen_at.desc())
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def get_by_id_for_cookie(
+        self, source: ChatAppSource, session_id: uuid.UUID, cookie_id: str
+    ) -> AppSession | None:
+        result = await self.db.execute(
+            select(AppSession).where(
+                self._source_filter(source),
+                AppSession.id == session_id,
+                AppSession.cookie_id == cookie_id,
+            )
         )
         return result.scalar_one_or_none()
 

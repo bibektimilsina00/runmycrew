@@ -5,9 +5,11 @@ import {
   PublicAppSchema,
   SendMessageOutSchema,
   SessionEnvelopeSchema,
+  SessionListSchema,
   type PublicApp,
   type SendMessageOut,
   type SessionEnvelope,
+  type SessionSummary,
   type AppMessage,
 } from '../types/publicAppTypes'
 
@@ -51,6 +53,24 @@ export const publicAppAPI = {
       method: 'POST',
     }),
 
+  listSessions: (ws: string, slug: string): Promise<SessionSummary[]> =>
+    req(SessionListSchema, {
+      url: `${publicAppAPI.base(ws, slug)}/sessions`,
+      method: 'GET',
+    }).then(r => r.sessions),
+
+  newSession: (ws: string, slug: string): Promise<SessionEnvelope> =>
+    req(SessionEnvelopeSchema, {
+      url: `${publicAppAPI.base(ws, slug)}/sessions`,
+      method: 'POST',
+    }),
+
+  getSession: (ws: string, slug: string, sessionId: string): Promise<SessionEnvelope> =>
+    req(SessionEnvelopeSchema, {
+      url: `${publicAppAPI.base(ws, slug)}/sessions/${sessionId}`,
+      method: 'GET',
+    }),
+
   history: (ws: string, slug: string): Promise<AppMessage[]> =>
     req(z.array(AppMessageSchema), {
       url: `${publicAppAPI.base(ws, slug)}/history`,
@@ -60,7 +80,7 @@ export const publicAppAPI = {
   sendMessage: (
     ws: string,
     slug: string,
-    body: { message: string; form_data?: Record<string, unknown> },
+    body: { message: string; form_data?: Record<string, unknown>; session_id?: string },
   ): Promise<SendMessageOut> =>
     req(SendMessageOutSchema, {
       url: `${publicAppAPI.base(ws, slug)}/message`,

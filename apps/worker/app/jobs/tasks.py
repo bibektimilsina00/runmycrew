@@ -543,17 +543,14 @@ async def _run_app_message(
                     value.get("total_output_tokens") or 0
                 )
 
-        await emitter.emit(
-            "execution_completed",
-            {"status": "completed", "output": final_output},
-        )
+        terminal_event = ("execution_completed", {"status": "completed", "output": final_output})
     except CancelledException:
-        await emitter.emit("execution_cancelled", {"status": "cancelled"})
         error_msg = "Cancelled"
+        terminal_event = ("execution_cancelled", {"status": "cancelled"})
     except Exception as e:
         error_msg = str(e)
         logger.error(f"app-message execution {execution_id} failed: {error_msg}")
-        await emitter.emit("execution_failed", {"status": "failed", "error": error_msg})
+        terminal_event = ("execution_failed", {"status": "failed", "error": error_msg})
 
     latency_ms = int((time.time() - started_at) * 1000)
     reply_text, inline_artifacts = _extract_reply(final_output)
@@ -596,6 +593,11 @@ async def _run_app_message(
                     "total_tokens": (session.total_tokens or 0) + tokens,
                 },
             )
+
+    # Terminal event AFTER persistence: the SSE terminal frame is the
+    # client's cue to refetch — emitting it before the DB write raced the
+    # refetch and served stale transcripts/counts.
+    await emitter.emit(*terminal_event)
 
 
 def _walk_dict(obj):

@@ -76,6 +76,15 @@ export const AppMessageSchema = z.object({
 })
 export type AppMessage = z.infer<typeof AppMessageSchema>
 
+export const SessionSummarySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  message_count: z.number(),
+  last_seen_at: z.string(),
+})
+export const SessionListSchema = z.object({ sessions: z.array(SessionSummarySchema) })
+export type SessionSummary = z.infer<typeof SessionSummarySchema>
+
 export const SessionEnvelopeSchema = z.object({
   session: SessionSchema,
   messages: z.array(AppMessageSchema),

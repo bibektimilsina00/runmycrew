@@ -52,7 +52,7 @@ export function useSendMessage(
   }, [])
 
   const send = useCallback(
-    async (message: string, formData?: Record<string, unknown>) => {
+    async (message: string, formData?: Record<string, unknown>, sessionId?: string) => {
       esRef.current?.close()
       setState({ status: 'sending', assistant: null, error: null, activity: null })
 
@@ -61,6 +61,7 @@ export function useSendMessage(
         stream = await publicAppAPI.sendMessage(workspaceSlug, appSlug, {
           message,
           form_data: formData,
+          session_id: sessionId,
         })
       } catch (e) {
         setState({

@@ -27,6 +27,9 @@ class MessageIn(SQLModel):
     message: str = ""
     form_data: dict[str, Any] = Field(default_factory=dict)
     file_ids: list[uuid.UUID] = Field(default_factory=list)
+    # Target conversation. Omitted → the visitor's most recent session
+    # (pre-multi-conversation behaviour).
+    session_id: uuid.UUID | None = None
 
 
 class MessageOut(SQLModel):
@@ -61,6 +64,19 @@ class SessionOut(SQLModel):
 class SessionEnvelope(SQLModel):
     session: SessionOut
     messages: list[MessageOut]
+
+
+class SessionSummaryOut(SQLModel):
+    """Sidebar row for the visitor's conversation list."""
+
+    id: uuid.UUID
+    title: str
+    message_count: int
+    last_seen_at: datetime
+
+
+class SessionListOut(SQLModel):
+    sessions: list[SessionSummaryOut]
 
 
 class SendMessageOut(SQLModel):

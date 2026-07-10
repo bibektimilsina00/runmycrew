@@ -3,14 +3,21 @@ import { useParams } from 'react-router-dom'
 import { Loader2, PanelRightClose, PanelRightOpen } from 'lucide-react'
 import axios from 'axios'
 import { useAppConfig } from '../hooks/useAppConfig'
-import { useAppSession, useAppendMessage } from '../hooks/useAppSession'
+import {
+  useAppSession,
+  useAppendMessage,
+  useConversation,
+  useSessionList,
+} from '../hooks/useAppSession'
 import { useSendMessage } from '../hooks/useSendMessage'
+import { publicAppAPI } from '../services/publicAppAPI'
 import { ThemeProvider } from '../theme/ThemeProvider'
 import { AppHeader } from '../components/AppHeader'
 import { MessageBubble } from '../components/MessageBubble'
 import { WelcomeState } from '../components/WelcomeState'
 import { InputBar } from '../components/InputBar'
 import { CanvasView } from '../components/CanvasView'
+import { ChatSidebar } from '../components/ChatSidebar'
 import { PasswordGate } from '../components/PasswordGate'
 import { FormView } from '../components/FormView'
 import type { AttachedFile } from '../components/InputBar'
@@ -30,8 +37,16 @@ export function PublicApp() {
   const slug = params.appSlug ?? ''
 
   const configQuery = useAppConfig(ws, slug)
+  // Bootstrap: sets the visitor cookie + hands back the latest session.
   const sessionQuery = useAppSession(ws, slug, !!configQuery.data)
-  const append = useAppendMessage(ws, slug)
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const bootSessionId = sessionQuery.data?.session.id ?? null
+  const currentSessionId = activeSessionId ?? bootSessionId
+
+  const sessionsQuery = useSessionList(ws, slug, !!sessionQuery.data)
+  const conversationQuery = useConversation(ws, slug, currentSessionId)
+  const append = useAppendMessage(ws, slug, currentSessionId)
   const [draft, setDraft] = useState('')
   const [attachments, setAttachments] = useState<AttachedFile[]>([])
   const [uploading, setUploading] = useState(false)
@@ -64,9 +79,15 @@ export function PublicApp() {
   })
 
   const optimistic = useMemo(
-    () => sessionQuery.data?.messages ?? [],
-    [sessionQuery.data?.messages],
+    () => conversationQuery.data?.messages ?? [],
+    [conversationQuery.data?.messages],
   )
+
+  const startNewChat = async () => {
+    const envelope = await publicAppAPI.newSession(ws, slug)
+    setActiveSessionId(envelope.session.id)
+    await sessionsQuery.refetch()
+  }
 
   // Every artifact across the transcript + the in-flight assistant message,
   // deduped by id so a rerender doesn't duplicate stream frames.
@@ -116,7 +137,7 @@ export function PublicApp() {
     }
     append(userMsg)
     setDraft('')
-    void send(value)
+    void send(value, undefined, currentSessionId ?? undefined)
   }
 
   if (configQuery.isLoading) {
@@ -188,12 +209,7 @@ export function PublicApp() {
     return (
       <ThemeProvider config={app.config}>
         <div className="flex min-h-screen flex-col bg-[#0b0b0f] text-white">
-          <AppHeader
-            app={app}
-            onNewChat={() => {
-              sessionQuery.refetch()
-            }}
-          />
+          <AppHeader app={app} onNewChat={() => void startNewChat()} />
           <main className="flex min-h-0 flex-1 flex-col">
             {isEmpty ? (
               <FormView
@@ -225,7 +241,7 @@ export function PublicApp() {
   return (
     <ThemeProvider config={app.config}>
       <div
-        className="flex min-h-screen flex-col bg-[#0b0b0f] text-white"
+        className="flex h-screen flex-row bg-[#0b0b0f] text-white"
         style={{
           background:
             app.config.background_data && app.config.background === 'gradient'
@@ -233,19 +249,29 @@ export function PublicApp() {
               : undefined,
         }}
       >
-        <AppHeader
-          app={app}
-          onNewChat={() => {
-            sessionQuery.refetch()
-          }}
-        />
+        {/* Conversation rail — ChatGPT-style history. Hidden on mobile. */}
+        <div className="hidden h-full md:block">
+          <ChatSidebar
+            title={app.title}
+            logoUrl={app.config.logo_url as string | undefined}
+            sessions={sessionsQuery.data ?? []}
+            activeId={currentSessionId}
+            collapsed={sidebarCollapsed}
+            onToggleCollapsed={() => setSidebarCollapsed(v => !v)}
+            onNewChat={() => void startNewChat()}
+            onSelect={id => setActiveSessionId(id)}
+          />
+        </div>
+
+        <div className="flex h-full min-w-0 flex-1 flex-col">
+        <AppHeader app={app} onNewChat={() => void startNewChat()} />
 
         {/* Two-pane body: chat + canvas. Canvas hides on mobile below lg
             unless the user explicitly opens it, at which point it slides
             up as a bottom sheet. */}
         <div className="flex min-h-0 flex-1">
           <section className="flex min-w-0 flex-1 flex-col">
-            <main className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-4 sm:px-6">
+            <main className="mx-auto flex min-h-0 w-full max-w-[860px] flex-1 flex-col px-4 sm:px-6">
               <div ref={scrollRef} className="flex flex-1 flex-col gap-6 overflow-y-auto pb-24 pt-4">
                 {isEmpty ? (
                   <WelcomeState app={app} onPickPrompt={p => sendDraft(p)} />
@@ -270,7 +296,7 @@ export function PublicApp() {
                     onChange={setDraft}
                     onSubmit={() => sendDraft()}
                     onCancel={cancel}
-                    disabled={sessionQuery.isLoading}
+                    disabled={sessionQuery.isLoading || conversationQuery.isLoading}
                     isStreaming={sendState.status === 'streaming' || sendState.status === 'sending'}
                     placeholder={`Message ${app.title}…`}
                     allowFileUpload={!!app.config.allow_file_upload}
@@ -316,6 +342,7 @@ export function PublicApp() {
               />
             </div>
           )}
+        </div>
         </div>
       </div>
     </ThemeProvider>
