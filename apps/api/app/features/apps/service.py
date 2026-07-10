@@ -130,6 +130,38 @@ class AppService:
         )
         return await self.session_repo.create(session)
 
+    async def create_session(
+        self,
+        workflow: ChatAppSource,
+        cookie_id: str | None,
+        user_id: uuid.UUID | None,
+        ip: str | None,
+    ) -> AppSession:
+        """Always start a fresh conversation (ChatGPT-style New chat)."""
+        is_crew = isinstance(workflow, Crew)
+        session = AppSession(
+            workflow_id=None if is_crew else workflow.id,
+            crew_id=workflow.id if is_crew else None,
+            cookie_id=cookie_id or secrets.token_urlsafe(24),
+            user_id=user_id,
+            ip_hash=hash_ip(ip),
+        )
+        return await self.session_repo.create(session)
+
+    async def list_sessions_with_titles(
+        self, workflow: ChatAppSource, cookie_id: str
+    ) -> list[tuple[AppSession, str]]:
+        """Visitor's conversations, newest first, titled by their first
+        user message. One extra query per session — fine at the 50-row
+        cap; switch to a window function if that ever grows."""
+        sessions = await self.session_repo.list_by_cookie(workflow, cookie_id)
+        out: list[tuple[AppSession, str]] = []
+        for sess in sessions:
+            first = await self.message_repo.list_by_session(sess.id, limit=1)
+            title = (first[0].content or "").strip() if first else ""
+            out.append((sess, title[:80] or "New chat"))
+        return out
+
     async def list_messages(self, session: AppSession, limit: int = 100) -> list[AppMessage]:
         return await self.message_repo.list_by_session(session.id, limit=limit)
 
