@@ -79,6 +79,7 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
       onClose={busy ? () => {} : onClose}
       title={persona ? 'Edit persona' : 'New persona'}
       description="Reusable named agent — role, system prompt, default model and tools."
+      width="880px"
       footer={
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose} disabled={busy}>
@@ -90,120 +91,129 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
         </div>
       }
     >
-      <div className="flex flex-col gap-4">
-        <Field label="Name">
-          <Input
-            value={form.name}
-            onChange={e => patch('name', e.target.value)}
-            placeholder="Senior Code Reviewer"
-            autoFocus
-            maxLength={128}
-          />
-        </Field>
-
-        <Field label="Role" hint="Task planners route by role. Keep it short: researcher, reviewer, coder…">
-          <Input
-            value={form.role}
-            onChange={e => patch('role', e.target.value.toLowerCase().replace(/\s+/g, '_'))}
-            placeholder="reviewer"
-            maxLength={64}
-            list="persona-role-suggestions"
-          />
-          <datalist id="persona-role-suggestions">
-            {ROLE_SUGGESTIONS.map(r => (
-              <option key={r} value={r} />
-            ))}
-          </datalist>
-        </Field>
-
-        <Field label="Description">
-          <Textarea
-            value={form.description ?? ''}
-            onChange={e => patch('description', e.target.value)}
-            placeholder="Short summary of what this persona does."
-            rows={2}
-          />
-        </Field>
-
-        <Field label="System prompt" hint="Baked-in behavior contract; overlaid onto the agent node when picked.">
-          <Textarea
-            value={form.system_prompt ?? ''}
-            onChange={e => patch('system_prompt', e.target.value)}
-            placeholder="You are a rigorous reviewer. Score work on correctness, clarity, and completeness…"
-            rows={6}
-          />
-        </Field>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Default provider">
-            <Input
-              value={form.default_provider ?? ''}
-              onChange={e => patch('default_provider', e.target.value)}
-              placeholder="openai / anthropic / google"
-            />
-          </Field>
-
-          <Field label="Default model">
-            <Input
-              value={form.default_model ?? ''}
-              onChange={e => patch('default_model', e.target.value)}
-              placeholder="claude-sonnet-4-6"
-            />
-          </Field>
-
-          <Field label="Temperature">
-            <Input
-              type="number"
-              min={0}
-              max={2}
-              step={0.1}
-              value={form.temperature ?? 0.3}
-              onChange={e => patch('temperature', Number(e.target.value))}
-            />
-          </Field>
-
-          <Field label="Max iterations">
-            <Input
-              type="number"
-              min={1}
-              max={50}
-              value={form.max_iterations ?? 10}
-              onChange={e => patch('max_iterations', Number(e.target.value))}
-            />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Icon slug" hint="A lucide icon name — e.g. Bot, PenLine, Shield.">
-            <Input
-              value={form.icon_slug ?? ''}
-              onChange={e => patch('icon_slug', e.target.value)}
-              placeholder="Bot"
-            />
-          </Field>
-          <Field label="Color">
-            <Input
-              type="color"
-              value={form.color ?? '#8b5cf6'}
-              onChange={e => patch('color', e.target.value)}
-            />
-          </Field>
-        </div>
-
-        <label className="flex items-start gap-3 rounded-[10px] border border-border-faint bg-bg2 p-3">
-          <input
-            type="checkbox"
-            checked={!!form.is_public}
-            onChange={e => patch('is_public', e.target.checked)}
-            className="mt-0.5"
-          />
-          <div>
-            <div className="text-[13px] font-medium text-text">Share publicly</div>
-            <div className="text-[11.5px] text-text-mute">
-              Other workspaces can import a copy from the shared library. Your original stays editable.
-            </div>
+      {/* Fixed body height so the modal doesn't jump when the system-prompt
+          textarea grows. Two columns: identity + config on the left, system
+          prompt + share on the right. */}
+      <div className="grid h-[520px] grid-cols-[1fr_1.15fr] gap-6 overflow-y-auto pr-1">
+        {/* ── Left column: identity + defaults ─────────────────── */}
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Name">
+              <Input
+                value={form.name}
+                onChange={e => patch('name', e.target.value)}
+                placeholder="Senior Code Reviewer"
+                autoFocus
+                maxLength={128}
+              />
+            </Field>
+            <Field label="Role" hint="Short tag: researcher, reviewer…">
+              <Input
+                value={form.role}
+                onChange={e => patch('role', e.target.value.toLowerCase().replace(/\s+/g, '_'))}
+                placeholder="reviewer"
+                maxLength={64}
+                list="persona-role-suggestions"
+              />
+              <datalist id="persona-role-suggestions">
+                {ROLE_SUGGESTIONS.map(r => (
+                  <option key={r} value={r} />
+                ))}
+              </datalist>
+            </Field>
           </div>
-        </label>
+
+          <Field label="Description">
+            <Textarea
+              value={form.description ?? ''}
+              onChange={e => patch('description', e.target.value)}
+              placeholder="Short summary of what this persona does."
+              rows={2}
+            />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Default provider">
+              <Input
+                value={form.default_provider ?? ''}
+                onChange={e => patch('default_provider', e.target.value)}
+                placeholder="openai"
+              />
+            </Field>
+            <Field label="Default model">
+              <Input
+                value={form.default_model ?? ''}
+                onChange={e => patch('default_model', e.target.value)}
+                placeholder="claude-sonnet-4-6"
+              />
+            </Field>
+            <Field label="Temperature">
+              <Input
+                type="number"
+                min={0}
+                max={2}
+                step={0.1}
+                value={form.temperature ?? 0.3}
+                onChange={e => patch('temperature', Number(e.target.value))}
+              />
+            </Field>
+            <Field label="Max iterations">
+              <Input
+                type="number"
+                min={1}
+                max={50}
+                value={form.max_iterations ?? 10}
+                onChange={e => patch('max_iterations', Number(e.target.value))}
+              />
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-[1fr_92px] items-end gap-3">
+            <Field label="Icon slug" hint="lucide icon: Bot, PenLine, Shield…">
+              <Input
+                value={form.icon_slug ?? ''}
+                onChange={e => patch('icon_slug', e.target.value)}
+                placeholder="Bot"
+              />
+            </Field>
+            <Field label="Color">
+              <Input
+                type="color"
+                value={form.color ?? '#8b5cf6'}
+                onChange={e => patch('color', e.target.value)}
+                className="h-9 !p-1"
+              />
+            </Field>
+          </div>
+        </div>
+
+        {/* ── Right column: system prompt + share ──────────────── */}
+        <div className="flex flex-col gap-4">
+          <Field label="System prompt" hint="Baked-in behavior contract; overlaid onto the agent node when picked.">
+            <Textarea
+              value={form.system_prompt ?? ''}
+              onChange={e => patch('system_prompt', e.target.value)}
+              placeholder="You are a rigorous reviewer. Score work on correctness, clarity, and completeness…"
+              rows={13}
+              className="min-h-[300px] resize-none"
+            />
+          </Field>
+
+          <label className="flex items-start gap-3 rounded-[10px] border border-border-faint bg-bg2 p-3">
+            <input
+              type="checkbox"
+              checked={!!form.is_public}
+              onChange={e => patch('is_public', e.target.checked)}
+              className="mt-0.5"
+            />
+            <div>
+              <div className="text-[13px] font-medium text-text">Share publicly</div>
+              <div className="text-[11.5px] text-text-mute">
+                Other workspaces can import a copy from the shared library. Your original stays editable.
+              </div>
+            </div>
+          </label>
+        </div>
       </div>
     </Modal>
   )
