@@ -123,14 +123,23 @@ class ChatAppTriggerNode(BaseNode[ChatAppTriggerProperties]):
                     "description": "Shown as the page title and header.",
                 },
                 {
+                    # Auto-derived from the title server-side (see the apps
+                    # repository's slug fallback). Kept in the model for
+                    # explicit overrides via API, but not user-editable —
+                    # the inspector shows the derived link instead.
                     "name": "app_slug",
                     "label": "URL slug",
                     "type": "string",
-                    "placeholder": "support-bot",
-                    "description": (
-                        "URL-safe identifier. Full URL: /apps/{workspace}/{slug}. "
-                        "Leave empty to auto-generate from the title."
-                    ),
+                    "visibility": "hidden",
+                },
+                {
+                    # Virtual, read-only: renders the live public link with
+                    # copy/open actions. Not a stored value — the renderer
+                    # derives the URL from title/app_slug + workspace.
+                    "name": "app_url",
+                    "label": "Public link",
+                    "type": "app-link",
+                    "visibility": "user-only",
                 },
                 {
                     "name": "description",

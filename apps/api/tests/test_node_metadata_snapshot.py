@@ -44,6 +44,7 @@ _VALID_CATEGORIES = {"action", "ai", "integration", "logic", "trigger"}
 # (`gforms-response`, etc.) — keeping it explicit prevents typo-driven
 # silent drift.
 _VALID_FIELD_TYPES = {
+    "app-link",
     "boolean",
     "code",
     "collection",

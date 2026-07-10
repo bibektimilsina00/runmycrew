@@ -14,6 +14,7 @@ import { MessagesRenderer } from './renderers/MessagesRenderer'
 import { CollectionRenderer } from './renderers/CollectionRenderer'
 import { ToolSelectorRenderer } from './renderers/ToolSelectorRenderer'
 import { SkillSelectorRenderer } from './renderers/SkillSelectorRenderer'
+import { AppLinkRenderer } from './renderers/AppLinkRenderer'
 import { PersonaPickerRenderer } from './renderers/PersonaPickerRenderer'
 import { MetaResourceRenderer } from './renderers/MetaResourceRenderer'
 import { WATemplateRenderer } from './renderers/WATemplateRenderer'
@@ -41,6 +42,7 @@ export const FIELD_RENDERERS: Partial<Record<NodePropertyType, FieldRenderer>> =
   'fixed-collection': CollectionRenderer,
   'tool-selector':    ToolSelectorRenderer,
   'skill-selector':   SkillSelectorRenderer,
+  'app-link':         AppLinkRenderer,
   'persona-picker':   PersonaPickerRenderer,
   'meta-resource':    MetaResourceRenderer,
   'wa-template':      WATemplateRenderer,
