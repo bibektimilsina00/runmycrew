@@ -87,6 +87,19 @@ export function BottomPanel({
     e.dataTransfer.setData('text/plain', tab)
   }
 
+  // Register Ctrl+` keyboard shortcut (capturing phase to bypass input focus locks)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && (e.key === '`' || e.code === 'Backquote')) {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleZone('bottom')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown, { capture: true })
+    return () => window.removeEventListener('keydown', handleKeyDown, { capture: true })
+  }, [toggleZone])
+
   // collapsed = 36px header, open = bottomHeight.
   const totalHeight = bottomOpen ? bottomHeight : COLLAPSED_HEIGHT
 
@@ -115,7 +128,11 @@ export function BottomPanel({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className="flex h-[36px] shrink-0 items-stretch border-b border-[var(--border-faint)]"
+        onClick={!bottomOpen ? () => setZoneOpen('bottom', true) : undefined}
+        className={cn(
+          "flex h-[36px] shrink-0 items-stretch border-b border-[var(--border-faint)] select-none",
+          !bottomOpen && "cursor-pointer hover:bg-[var(--surface)]/30 transition-colors"
+        )}
       >
         <div className="flex flex-1 items-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map(({ id, label, Icon, locked }) => {
@@ -125,9 +142,12 @@ export function BottomPanel({
                 key={id}
                 draggable={!locked}
                 onDragStart={locked ? undefined : onTabDragStart(id)}
-                onClick={() => {
-                  if (active) setZoneOpen('bottom', false)
-                  else setBottomActive(id)
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!bottomOpen) {
+                    setZoneOpen('bottom', true)
+                  }
+                  setBottomActive(id)
                 }}
                 className={cn(
                   'relative flex shrink-0 items-center gap-1.5 px-3 text-[12px] font-medium leading-none whitespace-nowrap transition-colors duration-100',
@@ -147,7 +167,10 @@ export function BottomPanel({
         </div>
         <div className="flex items-center gap-1 px-2">
           <button
-            onClick={() => toggleZone('bottom')}
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleZone('bottom')
+            }}
             className="flex h-7 w-7 items-center justify-center rounded-[6px] text-[var(--text-mute)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)]"
             title={bottomOpen ? 'Collapse panel' : 'Expand panel'}
           >
