@@ -11,6 +11,7 @@ import { useEditorLayoutStore } from '../stores/editorLayoutStore'
 import { EditorCanvas } from '../components/canvas/EditorCanvas'
 import { EditorRightPanel } from '../components/right-panel/EditorRightPanel'
 import { BottomPanel } from '../components/bottom-panel/BottomPanel'
+import { useHostedListen } from '../hooks/useHostedListen'
 import { EditorLoading } from '../components/overlays/EditorLoading'
 import { EditorError } from '../components/overlays/EditorError'
 
@@ -104,6 +105,14 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
     })
   }, [diffActive, proposed, baseline, edges])
 
+  // Hosted triggers (Chat App / Form) route EVERY Run button through the
+  // listen flow — open the hosted page, wait for the visitor interaction.
+  const hosted = useHostedListen(id ?? '')
+  const handleRun = () => {
+    if (hosted.hasHostedTrigger) void hosted.startListening()
+    else run()
+  }
+
   const hasPending = useCopilotPendingStore(s => !!s.prompt)
   useEffect(() => {
     if (hasPending && workflow?.id) {
@@ -141,7 +150,7 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
             <BottomPanel
               nodes={nodes}
               updateNodeData={updateNodeData}
-              onRun={() => run()}
+              onRun={handleRun}
               isRunning={isRunning}
             />
           </div>
@@ -150,7 +159,7 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
           <EditorRightPanel
             nodes={nodes}
             updateNodeData={updateNodeData}
-            onRun={() => run()}
+            onRun={handleRun}
             isRunning={isRunning}
           />
         </div>
