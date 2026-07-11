@@ -22,6 +22,11 @@ export function useNodeExecutionStatus(nodeId: string): ExecutionStatus {
   const listeningHere = useListenState(
     (s) => !!workflowId && s.activeFor === workflowId && s.nodeId === nodeId,
   )
+  const runInFlight = useRunsStore((s) => {
+    if (!workflowId) return false
+    const latest = s.byWorkflow[workflowId]?.runs.at(-1)
+    return latest?.status === 'running'
+  })
   const runStatus = useRunsStore((s) => {
     if (!workflowId) return null
     const slice = s.byWorkflow[workflowId]
@@ -44,6 +49,10 @@ export function useNodeExecutionStatus(nodeId: string): ExecutionStatus {
     if (latest.status === 'running' && touched) return 'running'
     return null
   })
+  // While an execution is actually flowing, the real per-node lifecycle
+  // wins — the trigger completes and downstream nodes light up in turn.
+  // The listening pulse only covers the idle gaps between submissions.
+  if (runInFlight) return runStatus
   if (listeningHere) return 'running'
   return runStatus
 }

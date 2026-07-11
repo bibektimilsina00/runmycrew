@@ -61,7 +61,12 @@ export function useHostedListen(workflowId: string) {
       if (data?.type !== 'fuse-app-execution' || !data.executionId) return
       if (data.executionId === lastSeenExecutionId) return
       lastSeenExecutionId = data.executionId
-      useRunsStore.getState().startRun(workflowId, data.executionId)
+      const runs = useRunsStore.getState()
+      runs.startRun(workflowId, data.executionId)
+      // startRun only appends the row; the stream hook keys off
+      // activeExecutionId (the editor's own Run path sets it in its
+      // mutation onSuccess) — without this the WS never attached.
+      runs.setActiveExecutionId(workflowId, data.executionId)
       focusTab('logs')
     }
     window.addEventListener('message', onMessage)
