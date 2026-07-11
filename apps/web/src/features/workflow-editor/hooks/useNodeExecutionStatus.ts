@@ -1,5 +1,6 @@
 import { useRunsStore } from '@/features/runs/store/runsStore'
 import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
+import { useListenState } from './useHostedListen'
 
 export type ExecutionStatus = 'running' | 'completed' | 'failed' | null
 
@@ -15,7 +16,13 @@ export type ExecutionStatus = 'running' | 'completed' | 'failed' | null
  */
 export function useNodeExecutionStatus(nodeId: string): ExecutionStatus {
   const workflowId = useWorkflowEditorStore((s) => s.workflow?.id ?? null)
-  return useRunsStore((s) => {
+  // A hosted trigger (Chat App / Form) with an open listen is "running":
+  // the graph is live and waiting on the visitor. Keeps the node pulsing
+  // between submissions, matching the action bar's "Listening…" state.
+  const listeningHere = useListenState(
+    (s) => !!workflowId && s.activeFor === workflowId && s.nodeId === nodeId,
+  )
+  const runStatus = useRunsStore((s) => {
     if (!workflowId) return null
     const slice = s.byWorkflow[workflowId]
     if (!slice) return null
@@ -37,4 +44,6 @@ export function useNodeExecutionStatus(nodeId: string): ExecutionStatus {
     if (latest.status === 'running' && touched) return 'running'
     return null
   })
+  if (listeningHere) return 'running'
+  return runStatus
 }

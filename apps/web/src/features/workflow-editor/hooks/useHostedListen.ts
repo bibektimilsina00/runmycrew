@@ -18,10 +18,17 @@ import { slugifyAppUrl } from '@/features/public-app/utils/slug'
  * live, exactly like a webhook trigger's listen mode.
  */
 // Keyed by workflow id so navigating to another editor never inherits a
-// stale "Listening…" flag.
-const useListenState = create<{ activeFor: string | null; set: (v: string | null) => void }>(
-  set => ({ activeFor: null, set: v => set({ activeFor: v }) }),
-)
+// stale "Listening…" flag. `nodeId` is the hosted trigger node, so the
+// canvas can render it as running while the listen is open.
+export const useListenState = create<{
+  activeFor: string | null
+  nodeId: string | null
+  set: (workflowId: string | null, nodeId?: string | null) => void
+}>(set => ({
+  activeFor: null,
+  nodeId: null,
+  set: (workflowId, nodeId = null) => set({ activeFor: workflowId, nodeId }),
+}))
 
 // Both hook instances (action bar + page) register the same message
 // listener; process each execution id exactly once.
@@ -43,7 +50,8 @@ export function useHostedListen(workflowId: string) {
   // Shared across hook instances (action bar + page) so every Run button
   // reflects the same listening state.
   const listening = useListenState(s => s.activeFor === workflowId && !!workflowId)
-  const setListening = (v: boolean) => useListenState.getState().set(v ? workflowId : null)
+  const setListening = (v: boolean) =>
+    useListenState.getState().set(v ? workflowId : null, v ? (hostedNode?.id ?? null) : null)
 
   useEffect(() => {
     if (!listening || !workflowId) return
