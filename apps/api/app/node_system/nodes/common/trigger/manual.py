@@ -31,7 +31,7 @@ class TriggerNode(BaseNode[TriggerProperties]):
             name="Manual",
             category="trigger",
             description="Start the workflow manually. No configuration, no inputs.",
-            icon="Play",
+            icon="MousePointerClick",
             color="#10b981",
             properties=[],
             inputs=0,

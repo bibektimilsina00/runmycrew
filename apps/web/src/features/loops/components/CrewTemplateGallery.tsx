@@ -14,7 +14,7 @@ import type { StarterGraph } from '../utils/starterCrew'
  * crew with that graph and drops the user straight into the editor.
  */
 
-const TRIGGER_TYPE = 'trigger.manual'
+const TRIGGER_TYPE = 'trigger.chat_app'
 const COL_GAP = 300
 const ROW_Y = 200
 
@@ -78,7 +78,7 @@ function buildGraphForTemplate(template: Template, availableTypes: Set<string>):
   if (availableTypes.has(TRIGGER_TYPE)) {
     const id = crypto.randomUUID()
     idByKey.set('trigger', id)
-    nodes.push({ id, type: TRIGGER_TYPE, position: { x: 0, y: ROW_Y }, data: { label: 'Start', properties: {} } })
+    nodes.push({ id, type: TRIGGER_TYPE, position: { x: 0, y: ROW_Y }, data: { label: 'Chat App', properties: {} } })
   }
 
   template.chain.forEach((presetId, i) => {
