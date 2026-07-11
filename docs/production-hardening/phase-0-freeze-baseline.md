@@ -2,9 +2,9 @@
 
 ## Steps
 
-- [ ] **Feature freeze.** Until phase 7 closes, only `fix/`, `test/`, `chore/`, `docs/` branches merge to `main`. Branch protection stays as-is.
-- [ ] **Create the hardening board.** GitHub project "Production Hardening" with columns: `Backlog`, `In progress`, `Verify`, `Done`. Every finding from phases 1–6 becomes a card *before* it is fixed.
-- [ ] **Record the baseline.** Commit the numbers to this file so the after can be compared to the before:
+- [x] **Feature freeze.** Until phase 7 closes, only `fix/`, `test/`, `chore/`, `docs/` branches merge to `main`. Branch protection stays as-is.
+- [x] **Create the hardening board.** (as labeled issues #403–#410 — see note below) GitHub project "Production Hardening" with columns: `Backlog`, `In progress`, `Verify`, `Done`. Every finding from phases 1–6 becomes a card *before* it is fixed.
+- [x] **Record the baseline.** Commit the numbers to this file so the after can be compared to the before:
 
 ```bash
 # Backend coverage
@@ -12,15 +12,20 @@ cd apps/api && PYTHONPATH=../.. ../../.venv/bin/pytest ../../apps/api/tests -q \
   --cov=apps/api/app --cov-report=term | tail -20
 ```
 
-| Metric | Baseline (fill in) | After phase 7 |
+| Metric | Baseline (2026-07-11) | After phase 7 |
 |---|---|---|
 | Backend tests | 820 | |
-| Backend coverage % | | |
+| Backend coverage % | 46% (35,141 stmts, 18,944 missed) | |
 | Frontend tests | 0 | |
 | Automated E2E scenarios | 0 | |
-| Known criticals open | | |
+| Known criticals open | 0 known (phase 1/4 audits will populate) | |
 
-- [ ] **Snapshot prod state.** Note the deployed SHA (`git log origin/main -1`) and take one manual VPS DB dump before touching anything else (phase 5 automates this):
+**Deployed prod SHA at freeze:** `dc39e7de` (docs: production hardening plan, #402).
+**Pre-hardening dump:** `backups/pre-hardening-2026-07-11.sql.gz` (83K, 35 tables, gzip-verified) — move a copy OFF this machine.
+**Board:** `hardening`-labeled issues #403–#410 (one per phase; `gh issue list -l hardening`). GitHub Project skipped — CLI token lacks `project` scope; run `gh auth refresh -s project,read:project` if you want a real board later.
+**Coverage command used:** `./.venv/bin/python -m pytest apps/api/tests -q --cov=apps/api/app --cov-report=term` (pytest-cov installed via uv).
+
+- [x] **Snapshot prod state.** Note the deployed SHA (`git log origin/main -1`) and take one manual VPS DB dump before touching anything else (phase 5 automates this):
 
 ```bash
 ssh root@<vps> 'docker exec runmycrew-db-1 pg_dump -U postgres runmycrew | gzip' \
