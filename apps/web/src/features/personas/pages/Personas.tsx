@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Globe, Plus, Search, Sparkles, Users as UsersIcon } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
+import { Globe, Plus, Search, Sparkles } from 'lucide-react'
 import { Button, useConfirm } from '@/shared/components'
 import {
   usePersonas,
@@ -142,29 +143,39 @@ export function Personas() {
                   personas other workspaces made public — tap to import a copy
                 </span>
               </div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {publicPersonas.map(p => (
-                  <button
-                    key={p.id}
-                    onClick={() => importPersona.mutate(p.id)}
-                    disabled={importPersona.isPending}
-                    className="flex items-start gap-3 rounded-[10px] border border-dashed border-border-faint bg-bg2/60 p-3 text-left transition-colors hover:border-border hover:bg-bg2 disabled:opacity-60"
-                  >
-                    <span
-                      className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-[7px] text-[12px]"
-                      style={{ background: `${p.color ?? '#8b5cf6'}22`, color: p.color ?? '#8b5cf6' }}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {publicPersonas.map(p => {
+                  const color = p.color || '#8b5cf6'
+                  const slug = p.icon_slug || 'Globe'
+                  const IconCmp = (LucideIcons as unknown as Record<string, React.FC<{ size?: number }>>)[slug] || Globe
+
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => importPersona.mutate(p.id)}
+                      disabled={importPersona.isPending}
+                      className="group relative flex flex-col gap-3 rounded-[12px] border border-dashed border-border-faint bg-bg2/60 p-4 text-left transition-colors hover:border-border hover:bg-bg2 disabled:opacity-60"
                     >
-                      <Globe size={14} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[13px] font-medium text-text">{p.name}</div>
-                      <div className="text-[10.5px] uppercase tracking-wider text-text-faint">{p.role}</div>
+                      <div className="flex items-start gap-3">
+                        <span
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[9px]"
+                          style={{ background: `${color}22`, color }}
+                        >
+                          <IconCmp size={18} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[14px] font-semibold text-text">{p.name}</div>
+                          <div className="mt-0.5 text-[11px] uppercase tracking-wider text-text-faint">{p.role}</div>
+                        </div>
+                      </div>
                       {p.description && (
-                        <div className="mt-1 line-clamp-2 text-[11.5px] text-text-mute">{p.description}</div>
+                        <p className="line-clamp-3 text-[12.5px] leading-relaxed text-text-mute">
+                          {p.description}
+                        </p>
                       )}
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  )
+                })}
               </div>
             </section>
           )}
@@ -176,25 +187,38 @@ export function Personas() {
                 <h2 className="text-[13px] font-semibold text-text">Starter templates</h2>
                 <span className="text-[11px] text-text-faint">tap to spin up a new persona</span>
               </div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {suggestions.map(s => (
-                  <button
-                    key={s.role}
-                    onClick={() => openNew(s)}
-                    className="flex items-start gap-3 rounded-[10px] border border-dashed border-border-faint bg-bg2/60 p-3 text-left transition-colors hover:border-border hover:bg-bg2"
-                  >
-                    <span
-                      className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-[7px] text-[12px]"
-                      style={{ background: `${s.color}22`, color: s.color ?? undefined }}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {suggestions.map(s => {
+                  const color = s.color || '#8b5cf6'
+                  const slug = s.icon_slug || 'Users'
+                  const IconCmp = (LucideIcons as unknown as Record<string, React.FC<{ size?: number }>>)[slug] || LucideIcons.Users
+
+                  return (
+                    <button
+                      key={s.role}
+                      onClick={() => openNew(s)}
+                      className="group relative flex flex-col gap-3 rounded-[12px] border border-dashed border-border-faint bg-bg2/60 p-4 text-left transition-colors hover:border-border hover:bg-bg2"
                     >
-                      <UsersIcon size={14} />
-                    </span>
-                    <div className="min-w-0">
-                      <div className="text-[13px] font-medium text-text">{s.name}</div>
-                      <div className="mt-0.5 line-clamp-2 text-[11.5px] text-text-mute">{s.description}</div>
-                    </div>
-                  </button>
-                ))}
+                      <div className="flex items-start gap-3">
+                        <span
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[9px]"
+                          style={{ background: `${color}22`, color }}
+                        >
+                          <IconCmp size={18} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[14px] font-semibold text-text">{s.name}</div>
+                          <div className="mt-0.5 text-[11px] uppercase tracking-wider text-text-faint">{s.role}</div>
+                        </div>
+                      </div>
+                      {s.description && (
+                        <p className="line-clamp-3 text-[12.5px] leading-relaxed text-text-mute">
+                          {s.description}
+                        </p>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </section>
           )}
@@ -217,7 +241,7 @@ function EmptyState({ onCreate, suggestions }: { onCreate: (seed?: PersonaCreate
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center gap-3 rounded-[12px] border border-dashed border-border-faint bg-bg p-10 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-accent/10 text-accent">
-          <UsersIcon size={20} />
+          <LucideIcons.Users size={20} />
         </div>
         <h2 className="text-[15px] font-semibold text-text">No personas yet</h2>
         <p className="max-w-md text-[12.5px] text-text-mute">
@@ -236,27 +260,37 @@ function EmptyState({ onCreate, suggestions }: { onCreate: (seed?: PersonaCreate
           <h2 className="text-[13px] font-semibold text-text">Starter templates</h2>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {suggestions.map(s => (
-            <button
-              key={s.role}
-              onClick={() => onCreate(s)}
-              className="flex flex-col gap-2 rounded-[12px] border border-border-faint bg-bg2 p-4 text-left transition-colors hover:border-border"
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className="flex h-9 w-9 items-center justify-center rounded-[8px]"
-                  style={{ background: `${s.color}22`, color: s.color ?? undefined }}
-                >
-                  <UsersIcon size={16} />
-                </span>
-                <div>
-                  <div className="text-[13.5px] font-semibold text-text">{s.name}</div>
-                  <div className="text-[10.5px] uppercase tracking-wider text-text-faint">{s.role}</div>
+          {suggestions.map(s => {
+            const color = s.color || '#8b5cf6'
+            const slug = s.icon_slug || 'Users'
+            const IconCmp = (LucideIcons as unknown as Record<string, React.FC<{ size?: number }>>)[slug] || LucideIcons.Users
+
+            return (
+              <button
+                key={s.role}
+                onClick={() => onCreate(s)}
+                className="group relative flex flex-col gap-3 rounded-[12px] border border-border-faint bg-bg2 p-4 text-left transition-colors hover:border-border"
+              >
+                <div className="flex items-start gap-3">
+                  <span
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[9px]"
+                    style={{ background: `${color}22`, color }}
+                  >
+                    <IconCmp size={18} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14px] font-semibold text-text">{s.name}</div>
+                    <div className="mt-0.5 text-[11px] uppercase tracking-wider text-text-faint">{s.role}</div>
+                  </div>
                 </div>
-              </div>
-              <p className="text-[12px] text-text-mute">{s.description}</p>
-            </button>
-          ))}
+                {s.description && (
+                  <p className="line-clamp-3 text-[12.5px] leading-relaxed text-text-mute">
+                    {s.description}
+                  </p>
+                )}
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>

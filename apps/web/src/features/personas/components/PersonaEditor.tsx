@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Modal, Input, Textarea, Button } from '@/shared/components'
+import * as LucideIcons from 'lucide-react'
+import { Modal, Input, Textarea, Button, FormField, Checkbox, ColorPicker, Tooltip } from '@/shared/components'
 import type { Persona, PersonaCreateRequest } from '../types/personaTypes'
 import { useCreatePersona, useUpdatePersona } from '../hooks/usePersonas'
 
@@ -27,6 +28,17 @@ const emptyForm: PersonaCreateRequest = {
   max_iterations: 10,
   is_public: false,
 }
+
+const FieldLabel = ({ text, tooltip }: { text: string; tooltip?: string }) => (
+  <div className="flex items-center gap-1.5 text-xs font-semibold text-text-mute select-none mb-1">
+    <span>{text}</span>
+    {tooltip && (
+      <Tooltip content={tooltip}>
+        <LucideIcons.HelpCircle size={13} className="text-text-faint hover:text-text-mute cursor-help transition-colors" />
+      </Tooltip>
+    )}
+  </div>
+)
 
 export function PersonaEditor({ open, persona, seed, onClose, onSaved }: PersonaEditorProps) {
   const [form, setForm] = useState<PersonaCreateRequest>(() => {
@@ -79,7 +91,7 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
       onClose={busy ? () => {} : onClose}
       title={persona ? 'Edit persona' : 'New persona'}
       description="Reusable named agent — role, system prompt, default model and tools."
-      width="880px"
+      width="900px"
       footer={
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose} disabled={busy}>
@@ -91,14 +103,12 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
         </div>
       }
     >
-      {/* Fixed body height so the modal doesn't jump when the system-prompt
-          textarea grows. Two columns: identity + config on the left, system
-          prompt + share on the right. */}
-      <div className="grid h-[520px] grid-cols-[1fr_1.15fr] gap-6 overflow-y-auto pr-1">
-        {/* ── Left column: identity + defaults ─────────────────── */}
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Name">
+      <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-8 h-[420px] pr-1">
+        {/* ── Left Column: Identity & Settings ─────────────────── */}
+        <div className="flex flex-col gap-4 h-full justify-between">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField required>
+              <FieldLabel text="Name" />
               <Input
                 value={form.name}
                 onChange={e => patch('name', e.target.value)}
@@ -106,8 +116,9 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
                 autoFocus
                 maxLength={128}
               />
-            </Field>
-            <Field label="Role" hint="Short tag: researcher, reviewer…">
+            </FormField>
+            <FormField required>
+              <FieldLabel text="Role" tooltip="Short tag matching the agent's task: e.g. researcher, reviewer, coder" />
               <Input
                 value={form.role}
                 onChange={e => patch('role', e.target.value.toLowerCase().replace(/\s+/g, '_'))}
@@ -120,34 +131,50 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
                   <option key={r} value={r} />
                 ))}
               </datalist>
-            </Field>
+            </FormField>
           </div>
 
-          <Field label="Description">
+          <FormField>
+            <FieldLabel text="Description" />
             <Textarea
               value={form.description ?? ''}
               onChange={e => patch('description', e.target.value)}
               placeholder="Short summary of what this persona does."
               rows={2}
+              className="resize-none bg-[#262626]"
             />
-          </Field>
+          </FormField>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Default provider">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField>
+              <FieldLabel text="Default Provider" />
               <Input
                 value={form.default_provider ?? ''}
                 onChange={e => patch('default_provider', e.target.value)}
                 placeholder="openai"
               />
-            </Field>
-            <Field label="Default model">
+            </FormField>
+            <FormField>
+              <FieldLabel text="Default Model" />
               <Input
                 value={form.default_model ?? ''}
                 onChange={e => patch('default_model', e.target.value)}
                 placeholder="claude-sonnet-4-6"
               />
-            </Field>
-            <Field label="Temperature">
+            </FormField>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <FormField>
+              <FieldLabel text="Icon Slug" tooltip="Lucide icon name (Bot, PenLine, Shield, Code...)" />
+              <Input
+                value={form.icon_slug ?? ''}
+                onChange={e => patch('icon_slug', e.target.value)}
+                placeholder="Bot"
+              />
+            </FormField>
+            <FormField>
+              <FieldLabel text="Temperature" />
               <Input
                 type="number"
                 min={0}
@@ -156,8 +183,9 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
                 value={form.temperature ?? 0.3}
                 onChange={e => patch('temperature', Number(e.target.value))}
               />
-            </Field>
-            <Field label="Max iterations">
+            </FormField>
+            <FormField>
+              <FieldLabel text="Max Iterations" />
               <Input
                 type="number"
                 min={1}
@@ -165,66 +193,44 @@ export function PersonaEditor({ open, persona, seed, onClose, onSaved }: Persona
                 value={form.max_iterations ?? 10}
                 onChange={e => patch('max_iterations', Number(e.target.value))}
               />
-            </Field>
+            </FormField>
           </div>
 
-          <div className="grid grid-cols-[1fr_92px] items-end gap-3">
-            <Field label="Icon slug" hint="lucide icon: Bot, PenLine, Shield…">
-              <Input
-                value={form.icon_slug ?? ''}
-                onChange={e => patch('icon_slug', e.target.value)}
-                placeholder="Bot"
+          <FormField>
+            <FieldLabel text="Color Theme" />
+            <div className="flex h-9 items-center">
+              <ColorPicker
+                value={form.color ?? null}
+                onChange={val => patch('color', val)}
               />
-            </Field>
-            <Field label="Color">
-              <Input
-                type="color"
-                value={form.color ?? '#8b5cf6'}
-                onChange={e => patch('color', e.target.value)}
-                className="h-9 !p-1"
-              />
-            </Field>
-          </div>
+            </div>
+          </FormField>
         </div>
 
-        {/* ── Right column: system prompt + share ──────────────── */}
-        <div className="flex flex-col gap-4">
-          <Field label="System prompt" hint="Baked-in behavior contract; overlaid onto the agent node when picked.">
+        {/* ── Right Column: Prompt & Sharing ─────────────────── */}
+        <div className="flex flex-col gap-4 h-full justify-between">
+          <div className="flex flex-col flex-1 min-h-0 gap-1">
+            <FieldLabel text="System Prompt" tooltip="Baked-in behavior contract; overlaid onto the agent node when picked." />
             <Textarea
               value={form.system_prompt ?? ''}
               onChange={e => patch('system_prompt', e.target.value)}
               placeholder="You are a rigorous reviewer. Score work on correctness, clarity, and completeness…"
-              rows={13}
-              className="min-h-[300px] resize-none"
+              className="flex-1 min-h-0 resize-none bg-[#262626]"
             />
-          </Field>
+          </div>
 
-          <label className="flex items-start gap-3 rounded-[10px] border border-border-faint bg-bg2 p-3">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-4 rounded-[10px] border border-border-faint bg-bg2/40 p-3 h-[58px] shrink-0">
+            <Checkbox
               checked={!!form.is_public}
               onChange={e => patch('is_public', e.target.checked)}
-              className="mt-0.5"
+              label="Share publicly"
             />
-            <div>
-              <div className="text-[13px] font-medium text-text">Share publicly</div>
-              <div className="text-[11.5px] text-text-mute">
-                Other workspaces can import a copy from the shared library. Your original stays editable.
-              </div>
-            </div>
-          </label>
+            <span className="text-[11px] text-text-faint flex-1">
+              Workspaces can import a copy from the shared library.
+            </span>
+          </div>
         </div>
       </div>
     </Modal>
-  )
-}
-
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-medium uppercase tracking-wider text-text-mute">{label}</span>
-      {children}
-      {hint && <span className="text-[11px] text-text-faint">{hint}</span>}
-    </label>
   )
 }
