@@ -91553,7 +91553,7 @@
     "default_width": null,
     "description": "Start the workflow manually. No configuration, no inputs.",
     "dynamic_outputs_from": null,
-    "icon": "Play",
+    "icon": "MousePointerClick",
     "inputs": 0,
     "name": "Manual",
     "operation_tool_map": null,

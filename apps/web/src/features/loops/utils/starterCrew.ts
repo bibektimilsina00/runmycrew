@@ -9,9 +9,10 @@ export interface StarterGraph {
   edges: Array<{ id: string; source: string; target: string }>
 }
 
-const TRIGGER_TYPE = 'trigger.manual'
+// Crews are conversational by default — the natural entry is the hosted chat.
+const TRIGGER_TYPE = 'trigger.chat_app'
 
-// Ordered spec for the starter crew: a manual trigger, then the orchestrator
+// Ordered spec for the starter crew: the chat trigger, then the orchestrator
 // and the three worker roles left→right. Each role points at a CrewPreset id so
 // labels + default properties stay in one place.
 const CHAIN: Array<{ presetId: string; label: string }> = [
@@ -46,7 +47,7 @@ export function buildStarterCrew(availableTypes: Set<string>): StarterGraph {
       id,
       type: TRIGGER_TYPE,
       position: { x: 0, y: ROW_Y },
-      data: { label: 'Start', properties: {} },
+      data: { label: 'Chat App', properties: {} },
     })
   }
 
