@@ -48,12 +48,14 @@ export function LogRow({ log, selected, nodeInfo, onClick }: Props) {
       )}
     >
       <div
-        className="flex size-[20px] shrink-0 items-center justify-center rounded-[5px]"
-        style={{ background: nodeInfo.color ?? 'var(--surface-3)' }}
+        className={`flex size-[22px] shrink-0 items-center justify-center rounded-[5px] transition-shadow duration-200 ${
+          nodeInfo.color === '#ffffff' ? 'bg-white border border-zinc-700/30 shadow-[0_1px_2px_rgba(0,0,0,0.2)]' : 'shadow-sm'
+        }`}
+        style={nodeInfo.color !== '#ffffff' ? { background: nodeInfo.color ?? 'var(--surface-3)' } : undefined}
       >
         {React.cloneElement(
           getIcon(nodeInfo.icon) as React.ReactElement<{ className?: string }>,
-          { className: 'size-[12px] text-white' },
+          { className: 'size-[13px] text-white' },
         )}
       </div>
       <span

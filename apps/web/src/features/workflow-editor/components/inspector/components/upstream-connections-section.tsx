@@ -236,12 +236,14 @@ function AncestorRow({ ancestor }: { ancestor: Ancestor }) {
       >
         {definition && (
           <div
-            className="flex size-[20px] shrink-0 items-center justify-center rounded-[5px]"
-            style={{ background: definition.color ?? 'var(--surface-3)' }}
+            className={`flex size-[22px] shrink-0 items-center justify-center rounded-[5px] transition-shadow duration-200 ${
+              definition.color === '#ffffff' ? 'bg-white border border-zinc-700/30 shadow-[0_1px_2px_rgba(0,0,0,0.2)]' : 'shadow-sm'
+            }`}
+            style={definition.color !== '#ffffff' ? { background: definition.color ?? 'var(--surface-3)' } : undefined}
           >
             {React.cloneElement(
               getIcon(definition.icon) as React.ReactElement<{ className?: string }>,
-              { className: 'size-[12px] text-white' },
+              { className: 'size-[13px] text-white' },
             )}
           </div>
         )}
