@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useReactFlow } from 'reactflow'
@@ -6,9 +6,7 @@ import { useWorkflowEditorStore } from '../stores/workflowEditorStore'
 import { useEditorLayoutStore } from '../stores/editorLayoutStore'
 import { editorAPI } from '../services/editorAPI'
 import { useToast } from '@/shared/components'
-import { useRunsStore } from '@/features/runs/store/runsStore'
-import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
-import { slugifyAppUrl } from '@/features/public-app/utils/slug'
+import { useHostedListen } from './useHostedListen'
 
 export interface ActionMenuItem {
   label: string
@@ -51,63 +49,12 @@ export function useEditorActionBar() {
     onError: () => toast('Failed to update state', { variant: 'err' }),
   })
 
-  // ── Hosted-trigger test loop ───────────────────────────────────────
-  // Chat App and Form triggers fire per visitor interaction — a bare Run
-  // has no payload. Run opens the hosted page (chat or form) and stays
-  // "listening": the page posts each execution id back (same-origin
-  // postMessage) and the log panel attaches to it live, exactly like a
-  // webhook trigger's listen mode.
-  const chatAppNode = nodes.find(
-    n => n.type === 'trigger.chat_app' || n.type === 'trigger.form',
-  )
-  const hasChatAppTrigger = Boolean(chatAppNode)
-  const [chatListening, setChatListening] = useState(false)
-  const wsSlug = useWorkspaceStore(s => s.currentWorkspace?.slug ?? '')
-
-  useEffect(() => {
-    if (!chatListening || !workflowId) return
-    const onMessage = (e: MessageEvent) => {
-      if (e.origin !== window.location.origin) return
-      const data = e.data as { type?: string; executionId?: string } | null
-      if (data?.type !== 'fuse-app-execution' || !data.executionId) return
-      useRunsStore.getState().startRun(workflowId, data.executionId)
-      focusTab('logs')
-    }
-    window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
-  }, [chatListening, workflowId, focusTab])
-
-  const startChatListening = async () => {
-    if (!workflow) return
-    // Open the tab synchronously inside the click — awaiting activation
-    // first would detach the user gesture and popup blockers eat the
-    // window. Navigate it once the page is actually live.
-    // (No 'noreferrer': it severs window.opener, which the hosted page
-    // uses to post execution ids back. Same-origin page we own — safe.)
-    const win = window.open('', '_blank')
-    if (!workflow.is_active) {
-      try {
-        await activateMutation.mutateAsync()
-      } catch {
-        win?.close()
-        return
-      }
-    }
-    const props = (chatAppNode?.data?.properties ?? {}) as Record<string, unknown>
-    const raw = (props.app_slug as string) || (props.title as string) || workflow.name
-    const href = `/apps/${wsSlug}/${slugifyAppUrl(raw)}`
-    if (win) win.location.href = href
-    else window.open(href, '_blank')
-    setChatListening(true)
-    toast(
-      chatAppNode?.type === 'trigger.form'
-        ? 'Listening — the graph runs when the form is submitted'
-        : 'Listening — each chat message runs the graph live',
-      { variant: 'ok' },
-    )
-  }
-
-  const stopChatListening = () => setChatListening(false)
+  const {
+    hasHostedTrigger: hasChatAppTrigger,
+    listening: chatListening,
+    startListening: startChatListening,
+    stopListening: stopChatListening,
+  } = useHostedListen(workflowId ?? '')
 
   const openMenu = () => setAnchorRect(btnRef.current?.getBoundingClientRect() ?? null)
   const closeMenu = () => setAnchorRect(null)
