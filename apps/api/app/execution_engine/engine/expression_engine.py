@@ -149,12 +149,13 @@ class JsonataResolver:
         """Return the data dict of the item that fed the current node.
 
         Looks up ``node_items[incoming.source_node_id][incoming.source_item_index]``
-        and returns its ``data`` payload. Returns ``None`` when no incoming
-        provenance was supplied (entry nodes, or resolver built without
-        graph context).
+        and returns its ``data`` payload. When no incoming provenance was
+        supplied (the first node of an orchestrated sub-graph — crew rounds,
+        ForEach bodies — or an entry node), falls back to the node's raw
+        input: "$step is whatever fed this node" stays true either way.
         """
         if self._incoming is None:
-            return None
+            return self._context if isinstance(self._context, dict) else None
         item = self._lookup_item(self._incoming.source_node_id, self._incoming.source_item_index)
         return item.data if item is not None else None
 

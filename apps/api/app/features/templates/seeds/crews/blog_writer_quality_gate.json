@@ -1,0 +1,140 @@
+{
+  "id": "crew-blog-writer-quality-gate",
+  "name": "Blog Writer with Quality Gate",
+  "category": "crews",
+  "summary": "Fill a form with a topic and audience; a writer drafts the post and an editor-judge blocks publication until clarity, structure, and engagement all score high enough.",
+  "description": "Content pipeline as a verified loop.\n\n1. Submit the hosted form (topic + audience).\n2. The Writer drafts the post, revising with the editor's feedback each round.\n3. The Editor Judge scores clarity, structure, and engagement; >= 60% passes.\n4. Up to 4 rounds, capped at $0.50 per submission.\n\nAfter installing: open the Writer + Editor Judge nodes and pick your AI credential, then press Run to open the form.",
+  "tags": [
+    "crew",
+    "form",
+    "content",
+    "verified"
+  ],
+  "workflow": {
+    "name": "Blog Writer with Quality Gate",
+    "graph": {
+      "nodes": [
+        {
+          "id": "form",
+          "type": "trigger.form",
+          "position": {
+            "x": 60,
+            "y": 220
+          },
+          "data": {
+            "label": "Form",
+            "properties": {
+              "inputs": [
+                {
+                  "name": "topic",
+                  "type": "string",
+                  "value": ""
+                },
+                {
+                  "name": "audience",
+                  "type": "string",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "crew",
+          "type": "ai.agent_crew",
+          "position": {
+            "x": 340,
+            "y": 220
+          },
+          "data": {
+            "label": "Crew",
+            "properties": {
+              "goal": "Produce a publish-ready blog post for the given topic and audience.",
+              "maxRounds": 4,
+              "minRounds": 1,
+              "maxCostUsd": 0.5
+            }
+          }
+        },
+        {
+          "id": "writer",
+          "type": "action.agent",
+          "position": {
+            "x": 620,
+            "y": 120
+          },
+          "data": {
+            "label": "Writer",
+            "properties": {
+              "provider": "google",
+              "model": "gemini-3-flash-preview",
+              "messages": [
+                {
+                  "role": "system",
+                  "content": "You are a sharp blog writer. Write a complete post (title, intro, sections, conclusion). If editor feedback is provided, revise the previous draft to address every point."
+                },
+                {
+                  "role": "user",
+                  "content": "Topic: {{$step.topic}}\nAudience: {{$step.audience}}\n\nEditor feedback from the last round (empty on round 1): {{$step.feedback}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "editor",
+          "type": "action.evaluator",
+          "position": {
+            "x": 900,
+            "y": 320
+          },
+          "data": {
+            "label": "Editor Judge",
+            "properties": {
+              "provider": "google",
+              "model": "gemini-3-flash-preview",
+              "content": "{{$step.content}}",
+              "metrics": [
+                {
+                  "name": "clarity",
+                  "description": "Plain language, no filler, easy to follow.",
+                  "min": 0,
+                  "max": 10
+                },
+                {
+                  "name": "structure",
+                  "description": "Strong title, logical sections, real conclusion.",
+                  "min": 0,
+                  "max": 10
+                },
+                {
+                  "name": "engagement",
+                  "description": "Would the stated audience actually read to the end?",
+                  "min": 0,
+                  "max": 10
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "form-crew",
+          "source": "form",
+          "target": "crew"
+        },
+        {
+          "id": "crew-writer",
+          "source": "crew",
+          "target": "writer"
+        },
+        {
+          "id": "writer-editor",
+          "source": "writer",
+          "target": "editor"
+        }
+      ]
+    }
+  }
+}

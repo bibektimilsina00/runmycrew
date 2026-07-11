@@ -1,0 +1,131 @@
+{
+  "id": "crew-verified-support-answerer",
+  "name": "Verified Support Answerer",
+  "category": "crews",
+  "summary": "A chat crew that drafts an answer, has a judge score it, and only replies once the answer passes \u2014 with a hard cost cap per conversation.",
+  "description": "The hero crew pattern: hosted chat entry, a maker/checker loop, and cost governance.\n\n1. A visitor asks a question in the hosted chat.\n2. The Draft Answer agent writes a reply (and revises it using the judge's feedback on later rounds).\n3. The Answer Judge scores correctness, completeness, and helpfulness. Score >= 60% passes.\n4. The Crew loops up to 3 rounds, stops early on success, and never spends more than $0.25 per message.\n\nAfter installing: open the Agent + Evaluator nodes and pick your AI credential, then press Run to open the chat.",
+  "tags": [
+    "crew",
+    "chat",
+    "support",
+    "verified"
+  ],
+  "workflow": {
+    "name": "Verified Support Answerer",
+    "graph": {
+      "nodes": [
+        {
+          "id": "chat",
+          "type": "trigger.chat_app",
+          "position": {
+            "x": 60,
+            "y": 220
+          },
+          "data": {
+            "label": "Chat App",
+            "properties": {
+              "title": "Verified Support Answerer",
+              "welcome_headline": "Ask me anything",
+              "welcome_sub": "Answers are reviewed by a judge before you see them."
+            }
+          }
+        },
+        {
+          "id": "crew",
+          "type": "ai.agent_crew",
+          "position": {
+            "x": 340,
+            "y": 220
+          },
+          "data": {
+            "label": "Crew",
+            "properties": {
+              "goal": "Answer the visitor's question accurately, completely, and helpfully.",
+              "maxRounds": 3,
+              "minRounds": 1,
+              "maxCostUsd": 0.25
+            }
+          }
+        },
+        {
+          "id": "draft",
+          "type": "action.agent",
+          "position": {
+            "x": 620,
+            "y": 120
+          },
+          "data": {
+            "label": "Draft Answer",
+            "properties": {
+              "provider": "google",
+              "model": "gemini-3-flash-preview",
+              "messages": [
+                {
+                  "role": "system",
+                  "content": "You are a precise, friendly support agent. Answer the question directly. If reviewer feedback is provided, revise your previous answer to address it \u2014 do not start from scratch."
+                },
+                {
+                  "role": "user",
+                  "content": "Question: {{$step.message}}\n\nReviewer feedback from the last round (empty on round 1): {{$step.feedback}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "judge",
+          "type": "action.evaluator",
+          "position": {
+            "x": 900,
+            "y": 320
+          },
+          "data": {
+            "label": "Answer Judge",
+            "properties": {
+              "provider": "google",
+              "model": "gemini-3-flash-preview",
+              "content": "{{$step.content}}",
+              "metrics": [
+                {
+                  "name": "correctness",
+                  "description": "Is the answer factually right and free of made-up claims?",
+                  "min": 0,
+                  "max": 10
+                },
+                {
+                  "name": "completeness",
+                  "description": "Does it fully address the question?",
+                  "min": 0,
+                  "max": 10
+                },
+                {
+                  "name": "helpfulness",
+                  "description": "Is it clear, direct, and actionable?",
+                  "min": 0,
+                  "max": 10
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "chat-crew",
+          "source": "chat",
+          "target": "crew"
+        },
+        {
+          "id": "crew-draft",
+          "source": "crew",
+          "target": "draft"
+        },
+        {
+          "id": "draft-judge",
+          "source": "draft",
+          "target": "judge"
+        }
+      ]
+    }
+  }
+}
