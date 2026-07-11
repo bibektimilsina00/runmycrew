@@ -13,6 +13,12 @@ TEMPLATE_PATTERN = re.compile(r"\{\{([^}]+)\}\}")
 
 # Comparison pattern: {{path}} OP value  e.g. {{variables.count}} < 10
 _CMP_PATTERN = re.compile(r"^\s*\{\{([^}]+)\}\}\s*(==|!=|<=|>=|<|>)\s*(.+?)\s*$")
+# Same comparison, but the LHS is a bare literal. Node property templates
+# are resolved by the runner BEFORE the node evaluates its condition, so
+# `{{$step.amount}} <= 500` arrives here as `900 <= 500` — without this
+# the string fell through to the truthy fallback and EVERY assertion
+# passed regardless of the values.
+_CMP_LITERAL_PATTERN = re.compile(r"^\s*(.+?)\s*(==|!=|<=|>=|<|>)\s*(.+?)\s*$")
 
 
 class TemplateResolver:
@@ -72,9 +78,22 @@ class TemplateResolver:
 
         # Try comparison pattern first: {{path}} OP literal
         m = _CMP_PATTERN.match(condition)
+        lhs: Any = None
+        op: str | None = None
+        raw_rhs: str | None = None
         if m:
             path, op, raw_rhs = m.group(1).strip(), m.group(2), m.group(3).strip()
             lhs = self._resolve_path(path)
+        else:
+            # Pre-resolved templates: `900 <= 500`, `true == true`, …
+            lm = _CMP_LITERAL_PATTERN.match(condition)
+            if lm and "{{" not in condition:
+                raw_lhs, op, raw_rhs = lm.group(1).strip(), lm.group(2), lm.group(3).strip()
+                try:
+                    lhs = json.loads(raw_lhs)
+                except json.JSONDecodeError:
+                    lhs = raw_lhs.strip("\"'")
+        if op is not None and raw_rhs is not None:
             # Parse RHS as JSON value (handles numbers, booleans, strings)
             try:
                 rhs = json.loads(raw_rhs)

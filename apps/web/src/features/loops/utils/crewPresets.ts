@@ -98,7 +98,7 @@ export const CREW_PRESETS: CrewPreset[] = [
     // this produces a reproducible pass/fail, not an opinion.
     defaultProperties: {
       mode: 'expression',
-      expression: '{{$json.passed}} == true',
+      expression: '{{$step.passed}} == true',
     },
   },
   {
@@ -110,7 +110,7 @@ export const CREW_PRESETS: CrewPreset[] = [
     nodeType: 'action.evaluator',
     defaultProperties: {
       provider: 'openai',
-      content: '{{$json.content}}',
+      content: '{{$step.content}}',
       metrics: [
         { name: 'correctness', description: 'Does it meet the spec and actually work?', min: 0, max: 10 },
         { name: 'completeness', description: 'Is anything missing?', min: 0, max: 10 },

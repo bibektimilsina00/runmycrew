@@ -1,0 +1,90 @@
+{
+  "id": "crew-expense-precheck-gate",
+  "name": "Expense Precheck Gate (no AI)",
+  "category": "crews",
+  "summary": "The crew loop with zero AI: a deterministic L1 policy assertion gates expense submissions. Watch rounds, verification, and terminal states \u2014 no API key needed.",
+  "description": "A teaching crew that costs $0 and needs no credentials.\n\n1. Submit the hosted form (description + amount).\n2. The Policy Check runs an objective L1 assertion: {{$step.amount}} <= 500.\n3. Within policy -> the crew terminates 'success' on round 1. Over policy -> it retries once and stops as 'stalled', because a deterministic check can never improve.\n\nPress Run, open the form, and watch node statuses + the Logs panel in the editor.",
+  "tags": [
+    "crew",
+    "form",
+    "deterministic",
+    "verified"
+  ],
+  "workflow": {
+    "name": "Expense Precheck Gate",
+    "graph": {
+      "nodes": [
+        {
+          "id": "form",
+          "type": "trigger.form",
+          "position": {
+            "x": 60,
+            "y": 200
+          },
+          "data": {
+            "label": "Form",
+            "properties": {
+              "inputs": [
+                {
+                  "name": "description",
+                  "type": "string",
+                  "value": ""
+                },
+                {
+                  "name": "amount",
+                  "type": "number",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "crew",
+          "type": "ai.agent_crew",
+          "position": {
+            "x": 340,
+            "y": 200
+          },
+          "data": {
+            "label": "Crew",
+            "properties": {
+              "goal": "Accept only expenses that are within policy.",
+              "maxRounds": 2,
+              "minRounds": 1,
+              "stagnationRounds": 1
+            }
+          }
+        },
+        {
+          "id": "check",
+          "type": "ai.verify",
+          "position": {
+            "x": 620,
+            "y": 200
+          },
+          "data": {
+            "label": "Policy Check",
+            "properties": {
+              "mode": "expression",
+              "expression": "{{$step.amount}} <= 500",
+              "level": 1
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "form-crew",
+          "source": "form",
+          "target": "crew"
+        },
+        {
+          "id": "crew-check",
+          "source": "crew",
+          "target": "check"
+        }
+      ]
+    }
+  }
+}
