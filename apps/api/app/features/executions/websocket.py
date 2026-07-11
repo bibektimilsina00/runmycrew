@@ -72,6 +72,28 @@ async def execution_websocket(
                     execution_uuid = UUID(execution_id)
                 except ValueError:
                     execution_uuid = None  # synthetic id (app-…) — Redis-only
+                if execution_uuid is None:
+                    # App runs have no execution row. If the run already
+                    # finished (sub-second graphs beat the subscribe), the
+                    # worker left a retained snapshot — replay it so the
+                    # canvas paints final node states + the terminal event.
+                    raw = await redis.get(f"execution:{execution_id}:snapshot")
+                    if raw:
+                        import json as _json
+
+                        snap = _json.loads(raw)
+                        for node_id, node_state in (snap.get("node_statuses") or {}).items():
+                            await websocket.send_json(
+                                {
+                                    "type": f"node_{node_state}",
+                                    "node_id": node_id,
+                                    "execution_id": execution_id,
+                                }
+                            )
+                        terminal = snap.get("terminal") or {}
+                        if terminal.get("type"):
+                            await websocket.send_json({**terminal, "execution_id": execution_id})
+                            terminal_status = str(terminal.get("status") or "completed")
                 if execution_uuid is not None:
                     repo = ExecutionRepository(db)
                     execution = await repo.get_by_id(execution_uuid)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import uuid
 from typing import Any
 
@@ -508,6 +509,7 @@ async def _run_app_message(
 
     final_output: dict[str, Any] = {}
     collected_artifacts: list[dict] = []
+    node_statuses: dict[str, str] = {}
     error_msg: str | None = None
     tokens = 0
     cost_usd = 0.0
@@ -526,7 +528,16 @@ async def _run_app_message(
             # Persona overlay for the first agent node in the graph.
             if persona_id:
                 runner.variables["_persona_overlay_id"] = persona_id
-            final_output = await runner.run(trigger_data) or {}
+            try:
+                final_output = await runner.run(trigger_data) or {}
+            finally:
+                # Final per-node lifecycle — retained for late WS
+                # subscribers (fast runs finish before the editor's
+                # socket lands, and pub/sub has no replay).
+                node_statuses = {
+                    nid: ("completed" if getattr(res, "success", False) else "failed")
+                    for nid, res in runner._executed.items()
+                }
             # Pull the runner's accumulated artifacts BEFORE the session
             # closes — after we exit the async-with the runner is dead.
             collected_artifacts = [
@@ -551,6 +562,12 @@ async def _run_app_message(
         error_msg = str(e)
         logger.error(f"app-message execution {execution_id} failed: {error_msg}")
         terminal_event = ("execution_failed", {"status": "failed", "error": error_msg})
+
+    # Ride the final per-node lifecycle on the terminal event: sockets that
+    # subscribed mid-run missed the individual node_* frames, and the
+    # terminal is the one event every subscriber is guaranteed to see
+    # (live via pub/sub, or replayed from the retained snapshot).
+    terminal_event[1]["node_statuses"] = node_statuses
 
     latency_ms = int((time.time() - started_at) * 1000)
     reply_text, inline_artifacts = _extract_reply(final_output)
@@ -598,6 +615,26 @@ async def _run_app_message(
     # client's cue to refetch — emitting it before the DB write raced the
     # refetch and served stale transcripts/counts.
     await emitter.emit(*terminal_event)
+
+    # Retained snapshot for late subscribers: app runs have no execution
+    # row, so a WebSocket that attaches after the run finished (sub-second
+    # graphs) would otherwise see nothing at all.
+    try:
+        from apps.api.app.core.redis import get_redis
+
+        redis = await get_redis()
+        await redis.set(
+            f"execution:{execution_id}:snapshot",
+            json.dumps(
+                {
+                    "node_statuses": node_statuses,
+                    "terminal": {"type": terminal_event[0], **terminal_event[1]},
+                }
+            ),
+            ex=3600,
+        )
+    except Exception:  # noqa: BLE001
+        logger.warning("could not retain execution snapshot", exc_info=True)
 
 
 def _walk_dict(obj):

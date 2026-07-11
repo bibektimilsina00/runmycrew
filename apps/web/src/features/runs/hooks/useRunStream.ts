@@ -222,6 +222,16 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
         // unfreezes the "Waiting…" badge. node_started events follow.
         setStatus(workflowId, executionId, 'running')
       } else if (type === 'execution_completed' || type === 'execution_failed') {
+        // Terminal events carry the final per-node lifecycle for sockets
+        // that attached mid-run and missed the individual node_* frames.
+        const finalStatuses = data.node_statuses
+        if (finalStatuses && typeof finalStatuses === 'object') {
+          for (const [nid, st] of Object.entries(finalStatuses as Record<string, string>)) {
+            if (st === 'completed' || st === 'failed' || st === 'running') {
+              setNodeStatus(workflowId, executionId, nid, st)
+            }
+          }
+        }
         setStatus(workflowId, executionId, type === 'execution_completed' ? 'completed' : 'failed')
       }
     }
