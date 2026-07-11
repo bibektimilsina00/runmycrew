@@ -200,6 +200,13 @@ def _public_out(
     if props.get("_trigger_type") == "trigger.form":
         # Hosted form: one-shot input page. Fields derive from the Form
         # trigger's schema; the page stays on the form until submitted.
+        # A fresh node hasn't persisted its default row — the editor only
+        # writes `inputs` once the user touches the field list — so fall
+        # back to the properties-model default (the same one the runtime
+        # applies), otherwise the page renders an empty form.
+        from apps.api.app.node_system.nodes.common.trigger.form import FormTriggerProperties
+
+        rows = props.get("inputs") or FormTriggerProperties().inputs
         input_fields = [
             {
                 "name": str(row.get("name") or f"input{i + 1}"),
@@ -207,7 +214,7 @@ def _public_out(
                 "type": _FORM_FIELD_CONTROL.get(str(row.get("type") or "string"), "text"),
                 "required": False,
             }
-            for i, row in enumerate(props.get("inputs") or [])
+            for i, row in enumerate(rows)
             if isinstance(row, dict)
         ]
         return PublicAppOut(
