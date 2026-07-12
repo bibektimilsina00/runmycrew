@@ -54,5 +54,9 @@ celery_app.conf.update(
             "task": "sweep_app_sessions",
             "schedule": crontab(minute="30", hour="4"),  # daily 04:30 UTC
         },
+        "reap-stale-executions": {
+            "task": "reap_stale_executions",
+            "schedule": 120.0,  # every 2 min: catch dead-worker orphans
+        },
     },
 )

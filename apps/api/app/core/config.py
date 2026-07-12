@@ -181,6 +181,9 @@ class Settings(BaseSettings):
     # Observability — error tracking is off unless SENTRY_DSN is set.
     SENTRY_DSN: str = ""
     SENTRY_TRACES_SAMPLE_RATE: float = 0.0
+    # Release identifier so Sentry errors map to a deploy. The deploy sets
+    # RUNMYCREW_IMAGE_TAG (e.g. "sha-abc1234"); compose forwards it here.
+    RELEASE: str = ""
 
     # Email — Resend HTTP API is preferred (port 443, no provider port-block
     # risk like DigitalOcean blocking 25/465/587). Falls back to SMTP for

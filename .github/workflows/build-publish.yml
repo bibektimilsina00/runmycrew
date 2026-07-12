@@ -126,6 +126,10 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Bake the release id into the web bundle so Sentry maps
+          # frontend errors to a deploy. Ignored by api/worker builds.
+          build-args: |
+            VITE_RELEASE=sha-${{ github.sha }}
           # buildx layer cache via Actions cache.
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,scope=${{ matrix.service }},mode=max
