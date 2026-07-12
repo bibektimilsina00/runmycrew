@@ -76,7 +76,7 @@ class VerifyNode(BaseNode[VerifyProperties]):
                     "label": "Expression",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$json.status}} == success",
+                    "placeholder": "{{$step.status}} == success",
                     "condition": {"field": "mode", "value": "expression"},
                     "description": "Template boolean. Passes when it resolves truthy.",
                 },

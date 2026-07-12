@@ -63,7 +63,7 @@
         },
         "label": "Message",
         "name": "message",
-        "placeholder": "{{$trigger.output.message}}",
+        "placeholder": "{{$step.message}}",
         "type": "string"
       },
       {
@@ -96,7 +96,7 @@
         },
         "label": "Task / Execution ID",
         "name": "taskId",
-        "placeholder": "{{$previous.output.executionId}}",
+        "placeholder": "{{$step.executionId}}",
         "type": "string"
       },
       {
@@ -271,7 +271,7 @@
       {
         "default": [
           {
-            "content": "{{$trigger.output}}",
+            "content": "{{$step}}",
             "role": "user"
           }
         ],
@@ -435,7 +435,7 @@
         "label": "Memory Key",
         "mode": "advanced",
         "name": "memoryKey",
-        "placeholder": "user-{{$trigger.user_id}}",
+        "placeholder": "user-{{$step.user_id}}",
         "type": "string"
       },
       {
@@ -19002,7 +19002,7 @@
       {
         "label": "Text to Embed",
         "name": "input",
-        "placeholder": "{{$trigger.text}}",
+        "placeholder": "{{$step.text}}",
         "required": true,
         "type": "string"
       },
@@ -21984,7 +21984,7 @@
         },
         "label": "Event ID",
         "name": "event_id",
-        "placeholder": "{{ $trigger.id }}",
+        "placeholder": "{{ $step.id }}",
         "required": true,
         "type": "string"
       },
@@ -22520,7 +22520,7 @@
         },
         "label": "Message text",
         "name": "text",
-        "placeholder": "Hello from RunMyCrew \u2014 {{ $trigger.summary }}",
+        "placeholder": "Hello from RunMyCrew \u2014 {{ $step.summary }}",
         "type": "string",
         "typeOptions": {
           "multiline": true,
@@ -24051,7 +24051,7 @@
         },
         "label": "File ID",
         "name": "file_id",
-        "placeholder": "{{ $trigger.id }}",
+        "placeholder": "{{ $step.id }}",
         "required": true,
         "type": "string"
       },
@@ -24744,7 +24744,7 @@
         },
         "label": "Response ID",
         "name": "response_id",
-        "placeholder": "{{ $trigger.response_id }}",
+        "placeholder": "{{ $step.response_id }}",
         "required": true,
         "type": "string"
       },
@@ -30210,7 +30210,7 @@
         },
         "label": "Match this value",
         "name": "lookup_value",
-        "placeholder": "{{ $trigger.email }}",
+        "placeholder": "{{ $step.email }}",
         "required": true,
         "type": "string"
       },
@@ -31016,7 +31016,7 @@
         "description": "Use the People API resource name (`people/c\u2026`).",
         "label": "Contact ID",
         "name": "resource_name",
-        "placeholder": "people/c12345\u2026  or  {{ $trigger.resource_name }}",
+        "placeholder": "people/c12345\u2026  or  {{ $step.resource_name }}",
         "required": true,
         "type": "string"
       },
@@ -33398,7 +33398,7 @@
         "description": "Bind an Agent/LLM node output OR paste a JSON array directly. Per-slide keys: `layout` (BLANK / TITLE / TITLE_AND_BODY / SECTION_HEADER / TITLE_AND_TWO_COLUMNS / TITLE_ONLY / BIG_NUMBER / CAPTION_ONLY), `title`, `subtitle` (TITLE layout), `body`, `notes`, `image_url`, `background_color`.",
         "label": "Outline",
         "name": "outline",
-        "placeholder": "{{ $node.Agent.output }}     \u2190 bind an LLM output\nOR paste a JSON array:\n[\n  {\"layout\": \"TITLE\", \"title\": \"Q1 review\", \"subtitle\": \"March 2026\"},\n  {\"layout\": \"TITLE_AND_BODY\", \"title\": \"Highlights\",\n   \"body\": \"Revenue up 30%\\n\u2022 500 new customers\\n\u2022 3 launches\",\n   \"notes\": \"Emphasise enterprise tier\"},\n  {\"layout\": \"TITLE_AND_BODY\", \"title\": \"Roadmap\",\n   \"body\": \"Q2 plans\u2026\",\n   \"image_url\": \"https://\u2026/chart.png\",\n   \"background_color\": \"#f4f4f4\"}\n]",
+        "placeholder": "{{ $node('Agent').content }}  \u2190 bind an LLM output\nOR paste a JSON array:\n[\n  {\"layout\": \"TITLE\", \"title\": \"Q1 review\", \"subtitle\": \"March 2026\"},\n  {\"layout\": \"TITLE_AND_BODY\", \"title\": \"Highlights\",\n   \"body\": \"Revenue up 30%\\n\u2022 500 new customers\\n\u2022 3 launches\",\n   \"notes\": \"Emphasise enterprise tier\"},\n  {\"layout\": \"TITLE_AND_BODY\", \"title\": \"Roadmap\",\n   \"body\": \"Q2 plans\u2026\",\n   \"image_url\": \"https://\u2026/chart.png\",\n   \"background_color\": \"#f4f4f4\"}\n]",
         "required": true,
         "type": "string",
         "typeOptions": {
@@ -33446,7 +33446,7 @@
         "description": "Object ID of the slide. Run `Get All Text` first to discover IDs.",
         "label": "Slide ID",
         "name": "slide_id",
-        "placeholder": "{{ $node.get_text.slides[0].slide_id }}",
+        "placeholder": "{{ $node('Get Text').slides[0].slide_id }}",
         "required": true,
         "type": "string"
       },
@@ -33463,7 +33463,7 @@
         "description": "Object ID of the page element (text box, image, shape).",
         "label": "Element ID",
         "name": "element_id",
-        "placeholder": "{{ $node.get_text.slides[0].elements[0].id }}",
+        "placeholder": "{{ $node('Get Text').slides[0].elements[0].id }}",
         "required": true,
         "type": "string"
       },
@@ -34265,7 +34265,7 @@
         },
         "label": "Task ID",
         "name": "task_id",
-        "placeholder": "{{ $trigger.id }}",
+        "placeholder": "{{ $step.id }}",
         "required": true,
         "type": "string"
       },
@@ -35311,7 +35311,7 @@
         },
         "label": "Parent comment ID",
         "name": "parent_comment_id",
-        "placeholder": "{{ $trigger.comment_id }}",
+        "placeholder": "{{ $step.comment_id }}",
         "required": true,
         "type": "string"
       },
@@ -35327,7 +35327,7 @@
         },
         "label": "Comment ID",
         "name": "comment_id",
-        "placeholder": "{{ $trigger.comment_id }}",
+        "placeholder": "{{ $step.comment_id }}",
         "required": true,
         "type": "string"
       },
@@ -35412,7 +35412,7 @@
         },
         "label": "Playlist item ID",
         "name": "playlist_item_id",
-        "placeholder": "{{ $trigger.playlist_item_id }}",
+        "placeholder": "{{ $step.playlist_item_id }}",
         "required": true,
         "type": "string"
       },
@@ -37681,7 +37681,7 @@
       {
         "label": "Prompt",
         "name": "prompt",
-        "placeholder": "A photorealistic image of {{$trigger.subject}}",
+        "placeholder": "A photorealistic image of {{$step.subject}}",
         "required": true,
         "type": "string"
       },
@@ -42134,7 +42134,7 @@
       {
         "label": "Search Query",
         "name": "query",
-        "placeholder": "What is the refund policy? {{$trigger.output}}",
+        "placeholder": "What is the refund policy? {{$step}}",
         "required": true,
         "type": "string"
       },
@@ -45454,7 +45454,7 @@
       {
         "default": [
           {
-            "content": "{{$trigger.output}}",
+            "content": "{{$step}}",
             "role": "user"
           }
         ],
@@ -48016,7 +48016,7 @@
         "description": "Same key used by the Agent node to share memory.",
         "label": "Memory Key",
         "name": "memory_key",
-        "placeholder": "user-{{$trigger.user_id}}",
+        "placeholder": "user-{{$step.user_id}}",
         "required": true,
         "type": "string"
       },
@@ -48051,7 +48051,7 @@
         },
         "label": "Message Content",
         "name": "content",
-        "placeholder": "{{$trigger.message}}",
+        "placeholder": "{{$step.message}}",
         "required": true,
         "type": "string"
       },
@@ -56190,7 +56190,7 @@
       {
         "label": "Query",
         "name": "query",
-        "placeholder": "What is the latest news on {{$trigger.topic}}?",
+        "placeholder": "What is the latest news on {{$step.topic}}?",
         "required": true,
         "type": "string"
       },
@@ -75461,7 +75461,7 @@
       {
         "label": "Prompt",
         "name": "prompt",
-        "placeholder": "Think through this step by step: {{$trigger.output}}",
+        "placeholder": "Think through this step by step: {{$step}}",
         "required": true,
         "type": "string"
       },
@@ -76769,7 +76769,7 @@
       {
         "label": "Text",
         "name": "text",
-        "placeholder": "{{$llm.text}}",
+        "placeholder": "{{$step.text}}",
         "required": true,
         "type": "string"
       },
@@ -84571,7 +84571,7 @@
         "description": "Template boolean. Passes when it resolves truthy.",
         "label": "Expression",
         "name": "expression",
-        "placeholder": "{{$json.status}} == success",
+        "placeholder": "{{$step.status}} == success",
         "required": true,
         "type": "string"
       },
@@ -85000,7 +85000,7 @@
           "value": "python"
         },
         "default": "# Access previous node data via `input`\n# Set `output` to pass data to the next node\noutput = {'result': input}",
-        "description": "Python: set `output` dict. Use `{{$node.output.field}}` to reference previous nodes.",
+        "description": "Python: set `output` dict. Use `{{$step.field}}` or `{{$node('Label').field}}` to reference previous nodes.",
         "label": "Code",
         "name": "code",
         "required": true,
@@ -85012,7 +85012,7 @@
           "value": "javascript"
         },
         "default": "// Access previous node data via `input`\n// Set `output` to pass data to the next node\noutput = { result: input };",
-        "description": "JavaScript: set `output` object. Use {{$node.output.field}} to reference previous nodes.",
+        "description": "JavaScript: set `output` object. Use {{$step.field}} or {{$node('Label').field}} to reference previous nodes.",
         "label": "Code",
         "name": "code",
         "required": true,
@@ -85149,7 +85149,7 @@
         "description": "Checked AFTER each iteration. Same syntax as While Loop.",
         "label": "Condition",
         "name": "condition",
-        "placeholder": "{{$variables.hasMore}}",
+        "placeholder": "{{$step.hasMore}}",
         "required": true,
         "type": "string"
       },
@@ -85309,7 +85309,7 @@
         "description": "Array to iterate. In downstream nodes use: {{$loop.item}}, {{$loop.index}}, {{$loop.total}}, {{$loop.items}}",
         "label": "Items",
         "name": "items",
-        "placeholder": "{{$trigger.output.items}}",
+        "placeholder": "{{$step.items}}",
         "required": true,
         "type": "string"
       },
@@ -85580,7 +85580,7 @@
         "description": "Array to iterate. Use {{$loop.item}}, {{$loop.index}}, {{$loop.total}} in downstream nodes.",
         "label": "Items",
         "name": "items",
-        "placeholder": "{{$trigger.output.items}}",
+        "placeholder": "{{$step.items}}",
         "required": true,
         "type": "string"
       },
@@ -85629,7 +85629,7 @@
         "description": "Loop continues while this is truthy. Use {{$loop.iteration}} in downstream nodes.",
         "label": "Condition",
         "name": "condition",
-        "placeholder": "{{$variables.hasMore}}",
+        "placeholder": "{{$step.hasMore}}",
         "required": true,
         "type": "string"
       },
@@ -85986,10 +85986,10 @@
     ],
     "properties": [
       {
-        "description": "Template expression. Loop continues while this resolves to truthy. Supports: {{$path}} == value, {{$path}} < 10, {{$path}} != null",
+        "description": "Template expression. Loop continues while this resolves to truthy. Supports: {{$step.field}} == value, {{$step.field}} < 10, {{$step.field}} != null",
         "label": "Condition",
         "name": "condition",
-        "placeholder": "{{$variables.hasMore}}",
+        "placeholder": "{{$step.hasMore}}",
         "required": true,
         "type": "string"
       },

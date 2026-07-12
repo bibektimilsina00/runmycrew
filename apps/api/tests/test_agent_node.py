@@ -37,7 +37,7 @@ def test_agent_messages_field_uses_messages_editor_contract():
     messages_property = next(prop for prop in metadata.properties if prop["name"] == "messages")
 
     assert messages_property["type"] == "messages"
-    assert messages_property["default"] == [{"role": "user", "content": "{{$trigger.output}}"}]
+    assert messages_property["default"] == [{"role": "user", "content": "{{$step}}"}]
 
 
 @pytest.fixture

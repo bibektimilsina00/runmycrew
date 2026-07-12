@@ -138,7 +138,7 @@ def test_form_coerce_garbage(value, declared, expected):
 _TEMPLATE_RE = re.compile(r"\{\{\s*([^}]+?)\s*\}\}")
 _ALLOWED = re.compile(
     r"^("
-    r"\$step(\.|$)|\$node\(|\$vars(\.|$)|\$env(\.|$)|\$secrets(\.|$)|"
+    r"\$step(\.|$)|\$node\(|\$vars(\.|$)|\$env(\.|$)|\$secrets(\.|$)|\$loop(\.|$)|"
     r"loop\.|env\.|variables\.|secrets\."
     r")"
 )
@@ -170,3 +170,88 @@ def test_crew_presets_use_resolvable_bindings():
     presets = (REPO / "apps/web/src/features/loops/utils/crewPresets.ts").read_text()
     problems = _lint_templates(presets, "crewPresets.ts")
     assert not problems, "\n".join(problems)
+
+
+def test_node_metadata_uses_resolvable_bindings():
+    """Every placeholder/default/description in node source files teaches
+    only the canonical forms. $previous_node shipped as ai.parallel's REAL
+    default and $trigger.output as llm/agent's default message — both
+    resolved to nothing for every fresh node."""
+    problems: list[str] = []
+    for f in glob(str(REPO / "apps/api/app/node_system/**/*.py"), recursive=True):
+        path = Path(f)
+        problems += _lint_templates(path.read_text(), str(path.relative_to(REPO)))
+    assert not problems, "\n".join(problems)
+
+
+# ── Loop-condition resolution ($step / $vars inside iterations) ────────
+
+
+def test_for_iteration_resolver_binds_step_and_vars():
+    r = TemplateResolver.for_iteration({"hasMore": True, "count": 3}, variables={"limit": 5})
+    assert r.evaluate_condition("{{$step.hasMore}}") is True
+    assert r.evaluate_condition("{{$step.count}} < 5") is True
+    assert r.evaluate_condition("{{$step.count}} >= 5") is False
+    assert r.evaluate_condition("{{$vars.limit}} == 5") is True
+    # Legacy non-$ forms keep working through the same resolver.
+    assert r.evaluate_condition("{{variables.limit}} == 5") is True
+    assert r.evaluate_condition("{{iteration.output.count}} == 3") is True
+
+
+def test_for_iteration_resolver_fails_closed_on_missing_field():
+    r = TemplateResolver.for_iteration({"done": False})
+    assert r.evaluate_condition("{{$step.hasMore}}") is False
+    assert r.evaluate_condition("{{$step.missing}} == 1") is False
+
+
+@pytest.fixture
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.mark.anyio
+async def test_while_condition_re_evaluates_per_iteration():
+    """Regression: the runner pre-resolved the while condition ONCE against
+    the loop node's input, so the node re-evaluated a baked-in constant
+    forever — every template-driven while loop ran to maxIterations.
+    `deferred_properties` hands the raw template to the node instead."""
+    from apps.api.app.execution_engine.engine.workflow_runner import WorkflowRunner
+
+    def _n(nid, ntype, label, props):
+        return {
+            "id": nid,
+            "type": ntype,
+            "position": {"x": 0, "y": 0},
+            "data": {"label": label, "properties": props},
+        }
+
+    g = {
+        "nodes": [
+            _n(
+                "form",
+                "trigger.form",
+                "Form",
+                {"inputs": [{"name": "stop", "type": "string", "value": ""}]},
+            ),
+            _n(
+                "w",
+                "logic.while",
+                "While",
+                {"condition": "{{$step.stop}} != done", "maxIterations": 5},
+            ),
+            _n(
+                "c",
+                "logic.code",
+                "Code",
+                {"language": "python", "code": "output = {'stop': 'done'}"},
+            ),
+        ],
+        "edges": [
+            {"id": "a", "source": "form", "target": "w"},
+            {"id": "b", "source": "w", "target": "c"},
+        ],
+    }
+    runner = WorkflowRunner(workflow_id="t-wf", execution_id="t-exec", graph=g)
+    out = await runner.run({"stop": ""})
+    # Body sets stop='done'; the SECOND check must see it and break.
+    assert out["iterations"] == 1

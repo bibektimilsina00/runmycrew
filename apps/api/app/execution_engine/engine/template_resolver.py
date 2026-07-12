@@ -51,6 +51,42 @@ class TemplateResolver:
         # renders as empty string in the mixed-text branch.
         self._jsonata = jsonata_resolver
 
+    @classmethod
+    def for_iteration(
+        cls,
+        current_input: dict[str, Any],
+        *,
+        variables: dict[str, Any] | None = None,
+        env: dict[str, str] | None = None,
+        loop_data: dict[str, Any] | None = None,
+    ) -> TemplateResolver:
+        """Resolver for a loop-body condition check, JSONata attached.
+
+        Loop nodes (while / do-while) re-evaluate their condition every
+        iteration against the latest iteration output. This gives that
+        check the same `$step` / `$vars` bindings as everywhere else —
+        `$step` is the current iteration's data, matching its "whatever
+        fed this node" meaning. Before this factory each loop node built
+        a bare resolver, so `$`-prefixed conditions silently resolved to
+        None and the loops never ran.
+        """
+        from apps.api.app.execution_engine.engine.expression_engine import JsonataResolver
+
+        return cls(
+            node_outputs={"iteration": current_input},
+            trigger_data=current_input,
+            variables=variables or {},
+            env=env,
+            loop_data=loop_data,
+            jsonata_resolver=JsonataResolver(
+                context=current_input,
+                trigger_data=current_input,
+                variables=variables or {},
+                env=env or {},
+                loop_data=loop_data or {},
+            ),
+        )
+
     def resolve_properties(self, properties: dict[str, Any]) -> dict[str, Any]:
         """Resolve all template strings in a node's properties dict recursively."""
         return self._resolve_recursive(properties)
@@ -89,7 +125,10 @@ class TemplateResolver:
         raw_rhs: str | None = None
         if m:
             path, op, raw_rhs = m.group(1).strip(), m.group(2), m.group(3).strip()
-            lhs = self._resolve_path(path)
+            # _resolve_one, not _resolve_path: `$`-prefixed paths
+            # ({{$step.x}} == 1) must route through JSONata like every
+            # other template chunk, not silently miss the legacy lookup.
+            lhs = self._resolve_one(path)
         else:
             # Pre-resolved templates: `900 <= 500`, `true == true`, …
             lm = _CMP_LITERAL_PATTERN.match(condition)

@@ -34,6 +34,19 @@ class BaseNode[TProps: BaseModel](ABC):
 
         return cast(type[TProps], cls.DefaultProps)
 
+    @classmethod
+    def deferred_properties(cls) -> frozenset[str]:
+        """Property names the runner must hand over UNRESOLVED.
+
+        The runner resolves `{{...}}` / `=expr` in every property before
+        `execute()` — correct for values consumed once, fatally wrong for
+        expressions a node re-evaluates itself (loop conditions checked
+        per iteration: pre-resolution bakes the first value in and the
+        condition never changes again). Nodes that own their evaluation
+        override this with those property names.
+        """
+        return frozenset()
+
     def validate_properties(self, properties: dict[str, Any]) -> TProps:
         """Validate properties against the Pydantic model.
 

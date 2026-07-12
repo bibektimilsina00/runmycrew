@@ -329,11 +329,24 @@ class WorkflowRunner:
         # Late-bind so inline `{{ $step.x }}` chunks inside literal-text
         # fields route through the same JSONata engine as `=expression`.
         template_resolver._jsonata = jsonata_resolver  # noqa: SLF001
+        raw_properties = node_data.get("data", {}).get("properties", {})
         resolved_properties = resolve_properties(
-            node_data.get("data", {}).get("properties", {}),
+            raw_properties,
             jsonata_resolver,
             template_resolver,
         )
+        # Deferred properties (a node's own per-iteration expressions —
+        # loop conditions) go through RAW: pre-resolving them bakes the
+        # first value in and the node re-evaluates a constant forever.
+        from apps.api.app.node_system.registry.registry import node_registry
+
+        try:
+            deferred = node_registry.get_node(node_data["type"]).deferred_properties()
+        except Exception:  # unknown type fails later with a proper error
+            deferred = frozenset()
+        for key in deferred:
+            if key in raw_properties:
+                resolved_properties[key] = raw_properties[key]
 
         from apps.api.app.core.http import get_http_client
 

@@ -231,7 +231,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "required": True,
                     "group": "Prompt",
                     "default": [
-                        {"role": "user", "content": "{{$trigger.output}}"},
+                        {"role": "user", "content": "{{$step}}"},
                     ],
                     "description": "Prompt messages with role and content.",
                 },
@@ -351,7 +351,7 @@ class AgentNode(BaseNode[AgentProperties]):
                     "name": "memoryKey",
                     "label": "Memory Key",
                     "type": "string",
-                    "placeholder": "user-{{$trigger.user_id}}",
+                    "placeholder": "user-{{$step.user_id}}",
                     "mode": "advanced",
                     "condition": {"field": "memoryType", "value": ["workflow", "redis"]},
                     "description": "Unique key scoping this memory. Use interpolation to make it per-user.",
