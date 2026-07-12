@@ -1,0 +1,11 @@
+{
+  "workflow_id": "2fa7eef9-5cd1-4889-9569-3b7aab25ad71",
+  "workspace_slug": "verify-s-workspace",
+  "app_slug": "fixture-crew-chat",
+  "title": "Fixture Crew Chat",
+  "description": null,
+  "mode": "chat",
+  "auth_mode": "public",
+  "config": {},
+  "public_url": "/apps/verify-s-workspace/fixture-crew-chat"
+}

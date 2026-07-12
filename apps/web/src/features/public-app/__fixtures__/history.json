@@ -1,0 +1,28 @@
+[
+  {
+    "id": "9e6bc477-33d0-41d2-8158-bcdaa4fe7434",
+    "session_id": "f1a3cfa2-6926-4c2a-802c-586bb4f95e7f",
+    "role": "user",
+    "content": "hello fixture",
+    "artifacts": [],
+    "execution_id": null,
+    "tokens": 0,
+    "cost_usd": 0.0,
+    "latency_ms": 0,
+    "is_error": false,
+    "created_at": "2026-07-12T08:57:02.319006Z"
+  },
+  {
+    "id": "57d8097c-2cd0-49f7-badf-2435749dd0de",
+    "session_id": "f1a3cfa2-6926-4c2a-802c-586bb4f95e7f",
+    "role": "assistant",
+    "content": "",
+    "artifacts": [],
+    "execution_id": "app-776e990c-2e55-4404-8acf-21cf167954ba",
+    "tokens": 0,
+    "cost_usd": 0.0,
+    "latency_ms": 37,
+    "is_error": false,
+    "created_at": "2026-07-12T08:57:02.347516Z"
+  }
+]
