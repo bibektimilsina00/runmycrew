@@ -177,5 +177,52 @@ k6 run scripts/load/workflow-run.js -e BASE=https://app.runmycrew.com -e TOKEN=<
 **Recorded limits (fill in):**
 - Hosted chat: known limit ≈ ___ concurrent chats before p95 > 2s on current VPS.
 - Workflow run: ___ concurrent runs before errors.
-```
-```
+
+---
+
+## Incident checklist
+
+Work top to bottom; stop when you've found and addressed the cause.
+
+1. **Probe** — is the app actually down? `curl -fsS https://app.runmycrew.com/healthz`
+   and `.../api/v1/health | jq .` (the health payload names which of
+   api/db/redis/worker is unhealthy). Run the synthetic probe:
+   `BASE=… WS=… SLUG=… scripts/synthetic-chat-probe.sh`.
+2. **Sentry** — check the api / worker / frontend projects for a spike; the
+   release tag (image sha) points at the deploy that introduced it.
+3. **VPS resources** — `ssh root@139.59.71.226 'df -h; free -m'`. Disk full or
+   OOM is the usual culprit for a wedged worker.
+4. **Containers** — `docker compose -f "$C" ps` — anything not `healthy`?
+   `docker compose -f "$C" logs --tail 200 <svc>`.
+5. **Worker** — stuck runs self-heal via the reaper (every 2 min, fails runs
+   `running` > 30 min). To force: see §"Stuck / abandoned executions".
+6. **Rollback decision** — if a recent deploy caused it and no quick fix is
+   obvious, roll back (§Rollback) and investigate off the critical path.
+
+---
+
+## Known limits & policies
+
+- **Load ceiling:** _(fill in from `scripts/load/` runs — k6, date)._ Until
+  measured, treat as unknown; the scripts are in `scripts/load/`.
+- **Redis restart** loses only the sub-second window of pub/sub frames
+  mid-broadcast (AOF is on, queue + results persist in Postgres/AOF). Accepted.
+- **Celery reliability:** `acks_late=True`; a failed task marks its execution
+  terminal (crash-net) and the reaper (2-min beat, 30-min cutoff) catches
+  dead-worker orphans. No task auto-retry — a failed run is a failed run, not
+  silently re-executed (avoids double side-effects).
+- **Auth rate limit:** `RATE_LIMIT_AUTH` (default 5/min per IP). Public-app
+  message + unlock have their own Redis sliding-window limits.
+
+---
+
+## Contacts / access
+
+_(fill in — kept out of git if sensitive; store in the team password manager)_
+
+- **VPS:** `root@139.59.71.226` (SSH key: _____).
+- **DNS:** registrar _____, records for `runmycrew.com` / `app.` / `www.`.
+- **Container registry:** GHCR under the repo owner.
+- **Sentry:** org _____, projects `api` / `worker` / `frontend`.
+- **Uptime monitor:** _____ (hosts the 5-min synthetic-chat probe).
+- **Secrets:** `deploy/.env` on the VPS + the `ENV_PRODUCTION` GitHub secret.
