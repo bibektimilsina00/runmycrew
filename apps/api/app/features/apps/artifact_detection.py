@@ -55,6 +55,7 @@ def detect_artifacts(
                 try:
                     out.append(Artifact(**entry))
                 except Exception:  # noqa: BLE001
+                    # Candidate isn't a well-formed artifact — skip, keep scanning.
                     continue
 
     image_url = output_data.get("image_url") or output_data.get("imageUrl")

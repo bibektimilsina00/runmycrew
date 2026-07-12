@@ -102,4 +102,5 @@ async def stream_execution_events(
             await pubsub.unsubscribe(channel)
             await pubsub.aclose()
         except Exception:  # noqa: BLE001
+            # Cleanup on an already-dead connection — nothing to report.
             pass

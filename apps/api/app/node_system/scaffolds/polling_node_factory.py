@@ -494,10 +494,15 @@ def build_polling_trigger(manifest: PollingTriggerManifest) -> type[BaseNode]:
             token_fields=_token_fields,
         )
     except Exception:  # noqa: BLE001
-        # Scheduler module unavailable (tests that don't import the
-        # worker). Skip registration silently — the node still works
-        # for direct execute() calls.
-        pass
+        # Scheduler module unavailable OR a circular import mid-init — the
+        # latter silently killed 28 of 36 pollers in July 2026, so this is
+        # never silent anymore. The node still works for direct execute().
+        import logging
+
+        logging.getLogger(__name__).warning(
+            f"register_poller skipped for {manifest.provider}: scheduler unavailable",
+            exc_info=True,
+        )
 
     return _ManifestTriggerNode
 

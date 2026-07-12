@@ -5,6 +5,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
+from apps.api.app.core.logger import get_logger
 from apps.api.app.features.credentials.models import Credential
 from apps.api.app.features.dashboard.schemas import (
     DashboardConnectionItem,
@@ -17,6 +18,8 @@ from apps.api.app.features.executions.models import Execution
 from apps.api.app.features.users.models import User
 from apps.api.app.features.workflows.models import Workflow
 from apps.api.app.features.workspaces.models import Workspace
+
+logger = get_logger(__name__)
 
 
 class DashboardService:
@@ -288,8 +291,13 @@ class DashboardService:
                             "next_iso": nxt.isoformat(),
                         }
                     )
-                except Exception:
-                    pass
+                except Exception:  # noqa: BLE001
+                    # A malformed cron expression would silently drop the
+                    # workflow from the schedule widget — say so in the logs
+                    # so the typo is findable.
+                    logger.warning(
+                        f"dashboard: unparseable cron '{expr}' on workflow {wf.id}; skipping row"
+                    )
 
         # Sort by next run time
         items.sort(key=lambda x: x["next_iso"])
@@ -351,8 +359,8 @@ class DashboardService:
                 return "err"
             if diff < 7 * 86400:
                 return "warn"
-        except Exception:
-            pass
+        except Exception:  # noqa: BLE001
+            logger.warning(f"dashboard: unparseable credential expiry {exp!r}; reporting ok")
         return "ok"
 
 

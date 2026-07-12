@@ -101,7 +101,9 @@ async def open_slot(slot: ListenSlot, ttl: int = DEFAULT_TTL_SECONDS) -> None:
                 slot.slot_key(),
             )
         except Exception:  # noqa: BLE001
-            pass
+            # Old slot payload unreadable — it gets overwritten below; only
+            # its index entry may linger until TTL. Worth a trace, not a fail.
+            logger.debug("listen slot re-index: stale payload unreadable", exc_info=True)
     await redis.set(slot.slot_key(), json.dumps(slot.as_dict()), ex=ttl)
     index_key = ListenSlot.index_key(slot.object_type, slot.target_id, slot.field)
     await redis.sadd(index_key, slot.slot_key())
@@ -155,6 +157,7 @@ async def claim_slots_for_event(
         try:
             data = json.loads(raw)
         except Exception:  # noqa: BLE001
+            logger.warning(f"listen slot {slot_key!r} payload corrupt; dropping")
             await redis.delete(slot_key)
             await redis.srem(index_key, slot_key)
             continue
@@ -192,6 +195,7 @@ async def list_slots_for_event(
             try:
                 data = json.loads(raw)
             except Exception:  # noqa: BLE001
+                logger.warning(f"listen slot {slot_key!r} payload corrupt; dropping")
                 await redis.delete(slot_key)
                 await redis.srem(index_key, slot_key)
                 continue

@@ -61,7 +61,7 @@ export const CREW_PRESETS: CrewPreset[] = [
           content:
             'You are the planner. Turn the goal into a concrete, buildable spec. On a reviewer rejection, revise the weakest part — not everything.',
         },
-        { role: 'user', content: '{{$trigger.output}}' },
+        { role: 'user', content: '{{$trigger}}' },
       ],
       temperature: 0.3,
     },
@@ -125,7 +125,7 @@ export const CREW_PRESETS: CrewPreset[] = [
     color: '#0ea5e9',
     nodeType: 'ai.task_planner',
     defaultProperties: {
-      goal: '{{$trigger.output.goal}}',
+      goal: '{{$trigger.goal}}',
       available_roles: ['researcher', 'writer', 'reviewer'],
       max_tasks: 6,
     },

@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.config import settings
 from apps.api.app.core.database import get_db
+from apps.api.app.core.logger import get_logger
 from apps.api.app.credential_manager.api_keys import get_ai_providers
 from apps.api.app.credential_manager.encryption.aes import AESEncryptionService
 from apps.api.app.features.copilot.repository import CopilotSessionRepository
@@ -21,6 +22,8 @@ from apps.api.app.features.copilot.schemas import (
 from apps.api.app.features.credentials.repository import CredentialRepository
 from apps.api.app.features.users.models import User
 from apps.api.app.features.workflows.repository import WorkflowRepository
+
+logger = get_logger(__name__)
 
 _PROVIDER_DEFAULT_MODELS: dict[str, str] = {
     "openai": "gpt-4o-mini",
@@ -80,8 +83,8 @@ class CopilotService:
                 try:
                     data = json.loads(encryption.decrypt(cred.encrypted_data))
                     return data.get("api_key") or None
-                except Exception:
-                    pass
+                except Exception:  # noqa: BLE001
+                    logger.debug("copilot: pinned credential unusable, falling back", exc_info=True)
 
         # Fall back to any credential of the right type
         cred = await self.cred_repo.get_by_type_and_user(credential_type, user.id)
@@ -89,8 +92,10 @@ class CopilotService:
             try:
                 data = json.loads(encryption.decrypt(cred.encrypted_data))
                 return data.get("api_key") or None
-            except Exception:
-                pass
+            except Exception:  # noqa: BLE001
+                logger.debug(
+                    "copilot: type-matched credential unusable, falling back", exc_info=True
+                )
 
         # Final fallback: a shared key from Settings (loaded from the root .env).
         settings_key = _PROVIDER_SETTINGS_KEYS.get(provider)
@@ -108,8 +113,10 @@ class CopilotService:
         if raw:
             try:
                 return CopilotSettingsBody(**json.loads(raw))
-            except Exception:
-                pass
+            except Exception:  # noqa: BLE001
+                logger.warning(
+                    "copilot: stored settings unreadable, serving defaults", exc_info=True
+                )
         return CopilotSettingsBody()
 
     async def update_settings(
