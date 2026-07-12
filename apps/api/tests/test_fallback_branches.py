@@ -130,13 +130,16 @@ def test_form_coerce_garbage(value, declared, expected):
 
 # ── Template-syntax lint over seeds + presets ──────────────────────────
 
-# Prefixes the resolvers can actually bind. `$json.<path>` is NOT one of
-# them (bare `$json` is) — it shipped broken in our own presets once.
+# The user-facing convention (what the expression autocomplete offers):
+# `$step.<field>` and `$node('Label').<field>`, plus the workflow-scope
+# namespaces. `$trigger` is an engine-internal binding, `$previous_node`
+# never existed, and `$json.<path>` never resolves — all three shipped
+# broken in our own presets/defaults once; ban them here.
 _TEMPLATE_RE = re.compile(r"\{\{\s*([^}]+?)\s*\}\}")
 _ALLOWED = re.compile(
     r"^("
-    r"\$step(\.|$)|\$trigger(\.|$)|\$node\(|\$vars(\.|$)|\$env(\.|$)|\$secrets(\.|$)|"
-    r"\$json$|\$previous_node(\.|$)|loop\.|env\.|variables\.|secrets\.|trigger\.|json\."
+    r"\$step(\.|$)|\$node\(|\$vars(\.|$)|\$env(\.|$)|\$secrets(\.|$)|"
+    r"loop\.|env\.|variables\.|secrets\."
     r")"
 )
 

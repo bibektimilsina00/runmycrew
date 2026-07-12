@@ -20,7 +20,7 @@ class RouteToProperties(BaseModel):
 class RouteToNode(BaseNode[RouteToProperties]):
     """Pass-through router: labels the next agent's persona / role.
 
-    Downstream agent nodes read ``$previous_node.output`` and pick up
+    Downstream agent nodes read ``$step`` and pick up
     ``to_persona_id`` / ``to_role`` to overlay their own execution.
     """
 

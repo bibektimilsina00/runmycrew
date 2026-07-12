@@ -19804,7 +19804,7 @@
       {
         "label": "Content to Evaluate",
         "name": "content",
-        "placeholder": "{{$previous_node.output.content}}",
+        "placeholder": "{{$step.content}}",
         "required": true,
         "type": "string"
       },
@@ -84064,7 +84064,7 @@
     ],
     "properties": [
       {
-        "default": "={{$previous_node.output.tasks}}",
+        "default": "={{$step.tasks}}",
         "description": "Array of {id, description, assignee_role} tasks \u2014 typically a Task Planner's output.",
         "label": "Tasks",
         "name": "tasks_input",
@@ -84583,7 +84583,7 @@
         "description": "Text (or JSON) the rule is applied to.",
         "label": "Subject",
         "name": "content",
-        "placeholder": "{{$previous_node.output.text}}",
+        "placeholder": "{{$step.text}}",
         "required": true,
         "type": "string"
       },

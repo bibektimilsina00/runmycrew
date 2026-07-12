@@ -97,7 +97,7 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
                     "label": "Content to Evaluate",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$previous_node.output.content}}",
+                    "placeholder": "{{$step.content}}",
                 },
                 {
                     "name": "metrics",
