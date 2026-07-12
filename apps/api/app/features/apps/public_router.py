@@ -64,12 +64,33 @@ class UnlockRequest(BaseModel):
 
 
 def _client_ip(request: Request) -> str | None:
-    fwd = request.headers.get("x-forwarded-for") or request.headers.get("x-real-ip")
+    # RIGHTMOST X-Forwarded-For entry, not leftmost. Caddy APPENDS the
+    # real peer to whatever the client sent, so the leftmost value is
+    # attacker-controlled — reading it let a client spoof its IP and
+    # rotate past the per-IP rate limit. The last hop is the one our own
+    # proxy wrote. (Assumes a single trusted proxy in front of the api,
+    # which the deployment guarantees.)
+    fwd = request.headers.get("x-forwarded-for")
     if fwd:
-        return fwd.split(",")[0].strip()
+        parts = [p.strip() for p in fwd.split(",") if p.strip()]
+        if parts:
+            return parts[-1]
+    xreal = request.headers.get("x-real-ip")
+    if xreal:
+        return xreal.strip()
     if request.client:
         return request.client.host
     return None
+
+
+def _cookie_secure() -> bool:
+    """Session/unlock cookies are the only thing gating a visitor's
+    transcript — mark them Secure in production so they never ride a
+    cleartext downgrade. Left off outside production so local http and
+    the e2e stack keep working."""
+    from apps.api.app.core.config import settings
+
+    return settings.ENVIRONMENT == "production"
 
 
 def _issue_session_cookie(
@@ -81,6 +102,7 @@ def _issue_session_cookie(
         max_age=SESSION_COOKIE_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=_cookie_secure(),
         path=f"/api/v1/apps/{workspace_slug}/{app_slug}",
     )
 
@@ -94,6 +116,7 @@ def _issue_unlock_cookie(
         max_age=UNLOCK_COOKIE_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=_cookie_secure(),
         path=f"/api/v1/apps/{workspace_slug}/{app_slug}",
     )
 
@@ -262,12 +285,22 @@ async def unlock_password(
     wf, props = await service.resolve_public_app(workspace_slug, app_slug)
     if (props.get("auth_mode") or "public") != "password":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="not_password_gated")
+    # Key the per-client window on the IP, not the constant "unlock":
+    # a shared bucket let any 8 attempts/min lock password unlock for
+    # every visitor of the app (global lockout DoS).
+    ip_hash = hash_ip(_client_ip(request))
     ok, retry = await check_rate_limit(
-        wf.id, "unlock", hash_ip(_client_ip(request)), max_per_minute=8
+        wf.id, f"unlock:{ip_hash or 'noip'}", ip_hash, max_per_minute=8
     )
     if not ok:
-        response.headers["Retry-After"] = str(retry)
-        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="rate_limited")
+        # Set Retry-After ON the exception: a header set on the injected
+        # Response is discarded when we raise, so the client got a 429
+        # with no back-off signal.
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="rate_limited",
+            headers={"Retry-After": str(retry)},
+        )
     if not service.verify_password(wf, body.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_password")
     token = _unlock_token_for(wf.id, getattr(wf, "app_password_hash", None))
@@ -447,8 +480,11 @@ async def send_message(
         wf.id, str(session.id), hash_ip(_client_ip(request)), max_per_minute=max_per_min
     )
     if not ok:
-        response.headers["Retry-After"] = str(retry)
-        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="rate_limited")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="rate_limited",
+            headers={"Retry-After": str(retry)},
+        )
 
     if session_cap > 0 and (session.total_cost_usd or 0) >= session_cap:
         raise HTTPException(
@@ -515,6 +551,13 @@ async def stream(
     session = await service.session_repo.get_by_cookie(wf, session_cookie)
     if not session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
+    # Bind the stream to the caller's OWN execution. Without this any
+    # visitor who learned an execution_id could subscribe to another
+    # visitor's live SSE output (IDOR) — ids are unguessable `app-{uuid4}`
+    # but that's obscurity, not authorization.
+    msg = await service.message_repo.get_by_execution(execution_id)
+    if msg is None or msg.session_id != session.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_your_execution")
     return StreamingResponse(
         stream_execution_events(execution_id),
         media_type="text/event-stream",
@@ -567,9 +610,19 @@ async def upload_file(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="file_upload_disabled")
     allowed_mimes: list[str] = list(props.get("allowed_file_types") or [])
     max_size_mb = int(props.get("max_file_size_mb") or 10)
+    max_bytes = max_size_mb * 1024 * 1024
+
+    # Reject by declared Content-Length BEFORE buffering the whole body —
+    # otherwise a multi-GB POST is fully read into memory before the size
+    # check runs (memory-exhaustion DoS).
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > max_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="file_too_large"
+        )
 
     data = await file.read()
-    if len(data) > max_size_mb * 1024 * 1024:
+    if len(data) > max_bytes:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="file_too_large"
         )
@@ -578,6 +631,23 @@ async def upload_file(
         or mimetypes.guess_type(file.filename or "")[0]
         or "application/octet-stream"
     )
+    # Never store a payload that renders as active content: the file is
+    # echoed back as a `data:{mime};base64` URL on the app's OWN origin,
+    # so an svg/html/xml upload is stored XSS in the visitor's session.
+    # Blocked regardless of the owner's allowlist.
+    _INLINE_ACTIVE = {
+        "image/svg+xml",
+        "text/html",
+        "application/xhtml+xml",
+        "text/xml",
+        "application/xml",
+        "text/javascript",
+        "application/javascript",
+    }
+    if mime.split(";")[0].strip().lower() in _INLINE_ACTIVE:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
+        )
     if allowed_mimes and mime not in allowed_mimes:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
