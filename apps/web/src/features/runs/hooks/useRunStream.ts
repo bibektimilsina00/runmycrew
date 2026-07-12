@@ -6,6 +6,7 @@ import {
   type AgentTraceStep,
   type RunLog,
 } from '../store/runsStore'
+import { apiWsBaseUrl } from '../utils/wsUrl'
 
 // React StrictMode runs effect mount → cleanup → mount in dev, which
 // would otherwise spawn two WebSockets for the same execution. The
@@ -16,20 +17,6 @@ import {
 // the pending close and reuses the same socket. Real unmounts still
 // close (after the short delay).
 const STRICTMODE_REUSE_WINDOW_MS = 150
-
-function buildWsUrl(): string {
-  const rawApiUrl = import.meta.env.VITE_API_URL || '/api/v1'
-  if (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://')) {
-    return rawApiUrl.replace(/^http/, 'ws')
-  }
-  // Same-origin always: vite dev proxies /ws (like Caddy in every
-  // deployment). The old `localhost -> localhost:8000` special case sent
-  // the socket to whatever dev API happened to be on :8000 — on any
-  // other localhost-served stack the Logs panel sat at "Executing…"
-  // forever.
-  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  return `${proto}//${window.location.host}${rawApiUrl}`
-}
 
 /**
  * Subscribe to /ws/executions/{id}. Streams catch-up + live `log_synced` events
@@ -98,7 +85,7 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
       socketRef.current = null
     }
 
-    const url = `${buildWsUrl()}/ws/executions/${executionId}?token=${encodeURIComponent(token)}`
+    const url = `${apiWsBaseUrl()}/ws/executions/${executionId}?token=${encodeURIComponent(token)}`
     const ws: WebSocket = new WebSocket(url)
     socketRef.current = { ws, executionId, closeTimer: null }
     let alive = true
