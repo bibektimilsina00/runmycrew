@@ -226,6 +226,17 @@ def eager_register_polling_providers() -> None:
         zendesk_trigger as _zendesk_trigger,  # noqa: F401
     )
 
+    # Canary: the register_poller back-import inside the polling factory
+    # swallows failures (circular imports silently killed 28/36 pollers in
+    # July 2026). If registrations ever drop below the known floor, scream.
+    _MIN_EXPECTED_POLLERS = 30
+    if len(_BY_PROVIDER) < _MIN_EXPECTED_POLLERS:
+        logger.error(
+            f"Only {len(_BY_PROVIDER)} polling providers registered "
+            f"(expected >= {_MIN_EXPECTED_POLLERS}) — check for import-order "
+            f"failures in polling_node_factory registrations."
+        )
+
 
 @celery_app.task(name="poll_integration_triggers")
 def poll_integration_triggers() -> None:

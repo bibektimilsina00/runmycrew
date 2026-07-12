@@ -232,7 +232,7 @@ class VerifyNode(BaseNode[VerifyProperties]):
             variables=context.variables,
             env=getattr(context, "env", {}),
         )
-        passed = bool(resolver.evaluate_condition(expr))
+        passed = bool(resolver.evaluate_condition(expr, strict=True))
         feedback = f"L1 assertion `{expr}` -> {passed}"
         return passed, feedback, {"expression": expr}
 

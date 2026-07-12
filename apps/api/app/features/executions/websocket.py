@@ -180,7 +180,9 @@ async def _stream_pubsub(
                     if data.get("type") in stop_event_types:
                         logger.info(f"Received terminal event in {channel}, closing.")
                         break
-                except Exception:
+                except Exception:  # noqa: BLE001
+                    # Non-JSON frame can't be a terminal event — forwarded
+                    # above already; nothing to decide here.
                     pass
 
     async def listen_ws():

@@ -64,11 +64,17 @@ class TemplateResolver:
         """
         return self._resolve_recursive(value)
 
-    def evaluate_condition(self, condition: str) -> bool:
+    def evaluate_condition(self, condition: str, strict: bool = False) -> bool:
         """Evaluate a condition expression. Supports:
         - {{path}} < / > / == / != / <= / >= value
+        - resolved literals: 900 <= 500, true == true
         - {{path}} alone (truthy check)
         - Literal 'true'/'false'
+
+        ``strict=True`` fails CLOSED: anything that doesn't parse as one
+        of the forms above is False. Verification checks (L1) use this —
+        the permissive truthy fallback let junk expressions count as a
+        pass for months.
         """
         condition = condition.strip()
         if condition.lower() == "true":
@@ -114,6 +120,11 @@ class TemplateResolver:
                     return float(lhs) >= float(rhs)  # type: ignore[arg-type]
             except (TypeError, ValueError):
                 return False
+
+        # Nothing parsed as a comparison. In strict mode that is a fail —
+        # a malformed check must never count as a pass.
+        if strict:
+            return False
 
         # Fallback: resolve as template and check truthiness
         resolved = self._resolve_string(condition)
