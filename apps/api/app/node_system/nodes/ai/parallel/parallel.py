@@ -53,7 +53,7 @@ class ParallelNode(BaseNode[ParallelProperties]):
                     "name": "tasks_input",
                     "label": "Tasks",
                     "type": "json",
-                    "default": "={{$previous_node.output.tasks}}",
+                    "default": "={{$step.tasks}}",
                     "description": (
                         "Array of {id, description, assignee_role} tasks — typically a "
                         "Task Planner's output."

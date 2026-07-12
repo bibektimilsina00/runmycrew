@@ -85,7 +85,7 @@ class VerifyNode(BaseNode[VerifyProperties]):
                     "label": "Subject",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$previous_node.output.text}}",
+                    "placeholder": "{{$step.text}}",
                     "condition": {"field": "mode", "value": "rule"},
                     "description": "Text (or JSON) the rule is applied to.",
                 },

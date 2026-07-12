@@ -61,7 +61,7 @@ export const CREW_PRESETS: CrewPreset[] = [
           content:
             'You are the planner. Turn the goal into a concrete, buildable spec. On a reviewer rejection, revise the weakest part — not everything.',
         },
-        { role: 'user', content: '{{$trigger}}' },
+        { role: 'user', content: '{{$step}}' },
       ],
       temperature: 0.3,
     },
@@ -80,7 +80,7 @@ export const CREW_PRESETS: CrewPreset[] = [
           content:
             'Build exactly what the spec says. One change per round. Leave working code untouched.',
         },
-        { role: 'user', content: '{{$json}}' },
+        { role: 'user', content: '{{$step}}' },
       ],
       temperature: 0.2,
     },
@@ -125,7 +125,7 @@ export const CREW_PRESETS: CrewPreset[] = [
     color: '#0ea5e9',
     nodeType: 'ai.task_planner',
     defaultProperties: {
-      goal: '{{$trigger.goal}}',
+      goal: '{{$step.goal}}',
       available_roles: ['researcher', 'writer', 'reviewer'],
       max_tasks: 6,
     },
@@ -138,7 +138,7 @@ export const CREW_PRESETS: CrewPreset[] = [
     color: '#10b981',
     nodeType: 'ai.parallel',
     defaultProperties: {
-      tasks_input: '={{$previous_node.output.tasks}}',
+      tasks_input: '={{$step.tasks}}',
       persona_map: {},
       max_concurrent: 4,
     },
