@@ -1,0 +1,14 @@
+{
+  "workflow_id": "3f85d6fc-dea4-4449-82d9-0da4316f5774",
+  "workspace_slug": "verify-s-workspace",
+  "app_slug": "verified-support-answerer",
+  "title": "Verified Support Answerer",
+  "description": "A chat crew that drafts an answer, has a judge score it, and only replies once the answer passes \u2014 with a hard cost cap per conversation.",
+  "mode": "chat",
+  "auth_mode": "public",
+  "config": {
+    "welcome_headline": "Ask me anything",
+    "welcome_sub": "Answers are reviewed by a judge before you see them."
+  },
+  "public_url": "/apps/verify-s-workspace/verified-support-answerer"
+}

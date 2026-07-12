@@ -1,0 +1,16 @@
+{
+  "session": {
+    "id": "fd575a15-3897-4ba2-900e-0a033433b76e",
+    "workflow_id": "3f85d6fc-dea4-4449-82d9-0da4316f5774",
+    "crew_id": null,
+    "cookie_id": "-IV6h1crdjq6xj8qkFi4gn5cZLDis6Yp",
+    "user_id": null,
+    "first_seen_at": "2026-07-12T08:54:51.338804Z",
+    "last_seen_at": "2026-07-12T08:54:51.338810Z",
+    "message_count": 0,
+    "total_cost_usd": 0.0,
+    "total_tokens": 0,
+    "is_blocked": false
+  },
+  "messages": []
+}

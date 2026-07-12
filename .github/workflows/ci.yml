@@ -67,6 +67,11 @@ jobs:
           PYTHONPATH: .
         run: uv run --project apps/api python -m pytest apps/api/tests -q
 
+      - name: Schema drift check
+        env:
+          PYTHONPATH: .
+        run: uv run --project apps/api python scripts/check-schema-drift.py
+
   frontend:
     name: Frontend — typecheck + lint + build
     runs-on: ubuntu-latest

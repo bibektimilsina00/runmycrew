@@ -1,0 +1,26 @@
+{
+  "workflow_id": "06c5ad16-4ce8-4ffd-9aca-5b6bd8792fe5",
+  "workspace_slug": "verify-s-workspace",
+  "app_slug": "expense-precheck-gate-no-ai",
+  "title": "Expense Precheck Gate (no AI)",
+  "description": "The crew loop with zero AI: a deterministic L1 policy assertion gates expense submissions. Watch rounds, verification, and terminal states \u2014 no API key needed.",
+  "mode": "form",
+  "auth_mode": "public",
+  "config": {
+    "input_fields": [
+      {
+        "name": "description",
+        "label": "description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "amount",
+        "label": "amount",
+        "type": "number",
+        "required": false
+      }
+    ]
+  },
+  "public_url": "/apps/verify-s-workspace/expense-precheck-gate-no-ai"
+}
