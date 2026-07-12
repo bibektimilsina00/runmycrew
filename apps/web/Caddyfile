@@ -8,6 +8,17 @@
 }
 
 # ─────────────────────────────────────────────────────────────────────
+# Container-local health probe (compose healthcheck).
+# Must be plain HTTP on localhost: the managed sites below make Caddy
+# 308-redirect every :80 request to HTTPS, and a redirect to
+# https://localhost can never handshake — the container sat permanently
+# "unhealthy" while serving fine.
+# ─────────────────────────────────────────────────────────────────────
+http://localhost {
+	respond /healthz "ok" 200
+}
+
+# ─────────────────────────────────────────────────────────────────────
 # Marketing site — runmycrew.com
 # Reverse-proxies to the Next.js standalone server in the `site`
 # container. The product app lives on the `app.` subdomain.
