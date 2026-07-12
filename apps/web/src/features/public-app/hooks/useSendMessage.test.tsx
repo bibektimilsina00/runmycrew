@@ -86,9 +86,9 @@ describe('useSendMessage — stream lifecycle', () => {
     expect(result.current.state.status).toBe('streaming')
 
     act(() => {
-      es.emit('token', { text: 'Hel' })
-      es.emit('token', { text: 'lo ' })
-      es.emit('token', { text: 'world' })
+      es.emit('agent_chunk', { delta: 'Hel' })
+      es.emit('agent_chunk', { delta: 'lo ' })
+      es.emit('agent_chunk', { delta: 'world' })
     })
     expect(result.current.state.assistant?.content).toBe('Hello world')
 
@@ -129,7 +129,7 @@ describe('useSendMessage — stream lifecycle', () => {
     const es = lastES()
 
     act(() => {
-      es.emit('token', { text: 'reply' })
+      es.emit('agent_chunk', { delta: 'reply' })
       es.emit('stream_end')
     })
 
@@ -141,7 +141,7 @@ describe('useSendMessage — stream lifecycle', () => {
     // A second turn completes exactly once more.
     await act(() => result.current.send('again'))
     act(() => {
-      lastES().emit('token', { text: 'two' })
+      lastES().emit('agent_chunk', { delta: 'two' })
       lastES().emit('stream_end')
     })
     expect(onComplete).toHaveBeenCalledTimes(2)
@@ -203,7 +203,7 @@ describe('useSendMessage — watchdog', () => {
     // Just before the deadline an event arrives — the clock re-arms.
     act(() => {
       vi.advanceTimersByTime(119_000)
-      es.emit('token', { text: 'still alive' })
+      es.emit('agent_chunk', { delta: 'still alive' })
       vi.advanceTimersByTime(119_000)
     })
     expect(result.current.state.status).toBe('streaming')

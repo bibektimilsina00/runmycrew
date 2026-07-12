@@ -603,11 +603,22 @@ class WorkflowRunner:
     async def _execute_subgraph(
         self, start_node_id: str, input_data: dict[str, Any]
     ) -> dict[str, Any]:
-        """Execute a sub-graph starting from start_node_id. Used by ForEach."""
+        """Execute a sub-graph starting from start_node_id and return the
+        TERMINAL node's output — orchestrators (Crew, ForEach, loops) read
+        a round's result from what the chain produced, not what it started
+        with. Returning the start node's output here silently discarded
+        every checker verdict in a linear ``crew → maker → checker`` round:
+        the crew saw the maker's output, found no ``passed`` key, and
+        exhausted its rounds.
+        """
         await self._execute_node(start_node_id, input_data)
-        if start_node_id in self._outputs:
-            return self._outputs[start_node_id]
-        return {}
+        # `_executed` is insertion-ordered: the last entry with an output
+        # is the chain's terminal. Only nodes run by THIS sub-runner are
+        # in it, so parent outputs copied into `_outputs` don't interfere.
+        for nid in reversed(self._executed.keys()):
+            if nid in self._outputs:
+                return self._outputs[nid]
+        return self._outputs.get(start_node_id, {})
 
     # ------------------------------------------------------------------
     # Helpers

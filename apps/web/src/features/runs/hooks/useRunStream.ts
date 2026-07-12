@@ -22,10 +22,13 @@ function buildWsUrl(): string {
   if (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://')) {
     return rawApiUrl.replace(/^http/, 'ws')
   }
+  // Same-origin always: vite dev proxies /ws (like Caddy in every
+  // deployment). The old `localhost -> localhost:8000` special case sent
+  // the socket to whatever dev API happened to be on :8000 — on any
+  // other localhost-served stack the Logs panel sat at "Executing…"
+  // forever.
   const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const host =
-    window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host
-  return `${proto}//${host}${rawApiUrl}`
+  return `${proto}//${window.location.host}${rawApiUrl}`
 }
 
 /**

@@ -662,6 +662,16 @@ def _extract_reply(output: dict) -> tuple[str, list[dict]]:
     if isinstance(output, dict):
         if isinstance(output.get("content"), str):
             text = output["content"]
+        elif isinstance(output.get("result"), dict):
+            # Crew terminal shape: {status, rounds, result: {…}} — the
+            # round's artifact lives one level down. Without this every
+            # crew-hosted chat replied "No response produced".
+            inner = output["result"]
+            if isinstance(inner.get("content"), str):
+                text = inner["content"]
+            elif not inner.get("passed", True) and isinstance(inner.get("feedback"), str):
+                # Failed gate with no artifact: the feedback IS the reply.
+                text = inner["feedback"]
         arts = output.get("artifacts")
         if isinstance(arts, list):
             artifacts = arts

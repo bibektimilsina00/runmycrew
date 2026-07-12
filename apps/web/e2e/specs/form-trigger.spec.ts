@@ -80,11 +80,10 @@ test.describe('hosted form app', () => {
     // Side note: GET /api/v1/executions/?workflow_id=… 500s anyway — the
     // ExecutionOut.logs relationship lazy-loads outside the async session.)
     await expect(page.getByText('Doubled: 42')).toBeVisible({ timeout: 30_000 })
-    // TODO(bug): the user's own "amount: 21" entry should be asserted here,
-    // but useAppSession.useAppendMessage drops the optimistic append when
-    // the session cache isn't hydrated yet and nothing ever re-fetches it —
-    // the visitor's entry is permanently lost on a fast submit. Restore
-    //   await expect(page.getByText('amount: 21')).toBeVisible()
-    // when that fix lands.
+    // The visitor's own entry survives a fast submit: useAppendMessage
+    // refetches the conversation when its cache hasn't hydrated instead
+    // of dropping the optimistic append (the entry used to be lost for
+    // good).
+    await expect(page.getByText('amount: 21')).toBeVisible({ timeout: 10_000 })
   })
 })

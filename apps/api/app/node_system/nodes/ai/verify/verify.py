@@ -207,17 +207,22 @@ class VerifyNode(BaseNode[VerifyProperties]):
             details = {"error": str(e)}
 
         average = 100.0 if passed else 0.0
-        return NodeResult(
-            success=True,
-            output_data={
-                "passed": passed,
-                "feedback": feedback,
-                "level": level,
-                "mode": mode,
-                "average": average,
-                "details": details,
-            },
-        )
+        output: dict[str, Any] = {
+            "passed": passed,
+            "feedback": feedback,
+            "level": level,
+            "mode": mode,
+            "average": average,
+            "details": details,
+        }
+        # Pass the judged artifact through. The verdict node is usually the
+        # TERMINAL of a crew round — without this the maker's content dies
+        # here and downstream consumers (hosted chat replies, next nodes)
+        # only ever see {passed, feedback}.
+        content = input_data.get("content")
+        if content is not None:
+            output["content"] = content
+        return NodeResult(success=True, output_data=output)
 
     # --- L1: deterministic expression ---------------------------------------
     def _verify_expression(
