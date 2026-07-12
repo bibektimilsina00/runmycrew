@@ -28,10 +28,19 @@ export default defineConfig({
   server: {
     port: 3001,
     proxy: {
+      // ws: true — buildWsUrl targets same-origin everywhere (execution
+      // sockets live under /api/v1/ws/…), so dev must upgrade WebSockets
+      // exactly like every deployed Caddy does.
       '/api': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
+        ws: true,
+      },
+      '/ws': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        ws: true,
       },
     },
   },

@@ -323,15 +323,18 @@ class EvaluatorNode(BaseNode[EvaluatorProperties]):
             max_total = sum(m.max for m in metrics)
             average = total / len(metrics) if metrics else 0
 
-            return NodeResult(
-                success=True,
-                output_data={
-                    "scores": scores,
-                    "passed": result.get("passed", average >= (max_total / len(metrics)) * 0.6),
-                    "feedback": result.get("feedback", ""),
-                    "average": round(average, 2),
-                },
-            )
+            output: dict[str, Any] = {
+                "scores": scores,
+                "passed": result.get("passed", average >= (max_total / len(metrics)) * 0.6),
+                "feedback": result.get("feedback", ""),
+                "average": round(average, 2),
+            }
+            # Pass the judged artifact through — the evaluator often
+            # terminates a crew round, and without this the maker's
+            # content dies at the verdict (hosted chat had nothing to say).
+            if self.props.content:
+                output["content"] = self.props.content
+            return NodeResult(success=True, output_data=output)
         except httpx.HTTPStatusError as e:
             return NodeResult(
                 success=False, error=f"API error {e.response.status_code}: {e.response.text[:200]}"

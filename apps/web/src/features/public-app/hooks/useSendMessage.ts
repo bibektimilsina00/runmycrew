@@ -155,12 +155,15 @@ export function useSendMessage(
         setState(s => ({ ...s, assistant: snapshot }))
       }
 
-      es.addEventListener('token', ev => {
+      // The engine emits `agent_chunk` frames with a `delta` field —
+      // this hook listened for a `token`/`text` event that nothing ever
+      // sent, so replies only appeared at execution_completed.
+      es.addEventListener('agent_chunk', ev => {
         armWatchdog()
         try {
-          const data = JSON.parse((ev as MessageEvent).data) as { text?: string }
-          if (data.text && assistantRef.current) {
-            patchAssistant({ content: assistantRef.current.content + data.text })
+          const data = JSON.parse((ev as MessageEvent).data) as { delta?: string }
+          if (data.delta && assistantRef.current) {
+            patchAssistant({ content: assistantRef.current.content + data.delta })
           }
         } catch {
           // ignore malformed frames
@@ -197,9 +200,16 @@ export function useSendMessage(
         try {
           const data = JSON.parse((ev as MessageEvent).data)
           const output = data.output ?? {}
-          // Prefer whatever text the runner emitted at the end.
-          if (typeof output.content === 'string' && output.content) {
-            patchAssistant({ content: output.content })
+          // Prefer whatever text the runner emitted at the end. Crew
+          // terminals nest the round artifact under `result`.
+          const finalText =
+            typeof output.content === 'string' && output.content
+              ? output.content
+              : typeof output.result?.content === 'string' && output.result.content
+                ? output.result.content
+                : ''
+          if (finalText) {
+            patchAssistant({ content: finalText })
           }
           if (Array.isArray(output.artifacts)) {
             patchAssistant({ artifacts: output.artifacts })

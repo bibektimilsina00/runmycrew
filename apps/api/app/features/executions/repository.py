@@ -92,6 +92,11 @@ class ExecutionRepository:
             select(Execution)
             .where(Execution.workflow_id == workflow_id)
             .order_by(Execution.started_at.desc())
+            # ExecutionOut serializes `logs`; without eager loading the
+            # relationship lazy-loads during response serialization —
+            # outside the async session — and the endpoint 500s
+            # (MissingGreenlet).
+            .options(selectinload(Execution.logs))
         )
         return list(result.scalars().all())
 
