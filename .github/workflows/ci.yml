@@ -101,3 +101,47 @@ jobs:
 
       - name: Build
         run: pnpm --filter runmycrew-web build
+
+  e2e-smoke:
+    name: E2E smoke — auth + run + form vs compose stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Bring up e2e stack
+        run: docker compose -f docker-compose.e2e.yml up -d --build --wait
+
+      - name: Smoke subset
+        working-directory: apps/web
+        run: pnpm e2e:smoke
+
+      - name: Stack logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.e2e.yml logs --tail 200 api worker
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-artifacts
+          path: |
+            apps/web/test-results/
+            apps/web/playwright-report/
+          retention-days: 7

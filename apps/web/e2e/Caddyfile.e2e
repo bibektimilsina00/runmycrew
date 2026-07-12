@@ -1,0 +1,19 @@
+# E2E Caddyfile — plain HTTP on :80, no domains, no TLS.
+# Mounted over /etc/caddy/Caddyfile in docker-compose.e2e.yml so the
+# production image is reused unchanged.
+:80 {
+	encode zstd gzip
+
+	respond /healthz "ok" 200
+
+	@api path /api/* /ws/* /openapi.json /docs /docs/* /health
+	handle @api {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

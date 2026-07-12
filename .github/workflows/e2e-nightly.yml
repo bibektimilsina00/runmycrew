@@ -1,0 +1,73 @@
+name: E2E nightly
+
+on:
+  schedule:
+    - cron: "30 2 * * *" # 02:30 UTC nightly
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  e2e:
+    name: Full Playwright suite vs compose stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Bring up e2e stack (always --build — stale workers lie)
+        run: docker compose -f docker-compose.e2e.yml up -d --build --wait
+
+      - name: Run full suite
+        working-directory: apps/web
+        run: pnpm exec playwright test
+
+      - name: Stack logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.e2e.yml logs --tail 200 api worker
+
+      - name: Upload traces + report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            apps/web/test-results/
+            apps/web/playwright-report/
+          retention-days: 14
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="E2E nightly failed — $(date -u +%F)"
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --search "\"$title\" in:title" --state open --json number -q '.[0].number' || true)
+          if [ -z "$existing" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --label e2e \
+              --body "Nightly E2E run failed: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — traces + report attached as artifacts."
+          fi
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.e2e.yml down -v
