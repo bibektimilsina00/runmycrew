@@ -1,0 +1,126 @@
+# E2E stack — everything Playwright needs, built from the CURRENT tree.
+#
+#   docker compose -f docker-compose.e2e.yml up -d --build --wait
+#   cd apps/web && pnpm e2e
+#
+# `--build` is not optional ceremony: the stale-worker trap (celery has
+# no hot reload) produced four false bug reports in July. The e2e npm
+# scripts always pass --build so neither CI nor a human can run specs
+# against yesterday's worker.
+#
+# No real API keys anywhere: agent/evaluator traffic goes to mock-llm
+# via the RMC_CHAT_COMPLETIONS_URL_* provider override.
+
+name: runmycrew-e2e
+
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: runmycrew
+    tmpfs:
+      - /var/lib/postgresql/data # throwaway state, faster CI
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mock-llm:
+    build:
+      context: apps/web/e2e/mock-llm
+    healthcheck:
+      # 127.0.0.1, not localhost: alpine resolves localhost to ::1 and
+      # the stdlib server binds IPv4 only.
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:9800/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment: &backend_env
+      POSTGRES_SERVER: db
+      REDIS_HOST: redis
+      ENVIRONMENT: local
+      SECRET_KEY: e2e-not-a-secret
+      RMC_CHAT_COMPLETIONS_URL_OPENAI_API_KEY: http://mock-llm:9800/v1/chat/completions
+      RMC_MODELS_URL_OPENAI_API_KEY: http://mock-llm:9800/v1/models
+      # Prod default is 5/minute — the auth specs + global setup burn
+      # that in one back-to-back run. Rate-limit BEHAVIOR isn't under
+      # test here; not-locking-out repeat suite runs is.
+      RATE_LIMIT_AUTH: 100/minute
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mock-llm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 20s
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment: *backend_env
+    # NOT on api: the api healthcheck reports 503 until a celery worker
+    # answers ping — api-before-worker deadlocks the stack.
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mock-llm:
+        condition: service_healthy
+    healthcheck:
+      # `uv run --no-sync`: deps live in the uv venv, bare `python` has
+      # no celery module.
+      test:
+        [
+          "CMD",
+          "uv",
+          "run",
+          "--no-sync",
+          "python",
+          "-c",
+          "import sys; from apps.api.app.core.celery import celery_app; r=celery_app.control.inspect(timeout=3).ping(); sys.exit(0 if r else 1)",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    volumes:
+      - ./apps/web/e2e/Caddyfile.e2e:/etc/caddy/Caddyfile:ro
+    ports:
+      - "4700:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12

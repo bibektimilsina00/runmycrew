@@ -9,7 +9,12 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "e2e:up": "docker compose -f ../../docker-compose.e2e.yml up -d --build --wait",
+    "e2e:down": "docker compose -f ../../docker-compose.e2e.yml down -v",
+    "e2e:run": "playwright test",
+    "e2e": "pnpm e2e:up && playwright test",
+    "e2e:smoke": "playwright test e2e/specs/auth.spec.ts e2e/specs/workflow-run.spec.ts e2e/specs/form-trigger.spec.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -55,6 +60,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
     "@sentry/vite-plugin": "^5.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

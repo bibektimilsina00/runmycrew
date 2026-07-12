@@ -11,6 +11,7 @@ on next backend reload. No monolith to edit.
 from __future__ import annotations
 
 import importlib
+import os
 import pkgutil
 
 from pydantic import BaseModel
@@ -59,8 +60,16 @@ class APIKeyProvider:
         self.supports_tools = supports_tools
         self.supports_response_format = supports_response_format
         self.ai_api_type = ai_api_type
-        self.chat_completions_url = chat_completions_url
-        self.models_url = models_url
+        # Per-provider endpoint override, e.g.
+        # RMC_CHAT_COMPLETIONS_URL_OPENAI_API_KEY=http://mock:9800/v1/chat/completions
+        # Lets ops point a provider at a proxy/self-hosted gateway, and
+        # lets the E2E stack run agent paths against a deterministic
+        # mock with no real keys.
+        env_key = id.upper().replace("-", "_")
+        self.chat_completions_url = (
+            os.environ.get(f"RMC_CHAT_COMPLETIONS_URL_{env_key}") or chat_completions_url
+        )
+        self.models_url = os.environ.get(f"RMC_MODELS_URL_{env_key}") or models_url
         # Set by `_discover_providers` after import from the module path.
         # `None` = flat provider (no brand grouping in the picker).
         self.brand: str | None = None
