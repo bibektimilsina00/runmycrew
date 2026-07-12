@@ -220,7 +220,7 @@ class GDriveNode(BaseNode[GDriveProperties]):
                     "label": "File ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.id }}",
+                    "placeholder": "{{ $step.id }}",
                     "condition": _cond_any("get_file", "share_file", "rename_file", "delete_file"),
                 },
                 # ── share ───────────────────────────────────────────

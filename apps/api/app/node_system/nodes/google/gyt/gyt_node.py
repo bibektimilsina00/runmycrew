@@ -509,7 +509,7 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                     "label": "Parent comment ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.comment_id }}",
+                    "placeholder": "{{ $step.comment_id }}",
                     "condition": _cond("reply_to_comment"),
                 },
                 {
@@ -517,7 +517,7 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                     "label": "Comment ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.comment_id }}",
+                    "placeholder": "{{ $step.comment_id }}",
                     "condition": _cond_any(
                         "update_comment",
                         "delete_comment",
@@ -565,7 +565,7 @@ class GoogleYouTubeNode(BaseNode[GoogleYouTubeProperties]):
                     "label": "Playlist item ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.playlist_item_id }}",
+                    "placeholder": "{{ $step.playlist_item_id }}",
                     "condition": _cond("remove_video_from_playlist"),
                 },
                 # ── subscriptions ──────────────────────────────────────

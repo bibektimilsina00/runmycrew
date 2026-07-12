@@ -350,7 +350,7 @@ class GoogleChatNode(BaseNode[GoogleChatProperties]):
                     "label": "Message text",
                     "type": "string",
                     "typeOptions": {"multiline": True, "rows": 4},
-                    "placeholder": "Hello from RunMyCrew — {{ $trigger.summary }}",
+                    "placeholder": "Hello from RunMyCrew — {{ $step.summary }}",
                     "condition": _cond_any("send_message", "update_message"),
                 },
                 {

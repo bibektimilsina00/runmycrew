@@ -39,7 +39,7 @@ class ForEachNode(BaseNode[ForEachProperties]):
                     "label": "Items",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$trigger.output.items}}",
+                    "placeholder": "{{$step.items}}",
                     "description": "Array to iterate. In downstream nodes use: {{$loop.item}}, {{$loop.index}}, {{$loop.total}}, {{$loop.items}}",
                 },
                 {

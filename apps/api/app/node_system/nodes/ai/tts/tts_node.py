@@ -149,7 +149,7 @@ class TTSNode(BaseNode[TTSProperties]):
                     "label": "Text",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$llm.text}}",
+                    "placeholder": "{{$step.text}}",
                 },
             ],
             inputs=1,

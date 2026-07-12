@@ -13,7 +13,7 @@ _MAX_ITERATIONS = 1000
 
 
 class WhileLoopProperties(BaseModel):
-    condition: str = "{{$variables.shouldContinue}}"
+    condition: str = "{{$step.shouldContinue}}"
     maxIterations: int = 100
 
 
@@ -37,8 +37,8 @@ class WhileLoopNode(BaseNode[WhileLoopProperties]):
                     "label": "Condition",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$variables.hasMore}}",
-                    "description": "Template expression. Loop continues while this resolves to truthy. Supports: {{$path}} == value, {{$path}} < 10, {{$path}} != null",
+                    "placeholder": "{{$step.hasMore}}",
+                    "description": "Template expression. Loop continues while this resolves to truthy. Supports: {{$step.field}} == value, {{$step.field}} < 10, {{$step.field}} != null",
                 },
                 {
                     "name": "maxIterations",
@@ -57,6 +57,11 @@ class WhileLoopNode(BaseNode[WhileLoopProperties]):
             ],
         )
 
+    @classmethod
+    def deferred_properties(cls) -> frozenset[str]:
+        # Re-evaluated every iteration; the runner must not pre-resolve it.
+        return frozenset({"condition"})
+
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
         if context.run_downstream is None:
             return NodeResult(success=False, error="run_downstream not injected")
@@ -69,10 +74,8 @@ class WhileLoopNode(BaseNode[WhileLoopProperties]):
         iteration = 0
 
         while iteration < max_iter:
-            # Build a resolver scoped to current iteration output
-            resolver = TemplateResolver(
-                node_outputs={"iteration": current_input},
-                trigger_data=current_input,
+            resolver = TemplateResolver.for_iteration(
+                current_input,
                 variables=context.variables,
                 env=getattr(context, "env", {}),
             )

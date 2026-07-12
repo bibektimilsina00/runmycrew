@@ -153,7 +153,7 @@ class GooglePeopleNode(BaseNode[GooglePeopleProperties]):
                     "label": "Contact ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "people/c12345…  or  {{ $trigger.resource_name }}",
+                    "placeholder": "people/c12345…  or  {{ $step.resource_name }}",
                     "description": "Use the People API resource name (`people/c…`).",
                     "condition": _cond_any(*_CONTACT_OPS),
                 },

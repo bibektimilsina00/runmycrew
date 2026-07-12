@@ -13,7 +13,7 @@ _MAX_ITERATIONS = 1000
 
 
 class DoWhileProperties(BaseModel):
-    condition: str = "{{$variables.shouldContinue}}"
+    condition: str = "{{$step.shouldContinue}}"
     maxIterations: int = 100
 
 
@@ -37,7 +37,7 @@ class DoWhileNode(BaseNode[DoWhileProperties]):
                     "label": "Condition",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$variables.hasMore}}",
+                    "placeholder": "{{$step.hasMore}}",
                     "description": "Checked AFTER each iteration. Same syntax as While Loop.",
                 },
                 {
@@ -55,6 +55,11 @@ class DoWhileNode(BaseNode[DoWhileProperties]):
                 {"label": "iterations", "type": "number"},
             ],
         )
+
+    @classmethod
+    def deferred_properties(cls) -> frozenset[str]:
+        # Re-evaluated every iteration; the runner must not pre-resolve it.
+        return frozenset({"condition"})
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
         if context.run_downstream is None:
@@ -78,9 +83,8 @@ class DoWhileNode(BaseNode[DoWhileProperties]):
             iteration += 1
 
             # Condition checked AFTER execution
-            resolver = TemplateResolver(
-                node_outputs={"iteration": current_input},
-                trigger_data=current_input,
+            resolver = TemplateResolver.for_iteration(
+                current_input,
                 variables=context.variables,
                 env=getattr(context, "env", {}),
             )

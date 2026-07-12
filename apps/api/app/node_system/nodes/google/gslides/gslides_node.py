@@ -443,7 +443,7 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                 },
                 # create_from_outline / build_deck — outline accepts
                 # either a JSON literal pasted in by the user OR an
-                # `{{ $agent.output }}` expression that resolves to an
+                # `{{ $step.outline }}` expression that resolves to an
                 # array at runtime. Field type is `string` (not `json`)
                 # so the editor doesn't slap an "Invalid JSON" warning
                 # onto a perfectly valid expression reference; the
@@ -456,7 +456,7 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                     "required": True,
                     "typeOptions": {"multiline": True, "rows": 8},
                     "placeholder": (
-                        "{{ $node.Agent.output }}     ← bind an LLM output\n"
+                        "{{ $node('Agent').content }}  ← bind an LLM output\n"
                         "OR paste a JSON array:\n"
                         "[\n"
                         '  {"layout": "TITLE", "title": "Q1 review", "subtitle": "March 2026"},\n'
@@ -502,7 +502,7 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                     "label": "Slide ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $node.get_text.slides[0].slide_id }}",
+                    "placeholder": "{{ $node('Get Text').slides[0].slide_id }}",
                     "description": "Object ID of the slide. Run `Get All Text` first to discover IDs.",
                     "condition": _cond_any(*_NEEDS_SLIDE_ID),
                 },
@@ -512,7 +512,7 @@ class GoogleSlidesNode(BaseNode[GoogleSlidesProperties]):
                     "label": "Element ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $node.get_text.slides[0].elements[0].id }}",
+                    "placeholder": "{{ $node('Get Text').slides[0].elements[0].id }}",
                     "description": "Object ID of the page element (text box, image, shape).",
                     "condition": _cond_any(*_NEEDS_ELEMENT_ID),
                 },

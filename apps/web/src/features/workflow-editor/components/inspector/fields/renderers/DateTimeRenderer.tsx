@@ -7,7 +7,7 @@ import type { RendererProps } from '../types'
  * Datetime field renderer — both **typeable** and **pickable**.
  *
  * The visible input is a plain text field, so users can paste expressions
- * (`{{ $trigger.date }}`) or hand-type a literal value. A trailing
+ * (`{{ $step.date }}`) or hand-type a literal value. A trailing
  * calendar icon opens the browser's native date / date-time picker via
  * `HTMLInputElement.showPicker()`; the picked value is normalised back
  * to the canonical shape and written into the text field.

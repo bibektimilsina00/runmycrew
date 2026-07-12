@@ -165,7 +165,7 @@ class GCalNode(BaseNode[GCalProperties]):
                     "label": "Event ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.id }}",
+                    "placeholder": "{{ $step.id }}",
                     "condition": _cond_any("update_event", "delete_event", "get_event"),
                 },
                 # ── content fields — create / update ────────────────

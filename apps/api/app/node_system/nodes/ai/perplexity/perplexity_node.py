@@ -77,7 +77,7 @@ class PerplexityNode(BaseNode[PerplexityProperties]):
                     "label": "Query",
                     "type": "string",
                     "required": True,
-                    "placeholder": "What is the latest news on {{$trigger.topic}}?",
+                    "placeholder": "What is the latest news on {{$step.topic}}?",
                 },
                 {
                     "name": "search_recency_filter",

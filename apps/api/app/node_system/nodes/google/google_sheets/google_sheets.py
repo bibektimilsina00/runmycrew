@@ -433,7 +433,7 @@ class GoogleSheetsNode(BaseNode[GoogleSheetsProperties]):
                     "label": "Match this value",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.email }}",
+                    "placeholder": "{{ $step.email }}",
                     "condition": _cond("lookup_row"),
                 },
                 {

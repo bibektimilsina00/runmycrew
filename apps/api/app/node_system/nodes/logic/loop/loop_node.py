@@ -26,7 +26,7 @@ class LoopProperties(BaseModel):
     start: int = 0
     step: int = 1
     # while / do_while
-    condition: str = "{{$variables.shouldContinue}}"
+    condition: str = "{{$step.shouldContinue}}"
     max_iterations: int = 100
     # shared
     parallel: bool = False
@@ -70,7 +70,7 @@ class LoopNode(BaseNode[LoopProperties]):
                     "label": "Items",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$trigger.output.items}}",
+                    "placeholder": "{{$step.items}}",
                     "description": "Array to iterate. Use {{$loop.item}}, {{$loop.index}}, {{$loop.total}} in downstream nodes.",
                     "condition": {"field": "loop_type", "value": "for_each"},
                 },
@@ -106,7 +106,7 @@ class LoopNode(BaseNode[LoopProperties]):
                     "label": "Condition",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{$variables.hasMore}}",
+                    "placeholder": "{{$step.hasMore}}",
                     "description": "Loop continues while this is truthy. Use {{$loop.iteration}} in downstream nodes.",
                     "condition": {"field": "loop_type", "value": ["while", "do_while"]},
                 },
@@ -138,6 +138,11 @@ class LoopNode(BaseNode[LoopProperties]):
                 {"label": "iterations", "type": "number"},
             ],
         )
+
+    @classmethod
+    def deferred_properties(cls) -> frozenset[str]:
+        # Re-evaluated every iteration; the runner must not pre-resolve it.
+        return frozenset({"condition"})
 
     async def execute(self, input_data: dict[str, Any], context: NodeContext) -> NodeResult:
         if context.run_downstream is None:
@@ -230,7 +235,7 @@ class LoopNode(BaseNode[LoopProperties]):
         iteration = 0
 
         while iteration < max_iter:
-            resolver = TemplateResolver(node_outputs={}, trigger_data=current_input, variables={})
+            resolver = TemplateResolver.for_iteration(current_input, variables=context.variables)
             if not resolver.evaluate_condition(self.props.condition):
                 break
 
@@ -269,7 +274,7 @@ class LoopNode(BaseNode[LoopProperties]):
             current_input = iteration_result
             iteration += 1
 
-            resolver = TemplateResolver(node_outputs={}, trigger_data=current_input, variables={})
+            resolver = TemplateResolver.for_iteration(current_input, variables=context.variables)
             if not resolver.evaluate_condition(self.props.condition):
                 break
 

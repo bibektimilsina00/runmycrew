@@ -83,7 +83,7 @@ class ThinkingNode(BaseNode[ThinkingProperties]):
                     "label": "Prompt",
                     "type": "string",
                     "required": True,
-                    "placeholder": "Think through this step by step: {{$trigger.output}}",
+                    "placeholder": "Think through this step by step: {{$step}}",
                 },
                 {
                     "name": "budgetTokens",

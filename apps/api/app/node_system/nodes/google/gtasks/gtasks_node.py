@@ -186,7 +186,7 @@ class GoogleTasksNode(BaseNode[GoogleTasksProperties]):
                     "label": "Task ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.id }}",
+                    "placeholder": "{{ $step.id }}",
                     "condition": _cond_any(
                         "get_task",
                         "update_task",

@@ -466,7 +466,7 @@ class GoogleFormsNode(BaseNode[GoogleFormsProperties]):
                     "label": "Response ID",
                     "type": "string",
                     "required": True,
-                    "placeholder": "{{ $trigger.response_id }}",
+                    "placeholder": "{{ $step.response_id }}",
                     "condition": _cond("get_response"),
                 },
                 # ── share ──────────────────────────────────────────────
