@@ -86,6 +86,7 @@ services:
       POSTGRES_SERVER: db
       REDIS_HOST: redis
       ENVIRONMENT: production
+      RELEASE: ${RUNMYCREW_IMAGE_TAG:-}
       BASE_URL: ${BASE_URL:-https://app.runmycrew.com}
       FRONTEND_URL: ${FRONTEND_URL:-https://app.runmycrew.com}
       TZ: UTC
@@ -112,6 +113,7 @@ services:
       POSTGRES_SERVER: db
       REDIS_HOST: redis
       ENVIRONMENT: production
+      RELEASE: ${RUNMYCREW_IMAGE_TAG:-}
       TZ: UTC
     # Worker MUST NOT depend on api. The api healthcheck uses Celery's
     # inspect ping, so api-healthy requires the worker alive — a
@@ -158,6 +160,7 @@ services:
       POSTGRES_SERVER: db
       REDIS_HOST: redis
       ENVIRONMENT: production
+      RELEASE: ${RUNMYCREW_IMAGE_TAG:-}
       TZ: UTC
     depends_on:
       db:

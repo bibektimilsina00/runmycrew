@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import Depends
 from sqlalchemy import func, select
+from sqlalchemy import update as sa_update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -126,6 +127,48 @@ class ExecutionRepository:
                 execution.output_data = output_data
             await self.db.commit()
             await self.publish_run_update(execution_id)
+
+    async def mark_terminal_if_not(
+        self, execution_id: uuid.UUID, status: str, output_data: dict | None = None
+    ) -> bool:
+        """Set a terminal status ONLY if the row isn't already terminal.
+
+        The worker's outer crash-net calls this so a late failure can't
+        clobber a run that actually finished (or was cancelled) in a race.
+        Returns True when it applied the change."""
+        result = await self.db.execute(select(Execution).where(Execution.id == execution_id))
+        execution = result.scalar_one_or_none()
+        if execution is None or execution.status in ("completed", "failed", "cancelled"):
+            return False
+        execution.status = status
+        execution.finished_at = datetime.now(UTC)
+        if output_data is not None:
+            execution.output_data = output_data
+        await self.db.commit()
+        await self.publish_run_update(execution_id)
+        return True
+
+    async def reap_stale_running(self, older_than_seconds: int) -> list[uuid.UUID]:
+        """Fail executions stuck `running` past a cutoff and return their ids.
+
+        A worker killed with SIGKILL (OOM, deploy, crash) runs no Python
+        `except`, so its execution row sits `running` forever and the UI
+        spins. This is the durable backstop: any run whose `started_at`
+        predates the cutoff is marked `failed`."""
+        cutoff = datetime.now(UTC) - timedelta(seconds=older_than_seconds)
+        result = await self.db.execute(
+            select(Execution.id).where(Execution.status == "running", Execution.started_at < cutoff)
+        )
+        ids = [row[0] for row in result.all()]
+        if not ids:
+            return []
+        await self.db.execute(
+            sa_update(Execution)
+            .where(Execution.id.in_(ids))
+            .values(status="failed", finished_at=datetime.now(UTC))
+        )
+        await self.db.commit()
+        return ids
 
     async def add_log(
         self,
