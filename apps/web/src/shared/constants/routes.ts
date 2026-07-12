@@ -169,8 +169,10 @@ export const API_ROUTES = {
 
   // User / Account
   USER_ME: '/users/me',
-  USER_API_KEYS: '/users/api-keys',
-  USER_API_KEY: (id: string) => `/users/api-keys/${id}`,
+  // Backend mounts the api-keys router at /api-keys (not under /users) —
+  // the old /users/api-keys path 404'd, so Settings → API keys was dead.
+  USER_API_KEYS: '/api-keys',
+  USER_API_KEY: (id: string) => `/api-keys/${id}`,
 
   // Workspaces
   WORKSPACES: '/workspaces/',

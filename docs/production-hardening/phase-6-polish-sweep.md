@@ -1,5 +1,25 @@
 # Phase 6 — Product Polish Sweep (2–3 days)
 
+> **Status: SWEEP DONE (2026-07-12), branch `test/phase-6-polish`.**
+> Automated Playwright sweep (`e2e/specs/polish-sweep.spec.ts`, opt-in via
+> `POLISH=1`) walked all 20 authenticated + editor + not-found screens at
+> 1440px and 375px, capturing console errors, failed requests, and
+> horizontal-scroll. Machine-checkable results:
+> **mobile 375px is clean — zero horizontal scroll on every screen.**
+> Three real bugs found and fixed here:
+> 1. `/runs` live-updates were dead off-localhost — `useRuns.ts` kept the
+>    same `localhost:8000` WS hardcode phase-3 fixed in `useRunStream`
+>    (both now share `apiWsBaseUrl()`).
+> 2. **Settings → API keys was 404** — the frontend called
+>    `/users/api-keys` but the backend mounts `/api-keys`.
+> 3. The PostgreSQL credential's `icon_slug` didn't match its shipped
+>    `postgresql.svg`, so `/icons/postgres` 404'd to a blank tile.
+> Two crew-editor endpoint-routing findings (copilot + collab WS use the
+> workflow path with a crew id) are carded in
+> `phase-6-deferred-findings.md`. The five-states-per-screen visual pass
+> (empty/loading/error nuance) is a human review of the captured
+> screenshots — the automated sweep covers the mechanical states.
+
 Systematic, not aesthetic. Every screen gets checked against the same five states; every gap becomes a card; fixes land in batches. Claude runs the sweep with Playwright screenshots and hands over the annotated gap list.
 
 ## The five states (per screen)

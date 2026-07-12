@@ -4,6 +4,7 @@ import { runsAPI, type ApiExecution } from '@/features/runs/services/runsAPI'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
 import { logger } from '@/shared/utils/logger'
+import { apiWsBaseUrl } from '@/features/runs/utils/wsUrl'
 
 export function mapBackendRun(r: ApiExecution): Run {
   let status: RunStatus = 'ok'
@@ -110,12 +111,7 @@ export function useRuns() {
     const resolvedToken = token || localStorage.getItem('runmycrew-auth-token') || ''
     if (!resolvedToken) return
 
-    const rawApiUrl = import.meta.env.VITE_API_URL || '/api/v1'
-    const wsBaseUrl = rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://')
-      ? rawApiUrl.replace(/^http/, 'ws')
-      : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host}${rawApiUrl}`
-
-    const wsUrl = `${wsBaseUrl}/ws/workspaces/${workspaceId}/runs?token=${encodeURIComponent(resolvedToken)}`
+    const wsUrl = `${apiWsBaseUrl()}/ws/workspaces/${workspaceId}/runs?token=${encodeURIComponent(resolvedToken)}`
 
     let ws: WebSocket | null = null
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null

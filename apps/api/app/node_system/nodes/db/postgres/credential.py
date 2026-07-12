@@ -10,7 +10,9 @@ from apps.api.app.credential_manager.api_keys import APIKeyProvider, CredentialF
 PROVIDER = APIKeyProvider(
     id="postgres_credentials",
     name="PostgreSQL",
-    icon_slug="postgres",
+    # Ships postgresql.svg in this folder — the slug must match the file
+    # or /icons/postgres 404s and the tile renders blank.
+    icon_slug="postgresql",
     color="#ffffff",
     description="PostgreSQL — connection string or host/port/user/password/db.",
     hint="Paste a full connection string (postgresql://user:pass@host:port/db) or fill the fields below.",
