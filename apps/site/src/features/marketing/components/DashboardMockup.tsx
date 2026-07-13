@@ -37,7 +37,20 @@ export function DashboardMockup() {
 
   return (
     <div className="relative mt-12 sm:mt-16">
-      <div className="relative flex h-[620px] overflow-hidden rounded-[14px] border border-white/10 bg-[#0c0d0f] shadow-[0_60px_160px_-40px_rgba(0,0,0,0.92),0_0_0_1px_rgba(255,255,255,0.02)]">
+      {/* Lit "floor" gradient the window floats above — gives the shot the
+          same depth as a real product screenshot instead of sitting flat
+          on black. Sits behind + below the frame, edges faded. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-[12%] -bottom-[20%] top-[6%] -z-10 rounded-[48px]"
+        style={{
+          background:
+            'radial-gradient(120% 95% at 50% 122%, color-mix(in oklab, var(--primary) 32%, transparent), transparent 62%), radial-gradient(100% 75% at 50% -12%, rgba(255,255,255,0.06), transparent 55%)',
+        }}
+      />
+      <div className="relative flex h-[620px] overflow-hidden rounded-[14px] border border-white/10 bg-[#0c0d0f] shadow-[0_80px_180px_-40px_rgba(0,0,0,0.94),0_8px_40px_-12px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+        {/* Top-edge sheen — the subtle highlight real windows catch. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
         <Sidebar />
 
         {/* ── Main ────────────────────────────────────────────── */}
