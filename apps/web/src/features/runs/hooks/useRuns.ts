@@ -4,7 +4,7 @@ import { runsAPI, type ApiExecution } from '@/features/runs/services/runsAPI'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { useWorkspaceStore } from '@/features/workspaces/store/workspaceStore'
 import { logger } from '@/shared/utils/logger'
-import { apiWsBaseUrl } from '@/features/runs/utils/wsUrl'
+import { apiWsBaseUrl, openAuthedWs } from '@/features/runs/utils/wsUrl'
 
 export function mapBackendRun(r: ApiExecution): Run {
   let status: RunStatus = 'ok'
@@ -111,7 +111,8 @@ export function useRuns() {
     const resolvedToken = token || localStorage.getItem('runmycrew-auth-token') || ''
     if (!resolvedToken) return
 
-    const wsUrl = `${apiWsBaseUrl()}/ws/workspaces/${workspaceId}/runs?token=${encodeURIComponent(resolvedToken)}`
+    // Token rides as a subprotocol, not in the URL (which proxies log).
+    const wsUrl = `${apiWsBaseUrl()}/ws/workspaces/${workspaceId}/runs`
 
     let ws: WebSocket | null = null
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
@@ -120,7 +121,7 @@ export function useRuns() {
     function connect() {
       if (!shouldReconnect) return
 
-      ws = new WebSocket(wsUrl)
+      ws = openAuthedWs(wsUrl, resolvedToken)
 
       ws.onopen = () => {
         logger.info('[WorkspaceRunsWS] Connected')

@@ -28,21 +28,22 @@ interface ClientOptions {
 function buildWsUrl({
   workflowId,
   workspaceId,
-  token,
 }: {
   workflowId: string
   workspaceId: string
-  token: string
 }): string {
   // Backend mounts the websocket at /api/v1/ws/workflows/:id/collaboration
   // (apps/api/app/api/v1/router.py:47). The HTTP base lives in
   // VITE_API_URL; we swap http→ws / https→wss and append the path.
+  // The token is NOT in the URL — it rides as a subprotocol (see
+  // openSocket) so it never lands in proxy logs. workspace_id isn't
+  // sensitive, so it stays a query param.
   const apiBase = import.meta.env.VITE_API_URL || `${window.location.origin}/api/v1`
   const httpUrl = apiBase.startsWith('http')
     ? apiBase
     : `${window.location.origin}${apiBase}`
   const wsBase = httpUrl.replace(/^http/, 'ws')
-  const params = new URLSearchParams({ token, workspace_id: workspaceId })
+  const params = new URLSearchParams({ workspace_id: workspaceId })
   return `${wsBase}/ws/workflows/${workflowId}/collaboration?${params.toString()}`
 }
 
@@ -84,7 +85,8 @@ export class CollaborationClient {
 
   private openSocket(): void {
     const url = buildWsUrl(this.opts)
-    const socket = new WebSocket(url)
+    // Token as a subprotocol, not in the URL (keeps the JWT out of logs).
+    const socket = new WebSocket(url, ['fuse-auth', this.opts.token])
     this.socket = socket
 
     socket.onopen = () => {

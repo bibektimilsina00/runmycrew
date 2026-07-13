@@ -179,7 +179,9 @@ class CollaborationService:
             await websocket.close(code=4001)
             return
 
-        await websocket.accept()
+        from apps.api.app.core.ws_auth import ws_accept_subprotocol
+
+        await websocket.accept(subprotocol=ws_accept_subprotocol(websocket))
         await self.add_presence(workflow_id, session)
         await websocket.send_json(
             CollaborationServerEvent(type="session.ready", session=session).model_dump(mode="json")

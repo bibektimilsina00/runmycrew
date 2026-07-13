@@ -52,7 +52,18 @@ content sniffing instead of trusting `content_type`; per-session byte + count
 quota.
 **Exploitable now?** DB-bloat DoS still possible via many in-quota uploads.
 
-## 3. WebSocket token in query string (LOW)
+## 3. WebSocket token in query string (LOW) — FIXED 2026-07-13
+
+> **FIXED (branch `fix/ws-subprotocol-auth`).** All four WS clients
+> (execution stream, workspace runs, collaboration ×2 URL builders) now
+> pass the JWT as a `Sec-WebSocket-Protocol` subprotocol (`["fuse-auth",
+> "<jwt>"]`) instead of `?token=`, so it no longer lands in proxy/uvicorn
+> access logs or history. Backend reads it via `core/ws_auth.py` and
+> echoes `fuse-auth` on accept; the query param is still accepted as a
+> fallback for older clients. Runtime-verified end-to-end through
+> Caddy→uvicorn: streaming specs pass and the WS URL carries no token.
+> +6 tests. Original finding follows.
+
 `/ws/executions/{id}?token=<jwt>` — the JWT can land in proxy/access logs.
 **Fix:** move to first-message auth or an `Authorization` header on the
 upgrade (frontend refactor). **Exploitable now?** Only with log access;
