@@ -175,17 +175,17 @@ export function DashboardMockup() {
         </div>
       </div>
 
-      {/* Neutral lit "floor" the window stands on — a soft gray spotlight
-          rising from the window's base and fading down to black, like a
-          real product shot on a lit surface. Painted AFTER the window so
-          the frame's drop shadow doesn't darken it; sits below the frame
-          (top ≈ window height) so it never covers the content. */}
+      {/* Neutral lit "floor" the window stands ON. The glow's centre is
+          pinned in px to y=620px — the window's exact bottom edge — so the
+          bright band hugs the base with no gap (the opaque frame, z-10,
+          hides the upper half of the ellipse). Painted after the frame so
+          its drop shadow can't darken the floor. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-[-20%] bottom-[40px] top-[600px] z-0"
+        className="pointer-events-none absolute inset-x-[-25%] top-0 bottom-0 z-0"
         style={{
           background:
-            'radial-gradient(50% 100% at 50% 8%, rgba(232,235,242,0.6), rgba(176,182,196,0.24) 34%, transparent 66%)',
+            'radial-gradient(700px 300px at 50% 620px, rgba(232,235,242,0.55), rgba(176,182,196,0.20) 38%, transparent 70%)',
         }}
       />
       <div className="relative z-10 mt-3 font-mono text-[11px] tracking-[0.04em] text-muted-foreground/60">
