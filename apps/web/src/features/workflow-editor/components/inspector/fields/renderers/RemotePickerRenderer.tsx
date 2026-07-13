@@ -132,15 +132,16 @@ function ModeButton({ active, onClick, icon, label }: {
     <button
       type="button"
       onClick={onClick}
+      title={label}
+      aria-label={label}
       className={cn(
-        'inline-flex items-center gap-1 rounded-[5px] px-1.5 py-[2px] text-[10.5px] font-medium transition-colors',
+        'inline-flex items-center justify-center rounded-[4px] px-1.5 py-[1px] transition-colors',
         active
           ? 'bg-[var(--bg-2)] text-[var(--text)] shadow-[inset_0_0_0_1px_var(--border-faint)]'
           : 'text-[var(--text-mute)] hover:text-[var(--text)]',
       )}
     >
       {icon}
-      {label}
     </button>
   )
 }
