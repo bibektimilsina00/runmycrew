@@ -16,12 +16,24 @@ class CopilotSession(SQLModelBase, table=True):
         default_factory=uuid.uuid4,
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
-    workflow_id: uuid.UUID = Field(
+    # Exactly one of workflow_id / crew_id is set — the entity this copilot
+    # thread is editing. Mirrors AppSession's dual-owner shape so the
+    # copilot can build crews as well as workflows.
+    workflow_id: uuid.UUID | None = Field(
+        default=None,
         sa_column=Column(
             UUID(as_uuid=True),
             ForeignKey("workflow.id", ondelete="CASCADE"),
-            nullable=False,
-        )
+            nullable=True,
+        ),
+    )
+    crew_id: uuid.UUID | None = Field(
+        default=None,
+        sa_column=Column(
+            UUID(as_uuid=True),
+            ForeignKey("crew.id", ondelete="CASCADE"),
+            nullable=True,
+        ),
     )
     user_id: uuid.UUID = Field(
         sa_column=Column(

@@ -34,7 +34,7 @@ async def copilot_chat(
     current_user: User = Depends(get_current_user),
     service: CopilotService = Depends(get_copilot_service),
 ) -> StreamingResponse:
-    wf = await service.get_workflow_or_404(workflow_id, current_user)
+    entity, kind = await service.resolve_target(workflow_id, current_user)
 
     # Resolve AI provider
     ai_provider = get_ai_provider(request.provider)
@@ -60,7 +60,7 @@ async def copilot_chat(
         )
 
     model = request.model or _PROVIDER_DEFAULT_MODELS.get(request.provider, "")
-    graph = request.graph if request.graph is not None else wf.graph
+    graph = request.graph if request.graph is not None else entity.graph
     messages = [{"role": m.role, "content": m.content} for m in request.messages]
     node_metadata = node_registry.list_nodes()
 
@@ -68,7 +68,7 @@ async def copilot_chat(
         async for chunk in run_copilot(
             messages=messages,
             graph=graph,
-            workflow_id=str(wf.id),
+            workflow_id=str(entity.id),
             api_key=api_key,
             ai_api_type=ai_provider.ai_api_type,
             chat_completions_url=ai_provider.chat_completions_url or "",
@@ -77,6 +77,7 @@ async def copilot_chat(
             db=service.db,
             session_id=request.session_id,
             user_id=str(current_user.id),
+            kind=kind,
         ):
             yield chunk
 

@@ -1,9 +1,8 @@
 /**
- * Copilot is workflow-only (its backend routes are WorkflowRepository-
- * scoped). On a crew editor the id is a crew id, so every copilot call
- * 404s — the hook must not fire them there.
+ * Copilot works for both workflows and crews — the backend resolves the id
+ * as either kind and builds the graph with the same tools.
  */
-import { renderHook, act } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { copilotAPI } from '../services/copilotAPI'
@@ -38,25 +37,16 @@ afterEach(() => {
   useWorkflowEditorStore.setState({ mode: 'workflow' })
 })
 
-describe('useCopilotChat crew gating', () => {
+describe('useCopilotChat works for workflows AND crews', () => {
   it('loads sessions for a workflow', () => {
     setEditor('workflow')
     renderHook(() => useCopilotChat())
     expect(copilotAPI.listSessions).toHaveBeenCalledWith('id-123')
   })
 
-  it('does NOT call copilot session endpoints for a crew', () => {
+  it('loads sessions for a crew too (backend resolves either kind)', () => {
     setEditor('crew')
     renderHook(() => useCopilotChat())
-    expect(copilotAPI.listSessions).not.toHaveBeenCalled()
-  })
-
-  it('send() on a crew sets an error instead of hitting the 404 path', async () => {
-    setEditor('crew')
-    const { result } = renderHook(() => useCopilotChat())
-    await act(async () => {
-      await result.current.send('hi')
-    })
-    expect(result.current.error).toMatch(/workflows, not crews/i)
+    expect(copilotAPI.listSessions).toHaveBeenCalledWith('id-123')
   })
 })

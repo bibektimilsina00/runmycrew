@@ -10,18 +10,23 @@ class CopilotSessionRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def list_by_workflow_and_user(
+    async def list_by_target_and_user(
         self,
-        workflow_id: uuid.UUID,
+        *,
+        workflow_id: uuid.UUID | None = None,
+        crew_id: uuid.UUID | None = None,
         user_id: uuid.UUID,
         limit: int = 50,
     ) -> list[CopilotSession]:
+        """Sessions for a workflow OR crew (exactly one id set)."""
+        target = (
+            CopilotSession.workflow_id == workflow_id
+            if workflow_id is not None
+            else CopilotSession.crew_id == crew_id
+        )
         result = await self.db.execute(
             select(CopilotSession)
-            .where(
-                CopilotSession.workflow_id == workflow_id,
-                CopilotSession.user_id == user_id,
-            )
+            .where(target, CopilotSession.user_id == user_id)
             .order_by(CopilotSession.updated_at.desc())
             .limit(limit)
         )
