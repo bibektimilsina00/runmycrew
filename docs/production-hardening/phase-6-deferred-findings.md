@@ -1,5 +1,14 @@
 # Phase 6 — deferred polish findings (carded)
 
+> **UPDATE (2026-07-13):** both crew-editor findings below are FIXED
+> (branch `fix/crew-editor-routing`). Copilot and collaboration are
+> workflow-only on the backend (their routes are WorkflowRepository-
+> scoped), so the frontend now gates both off when the editor mode is
+> `crew`: no session-list call, no collab WS connect, and opening Copilot
+> on a crew shows "available for workflows, not crews" instead of 404ing.
+> Verified at runtime — crew editor loads with zero copilot/collab 404s
+> and zero console errors. +3 vitest.
+
 Fixed in the phase-6 PR: the WS-hardcode on the runs list, the dead
 Settings→API-keys path, the postgres brand-icon slug. These remain — real
 but architectural (crew editor reuses workflow-scoped endpoints with a crew
