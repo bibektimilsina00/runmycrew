@@ -1,8 +1,10 @@
 import { useState, type KeyboardEvent } from 'react'
-import { Mic, ArrowUp, Loader2, X, ChevronDown } from 'lucide-react'
+import { Mic, ArrowUp, Loader2, X, ChevronDown, Workflow, Users } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useVoiceInput } from '@/shared/hooks/useVoiceInput'
 import { Icons } from '@/shared/components/icons'
+
+export type BuildKind = 'workflow' | 'crew'
 
 interface PromptCardProps {
   prompt: string
@@ -12,6 +14,8 @@ interface PromptCardProps {
   statusMessage?: string
   onCancel?: () => void
   placeholder?: string
+  kind?: BuildKind
+  onKindChange?: (k: BuildKind) => void
 }
 
 export function PromptCard({
@@ -22,6 +26,8 @@ export function PromptCard({
   statusMessage,
   onCancel,
   placeholder = 'What workflow shall we automate?',
+  kind = 'workflow',
+  onKindChange,
 }: PromptCardProps) {
   const [focused, setFocused] = useState(false)
   const voice = useVoiceInput({ value: prompt, onChange: onPromptChange })
@@ -91,6 +97,25 @@ export function PromptCard({
             </div>
           ) : (
             <>
+              {/* Build target: workflow or crew. Copilot builds either. */}
+              <div className="inline-flex items-center rounded-[8px] border border-[var(--border-soft)] bg-[var(--surface-2)] p-[2px]">
+                {(['workflow', 'crew'] as const).map(k => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => onKindChange?.(k)}
+                    className={cn(
+                      'inline-flex items-center gap-[5px] rounded-[6px] px-[9px] py-[4px] text-[12px] font-medium capitalize transition-colors',
+                      kind === k
+                        ? 'bg-[var(--surface)] text-[var(--text)] shadow-[inset_0_0_0_1px_var(--border-soft)]'
+                        : 'text-[var(--text-mute)] hover:text-[var(--text)]',
+                    )}
+                  >
+                    {k === 'workflow' ? <Workflow className="h-[13px] w-[13px]" /> : <Users className="h-[13px] w-[13px]" />}
+                    {k}
+                  </button>
+                ))}
+              </div>
               <div className="ml-auto flex items-center gap-[10px]">
                 <span className="hidden sm:inline-flex items-center gap-[5px] text-[11.5px] text-[var(--text-dim)]">
                   <kbd className="kbd">↵</kbd> to send

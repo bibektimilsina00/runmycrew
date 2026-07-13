@@ -9,12 +9,36 @@ from apps.api.app.features.copilot.engine_core.node_schema import build_node_ind
 def build_system_prompt(
     graph: dict[str, Any],
     node_metadata: list[dict[str, Any]],
+    kind: str = "workflow",
 ) -> str:
     """Build the copilot system prompt: a *bounded* node index (triggers + core),
     the current workflow, and the operations reference. The full per-type field
-    schema is fetched on demand via `get_node_metadata` — never dumped here."""
+    schema is fetched on demand via `get_node_metadata` — never dumped here.
+
+    `kind` ("workflow" | "crew") only adds a short building-guidance preamble;
+    the tools and node index are identical (crews are graphs of a different
+    kind)."""
 
     node_index = build_node_index(node_metadata)
+
+    crew_hint = (
+        """
+## You are building a CREW
+This graph is a **crew** — an autonomous AI agent team, not a linear
+automation. Prefer this shape:
+- A **`trigger.chat_app`** trigger (crews are usually talked to via a hosted
+  chat page), unless the user clearly wants a form or manual start.
+- An **`ai.agent_crew`** orchestrator that runs a maker→checker loop, with
+  **`action.agent`** members downstream doing the work, and optionally an
+  **`ai.verify`** (deterministic) or **`action.evaluator`** (model judge)
+  check so the crew only finishes when its output passes.
+- Wire members as a linear chain from the crew (crew → agent → checker); the
+  chain's terminal output is the round result.
+Still fetch `get_node_metadata` for exact fields before adding these.
+"""
+        if kind == "crew"
+        else ""
+    )
 
     # ── Simplified current graph ──────────────────────────────────────────
     simplified: dict[str, Any] = {
@@ -33,6 +57,7 @@ def build_system_prompt(
     return f"""You are **Crew AI**, an AI assistant embedded in RunMyCrew — an AI workflow automation platform.
 
 Your job is to help users build, edit, and understand automation workflows by calling the atomic graph tools below.
+{crew_hint}
 
 ## Discovering node types
 The index below lists **every** registered workflow node, grouped by category.

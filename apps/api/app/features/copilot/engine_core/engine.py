@@ -353,10 +353,15 @@ async def run_copilot(
     db: Any,
     session_id: str | None = None,
     user_id: str = "",
+    kind: str = "workflow",
 ) -> AsyncGenerator[str]:
     """
     Run the Crew AI agentic loop (Sim-style).
     Yields SSE-formatted strings.
+
+    `kind` is "workflow" or "crew" — same graph tools either way (crews are
+    just graphs of a different kind); it only decides which owner column the
+    saved session hangs off and whether the run-diagnostics tool applies.
     """
     import uuid as _uuid
 
@@ -364,7 +369,7 @@ async def run_copilot(
     from apps.api.app.features.copilot.repository import CopilotSessionRepository
 
     meta_by_type = {m["type"]: m for m in node_metadata}
-    system_prompt = build_system_prompt(graph, node_metadata)
+    system_prompt = build_system_prompt(graph, node_metadata, kind=kind)
     current_graph = json.loads(json.dumps(graph))
     graph_dirty = False  # any edit_workflow applied → emit workflow_proposed at the end
     proposed_name: str | None = None  # set by model via edit_workflow.workflow_name
@@ -551,6 +556,19 @@ async def run_copilot(
                     from apps.api.app.features.executions.repository import ExecutionRepository
 
                     try:
+                        if kind == "crew":
+                            # Crew runs live in a separate table; run-diagnostics
+                            # isn't wired for crews yet — report cleanly.
+                            result = {
+                                "status": "no_runs",
+                                "message": "Run diagnostics aren't available for crews yet.",
+                            }
+                            all_tool_calls.append(
+                                {"name": tool_name, "success": True, "result": result}
+                            )
+                            yield _sse("tool_result", {"tool": tool_name, "success": True})
+                            conversation.append(_build_tool_result_msg(tc, result, ai_api_type))
+                            continue
                         exec_repo = ExecutionRepository(db)
                         runs = await exec_repo.list_by_workflow(_uuid.UUID(workflow_id))
                         if not runs:
@@ -650,8 +668,13 @@ async def run_copilot(
                     session_id = None  # fall through to create
 
             if not session_id:
+                owner = (
+                    {"crew_id": _uuid.UUID(workflow_id)}
+                    if kind == "crew"
+                    else {"workflow_id": _uuid.UUID(workflow_id)}
+                )
                 new_session = CopilotSessionModel(
-                    workflow_id=_uuid.UUID(workflow_id),
+                    **owner,
                     user_id=_uuid.UUID(user_id),
                     title=title,
                     messages=storable,

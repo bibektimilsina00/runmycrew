@@ -30,6 +30,7 @@ export function Dashboard() {
   const { data } = useDashboard()
   const ai = useAIGenerator()
   const [prompt, setPrompt] = useState('')
+  const [kind, setKind] = useState<'workflow' | 'crew'>('workflow')
 
   const stats       = data?.stats       ?? SKELETON_STATS
   const recentRuns  = data?.recent_runs ?? []
@@ -40,7 +41,7 @@ export function Dashboard() {
   const submit = () => {
     const text = prompt.trim()
     if (!text || ai.creating) return
-    void ai.generate(text)
+    void ai.generate(text, kind)
   }
 
   return (
@@ -56,6 +57,9 @@ export function Dashboard() {
           onSubmit={submit}
           busy={ai.creating}
           statusMessage={ai.statusMessage}
+          kind={kind}
+          onKindChange={setKind}
+          placeholder={kind === 'crew' ? 'What should this crew do?' : 'What workflow shall we automate?'}
         />
 
         <SuggestionChips

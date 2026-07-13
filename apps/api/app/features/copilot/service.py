@@ -1,5 +1,6 @@
 import json
 import uuid
+from typing import Any
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,6 +21,7 @@ from apps.api.app.features.copilot.schemas import (
     SessionListResponse,
 )
 from apps.api.app.features.credentials.repository import CredentialRepository
+from apps.api.app.features.crews.repository import CrewRepository
 from apps.api.app.features.users.models import User
 from apps.api.app.features.workflows.repository import WorkflowRepository
 
@@ -49,19 +51,35 @@ class CopilotService:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.workflow_repo = WorkflowRepository(db)
+        self.crew_repo = CrewRepository(db)
         self.session_repo = CopilotSessionRepository(db)
         self.cred_repo = CredentialRepository(db)
 
     async def get_workflow_or_404(self, workflow_id: str, user: User):
+        """Back-compat: workflow-only resolution."""
+        entity, kind = await self.resolve_target(workflow_id, user)
+        if kind != "workflow":
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workflow not found")
+        return entity
+
+    async def resolve_target(self, target_id: str, user: User) -> tuple[Any, str]:
+        """Resolve a copilot target that may be a workflow OR a crew the user
+        owns. Returns (entity, kind) where kind is "workflow" | "crew".
+        Copilot builds crews with the same graph tools it uses for workflows —
+        crews are just graphs of a different `kind`."""
         try:
-            wf = await self.workflow_repo.get_by_id_and_user(uuid.UUID(workflow_id), user.id)
+            tid = uuid.UUID(target_id)
         except ValueError as err:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid workflow ID"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid id"
             ) from err
-        if not wf:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workflow not found")
-        return wf
+        wf = await self.workflow_repo.get_by_id_and_user(tid, user.id)
+        if wf:
+            return wf, "workflow"
+        crew = await self.crew_repo.get_by_id(tid)
+        if crew and crew.user_id == user.id:
+            return crew, "crew"
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
     async def resolve_api_key(
         self,
@@ -107,8 +125,11 @@ class CopilotService:
         return None
 
     async def get_settings(self, workflow_id: str, user: User) -> CopilotSettingsBody:
-        wf = await self.get_workflow_or_404(workflow_id, user)
-        env = wf.env or {}
+        entity, kind = await self.resolve_target(workflow_id, user)
+        # Crews have no `env` column to store copilot prefs — serve defaults.
+        if kind != "workflow":
+            return CopilotSettingsBody()
+        env = entity.env or {}
         raw = env.get(_COPILOT_SETTINGS_KEY)
         if raw:
             try:
@@ -122,15 +143,22 @@ class CopilotService:
     async def update_settings(
         self, workflow_id: str, body: CopilotSettingsBody, user: User
     ) -> CopilotSettingsBody:
-        wf = await self.get_workflow_or_404(workflow_id, user)
-        env = dict(wf.env or {})
-        env[_COPILOT_SETTINGS_KEY] = json.dumps(body.model_dump())
-        await self.workflow_repo.update(wf, {"env": env})
+        entity, kind = await self.resolve_target(workflow_id, user)
+        # No env on crews — accept the settings but don't persist (the AI
+        # build works on the default model regardless).
+        if kind == "workflow":
+            env = dict(entity.env or {})
+            env[_COPILOT_SETTINGS_KEY] = json.dumps(body.model_dump())
+            await self.workflow_repo.update(entity, {"env": env})
         return body
 
     async def list_sessions(self, workflow_id: str, user: User) -> SessionListResponse:
-        wf = await self.get_workflow_or_404(workflow_id, user)
-        sessions = await self.session_repo.list_by_workflow_and_user(wf.id, user.id)
+        entity, kind = await self.resolve_target(workflow_id, user)
+        sessions = await self.session_repo.list_by_target_and_user(
+            workflow_id=entity.id if kind == "workflow" else None,
+            crew_id=entity.id if kind == "crew" else None,
+            user_id=user.id,
+        )
         return SessionListResponse(
             sessions=[
                 SessionItem(
@@ -146,7 +174,7 @@ class CopilotService:
     async def get_session(
         self, workflow_id: str, session_id: str, user: User
     ) -> SessionDetailResponse:
-        await self.get_workflow_or_404(workflow_id, user)
+        await self.resolve_target(workflow_id, user)  # authorize workflow OR crew
         try:
             s = await self.session_repo.get_by_id_and_user(uuid.UUID(session_id), user.id)
         except ValueError as err:
@@ -164,7 +192,7 @@ class CopilotService:
         )
 
     async def delete_session(self, workflow_id: str, session_id: str, user: User) -> None:
-        await self.get_workflow_or_404(workflow_id, user)
+        await self.resolve_target(workflow_id, user)  # authorize workflow OR crew
         try:
             s = await self.session_repo.get_by_id_and_user(uuid.UUID(session_id), user.id)
         except ValueError as err:
