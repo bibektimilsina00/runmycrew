@@ -36,19 +36,8 @@ export function DashboardMockup() {
   const active = EXAMPLES[0]
 
   return (
-    <div className="relative mt-12 sm:mt-16">
-      {/* Lit "floor" gradient the window floats above — gives the shot the
-          same depth as a real product screenshot instead of sitting flat
-          on black. Sits behind + below the frame, edges faded. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-x-[12%] -bottom-[20%] top-[6%] -z-10 rounded-[48px]"
-        style={{
-          background:
-            'radial-gradient(120% 95% at 50% 122%, color-mix(in oklab, var(--primary) 32%, transparent), transparent 62%), radial-gradient(100% 75% at 50% -12%, rgba(255,255,255,0.06), transparent 55%)',
-        }}
-      />
-      <div className="relative flex h-[620px] overflow-hidden rounded-[14px] border border-white/10 bg-[#0c0d0f] shadow-[0_80px_180px_-40px_rgba(0,0,0,0.94),0_8px_40px_-12px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+    <div className="relative mt-16 pb-[180px] sm:mt-24 sm:pb-[240px]">
+      <div className="relative z-10 flex h-[620px] overflow-hidden rounded-[14px] border border-white/10 bg-[#0c0d0f] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
         {/* Top-edge sheen — the subtle highlight real windows catch. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
         <Sidebar />
@@ -186,7 +175,20 @@ export function DashboardMockup() {
         </div>
       </div>
 
-      <div className="mt-3 font-mono text-[11px] tracking-[0.04em] text-muted-foreground/60">
+      {/* Neutral lit "floor" the window stands on — a soft gray spotlight
+          rising from the window's base and fading down to black, like a
+          real product shot on a lit surface. Painted AFTER the window so
+          the frame's drop shadow doesn't darken it; sits below the frame
+          (top ≈ window height) so it never covers the content. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-[-20%] bottom-[40px] top-[600px] z-0"
+        style={{
+          background:
+            'radial-gradient(50% 100% at 50% 8%, rgba(232,235,242,0.6), rgba(176,182,196,0.24) 34%, transparent 66%)',
+        }}
+      />
+      <div className="relative z-10 mt-3 font-mono text-[11px] tracking-[0.04em] text-muted-foreground/60">
         FIG 0.1 — FUSE DASHBOARD · CLICK A PROMPT TO TRY IT
       </div>
     </div>

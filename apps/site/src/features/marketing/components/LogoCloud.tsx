@@ -20,33 +20,28 @@ function SlackMark() {
  */
 export function LogoCloud() {
   return (
-    <section className="pt-16 sm:pt-20">
-      <Container className="max-w-[1280px] px-7">
-        <Reveal>
-          <p className="mb-8 font-mono text-[12px] uppercase tracking-[0.14em] text-muted-foreground/50">
-            Connects the tools your team already runs on
-          </p>
-        </Reveal>
-        <div className="flex flex-wrap items-center gap-x-12 gap-y-6 sm:gap-x-16">
+    <section className="pt-6 sm:pt-8">
+      <Container className="max-w-[1180px] px-7">
+        <div className="flex flex-wrap items-center justify-between gap-x-10 gap-y-8">
           {LOGOS.map((logo, i) => (
             <Reveal key={logo.slug} delay={i * 0.04}>
-              <span className="group inline-flex items-center gap-2.5">
-                <span className="inline-flex h-[20px] w-[20px] items-center justify-center opacity-70 transition-opacity group-hover:opacity-100">
+              <span className="group inline-flex items-center gap-2.5 opacity-80 transition-opacity hover:opacity-100">
+                <span className="inline-flex h-[22px] w-[22px] items-center justify-center">
                   {logo.slug === 'slack' ? (
                     <SlackMark />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={`https://cdn.simpleicons.org/${logo.slug}/9ca3af`}
+                      src={`https://cdn.simpleicons.org/${logo.slug}/ffffff`}
                       alt={logo.name}
-                      width={20}
-                      height={20}
+                      width={22}
+                      height={22}
                       loading="lazy"
-                      className="h-[20px] w-[20px]"
+                      className="h-[22px] w-[22px]"
                     />
                   )}
                 </span>
-                <span className="text-[17px] font-medium tracking-[-0.01em] text-foreground/55 transition-colors group-hover:text-foreground/90">
+                <span className="text-[18px] font-semibold tracking-[-0.01em] text-white">
                   {logo.name}
                 </span>
               </span>
