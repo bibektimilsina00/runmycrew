@@ -185,6 +185,13 @@ class Settings(BaseSettings):
     # RUNMYCREW_IMAGE_TAG (e.g. "sha-abc1234"); compose forwards it here.
     RELEASE: str = ""
 
+    # Per-session public-app upload quota. Uploads are base64'd into a
+    # Postgres TEXT column, so without a cap an anonymous visitor can bloat
+    # the primary DB. (Off-DB blob storage is the real fix; this bounds the
+    # damage until then.)
+    PUBLIC_APP_MAX_UPLOADS_PER_SESSION: int = 20
+    PUBLIC_APP_MAX_UPLOAD_BYTES_PER_SESSION: int = 50 * 1024 * 1024
+
     # Email — Resend HTTP API is preferred (port 443, no provider port-block
     # risk like DigitalOcean blocking 25/465/587). Falls back to SMTP for
     # self-hosters using Gmail, SES relay, Mailgun, etc.

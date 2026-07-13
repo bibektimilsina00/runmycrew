@@ -475,3 +475,88 @@ async def test_upload_rejects_inline_active_mime():
         assert r.status_code == 415, r.text
     finally:
         await _cleanup(user.id)
+
+
+# ── Upload quota + magic-byte sniffing ─────────────────────────────────
+
+
+@pytest.mark.anyio
+async def test_upload_magic_bytes_reject_spoofed_active_content():
+    """An svg/html payload labeled image/png must still be rejected — the
+    declared MIME is client-supplied, so we sniff the bytes."""
+    if not await _db_available():
+        pytest.skip("requires Postgres (run: make db-up)")
+    user, ws, wf = await _seed(_chat_graph("up-sniff", allow_file_upload=True))
+    try:
+        cookie = "cookie-sniff-" + uuid.uuid4().hex[:8]
+        await _seed_session(wf, cookie)
+        payload = b'<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>'
+        async with _client() as client:
+            client.cookies.set(SESSION_COOKIE, cookie)
+            r = await client.post(
+                f"{API}/apps/{ws.slug}/up-sniff/upload",
+                # Lies: claims PNG, is SVG.
+                files={"file": ("evil.png", payload, "image/png")},
+            )
+        assert r.status_code == 415, r.text
+        assert r.json()["detail"] == "mime_not_allowed"
+    finally:
+        await _cleanup(user.id)
+
+
+@pytest.mark.anyio
+async def test_upload_per_session_count_quota(monkeypatch):
+    """Once a session hits the per-session upload count, further uploads 413
+    — bounds the DB-bloat DoS from unlimited base64 blobs."""
+    if not await _db_available():
+        pytest.skip("requires Postgres (run: make db-up)")
+    from apps.api.app.core.config import settings
+
+    monkeypatch.setattr(settings, "PUBLIC_APP_MAX_UPLOADS_PER_SESSION", 2)
+    user, ws, wf = await _seed(_chat_graph("up-quota", allow_file_upload=True))
+    try:
+        cookie = "cookie-quota-" + uuid.uuid4().hex[:8]
+        await _seed_session(wf, cookie)
+        async with _client() as client:
+            client.cookies.set(SESSION_COOKIE, cookie)
+            statuses = []
+            for i in range(3):
+                r = await client.post(
+                    f"{API}/apps/{ws.slug}/up-quota/upload",
+                    files={"file": (f"f{i}.bin", b"hello", "application/octet-stream")},
+                )
+                statuses.append(r.status_code)
+        # First two stored, third refused.
+        assert statuses[0] == 200 and statuses[1] == 200, statuses
+        assert statuses[2] == 413, statuses
+    finally:
+        await _cleanup(user.id)
+
+
+@pytest.mark.anyio
+async def test_upload_per_session_byte_quota(monkeypatch):
+    """Total stored bytes per session are capped too."""
+    if not await _db_available():
+        pytest.skip("requires Postgres (run: make db-up)")
+    from apps.api.app.core.config import settings
+
+    monkeypatch.setattr(settings, "PUBLIC_APP_MAX_UPLOAD_BYTES_PER_SESSION", 10)
+    user, ws, wf = await _seed(_chat_graph("up-bytes", allow_file_upload=True))
+    try:
+        cookie = "cookie-bytes-" + uuid.uuid4().hex[:8]
+        await _seed_session(wf, cookie)
+        async with _client() as client:
+            client.cookies.set(SESSION_COOKIE, cookie)
+            r1 = await client.post(
+                f"{API}/apps/{ws.slug}/up-bytes/upload",
+                files={"file": ("a.bin", b"12345678", "application/octet-stream")},  # 8B ok
+            )
+            r2 = await client.post(
+                f"{API}/apps/{ws.slug}/up-bytes/upload",
+                files={"file": ("b.bin", b"12345", "application/octet-stream")},  # +5 > 10
+            )
+        assert r1.status_code == 200, r1.text
+        assert r2.status_code == 413, r2.text
+        assert r2.json()["detail"] == "upload_quota_exceeded"
+    finally:
+        await _cleanup(user.id)
