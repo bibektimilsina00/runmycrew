@@ -84,7 +84,9 @@ export function RemotePickerRenderer({ prop, value, onChange, properties, disabl
   return (
     <div className="flex flex-col gap-1.5">
       {remote.allow_manual && (
-        <ModeToggle mode={mode} onChange={setMode} />
+        <div className="flex justify-end">
+          <ModeToggle mode={mode} onChange={setMode} />
+        </div>
       )}
       {mode === 'manual' ? (
         <ExpressionEditor
@@ -113,7 +115,7 @@ export function RemotePickerRenderer({ prop, value, onChange, properties, disabl
 
 function ModeToggle({ mode, onChange }: { mode: 'list' | 'manual'; onChange: (m: 'list' | 'manual') => void }) {
   return (
-    <div className="inline-flex items-center rounded-[7px] border border-[var(--border-faint)] bg-[var(--surface)] p-[2px]">
+    <div className="inline-flex items-center rounded-[6px] border border-[var(--border-faint)] bg-[var(--surface)] p-[1px]">
       <ModeButton active={mode === 'list'} onClick={() => onChange('list')} icon={<ListPlus className="h-3 w-3" />} label="From list" />
       <ModeButton active={mode === 'manual'} onClick={() => onChange('manual')} icon={<Pencil className="h-3 w-3" />} label="Manual" />
     </div>
@@ -131,7 +133,7 @@ function ModeButton({ active, onClick, icon, label }: {
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-[3px] text-[11px] font-medium transition-colors',
+        'inline-flex items-center gap-1 rounded-[5px] px-1.5 py-[2px] text-[10.5px] font-medium transition-colors',
         active
           ? 'bg-[var(--bg-2)] text-[var(--text)] shadow-[inset_0_0_0_1px_var(--border-faint)]'
           : 'text-[var(--text-mute)] hover:text-[var(--text)]',
