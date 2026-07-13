@@ -436,6 +436,18 @@ def execute_app_message(
             asyncio.run(_fail_app_message(execution_id, assistant_message_id, str(e)))
         except Exception:
             logger.error("could not persist app-message failure", exc_info=True)
+    finally:
+        # Always release the app's concurrency slot the router reserved at
+        # dispatch — success, failure, or crash. Without this a crashed run
+        # would hold its slot until the TTL and slowly starve the app.
+        source_id = crew_id or workflow_id
+        if source_id:
+            try:
+                from apps.api.app.features.apps.spend import decr_inflight
+
+                asyncio.run(decr_inflight(source_id))
+            except Exception:
+                logger.warning("could not release app in-flight slot", exc_info=True)
 
 
 async def _fail_app_message(execution_id: str, assistant_message_id: str, error: str) -> None:
@@ -641,6 +653,14 @@ async def _run_app_message(
                     "total_tokens": (session.total_tokens or 0) + tokens,
                 },
             )
+
+    # App-level daily spend counter (rotation-immune) — the dispatch-time
+    # daily cap reads this, not the per-session sums a fresh cookie resets.
+    source_id = crew_id or workflow_id
+    if source_id and cost_usd > 0:
+        from apps.api.app.features.apps.spend import record_spend
+
+        await record_spend(source_id, cost_usd)
 
     # Terminal event AFTER persistence: the SSE terminal frame is the
     # client's cue to refetch — emitting it before the DB write raced the

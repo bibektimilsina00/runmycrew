@@ -490,27 +490,34 @@ async def send_message(
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="session_cost_cap_reached"
         )
-    if daily_cap > 0:
-        from datetime import UTC, datetime
 
-        from sqlalchemy import select
+    # Daily cap on an app-level Redis counter (rotation-immune): summing
+    # per-session rows let a fresh cookie reset the total to zero. The
+    # effective cap is the owner's value when set, else a non-zero default
+    # so an unconfigured app still can't burn unbounded spend.
+    from apps.api.app.core.config import settings as _settings
+    from apps.api.app.features.apps import spend as _spend
 
-        from apps.api.app.features.apps.models import AppSession as _S
-
-        today = datetime.now(UTC).date()
-        from apps.api.app.features.crews.models import Crew as _Crew
-
-        source_col = _S.crew_id if isinstance(wf, _Crew) else _S.workflow_id
-        rows = await db.execute(select(_S).where(source_col == wf.id))
-        spent_today = 0.0
-        for r in rows.scalars().all():
-            if r.last_seen_at and r.last_seen_at.date() == today:
-                spent_today += float(r.total_cost_usd or 0.0)
-        if spent_today >= daily_cap:
+    effective_daily_cap = daily_cap if daily_cap > 0 else _settings.PUBLIC_APP_DEFAULT_DAILY_CAP_USD
+    if effective_daily_cap > 0:
+        spent_today = await _spend.spend_today(wf.id)
+        if spent_today >= effective_daily_cap:
             raise HTTPException(
                 status_code=status.HTTP_402_PAYMENT_REQUIRED,
                 detail="daily_cost_cap_reached",
             )
+
+    # Concurrency cap: bounds the burst race where many messages dispatch
+    # before any cost is recorded. Reserve a slot atomically; the worker
+    # releases it on terminal. Over the limit → 429 with a short backoff.
+    inflight = await _spend.incr_inflight(wf.id)
+    if inflight > _settings.PUBLIC_APP_MAX_INFLIGHT:
+        await _spend.decr_inflight(wf.id)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="too_many_concurrent",
+            headers={"Retry-After": "5"},
+        )
 
     await service.create_user_message(session, payload.message)
     execution_id = f"app-{uuid.uuid4()}"
