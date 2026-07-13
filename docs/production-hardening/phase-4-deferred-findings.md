@@ -4,7 +4,20 @@ The surgical, low-regression fixes landed in the phase-4 PR. These are the
 architectural ones that need a design decision or a bigger change — each is
 real, none is a drop-everything emergency (exploitability noted).
 
-## 1. Public-app cost/rate caps are bypassable (HIGH)
+## 1. Public-app cost/rate caps are bypassable (HIGH) — FIXED 2026-07-13
+
+> **FIXED (branch `fix/public-app-spend-cap`).** Daily cap now reads an
+> app-level Redis counter (`app_spend:{source}:{date}`) the worker
+> increments with real cost after each run — keyed on the workflow/crew
+> id, so rotating the session cookie can't reset it. The effective cap is
+> the owner's `daily_cost_cap_usd` when set, else a non-zero config
+> default (`PUBLIC_APP_DEFAULT_DAILY_CAP_USD=25`), closing the
+> unconfigured-app hole. A per-app in-flight counter
+> (`PUBLIC_APP_MAX_INFLIGHT=6`) bounds the concurrent-burst race the
+> post-hoc cost record couldn't. Runtime-verified against the e2e stack:
+> a fresh session cookie over the counter still 402s. +7 tests. The
+> remaining note below is the original finding.
+
 Per-session rate limit + `session_cost_cap_usd` key on `session.id`, but an
 anonymous client mints a fresh session per request (`POST /session`), so
 rotating the cookie resets the window and the session cap to zero. Cost is

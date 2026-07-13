@@ -475,3 +475,79 @@ async def test_upload_rejects_inline_active_mime():
         assert r.status_code == 415, r.text
     finally:
         await _cleanup(user.id)
+
+
+# ── Rotation-immune daily cap + concurrency cap ────────────────────────
+
+
+@pytest.mark.anyio
+async def test_default_daily_cap_trips_402_even_with_no_owner_cap(monkeypatch):
+    """An app that set NO daily cap still can't burn unbounded spend: the
+    app-level Redis counter is checked against the config default, and it's
+    keyed on the app id so rotating the session cookie can't reset it."""
+    if not await _db_available():
+        pytest.skip("Postgres unavailable")
+    user, ws, wf = await _seed(_chat_graph("daily-app"))  # no daily_cost_cap_usd
+    try:
+        from apps.api.app.core.config import settings
+        from apps.api.app.features.apps import spend as spend_mod
+
+        async def _allow(app_id, session_key, ip_hash, max_per_minute):
+            return True, 0
+
+        # App has already spent over the DEFAULT ceiling today.
+        async def _spent(source_id):
+            return settings.PUBLIC_APP_DEFAULT_DAILY_CAP_USD + 1.0
+
+        monkeypatch.setattr(public_router, "check_rate_limit", _allow)
+        monkeypatch.setattr(spend_mod, "spend_today", _spent)
+
+        async with _client() as client:
+            client.cookies.set(SESSION_COOKIE, "cookie-daily-" + uuid.uuid4().hex[:8])
+            r = await client.post(f"{API}/apps/{ws.slug}/daily-app/message", json={"message": "hi"})
+        assert r.status_code == 402, r.text
+        assert r.json()["detail"] == "daily_cost_cap_reached"
+    finally:
+        await _cleanup(user.id)
+
+
+@pytest.mark.anyio
+async def test_concurrency_cap_returns_429(monkeypatch):
+    """Over the per-app in-flight limit → 429, bounding the burst race a
+    post-hoc cost record can't catch."""
+    if not await _db_available():
+        pytest.skip("Postgres unavailable")
+    user, ws, wf = await _seed(_chat_graph("conc-app"))
+    try:
+        from apps.api.app.core.config import settings
+        from apps.api.app.features.apps import spend as spend_mod
+
+        async def _allow(app_id, session_key, ip_hash, max_per_minute):
+            return True, 0
+
+        async def _no_spend(source_id):
+            return 0.0
+
+        released = {"n": 0}
+
+        async def _over_limit(source_id):
+            return settings.PUBLIC_APP_MAX_INFLIGHT + 1  # already over
+
+        async def _decr(source_id):
+            released["n"] += 1
+
+        monkeypatch.setattr(public_router, "check_rate_limit", _allow)
+        monkeypatch.setattr(spend_mod, "spend_today", _no_spend)
+        monkeypatch.setattr(spend_mod, "incr_inflight", _over_limit)
+        monkeypatch.setattr(spend_mod, "decr_inflight", _decr)
+
+        async with _client() as client:
+            client.cookies.set(SESSION_COOKIE, "cookie-conc-" + uuid.uuid4().hex[:8])
+            r = await client.post(f"{API}/apps/{ws.slug}/conc-app/message", json={"message": "hi"})
+        assert r.status_code == 429, r.text
+        assert r.json()["detail"] == "too_many_concurrent"
+        assert r.headers.get("Retry-After") == "5"
+        # The reserved slot is released when we reject over-limit.
+        assert released["n"] == 1
+    finally:
+        await _cleanup(user.id)
