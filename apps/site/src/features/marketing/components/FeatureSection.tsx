@@ -17,7 +17,7 @@ interface Props {
  */
 export function FeatureSection({ meta, mockup }: Props) {
   return (
-    <section id={meta.slug} className="mt-[120px] border-t border-border/80">
+    <section id={meta.slug} className="mt-[88px] border-t border-border/80">
       <Container className="max-w-[1280px] px-7">
         <Reveal>
           <div className="grid grid-cols-1 gap-12 pt-14 lg:grid-cols-2 lg:items-start">

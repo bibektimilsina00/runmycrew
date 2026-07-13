@@ -177,7 +177,17 @@ export const EXAMPLES: PromptExample[] = [
 
 /* ─── LOGO CLOUD ───────────────────────────────────────────────────── */
 
-export const LOGOS = ['GitHub', 'Slack', 'Notion', 'Google', 'Meta', 'Stripe', 'Linear', 'Figma'] as const
+// name + simple-icons slug (served monochrome via cdn.simpleicons.org).
+export const LOGOS = [
+  { name: 'GitHub', slug: 'github' },
+  { name: 'Slack', slug: 'slack' },
+  { name: 'Notion', slug: 'notion' },
+  { name: 'Google', slug: 'google' },
+  { name: 'Meta', slug: 'meta' },
+  { name: 'Stripe', slug: 'stripe' },
+  { name: 'Linear', slug: 'linear' },
+  { name: 'Figma', slug: 'figma' },
+] as const
 
 /* ─── STATEMENT SECTION ────────────────────────────────────────────── */
 
