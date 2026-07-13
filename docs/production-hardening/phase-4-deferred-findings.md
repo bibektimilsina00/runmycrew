@@ -32,7 +32,16 @@ executions per app.
 leftmost-spoof half is already closed (rightmost hop). The session-rotation
 half remains.
 
-## 2. Upload storage: base64 data-URLs in Postgres (HIGH)
+## 2. Upload storage: base64 data-URLs in Postgres (HIGH) — PARTIALLY FIXED 2026-07-13
+
+> **HARDENED (branch `fix/upload-quota-v2`).** Two of the three exploitable
+> pieces are closed in code: a per-session upload quota (count 20 / 50 MB,
+> config-tunable) bounds the DB-bloat DoS, and magic-byte sniffing rejects
+> active markup (svg/html/xml/script) whose bytes betray a spoofed
+> content_type. The remaining piece — moving blobs OFF the primary DB to
+> object storage served from a sandboxed domain — needs infra and stays
+> carded (human). The original finding follows.
+
 Uploads are base64-inflated and stored in an `AppFile.url` TEXT column, no
 per-session/app quota, served back inline as `data:` URLs. Active-content
 MIMEs (svg/html/js) are now blocked and size is precapped, but the storage

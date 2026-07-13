@@ -20,6 +20,7 @@ import mimetypes
 import uuid
 from typing import Any
 
+import sqlalchemy as sa
 from fastapi import (
     APIRouter,
     Cookie,
@@ -33,6 +34,7 @@ from fastapi import (
 )
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
@@ -655,10 +657,45 @@ async def upload_file(
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
         )
+    # Sniff the real content — the declared MIME is client-supplied, so an
+    # attacker labels an svg/html payload `image/png` to slip past the
+    # check above. If the bytes look like active markup, reject regardless.
+    head = data[:512].lstrip().lower()
+    if (
+        head.startswith(b"<svg")
+        or head.startswith(b"<!doctype html")
+        or head.startswith(b"<html")
+        or head.startswith(b"<?xml")
+        or b"<script" in head
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
+        )
     if allowed_mimes and mime not in allowed_mimes:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
         )
+
+    # Per-session quota: uploads live base64'd in a Postgres TEXT column,
+    # so an anonymous visitor with no cap can bloat the primary DB. Count +
+    # total bytes checked against config ceilings before storing.
+    from apps.api.app.core.config import settings as _upl_settings
+    from apps.api.app.features.apps.models import AppFile as _AF
+
+    quota = await db.execute(
+        select(sa.func.count(_AF.id), sa.func.coalesce(sa.func.sum(_AF.size_bytes), 0)).where(
+            _AF.session_id == session.id
+        )
+    )
+    used_count, used_bytes = quota.one()
+    if (
+        used_count >= _upl_settings.PUBLIC_APP_MAX_UPLOADS_PER_SESSION
+        or int(used_bytes) + len(data) > _upl_settings.PUBLIC_APP_MAX_UPLOAD_BYTES_PER_SESSION
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="upload_quota_exceeded"
+        )
+
     sha = hashlib.sha256(data).hexdigest()
     b64 = base64.b64encode(data).decode("ascii")
     url = f"data:{mime};base64,{b64}"
