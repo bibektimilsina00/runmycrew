@@ -20,6 +20,7 @@ import mimetypes
 import uuid
 from typing import Any
 
+import sqlalchemy as sa
 from fastapi import (
     APIRouter,
     Cookie,
@@ -33,6 +34,7 @@ from fastapi import (
 )
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.core.database import get_db
@@ -64,12 +66,33 @@ class UnlockRequest(BaseModel):
 
 
 def _client_ip(request: Request) -> str | None:
-    fwd = request.headers.get("x-forwarded-for") or request.headers.get("x-real-ip")
+    # RIGHTMOST X-Forwarded-For entry, not leftmost. Caddy APPENDS the
+    # real peer to whatever the client sent, so the leftmost value is
+    # attacker-controlled — reading it let a client spoof its IP and
+    # rotate past the per-IP rate limit. The last hop is the one our own
+    # proxy wrote. (Assumes a single trusted proxy in front of the api,
+    # which the deployment guarantees.)
+    fwd = request.headers.get("x-forwarded-for")
     if fwd:
-        return fwd.split(",")[0].strip()
+        parts = [p.strip() for p in fwd.split(",") if p.strip()]
+        if parts:
+            return parts[-1]
+    xreal = request.headers.get("x-real-ip")
+    if xreal:
+        return xreal.strip()
     if request.client:
         return request.client.host
     return None
+
+
+def _cookie_secure() -> bool:
+    """Session/unlock cookies are the only thing gating a visitor's
+    transcript — mark them Secure in production so they never ride a
+    cleartext downgrade. Left off outside production so local http and
+    the e2e stack keep working."""
+    from apps.api.app.core.config import settings
+
+    return settings.ENVIRONMENT == "production"
 
 
 def _issue_session_cookie(
@@ -81,6 +104,7 @@ def _issue_session_cookie(
         max_age=SESSION_COOKIE_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=_cookie_secure(),
         path=f"/api/v1/apps/{workspace_slug}/{app_slug}",
     )
 
@@ -94,6 +118,7 @@ def _issue_unlock_cookie(
         max_age=UNLOCK_COOKIE_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=_cookie_secure(),
         path=f"/api/v1/apps/{workspace_slug}/{app_slug}",
     )
 
@@ -262,12 +287,22 @@ async def unlock_password(
     wf, props = await service.resolve_public_app(workspace_slug, app_slug)
     if (props.get("auth_mode") or "public") != "password":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="not_password_gated")
+    # Key the per-client window on the IP, not the constant "unlock":
+    # a shared bucket let any 8 attempts/min lock password unlock for
+    # every visitor of the app (global lockout DoS).
+    ip_hash = hash_ip(_client_ip(request))
     ok, retry = await check_rate_limit(
-        wf.id, "unlock", hash_ip(_client_ip(request)), max_per_minute=8
+        wf.id, f"unlock:{ip_hash or 'noip'}", ip_hash, max_per_minute=8
     )
     if not ok:
-        response.headers["Retry-After"] = str(retry)
-        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="rate_limited")
+        # Set Retry-After ON the exception: a header set on the injected
+        # Response is discarded when we raise, so the client got a 429
+        # with no back-off signal.
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="rate_limited",
+            headers={"Retry-After": str(retry)},
+        )
     if not service.verify_password(wf, body.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_password")
     token = _unlock_token_for(wf.id, getattr(wf, "app_password_hash", None))
@@ -447,34 +482,44 @@ async def send_message(
         wf.id, str(session.id), hash_ip(_client_ip(request)), max_per_minute=max_per_min
     )
     if not ok:
-        response.headers["Retry-After"] = str(retry)
-        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="rate_limited")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="rate_limited",
+            headers={"Retry-After": str(retry)},
+        )
 
     if session_cap > 0 and (session.total_cost_usd or 0) >= session_cap:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="session_cost_cap_reached"
         )
-    if daily_cap > 0:
-        from datetime import UTC, datetime
 
-        from sqlalchemy import select
+    # Daily cap on an app-level Redis counter (rotation-immune): summing
+    # per-session rows let a fresh cookie reset the total to zero. The
+    # effective cap is the owner's value when set, else a non-zero default
+    # so an unconfigured app still can't burn unbounded spend.
+    from apps.api.app.core.config import settings as _settings
+    from apps.api.app.features.apps import spend as _spend
 
-        from apps.api.app.features.apps.models import AppSession as _S
-
-        today = datetime.now(UTC).date()
-        from apps.api.app.features.crews.models import Crew as _Crew
-
-        source_col = _S.crew_id if isinstance(wf, _Crew) else _S.workflow_id
-        rows = await db.execute(select(_S).where(source_col == wf.id))
-        spent_today = 0.0
-        for r in rows.scalars().all():
-            if r.last_seen_at and r.last_seen_at.date() == today:
-                spent_today += float(r.total_cost_usd or 0.0)
-        if spent_today >= daily_cap:
+    effective_daily_cap = daily_cap if daily_cap > 0 else _settings.PUBLIC_APP_DEFAULT_DAILY_CAP_USD
+    if effective_daily_cap > 0:
+        spent_today = await _spend.spend_today(wf.id)
+        if spent_today >= effective_daily_cap:
             raise HTTPException(
                 status_code=status.HTTP_402_PAYMENT_REQUIRED,
                 detail="daily_cost_cap_reached",
             )
+
+    # Concurrency cap: bounds the burst race where many messages dispatch
+    # before any cost is recorded. Reserve a slot atomically; the worker
+    # releases it on terminal. Over the limit → 429 with a short backoff.
+    inflight = await _spend.incr_inflight(wf.id)
+    if inflight > _settings.PUBLIC_APP_MAX_INFLIGHT:
+        await _spend.decr_inflight(wf.id)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="too_many_concurrent",
+            headers={"Retry-After": "5"},
+        )
 
     await service.create_user_message(session, payload.message)
     execution_id = f"app-{uuid.uuid4()}"
@@ -515,6 +560,13 @@ async def stream(
     session = await service.session_repo.get_by_cookie(wf, session_cookie)
     if not session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
+    # Bind the stream to the caller's OWN execution. Without this any
+    # visitor who learned an execution_id could subscribe to another
+    # visitor's live SSE output (IDOR) — ids are unguessable `app-{uuid4}`
+    # but that's obscurity, not authorization.
+    msg = await service.message_repo.get_by_execution(execution_id)
+    if msg is None or msg.session_id != session.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_your_execution")
     return StreamingResponse(
         stream_execution_events(execution_id),
         media_type="text/event-stream",
@@ -567,9 +619,19 @@ async def upload_file(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="file_upload_disabled")
     allowed_mimes: list[str] = list(props.get("allowed_file_types") or [])
     max_size_mb = int(props.get("max_file_size_mb") or 10)
+    max_bytes = max_size_mb * 1024 * 1024
+
+    # Reject by declared Content-Length BEFORE buffering the whole body —
+    # otherwise a multi-GB POST is fully read into memory before the size
+    # check runs (memory-exhaustion DoS).
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > max_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="file_too_large"
+        )
 
     data = await file.read()
-    if len(data) > max_size_mb * 1024 * 1024:
+    if len(data) > max_bytes:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="file_too_large"
         )
@@ -578,10 +640,62 @@ async def upload_file(
         or mimetypes.guess_type(file.filename or "")[0]
         or "application/octet-stream"
     )
+    # Never store a payload that renders as active content: the file is
+    # echoed back as a `data:{mime};base64` URL on the app's OWN origin,
+    # so an svg/html/xml upload is stored XSS in the visitor's session.
+    # Blocked regardless of the owner's allowlist.
+    _INLINE_ACTIVE = {
+        "image/svg+xml",
+        "text/html",
+        "application/xhtml+xml",
+        "text/xml",
+        "application/xml",
+        "text/javascript",
+        "application/javascript",
+    }
+    if mime.split(";")[0].strip().lower() in _INLINE_ACTIVE:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
+        )
+    # Sniff the real content — the declared MIME is client-supplied, so an
+    # attacker labels an svg/html payload `image/png` to slip past the
+    # check above. If the bytes look like active markup, reject regardless.
+    head = data[:512].lstrip().lower()
+    if (
+        head.startswith(b"<svg")
+        or head.startswith(b"<!doctype html")
+        or head.startswith(b"<html")
+        or head.startswith(b"<?xml")
+        or b"<script" in head
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
+        )
     if allowed_mimes and mime not in allowed_mimes:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="mime_not_allowed"
         )
+
+    # Per-session quota: uploads live base64'd in a Postgres TEXT column,
+    # so an anonymous visitor with no cap can bloat the primary DB. Count +
+    # total bytes checked against config ceilings before storing.
+    from apps.api.app.core.config import settings as _upl_settings
+    from apps.api.app.features.apps.models import AppFile as _AF
+
+    quota = await db.execute(
+        select(sa.func.count(_AF.id), sa.func.coalesce(sa.func.sum(_AF.size_bytes), 0)).where(
+            _AF.session_id == session.id
+        )
+    )
+    used_count, used_bytes = quota.one()
+    if (
+        used_count >= _upl_settings.PUBLIC_APP_MAX_UPLOADS_PER_SESSION
+        or int(used_bytes) + len(data) > _upl_settings.PUBLIC_APP_MAX_UPLOAD_BYTES_PER_SESSION
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="upload_quota_exceeded"
+        )
+
     sha = hashlib.sha256(data).hexdigest()
     b64 = base64.b64encode(data).decode("ascii")
     url = f"data:{mime};base64,{b64}"

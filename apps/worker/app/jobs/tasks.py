@@ -35,7 +35,37 @@ def execute_workflow(
             )
         )
     except Exception as e:
+        # Crash net: anything that escaped _run_workflow's own handlers
+        # (a crash during setup before the inner try, an OOM in a node)
+        # must still land the execution in a terminal state. The outer
+        # `except` returning normally would otherwise ack the Celery
+        # message (acks_late) with the row stuck `running` — a run that
+        # spins in the UI forever. Idempotent: won't clobber a finished run.
         logger.error(f"execute_workflow task failed: {e}", exc_info=True)
+        _ensure_execution_failed(execution_id, str(e))
+
+
+def _ensure_execution_failed(execution_id: str, error: str) -> None:
+    """Best-effort terminal-fail for an execution, callable from a sync
+    Celery wrapper. Marks `failed` only if not already terminal and emits
+    the terminal event so subscribers stop waiting."""
+    try:
+        asyncio.run(_ensure_execution_failed_async(execution_id, error))
+    except Exception:
+        logger.error("could not persist execution failure", exc_info=True)
+
+
+async def _ensure_execution_failed_async(execution_id: str, error: str) -> None:
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.execution_engine.engine.event_emitter import RedisEventEmitter
+    from apps.api.app.features.executions.repository import ExecutionRepository
+
+    async with AsyncSessionLocal() as db:
+        repo = ExecutionRepository(db)
+        applied = await repo.mark_terminal_if_not(uuid.UUID(execution_id), "failed")
+    if applied:
+        emitter = RedisEventEmitter(execution_id)
+        await emitter.emit("execution_failed", {"status": "failed", "error": error})
 
 
 async def _run_workflow(
@@ -232,6 +262,7 @@ def execute_crew(
         )
     except Exception as e:
         logger.error(f"execute_crew task failed: {e}", exc_info=True)
+        _ensure_execution_failed(crew_execution_id, str(e))
 
 
 async def _run_crew(
@@ -405,6 +436,18 @@ def execute_app_message(
             asyncio.run(_fail_app_message(execution_id, assistant_message_id, str(e)))
         except Exception:
             logger.error("could not persist app-message failure", exc_info=True)
+    finally:
+        # Always release the app's concurrency slot the router reserved at
+        # dispatch — success, failure, or crash. Without this a crashed run
+        # would hold its slot until the TTL and slowly starve the app.
+        source_id = crew_id or workflow_id
+        if source_id:
+            try:
+                from apps.api.app.features.apps.spend import decr_inflight
+
+                asyncio.run(decr_inflight(source_id))
+            except Exception:
+                logger.warning("could not release app in-flight slot", exc_info=True)
 
 
 async def _fail_app_message(execution_id: str, assistant_message_id: str, error: str) -> None:
@@ -611,6 +654,14 @@ async def _run_app_message(
                 },
             )
 
+    # App-level daily spend counter (rotation-immune) — the dispatch-time
+    # daily cap reads this, not the per-session sums a fresh cookie resets.
+    source_id = crew_id or workflow_id
+    if source_id and cost_usd > 0:
+        from apps.api.app.features.apps.spend import record_spend
+
+        await record_spend(source_id, cost_usd)
+
     # Terminal event AFTER persistence: the SSE terminal frame is the
     # client's cue to refetch — emitting it before the DB write raced the
     # refetch and served stale transcripts/counts.
@@ -662,6 +713,16 @@ def _extract_reply(output: dict) -> tuple[str, list[dict]]:
     if isinstance(output, dict):
         if isinstance(output.get("content"), str):
             text = output["content"]
+        elif isinstance(output.get("result"), dict):
+            # Crew terminal shape: {status, rounds, result: {…}} — the
+            # round's artifact lives one level down. Without this every
+            # crew-hosted chat replied "No response produced".
+            inner = output["result"]
+            if isinstance(inner.get("content"), str):
+                text = inner["content"]
+            elif not inner.get("passed", True) and isinstance(inner.get("feedback"), str):
+                # Failed gate with no artifact: the feedback IS the reply.
+                text = inner["feedback"]
         arts = output.get("artifacts")
         if isinstance(arts, list):
             artifacts = arts
@@ -709,3 +770,46 @@ async def _sweep_app_sessions():
             await db.execute(delete(AppSession).where(AppSession.id.in_(stale_ids)))
             await db.commit()
             logger.info(f"sweep_app_sessions: dropped {len(stale_ids)} stale sessions")
+
+
+# Runs longer than this without finishing are treated as orphaned by a
+# dead worker. Generous: real long runs (big crews) must not be reaped
+# mid-flight. Tune if legitimate runs approach it.
+_STALE_EXECUTION_SECONDS = 60 * 30
+
+
+@celery_app.task(name="reap_stale_executions")
+def reap_stale_executions():
+    """Fail executions stuck `running` past the cutoff (dead-worker orphans).
+
+    A SIGKILL'd worker (OOM, deploy, crash) runs no Python `except`, so its
+    execution row never reaches a terminal state and the UI spins forever.
+    This beat task is the durable backstop the in-process crash-net can't
+    cover."""
+    try:
+        asyncio.run(_reap_stale_executions())
+    except Exception as e:
+        logger.error(f"reap_stale_executions failed: {e}", exc_info=True)
+
+
+async def _reap_stale_executions():
+    from apps.api.app.core.database import AsyncSessionLocal
+    from apps.api.app.execution_engine.engine.event_emitter import RedisEventEmitter
+    from apps.api.app.features.executions.repository import ExecutionRepository
+
+    async with AsyncSessionLocal() as db:
+        repo = ExecutionRepository(db)
+        reaped = await repo.reap_stale_running(_STALE_EXECUTION_SECONDS)
+    for exec_id in reaped:
+        # Terminal event so any live subscriber stops waiting; snapshot
+        # replay covers late subscribers.
+        emitter = RedisEventEmitter(str(exec_id))
+        await emitter.emit(
+            "execution_failed",
+            {
+                "status": "failed",
+                "error": "Execution abandoned (worker stopped before it finished)",
+            },
+        )
+    if reaped:
+        logger.warning(f"reap_stale_executions: failed {len(reaped)} orphaned run(s)")

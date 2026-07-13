@@ -24,6 +24,9 @@ def init_sentry() -> None:
             dsn=settings.SENTRY_DSN,
             environment=settings.ENVIRONMENT,
             traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+            # Tag every event with the deployed image sha so errors map to
+            # a release. Empty → sentry-sdk falls back to auto-detection.
+            release=settings.RELEASE or None,
             send_default_pii=False,
         )
         _initialized = True

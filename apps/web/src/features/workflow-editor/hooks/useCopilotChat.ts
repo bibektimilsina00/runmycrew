@@ -52,10 +52,14 @@ export function useCopilotChat() {
   const selectedNodeId = useWorkflowEditorStore(s => s.selectedNodeId)
   const selectedNode = nodes.find(n => n.id === selectedNodeId)
   const workflowId = useWorkflowEditorStore(s => s.workflow?.id)
+  // Copilot is workflow-only on the backend (its session/settings routes are
+  // WorkflowRepository-scoped). On a crew editor the id is a crew id, so every
+  // copilot call 404s — skip them entirely there.
+  const copilotEnabled = useWorkflowEditorStore(s => s.mode !== 'crew')
 
   // Load sessions when the workflow opens.
   useEffect(() => {
-    if (!workflowId) return
+    if (!workflowId || !copilotEnabled) return
     let cancelled = false
     void copilotAPI
       .listSessions(workflowId)
@@ -66,10 +70,11 @@ export function useCopilotChat() {
     return () => {
       cancelled = true
     }
-  }, [workflowId])
+  }, [workflowId, copilotEnabled])
 
   const refreshSessions = () => {
-    if (workflowId) void copilotAPI.listSessions(workflowId).then(setSessions).catch(() => {})
+    if (workflowId && copilotEnabled)
+      void copilotAPI.listSessions(workflowId).then(setSessions).catch(() => {})
   }
 
   const newChat = () => {
@@ -165,6 +170,10 @@ export function useCopilotChat() {
     const workflowId = editor.workflow?.id
     if (!workflowId) {
       setError('Open a workflow to use Copilot.')
+      return
+    }
+    if (editor.mode === 'crew') {
+      setError('Copilot is available for workflows, not crews.')
       return
     }
 

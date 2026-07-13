@@ -23,6 +23,11 @@ COPY apps/web ./apps/web
 # baked here is the production value.
 ENV VITE_API_URL=/api/v1
 
+# Release id for Sentry (short image sha), passed by build-publish.yml.
+# Empty in a plain local build → Sentry falls back to auto-detection.
+ARG VITE_RELEASE=""
+ENV VITE_RELEASE=${VITE_RELEASE}
+
 WORKDIR /app/apps/web
 RUN pnpm build
 

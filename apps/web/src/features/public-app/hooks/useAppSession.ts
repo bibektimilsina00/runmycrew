@@ -50,14 +50,20 @@ export function useAppendMessage(
   const qc = useQueryClient()
   return (msg: AppMessage) => {
     if (!sessionId) return
-    qc.setQueryData(
-      ['public-app-conversation', workspaceSlug, appSlug, sessionId],
-      (prev: unknown) => {
+    const key = ['public-app-conversation', workspaceSlug, appSlug, sessionId]
+    void (async () => {
+      // Cancel any in-flight conversation fetch FIRST: its snapshot was
+      // taken before this message existed server-side, and letting it
+      // land after the append silently erased the visitor's entry.
+      await qc.cancelQueries({ queryKey: key })
+      qc.setQueryData(key, (prev: unknown) => {
         const envelope = prev as { session: unknown; messages: AppMessage[] } | undefined
-        if (!envelope) return prev
+        // Nothing hydrated yet (fast submit): seed a minimal envelope
+        // instead of dropping the message.
+        if (!envelope) return { session: null, messages: [msg] }
         return { ...envelope, messages: [...envelope.messages, msg] }
-      },
-    )
+      })
+    })()
     // Keep the sidebar ordering/preview fresh after the turn.
     void qc.invalidateQueries({ queryKey: ['public-app-sessions', workspaceSlug, appSlug] })
   }

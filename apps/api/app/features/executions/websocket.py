@@ -13,6 +13,7 @@ from apps.api.app.core.database import get_db
 from apps.api.app.core.logger import get_logger
 from apps.api.app.core.redis import get_redis
 from apps.api.app.core.security import get_current_user_from_token
+from apps.api.app.core.ws_auth import ws_accept_subprotocol, ws_token
 from apps.api.app.features.executions.repository import ExecutionRepository
 from apps.api.app.shared.websockets import stream_redis_channel
 
@@ -24,7 +25,7 @@ router = APIRouter()
 async def execution_websocket(
     websocket: WebSocket,
     execution_id: str,
-    token: str = Query(...),
+    token: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -37,13 +38,15 @@ async def execution_websocket(
     they just have no DB catch-up.
     """
     try:
-        # 1. Verify token
-        user = await get_current_user_from_token(token)
+        # 1. Verify token — from the auth subprotocol (keeps the JWT out of
+        # the URL / access logs) or the ?token= fallback.
+        token = ws_token(websocket, token)
+        user = await get_current_user_from_token(token) if token else None
         if not user:
             await websocket.close(code=4001)  # Unauthorized
             return
 
-        await websocket.accept()
+        await websocket.accept(subprotocol=ws_accept_subprotocol(websocket))
         logger.info(f"WebSocket connected for execution {execution_id}")
 
         # CRITICAL ORDERING: subscribe to Redis BEFORE the catch-up read.
@@ -213,7 +216,7 @@ async def _stream_pubsub(
 async def workspace_runs_websocket(
     websocket: WebSocket,
     workspace_id: UUID,
-    token: str = Query(...),
+    token: str | None = Query(default=None),
 ):
     """
     WebSocket endpoint for streaming workspace-wide execution/run events.
@@ -221,12 +224,13 @@ async def workspace_runs_websocket(
     Subscribes to Redis pub/sub for the specific workspace runs channel.
     """
     try:
-        user = await get_current_user_from_token(token)
+        token = ws_token(websocket, token)
+        user = await get_current_user_from_token(token) if token else None
         if not user:
             await websocket.close(code=4001)  # Unauthorized
             return
 
-        await websocket.accept()
+        await websocket.accept(subprotocol=ws_accept_subprotocol(websocket))
         logger.info(f"WebSocket connected for workspace {workspace_id} runs")
         channel = f"workspace:{workspace_id}:runs"
         await stream_redis_channel(websocket, channel)

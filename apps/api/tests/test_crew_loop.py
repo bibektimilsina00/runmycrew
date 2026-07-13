@@ -197,3 +197,51 @@ async def test_failed_subrun_returns_status_and_error_not_empty_dict():
         await runner.run({"x": "1"})
     # The crew's terminal error embeds the inner node's real failure.
     assert "credential" in (runner._error_message or "").lower()
+
+
+# ── Linear round bodies (crew → maker → checker) ──────────────────────
+
+
+@pytest.mark.anyio
+async def test_linear_chain_round_returns_terminal_verdict():
+    """THE phase-3 E2E find: _execute_subgraph returned the START node's
+    output, so a linear crew → maker → checker chain discarded the
+    checker's verdict and every round 'failed'. The round result must be
+    the chain TERMINAL's output."""
+    g = {
+        "nodes": [
+            _node(
+                "form",
+                "trigger.form",
+                "Form",
+                {"inputs": [{"name": "amount", "type": "number", "value": ""}]},
+            ),
+            _node(
+                "crew", "ai.agent_crew", "Crew", {"goal": "gate", "maxRounds": 3, "minRounds": 1}
+            ),
+            # Maker stage: a pass-through code node between crew and check.
+            _node(
+                "mk",
+                "logic.code",
+                "Maker",
+                {
+                    "language": "python",
+                    "code": "output = {'amount': input.get('amount'), 'content': 'made it'}",
+                },
+            ),
+            _node(
+                "check",
+                "ai.verify",
+                "Check",
+                {"mode": "expression", "level": 1, "expression": "{{$step.amount}} <= 500"},
+            ),
+        ],
+        "edges": [_edge("form", "crew"), _edge("crew", "mk"), _edge("mk", "check")],
+    }
+    out = await _run(g, {"amount": 120})
+    assert out["status"] == "success", out
+    assert out["rounds"] == 1
+    assert out["result"]["passed"] is True
+    # The verdict node passes the judged artifact through, so terminal
+    # consumers (hosted chat) have something to say.
+    assert out["result"]["content"] == "made it"

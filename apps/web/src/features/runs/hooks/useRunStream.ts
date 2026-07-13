@@ -6,6 +6,7 @@ import {
   type AgentTraceStep,
   type RunLog,
 } from '../store/runsStore'
+import { apiWsBaseUrl, openAuthedWs } from '../utils/wsUrl'
 
 // React StrictMode runs effect mount → cleanup → mount in dev, which
 // would otherwise spawn two WebSockets for the same execution. The
@@ -16,17 +17,6 @@ import {
 // the pending close and reuses the same socket. Real unmounts still
 // close (after the short delay).
 const STRICTMODE_REUSE_WINDOW_MS = 150
-
-function buildWsUrl(): string {
-  const rawApiUrl = import.meta.env.VITE_API_URL || '/api/v1'
-  if (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://')) {
-    return rawApiUrl.replace(/^http/, 'ws')
-  }
-  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const host =
-    window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host
-  return `${proto}//${host}${rawApiUrl}`
-}
 
 /**
  * Subscribe to /ws/executions/{id}. Streams catch-up + live `log_synced` events
@@ -95,8 +85,9 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
       socketRef.current = null
     }
 
-    const url = `${buildWsUrl()}/ws/executions/${executionId}?token=${encodeURIComponent(token)}`
-    const ws: WebSocket = new WebSocket(url)
+    // Token rides as a subprotocol, not in the URL (which proxies log).
+    const url = `${apiWsBaseUrl()}/ws/executions/${executionId}`
+    const ws: WebSocket = openAuthedWs(url, token)
     socketRef.current = { ws, executionId, closeTimer: null }
     let alive = true
     let liveCounter = 0

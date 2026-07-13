@@ -181,6 +181,25 @@ class Settings(BaseSettings):
     # Observability — error tracking is off unless SENTRY_DSN is set.
     SENTRY_DSN: str = ""
     SENTRY_TRACES_SAMPLE_RATE: float = 0.0
+    # Release identifier so Sentry errors map to a deploy. The deploy sets
+    # RUNMYCREW_IMAGE_TAG (e.g. "sha-abc1234"); compose forwards it here.
+    RELEASE: str = ""
+
+    # Public-app abuse ceilings. A safety net EVEN WHEN the app owner sets
+    # no cap — the old daily cap defaulted to 0 (disabled), so a rotating
+    # anonymous client could run up unbounded LLM spend.
+    # Per-app, per-UTC-day USD ceiling. Owner's `daily_cost_cap_usd` wins
+    # when it's set lower; this caps the case where they set nothing.
+    PUBLIC_APP_DEFAULT_DAILY_CAP_USD: float = 25.0
+    # Max concurrent in-flight executions per public app. Bounds the burst
+    # race that a post-hoc cost record can't (many messages dispatched
+    # before any cost lands).
+    PUBLIC_APP_MAX_INFLIGHT: int = 6
+    # Per-session upload quota. Uploads are base64'd into a Postgres TEXT
+    # column, so without a cap an anonymous visitor can bloat the primary
+    # DB. (Off-DB blob storage is the real fix; this bounds the damage.)
+    PUBLIC_APP_MAX_UPLOADS_PER_SESSION: int = 20
+    PUBLIC_APP_MAX_UPLOAD_BYTES_PER_SESSION: int = 50 * 1024 * 1024
 
     # Email — Resend HTTP API is preferred (port 443, no provider port-block
     # risk like DigitalOcean blocking 25/465/587). Falls back to SMTP for

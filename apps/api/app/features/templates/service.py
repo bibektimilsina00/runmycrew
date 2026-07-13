@@ -396,10 +396,20 @@ def _prepare_graph_snapshot(
                 creds.add(str(node_type) or "credential")
                 props[key] = ""
 
-        # Common multi-credential property names that some integrations
-        # use for primary/secondary OAuth tokens.
+        # Blank any property whose name looks like an inline secret before
+        # the graph is shared. Credentials normally live as encrypted
+        # Credential rows referenced by id, but a node that stores a raw
+        # token/key inline (webhook secret, api_key, bearer_token, …) would
+        # otherwise publish the publisher's secret in plaintext. Matched
+        # case-insensitively across camelCase and snake_case.
         for key in list(props.keys()):
-            if key.lower().endswith("credential") and isinstance(props[key], str) and props[key]:
+            if not isinstance(props.get(key), str) or not props[key]:
+                continue
+            low = key.lower().replace("_", "")
+            if low.endswith("credential") or any(
+                marker in low
+                for marker in ("apikey", "secret", "token", "password", "passwd", "privatekey")
+            ):
                 creds.add(str(node_type) or "credential")
                 props[key] = ""
 

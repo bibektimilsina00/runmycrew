@@ -12,13 +12,13 @@ cd apps/api && PYTHONPATH=../.. ../../.venv/bin/pytest ../../apps/api/tests -q \
   --cov=apps/api/app --cov-report=term | tail -20
 ```
 
-| Metric | Baseline (2026-07-11) | After phase 7 |
+| Metric | Baseline (2026-07-11) | After phase 7 (2026-07-12) |
 |---|---|---|
-| Backend tests | 820 | |
-| Backend coverage % | 46% (35,141 stmts, 18,944 missed) | |
-| Frontend tests | 0 | |
-| Automated E2E scenarios | 0 | |
-| Known criticals open | 0 known (phase 1/4 audits will populate) | |
+| Backend tests | 820 | **924** (+104) |
+| Backend coverage % | 46% (35,141 stmts, 18,944 missed) | **48%** (35,231 stmts, 18,407 missed) |
+| Frontend tests | 0 | **85** |
+| Automated E2E scenarios | 0 | **12** (9 spec files) + smoke gate + nightly |
+| Known criticals open | 0 known (phase 1/4 audits will populate) | **0** (security fixes shipped; deferred items non-critical, carded) |
 
 **Deployed prod SHA at freeze:** `dc39e7de` (docs: production hardening plan, #402).
 **Pre-hardening dump:** `backups/pre-hardening-2026-07-11.sql.gz` (83K, 35 tables, gzip-verified) — move a copy OFF this machine.

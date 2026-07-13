@@ -144,9 +144,17 @@ class AuthService(BaseService):
                 detail="Invalid OAuth state",
             )
         next_path = payload.get("next") or "/dashboard"
-        # Only accept same-origin relative paths; reject absolute URLs
-        # so we can't be used as an open redirect.
-        if not isinstance(next_path, str) or not next_path.startswith("/"):
+        # Only accept same-origin relative paths; reject absolute URLs so
+        # we can't be used as an open redirect that leaks the minted JWT.
+        # `startswith("/")` alone is NOT enough: `//evil.com` and `/\evil`
+        # are scheme-relative — the browser treats them as absolute and
+        # navigates off-site.
+        if (
+            not isinstance(next_path, str)
+            or not next_path.startswith("/")
+            or next_path.startswith("//")
+            or next_path.startswith("/\\")
+        ):
             next_path = "/dashboard"
         return next_path
 

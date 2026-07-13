@@ -11,29 +11,21 @@ import {
 } from '../api'
 
 /**
- * Crew loop with a model judge: trigger.chat_app → ai.agent_crew with a
- * maker (action.agent) and a checker (action.evaluator) as round members.
+ * Crew loop with a model judge, wired the way the product teaches it:
+ * a LINEAR chain trigger.chat_app → ai.agent_crew → action.agent (maker)
+ * → action.evaluator (checker). The round result is the chain TERMINAL's
+ * output (the evaluator's verdict, with the judged content passed
+ * through) — this exact shape used to exhaust every round because
+ * _execute_subgraph returned the START node's output.
+ *
  * The mock LLM answers the maker with "Echo: <message>" and the judge
  * prompt with {"passed": true, "quality": 9, feedback} — so the crew must
- * terminate `success` in round 1 with the verdict attached.
- *
- * Graph shape note: the maker and checker hang as SIBLING successors of
- * the crew (crew→agent, crew→judge), not as a linear chain. A linear
- * crew → agent → evaluator chain never surfaces the checker's verdict:
- * WorkflowRunner._execute_subgraph returns the START node's output while
- * agent_crew reads sub[-1] as the round verdict — see the suspected-bug
- * notes in the PR. With siblings, run_downstream returns one output per
- * successor and sub[-1] is genuinely the evaluator's verdict.
+ * terminate `success` in round 1 AND the maker's answer must reach the
+ * visitor as the assistant reply.
  *
  * The judge references the maker via the legacy `{{agent.output.content}}`
  * path ($node('Agent') needs paired-item provenance that sub-graph start
  * nodes don't have).
- *
- * Outcome is asserted from the SSE stream the page opens (app runs have
- * no execution row): the execution_completed frame carries the crew
- * output. The maker's "Echo:" content is judged (quality 9 → passed) but
- * the crew's terminal output exposes only the verdict, so the visible
- * assistant entry is the empty state — asserted as proof the turn closed.
  */
 
 const TITLE = `E2E Judge ${Date.now()}`
@@ -65,7 +57,7 @@ test.beforeAll(async () => {
           credential: credentialId,
           messages: [{ role: 'user', content: '{{$step.message}}' }],
         },
-        { x: 480, y: -100 },
+        { x: 480, y: 0 },
       ),
       node(
         'judge',
@@ -77,26 +69,21 @@ test.beforeAll(async () => {
           content: '{{agent.output.content}}',
           metrics: [{ name: 'quality', description: 'q', min: 0, max: 10 }],
         },
-        { x: 480, y: 100 },
+        { x: 720, y: 0 },
       ),
     ],
-    // Order matters twice: successors run in edge order (maker before
-    // judge), and the crew reads the LAST successor's output as the
-    // round verdict.
-    edges: [edge('trig', 'crew'), edge('crew', 'agent'), edge('crew', 'judge')],
+    edges: [edge('trig', 'crew'), edge('crew', 'agent'), edge('agent', 'judge')],
   })
 })
 
 test.describe('crew loop — mock LLM judge', () => {
-  test('judge passes the maker output → crew succeeds in round 1', async ({
+  test('linear maker → judge chain succeeds and the answer reaches the visitor', async ({
     page,
   }) => {
     await page.goto(`/apps/${ws}/${SLUG}`)
     await expect(
       page.getByRole('heading', { name: `Talk to ${TITLE}` }),
     ).toBeVisible()
-    // Wait for the conversation query to hydrate: useAppendMessage drops
-    // optimistic entries while its cache is still empty.
     await page.waitForLoadState('networkidle')
 
     const streamDone = page.waitForResponse((r) => r.url().includes('/stream/'), {
@@ -119,9 +106,9 @@ test.describe('crew loop — mock LLM judge', () => {
     expect(sse).toContain('mock judge: looks good')
     expect(sse).toContain('"quality":9')
 
-    // Turn closes on the page. Crew output carries no `content`, so the
-    // assistant entry renders the empty state (see header note).
-    await expect(page.getByText('No response produced.')).toBeVisible({
+    // The maker's answer survives the verdict node (content pass-through)
+    // and lands in the transcript as the assistant reply.
+    await expect(page.getByText('Echo: what is fuse')).toBeVisible({
       timeout: 60_000,
     })
   })

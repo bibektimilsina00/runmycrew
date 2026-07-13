@@ -281,6 +281,10 @@ uv run --no-sync alembic -c apps/api/alembic.ini upgrade head
 uv run --no-sync uvicorn apps.api.app.main:app --reload --port 8000
 
 # Celery worker (terminal 2)
+# NB: the worker has NO hot reload — unlike uvicorn --reload, it does not
+# pick up backend changes. After editing anything the worker runs (node
+# logic, tasks.py, the engine), RESTART this process or you'll test stale
+# code and chase phantom bugs.
 uv run --no-sync celery -A apps.worker.app.jobs.tasks worker --loglevel=info --concurrency=2
 
 # Celery beat (terminal 3)

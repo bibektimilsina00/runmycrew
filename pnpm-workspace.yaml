@@ -13,3 +13,13 @@ onlyBuiltDependencies:
   - '@sentry/cli'
   - sharp
   - unrs-resolver
+
+auditConfig:
+  # jsonata <2.2.0 $toMillis DoS. Frontend jsonata evaluates ONLY the
+  # workflow author's own design-time constant expressions (runtime vars
+  # bail, evaluated against null data on the canvas render path) — the DoS
+  # is self-inflicted, not attacker-reachable. v2 makes evaluate() async,
+  # breaking the sync canvas path. Revisit if that eval touches untrusted
+  # input.
+  ignoreGhsas:
+    - GHSA-86vw-mfpg-wwv9
