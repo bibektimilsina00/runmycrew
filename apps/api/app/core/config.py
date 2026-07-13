@@ -185,6 +185,17 @@ class Settings(BaseSettings):
     # RUNMYCREW_IMAGE_TAG (e.g. "sha-abc1234"); compose forwards it here.
     RELEASE: str = ""
 
+    # Public-app abuse ceilings. A safety net EVEN WHEN the app owner sets
+    # no cap — the old daily cap defaulted to 0 (disabled), so a rotating
+    # anonymous client could run up unbounded LLM spend.
+    # Per-app, per-UTC-day USD ceiling. Owner's `daily_cost_cap_usd` wins
+    # when it's set lower; this caps the case where they set nothing.
+    PUBLIC_APP_DEFAULT_DAILY_CAP_USD: float = 25.0
+    # Max concurrent in-flight executions per public app. Bounds the burst
+    # race that a post-hoc cost record can't (many messages dispatched
+    # before any cost lands).
+    PUBLIC_APP_MAX_INFLIGHT: int = 6
+
     # Email — Resend HTTP API is preferred (port 443, no provider port-block
     # risk like DigitalOcean blocking 25/465/587). Falls back to SMTP for
     # self-hosters using Gmail, SES relay, Mailgun, etc.
