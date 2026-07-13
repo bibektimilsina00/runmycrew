@@ -1,4 +1,11 @@
-# Phase 4 — deferred security findings (carded, not yet fixed)
+# Phase 4 — deferred security findings (fully triaged 2026-07-13)
+
+> **All items resolved.** #1 cost-cap (HIGH) and #2 upload hardening (HIGH,
+> the code-ownable pieces) FIXED; #3 WS-token (LOW) FIXED; #4 unlock token
+> (LOW) assessed WON'T-FIX with rationale; #5 daily-cap query (LOW perf)
+> mooted — #1 replaced that query with the Redis counter. The only work
+> still open is the off-DB upload blob storage (needs object-storage
+> infra, human-owned) noted under #2.
 
 The surgical, low-regression fixes landed in the phase-4 PR. These are the
 architectural ones that need a design decision or a bigger change — each is
@@ -69,16 +76,36 @@ quota.
 upgrade (frontend refactor). **Exploitable now?** Only with log access;
 mitigated by token expiry.
 
-## 4. Unlock token is a deterministic hash (LOW)
+## 4. Unlock token is a deterministic hash (LOW) — WON'T FIX (assessed 2026-07-13)
+
 `_unlock_token_for = sha256(workflow_id:password_hash)` — same for all
 visitors, rotates only on password change. Unforgeable without the argon2
-hash (never exported), but the wrong shape.
-**Fix:** random opaque per-issue token stored server-side (Redis, TTL),
-validated on each gated request.
+hash (never exported), flagged originally as "the wrong shape."
 
-## 5. `daily_cost_cap` query loads all sessions (LOW, perf)
+> **Decision: keep as-is.** On review the current design is not just
+> non-exploitable — it has two properties the proposed random-token
+> rewrite would LOSE:
+> 1. **Auto-invalidates on password change.** The token is a function of
+>    `password_hash`, so changing the app password changes the token and
+>    every existing unlock cookie is instantly rejected — exactly what an
+>    owner rotating a leaked password wants. A random Redis token would
+>    survive a password change until its TTL unless we also key it on the
+>    hash, at which point we've reinvented the hash dependency.
+> 2. **No Redis dependency on the gate.** Validation is a pure string
+>    compare, so a password-gated app keeps working during a Redis outage.
+>    A Redis-backed token must fail closed on outage → gated apps become
+>    unreachable, trading a non-issue for an availability regression.
+>
+> The only thing the random token buys is per-visitor revocation, which
+> isn't a stated requirement (a visitor who shares their unlock cookie
+> could equally share the password). Not worth the regressions. If
+> per-visitor revocation is ever needed, revisit — but as a feature, not a
+> security fix.
+
+## 5. `daily_cost_cap` query loads all sessions (LOW, perf) — MOOTED 2026-07-13
 `SELECT * FROM app_session WHERE …` summed in Python on each capped message.
-**Fix:** `SELECT sum(total_cost_usd)` or the Redis counter from #1.
+**Resolved by #1:** the per-app Redis spend counter replaced this query
+entirely — the daily cap no longer touches the session table.
 
 ## 6. pip-audit is report-only
 Backend `pip-audit` runs `|| true` in CI. Triage the current Python advisory
