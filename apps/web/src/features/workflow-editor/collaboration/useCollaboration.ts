@@ -51,8 +51,13 @@ export function useCollaborationLifecycle(workflowId: string | undefined) {
   const setTyping = useCollaborationStore((s) => s.setTyping)
   const reset = useCollaborationStore((s) => s.reset)
 
+  // Collaboration is workflow-only: the backend WS authenticates against
+  // WorkflowRepository, so a crew id hits /ws/workflows/{crewId} and 404s
+  // the handshake in a loop. Don't connect on a crew editor.
+  const isCrew = useWorkflowEditorStore((s) => s.mode === 'crew')
+
   useEffect(() => {
-    if (!workflowId || !token || !workspaceId) return
+    if (!workflowId || !token || !workspaceId || isCrew) return
     reset()
 
     const handleEvent = (event: ServerEvent) => {
@@ -159,6 +164,7 @@ export function useCollaborationLifecycle(workflowId: string | undefined) {
     workflowId,
     token,
     workspaceId,
+    isCrew,
     reset,
     setClient,
     setOwn,
