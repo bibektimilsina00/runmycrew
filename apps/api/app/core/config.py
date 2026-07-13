@@ -195,6 +195,11 @@ class Settings(BaseSettings):
     # race that a post-hoc cost record can't (many messages dispatched
     # before any cost lands).
     PUBLIC_APP_MAX_INFLIGHT: int = 6
+    # Per-session upload quota. Uploads are base64'd into a Postgres TEXT
+    # column, so without a cap an anonymous visitor can bloat the primary
+    # DB. (Off-DB blob storage is the real fix; this bounds the damage.)
+    PUBLIC_APP_MAX_UPLOADS_PER_SESSION: int = 20
+    PUBLIC_APP_MAX_UPLOAD_BYTES_PER_SESSION: int = 50 * 1024 * 1024
 
     # Email — Resend HTTP API is preferred (port 443, no provider port-block
     # risk like DigitalOcean blocking 25/465/587). Falls back to SMTP for
