@@ -6,7 +6,7 @@ import {
   type AgentTraceStep,
   type RunLog,
 } from '../store/runsStore'
-import { apiWsBaseUrl } from '../utils/wsUrl'
+import { apiWsBaseUrl, openAuthedWs } from '../utils/wsUrl'
 
 // React StrictMode runs effect mount → cleanup → mount in dev, which
 // would otherwise spawn two WebSockets for the same execution. The
@@ -85,8 +85,9 @@ export function useRunStream(workflowId: string | null, executionId: string | nu
       socketRef.current = null
     }
 
-    const url = `${apiWsBaseUrl()}/ws/executions/${executionId}?token=${encodeURIComponent(token)}`
-    const ws: WebSocket = new WebSocket(url)
+    // Token rides as a subprotocol, not in the URL (which proxies log).
+    const url = `${apiWsBaseUrl()}/ws/executions/${executionId}`
+    const ws: WebSocket = openAuthedWs(url, token)
     socketRef.current = { ws, executionId, closeTimer: null }
     let alive = true
     let liveCounter = 0

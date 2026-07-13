@@ -16,3 +16,15 @@ export function apiWsBaseUrl(): string {
   const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
   return `${proto}//${window.location.host}${rawApiUrl}`
 }
+
+/**
+ * Open a WebSocket that authenticates via the `Sec-WebSocket-Protocol`
+ * subprotocol instead of a `?token=` query param — the token no longer
+ * lands in proxy / uvicorn access logs or browser history. The server
+ * (apps/api/app/core/ws_auth.py) reads the JWT from the second offered
+ * subprotocol and echoes `fuse-auth` back on accept. Keep the token OUT
+ * of the `url` you pass here.
+ */
+export function openAuthedWs(url: string, token: string): WebSocket {
+  return new WebSocket(url, ['fuse-auth', token])
+}
