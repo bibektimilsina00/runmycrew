@@ -28,7 +28,7 @@ export function FinalCTA() {
               Get started
             </Link>
             <Link
-              href="#contact"
+              href="/contact"
               className="inline-flex h-[34px] items-center gap-[7px] rounded-[8px] border border-border bg-white/[0.02] px-[16px] text-[13px] font-medium text-foreground/90 transition-colors hover:bg-white/[0.06]"
             >
               Contact sales

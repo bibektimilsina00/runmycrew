@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plug } from 'lucide-react'
+import { BrandGlyph } from './BrandGlyph'
 import { INTEGRATIONS } from '../data/site'
 
 /**
@@ -36,7 +37,7 @@ export function MockupIntegrations() {
                   className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[9px] font-mono text-[13px] font-bold text-white"
                   style={{ background: c.bg }}
                 >
-                  {c.letter}
+                  <BrandGlyph slug={c.slug} fallback={c.letter} size={18} />
                 </span>
                 <span className="flex min-w-0 flex-col leading-[1.3]">
                   <span className="text-[14px] font-medium text-foreground">{c.name}</span>

@@ -16,5 +16,6 @@ export { MockupObserve }     from './components/MockupObserve'
 export { Changelog }         from './components/Changelog'
 export { Testimonials }      from './components/Testimonials'
 export { FinalCTA }          from './components/FinalCTA'
+export { ContactForm }       from './components/ContactForm'
 
 export { FEATURES } from './data/site'
