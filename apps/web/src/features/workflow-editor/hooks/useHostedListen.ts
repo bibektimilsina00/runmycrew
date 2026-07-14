@@ -43,9 +43,10 @@ export function useHostedListen(workflowId: string) {
   const wsSlug = useWorkspaceStore(s => s.currentWorkspace?.slug ?? '')
   const { toast } = useToast()
 
-  const hostedNode = nodes.find(
-    n => n.type === 'trigger.chat_app' || n.type === 'trigger.form',
-  )
+  // Only Chat App is a hosted public page (/apps/{ws}/{slug}). Form
+  // triggers open an in-editor run dialog instead — they are not published
+  // apps, so routing them here would open a page the backend can't resolve.
+  const hostedNode = nodes.find(n => n.type === 'trigger.chat_app')
   const hasHostedTrigger = Boolean(hostedNode)
   // Shared across hook instances (action bar + page) so every Run button
   // reflects the same listening state.
@@ -103,12 +104,7 @@ export function useHostedListen(workflowId: string) {
     if (win) win.location.href = href
     else window.open(href, '_blank')
     setListening(true)
-    toast(
-      hostedNode?.type === 'trigger.form'
-        ? 'Listening — the graph runs when the form is submitted'
-        : 'Listening — each chat message runs the graph live',
-      { variant: 'ok' },
-    )
+    toast('Listening — each chat message runs the graph live', { variant: 'ok' })
   }
 
   const stopListening = () => setListening(false)
