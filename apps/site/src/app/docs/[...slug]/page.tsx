@@ -1,13 +1,28 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { MarketingNav } from '@/features/marketing'
-import { DocsLayout, DocsToc, findDoc, type TocEntry } from '@/features/docs'
+import { DocsLayout, DocsToc, findDoc, DOC_CONTENT, type TocEntry } from '@/features/docs'
 
 /**
- * Catch-all docs route. For now every page renders a placeholder body
- * derived from the leaf's `intro`. Swap this file to MDX (Fumadocs /
- * next-mdx-remote) when content arrives — the URL + layout shape stay
- * identical so links don't churn.
+ * Catch-all docs route. Renders rich content from `DOC_CONTENT` when the
+ * slug has a body; otherwise falls back to a short placeholder derived from
+ * the nav leaf. The URL + layout shape stay identical either way.
  */
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const match = findDoc(slug)
+  if (!match) return { title: 'Docs' }
+  return {
+    title: `${match.leaf.title} · Docs`,
+    description: match.leaf.intro,
+  }
+}
+
 export default async function DocPage({
   params,
 }: {
@@ -18,11 +33,25 @@ export default async function DocPage({
   if (!match) notFound()
 
   const { group, leaf } = match
+  const content = DOC_CONTENT[slug.join('/')]
+
+  // Rich content path.
+  if (content) {
+    return (
+      <>
+        <MarketingNav />
+        <DocsLayout toc={<DocsToc items={content.toc} />}>
+          {content.body}
+        </DocsLayout>
+      </>
+    )
+  }
+
+  // Placeholder fallback for any leaf without a body yet.
   const toc: TocEntry[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'usage',    label: 'Usage' },
+    { id: 'usage', label: 'Usage' },
   ]
-
   return (
     <>
       <MarketingNav />
@@ -32,15 +61,13 @@ export default async function DocPage({
         </p>
         <h1>{leaf.title}</h1>
         {leaf.intro && <p className="lead">{leaf.intro}</p>}
-
         <h2 id="overview">Overview</h2>
         <p>
-          This page is a placeholder. Content for <strong>{leaf.title}</strong>{' '}
-          is being written and will land in a future release.
+          This page is being written. Use the sidebar to explore the rest of
+          the docs in the meantime.
         </p>
-
         <h2 id="usage">Usage</h2>
-        <p>Until then, use the sidebar to explore other sections.</p>
+        <p>Check back soon.</p>
       </DocsLayout>
     </>
   )
