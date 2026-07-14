@@ -12,6 +12,7 @@ import { EditorCanvas } from '../components/canvas/EditorCanvas'
 import { EditorRightPanel } from '../components/right-panel/EditorRightPanel'
 import { BottomPanel } from '../components/bottom-panel/BottomPanel'
 import { useHostedListen } from '../hooks/useHostedListen'
+import { FormRunDialog } from '../components/FormRunDialog'
 import { EditorLoading } from '../components/overlays/EditorLoading'
 import { EditorError } from '../components/overlays/EditorError'
 
@@ -105,11 +106,18 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
     })
   }, [diffActive, proposed, baseline, edges])
 
-  // Hosted triggers (Chat App / Form) route EVERY Run button through the
-  // listen flow — open the hosted page, wait for the visitor interaction.
+  // Chat App triggers route Run through the hosted-page listen flow. A Form
+  // trigger instead opens an in-editor dialog built from its input schema —
+  // fill it, submit, and the graph runs once with those values as input.
   const hosted = useHostedListen(id ?? '')
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
+  const formNode = useMemo(
+    () => nodes.find(n => n.type === 'trigger.form') ?? null,
+    [nodes],
+  )
   const handleRun = () => {
     if (hosted.hasHostedTrigger) void hosted.startListening()
+    else if (formNode) setFormDialogOpen(true)
     else run()
   }
 
@@ -177,6 +185,18 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
           />
         </div>
       </div>
+
+      {formDialogOpen && formNode && (
+        <FormRunDialog
+          formNode={formNode}
+          isRunning={isRunning}
+          onClose={() => setFormDialogOpen(false)}
+          onRun={(inputData) => {
+            setFormDialogOpen(false)
+            run(inputData)
+          }}
+        />
+      )}
     </ReactFlowProvider>
   )
 }
