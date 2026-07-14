@@ -33,12 +33,24 @@ export function Statement() {
                       {f.tag}
                     </div>
                     <div className="relative grid h-[200px] place-items-center overflow-hidden rounded-[14px] border border-white/[0.07] bg-gradient-to-br from-white/[0.03] to-transparent transition-colors duration-500 group-hover:border-white/[0.12]">
-                      {/* Cursor-tracked highlight (handled at the section level keeps this child cheap) */}
+                      {/* Canvas dot-grid — reads the tile as a mini builder surface. */}
+                      <div
+                        aria-hidden
+                        className="pointer-events-none absolute inset-0 opacity-[0.5]"
+                        style={{
+                          backgroundImage:
+                            'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
+                          backgroundSize: '18px 18px',
+                          maskImage:
+                            'radial-gradient(120% 90% at 50% 45%, black 40%, transparent 85%)',
+                        }}
+                      />
+                      {/* Top-edge sheen on hover */}
                       <div
                         aria-hidden
                         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.25] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                       />
-                      <Glyph className="h-[150px] w-[150px] text-primary/85 transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
+                      <Glyph className="relative h-auto w-[78%] text-primary transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
                     </div>
                     <div className="mt-3.5 text-[14px] leading-[1.5] text-muted-foreground/85">
                       {f.body}

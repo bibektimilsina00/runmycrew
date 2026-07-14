@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { BrandMark } from './BrandMark'
+import { BrandGlyph } from './BrandGlyph'
 import { EXAMPLES } from '../data/site'
 
 /**
@@ -49,7 +50,7 @@ export function MockupWorkflow() {
                   className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg font-mono text-[11px] font-bold text-white"
                   style={{ background: n.iconBg }}
                 >
-                  {n.icon}
+                  <BrandGlyph slug={n.slug} fallback={n.icon} size={16} />
                 </span>
                 <span className="flex min-w-0 flex-col leading-[1.3]">
                   <span className="text-[14px] font-medium text-foreground">{n.title}</span>

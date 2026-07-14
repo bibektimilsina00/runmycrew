@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { MarketingNav, MarketingFooter } from '@/features/marketing'
+import { MarketingNav, MarketingFooter, ContactForm } from '@/features/marketing'
 import { Container } from '@/shared/components/Container'
 
 export const metadata: Metadata = {
@@ -75,6 +75,13 @@ export default function ContactPage() {
 
         <section className="pb-24">
           <Container className="max-w-[760px] px-7">
+            <div className="mb-10">
+              <ContactForm />
+            </div>
+
+            <p className="m-0 mb-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70">
+              Or reach a specific team
+            </p>
             <div className="flex flex-col gap-4">
               {CHANNELS.map((c) => (
                 <a

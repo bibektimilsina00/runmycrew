@@ -12,13 +12,7 @@ import { DashboardMockup } from './DashboardMockup'
  */
 export function Hero() {
   return (
-    <section className="relative pt-[104px] sm:pt-[136px]">
-      {/* Soft whitish glow behind the headline — Linear-style, keeps the dark. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[80px] h-[420px] w-[820px] max-w-[92vw] -translate-x-1/2 rounded-full opacity-[0.1] blur-[120px]"
-        style={{ background: 'radial-gradient(closest-side, #fff, transparent 72%)' }}
-      />
+    <section className="relative overflow-x-clip pt-[104px] sm:pt-[136px]">
       <Container className="relative max-w-[1330px] px-7">
         <Reveal y={24} delay={0.05}>
           <h1 className="m-0 max-w-[1024px] text-[clamp(34px,4.4vw,56px)] font-[560] leading-[1.08] tracking-[-0.022em] text-foreground">
@@ -42,7 +36,7 @@ export function Hero() {
               Get started
             </Link>
             <Link
-              href="#contact"
+              href="/contact"
               className="inline-flex h-[34px] items-center gap-[7px] rounded-[8px] border border-border bg-white/[0.02] px-[16px] text-[13px] font-medium text-foreground/90 transition-colors hover:bg-white/[0.06]"
             >
               Get demo

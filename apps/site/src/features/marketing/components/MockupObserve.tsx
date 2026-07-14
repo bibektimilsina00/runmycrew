@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check } from 'lucide-react'
+import { BrandGlyph } from './BrandGlyph'
 import { RUN_DETAIL_TITLE, RUN_DETAIL_TOTAL, RUN_STEPS } from '../data/site'
 
 /**
@@ -37,7 +38,7 @@ export function MockupObserve() {
                   className="grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md font-mono text-[10px] font-bold text-white"
                   style={{ background: s.iconBg }}
                 >
-                  {s.icon}
+                  <BrandGlyph slug={s.slug} fallback={s.icon} size={13} />
                 </span>
                 <span className="flex-1 text-[13px] font-medium text-foreground/85">{s.title}</span>
                 <span className="font-mono text-[11px] text-muted-foreground/70">{s.ms}</span>

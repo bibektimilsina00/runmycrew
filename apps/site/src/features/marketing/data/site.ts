@@ -134,6 +134,7 @@ export type WorkflowNode = {
   sub: string
   icon: string
   iconBg: string
+  slug?: string
   last?: boolean
 }
 
@@ -148,19 +149,19 @@ export const EXAMPLES: PromptExample[] = [
     label: 'Urgent issues → Slack',
     text: 'When a GitHub issue is labeled "urgent", post it to #incidents in Slack and create a Linear ticket.',
     nodes: [
-      { kind: 'TRIGGER', title: 'GitHub · Issue labeled', sub: 'label is "urgent"', icon: 'GH', iconBg: '#24292f' },
+      { kind: 'TRIGGER', title: 'GitHub · Issue labeled', sub: 'label is "urgent"', icon: 'GH', iconBg: '#24292f', slug: 'github' },
       { kind: 'FILTER',  title: 'Only if unassigned',     sub: 'assignee is empty', icon: 'IF', iconBg: '#3a3f4a' },
-      { kind: 'ACTION',  title: 'Slack · Post message',   sub: 'channel #incidents', icon: 'SL', iconBg: '#4a154b' },
-      { kind: 'ACTION',  title: 'Linear · Create issue',  sub: 'team Platform · P1', icon: 'LN', iconBg: '#5e6ad2', last: true },
+      { kind: 'ACTION',  title: 'Slack · Post message',   sub: 'channel #incidents', icon: 'SL', iconBg: '#4a154b', slug: 'slack' },
+      { kind: 'ACTION',  title: 'Linear · Create issue',  sub: 'team Platform · P1', icon: 'LN', iconBg: '#5e6ad2', slug: 'linear', last: true },
     ],
   },
   {
     label: 'New lead → CRM',
     text: 'When a Meta lead form is submitted, add the lead to Notion and send a welcome email via Gmail.',
     nodes: [
-      { kind: 'TRIGGER', title: 'Meta · Lead submitted', sub: 'form "Spring Campaign"', icon: 'MT', iconBg: '#0866ff' },
-      { kind: 'ACTION',  title: 'Notion · Add to CRM',   sub: 'database Leads',         icon: 'NO', iconBg: '#111' },
-      { kind: 'ACTION',  title: 'Gmail · Send welcome',   sub: 'template Welcome v2',    icon: 'GM', iconBg: '#ea4335', last: true },
+      { kind: 'TRIGGER', title: 'Meta · Lead submitted', sub: 'form "Spring Campaign"', icon: 'MT', iconBg: '#0866ff', slug: 'meta' },
+      { kind: 'ACTION',  title: 'Notion · Add to CRM',   sub: 'database Leads',         icon: 'NO', iconBg: '#111', slug: 'notion' },
+      { kind: 'ACTION',  title: 'Gmail · Send welcome',   sub: 'template Welcome v2',    icon: 'GM', iconBg: '#ea4335', slug: 'gmail', last: true },
     ],
   },
   {
@@ -168,9 +169,9 @@ export const EXAMPLES: PromptExample[] = [
     text: 'Every weekday at 9am, summarize new GitHub activity with AI and post the digest to Slack.',
     nodes: [
       { kind: 'TRIGGER', title: 'Schedule · 9:00 AM',          sub: 'Mon–Fri',         icon: '⏱', iconBg: '#3a3f4a' },
-      { kind: 'FETCH',   title: 'GitHub · Recent activity',    sub: 'last 24 hours',   icon: 'GH', iconBg: '#24292f' },
+      { kind: 'FETCH',   title: 'GitHub · Recent activity',    sub: 'last 24 hours',   icon: 'GH', iconBg: '#24292f', slug: 'github' },
       { kind: 'AI',      title: 'Crew AI · Summarize',         sub: 'Claude Sonnet',   icon: 'AI', iconBg: '#5e6ad2' },
-      { kind: 'ACTION',  title: 'Slack · Post digest',         sub: 'channel #standup', icon: 'SL', iconBg: '#4a154b', last: true },
+      { kind: 'ACTION',  title: 'Slack · Post digest',         sub: 'channel #standup', icon: 'SL', iconBg: '#4a154b', slug: 'slack', last: true },
     ],
   },
 ]
@@ -281,16 +282,17 @@ export type IntegrationCard = {
   sub: string
   bg: string
   letter: string
+  slug?: string
   defaultConnected: boolean
 }
 
 export const INTEGRATIONS: IntegrationCard[] = [
-  { key: 'github', name: 'GitHub', sub: 'Issues, PRs, Actions',    bg: '#24292f', letter: 'GH', defaultConnected: true },
-  { key: 'slack',  name: 'Slack',  sub: 'Messages & channels',     bg: '#4a154b', letter: 'SL', defaultConnected: true },
-  { key: 'notion', name: 'Notion', sub: 'Databases & pages',       bg: '#111',    letter: 'NO', defaultConnected: false },
-  { key: 'google', name: 'Google', sub: 'Calendar, Sheets, Mail',  bg: '#1a73e8', letter: 'GO', defaultConnected: false },
-  { key: 'stripe', name: 'Stripe', sub: 'Payments & webhooks',     bg: '#635bff', letter: 'ST', defaultConnected: false },
-  { key: 'meta',   name: 'Meta',   sub: 'Ads & lead forms',        bg: '#0866ff', letter: 'MT', defaultConnected: false },
+  { key: 'github', name: 'GitHub', sub: 'Issues, PRs, Actions',    bg: '#24292f', letter: 'GH', slug: 'github', defaultConnected: true },
+  { key: 'slack',  name: 'Slack',  sub: 'Messages & channels',     bg: '#4a154b', letter: 'SL', slug: 'slack',  defaultConnected: true },
+  { key: 'notion', name: 'Notion', sub: 'Databases & pages',       bg: '#111',    letter: 'NO', slug: 'notion', defaultConnected: false },
+  { key: 'google', name: 'Google', sub: 'Calendar, Sheets, Mail',  bg: '#1a73e8', letter: 'GO', slug: 'google', defaultConnected: false },
+  { key: 'stripe', name: 'Stripe', sub: 'Payments & webhooks',     bg: '#635bff', letter: 'ST', slug: 'stripe', defaultConnected: false },
+  { key: 'meta',   name: 'Meta',   sub: 'Ads & lead forms',        bg: '#0866ff', letter: 'MT', slug: 'meta',   defaultConnected: false },
 ]
 
 /* ─── RECENT RUNS ─────────────────────────────────────────────────── */
@@ -318,6 +320,7 @@ export const RUNS: RecentRun[] = [
 export type RunStep = {
   icon: string
   iconBg: string
+  slug?: string
   title: string
   ms: string
   payload: string
@@ -328,7 +331,7 @@ export const RUN_DETAIL_TOTAL = '0.4s'
 
 export const RUN_STEPS: RunStep[] = [
   {
-    icon: 'GH', iconBg: '#24292f',
+    icon: 'GH', iconBg: '#24292f', slug: 'github',
     title: 'Trigger received', ms: '12ms',
     payload: `{
   "event": "issues.labeled",
@@ -346,7 +349,7 @@ export const RUN_STEPS: RunStep[] = [
 }`,
   },
   {
-    icon: 'SL', iconBg: '#4a154b',
+    icon: 'SL', iconBg: '#4a154b', slug: 'slack',
     title: 'Slack message sent', ms: '287ms',
     payload: `{
   "channel": "#incidents",
@@ -355,7 +358,7 @@ export const RUN_STEPS: RunStep[] = [
 }`,
   },
   {
-    icon: 'LN', iconBg: '#5e6ad2',
+    icon: 'LN', iconBg: '#5e6ad2', slug: 'linear',
     title: 'Linear issue created', ms: '141ms',
     payload: `{
   "id": "ENG-2703",
