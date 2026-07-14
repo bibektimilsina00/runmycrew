@@ -20,8 +20,10 @@ import {
   ArrowUpRight,
   HelpCircle,
   MessageSquare,
+  ChevronRight,
 } from 'lucide-react'
 import { BrandMark } from './BrandMark'
+import { BrandGlyph } from './BrandGlyph'
 
 /**
  * Hero product shot — a faithful, interactive recreation of the RunMyCrew
@@ -87,11 +89,29 @@ const OPERATE_NAV = [
   { id: 'logs',      label: 'Logs',      icon: Terminal },
 ]
 
-const CONNECTIONS = [
-  { name: 'GitHub', sub: 'Source control', letter: 'GH', bg: '#24292e' },
-  { name: 'Slack',  sub: 'Messaging',      letter: 'SL', bg: '#4a154b' },
-  { name: 'Google', sub: 'Workspace',      letter: 'GO', bg: '#1a73e8' },
+const RUNS = [
+  { name: 'Daily standup digest',  trigger: 'Schedule', dur: '1.2s', ago: '9:00', status: 'ok' as const },
+  { name: 'Urgent issue → Slack',  trigger: 'Webhook',  dur: '0.4s', ago: '8:41', status: 'ok' as const },
+  { name: 'New lead → Notion CRM', trigger: 'Meta',     dur: '0.9s', ago: '8:32', status: 'ok' as const },
+  { name: 'Weekly metrics digest', trigger: 'Schedule', dur: '2.1s', ago: '7:00', status: 'warn' as const },
 ]
+
+const SCHEDULES = [
+  { time: '9:00',  name: 'Daily standup digest', sub: '0 9 * * 1-5' },
+  { time: '12:00', name: 'Weekly metrics digest', sub: '0 12 * * 5' },
+  { time: '17:00', name: 'EOD summary',           sub: '0 17 * * *' },
+]
+
+const CONNECTIONS = [
+  { name: 'GitHub', provider: 'GitHub',           slug: 'github', bg: '#24292f' },
+  { name: 'Slack',  provider: 'Slack',            slug: 'slack',  bg: '#4a154b' },
+  { name: 'Google', provider: 'Google Workspace', slug: 'google', bg: '#1a73e8' },
+]
+
+const STATUS_TONE = {
+  ok:   { dot: 'var(--ok)',   glow: 'rgba(76,195,138,0.18)' },
+  warn: { dot: 'var(--warn)', glow: 'rgba(231,183,102,0.20)' },
+}
 
 export function DashboardMockup() {
   const [activeNav, setActiveNav] = useState('home')
@@ -104,7 +124,7 @@ export function DashboardMockup() {
     <div className="relative mt-16 pb-[124px] sm:mt-24 sm:pb-[150px]">
       <div
         style={THEME}
-        className="relative z-10 flex h-[620px] overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
+        className="relative z-10 flex h-[1200px] overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
       >
         {/* Top-edge sheen — the highlight real windows catch. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -116,7 +136,7 @@ export function DashboardMockup() {
           <Topbar />
 
           <div className="flex-1 overflow-hidden">
-            <div className="mx-auto flex h-full max-w-[1160px] flex-col gap-[26px] overflow-hidden px-[30px] pt-[26px]">
+            <div className="mx-auto flex h-full max-w-[1160px] flex-col gap-[26px] overflow-hidden px-[30px] pb-[30px] pt-[26px]">
               <GreetingRow />
               <StatsGrid />
               <PromptCard
@@ -130,6 +150,13 @@ export function DashboardMockup() {
                 setModelOpen={setModelOpen}
               />
               <Suggestions onPick={setPrompt} />
+              <div className="grid grid-cols-1 items-start gap-[18px] lg:grid-cols-[1.55fr_1fr]">
+                <RecentRuns />
+                <div className="flex flex-col gap-[14px]">
+                  <SchedulePanel />
+                  <ConnectionsPanel />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -142,7 +169,7 @@ export function DashboardMockup() {
           gutters. Sized like Linear's wrapper (window top → base + 28px). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 z-0 h-[740px] w-screen -translate-x-1/2 select-none"
+        className="pointer-events-none absolute left-1/2 top-0 z-0 h-[1320px] w-screen -translate-x-1/2 select-none"
         style={{
           background:
             'radial-gradient(52.53% 57.5% at 50% 100%, rgba(8,9,10,0) 0%, rgba(8,9,10,0.5) 100%), linear-gradient(#08090a 10%, #d0d6e0 100%)',
@@ -474,6 +501,107 @@ function Suggestions({ onPick }: { onPick: (text: string) => void }) {
               <ArrowUpRight className="h-[15px] w-[15px] text-[var(--text-dim)] transition-colors group-hover:text-[var(--text-mute)]" strokeWidth={1.9} />
             </span>
             <span className="text-[13.5px] font-medium leading-[1.4] text-[var(--text)]">{s}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ─── Bottom panels: recent runs, schedule, connections ─────────────── */
+
+function PanelHead({
+  icon, title, count, countTone, action,
+}: {
+  icon: React.ReactNode
+  title: string
+  count?: string
+  countTone?: 'ok' | 'neutral'
+  action: string
+}) {
+  return (
+    <div className="flex items-center gap-[9px] px-[15px] pb-[10px] pt-[14px]">
+      <span className="inline-flex items-center justify-center text-[var(--text-mute)]">{icon}</span>
+      <span className="text-[13.5px] font-semibold text-[var(--text)]">{title}</span>
+      {count && (
+        <span
+          className={
+            countTone === 'ok'
+              ? 'rounded-[5px] bg-[var(--badge-ok-bg)] px-[7px] py-[2px] text-[11px] font-semibold text-[var(--ok)]'
+              : 'rounded-[5px] bg-[rgba(255,255,255,0.05)] px-[7px] py-[2px] font-mono text-[11px] font-medium text-[var(--text-mute)]'
+          }
+        >
+          {count}
+        </span>
+      )}
+      <button className="ml-auto inline-flex items-center gap-[4px] rounded-[6px] px-[8px] py-[4px] text-[12px] font-medium text-[var(--text-faint)] transition-colors hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--text)]">
+        {action}
+        <ChevronRight className="h-[13px] w-[13px]" />
+      </button>
+    </div>
+  )
+}
+
+function RecentRuns() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-[8px] border border-[var(--border-faint)] bg-[var(--surface)]">
+      <PanelHead icon={<Activity className="h-[15px] w-[15px]" strokeWidth={1.9} />} title="Recent runs" count="214 today" action="View all" />
+      <div className="flex flex-col gap-[2px] px-[8px] pb-[8px]">
+        {RUNS.map((r) => {
+          const tone = STATUS_TONE[r.status]
+          return (
+            <button key={r.name} className="flex w-full items-center gap-[12px] rounded-[6px] px-[12px] py-[8px] text-left transition-colors hover:bg-[rgba(255,255,255,0.04)]">
+              <span className="h-[8px] w-[8px] shrink-0 rounded-full" style={{ background: tone.dot, boxShadow: `0 0 0 3px ${tone.glow}` }} />
+              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[var(--text)]">{r.name}</span>
+              <span className="rounded-[5px] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.04)] px-[7px] py-[2px] font-mono text-[11.5px] text-[var(--text-mute)]">{r.trigger}</span>
+              <span className="w-[54px] text-right font-mono text-[11.5px] text-[var(--text-faint)]">{r.dur}</span>
+              <span className="w-[40px] text-right text-[11.5px] text-[var(--text-dim)]">{r.ago}</span>
+              <ChevronRight className="h-[14px] w-[14px] shrink-0 text-[var(--text-dim)]" />
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function SchedulePanel() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-[8px] border border-[var(--border-faint)] bg-[var(--surface)]">
+      <PanelHead icon={<Clock className="h-[15px] w-[15px]" strokeWidth={1.9} />} title="Next 12 hours" action="All" />
+      <div className="flex flex-col gap-[2px] px-[8px] pb-[8px]">
+        {SCHEDULES.map((s) => (
+          <button key={s.name} className="flex w-full items-center gap-[12px] rounded-[6px] px-[12px] py-[8px] text-left transition-colors hover:bg-[rgba(255,255,255,0.04)]">
+            <span className="w-[46px] shrink-0 font-mono text-[11.5px] text-[var(--text)]">{s.time}</span>
+            <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
+              <span className="truncate text-[12.5px] font-medium text-[var(--text)]">{s.name}</span>
+              <span className="truncate font-mono text-[11px] text-[var(--text-faint)]">{s.sub}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ConnectionsPanel() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-[8px] border border-[var(--border-faint)] bg-[var(--surface)]">
+      <PanelHead icon={<Plug className="h-[15px] w-[15px]" strokeWidth={1.9} />} title="Connections" count="3 active" countTone="ok" action="Manage" />
+      <div className="flex flex-col gap-[2px] px-[8px] pb-[8px]">
+        {CONNECTIONS.map((c) => (
+          <button key={c.name} className="flex w-full items-center gap-[11px] rounded-[6px] px-[12px] py-[8px] text-left transition-colors hover:bg-[rgba(255,255,255,0.04)]">
+            <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[8px]" style={{ background: c.bg }}>
+              <BrandGlyph slug={c.slug} size={16} />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-[2px] leading-[1.3]">
+              <span className="truncate text-[13px] font-medium text-[var(--text)]">{c.name}</span>
+              <span className="truncate text-[11px] text-[var(--text-faint)]">{c.provider}</span>
+            </span>
+            <span className="inline-flex items-center gap-[5px] rounded-[6px] px-[8px] py-[3px] text-[11px] font-semibold" style={{ background: 'var(--badge-ok-bg)', color: 'var(--ok)' }}>
+              <span className="h-[5px] w-[5px] rounded-full" style={{ background: 'var(--ok)' }} />
+              OK
+            </span>
           </button>
         ))}
       </div>
