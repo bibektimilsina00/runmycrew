@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ReactFlowProvider } from 'reactflow'
 import { APP_ROUTES } from '@/shared/constants/routes'
@@ -119,6 +119,19 @@ export function WorkflowEditor({ entity = 'workflow' }: WorkflowEditorProps = {}
       useEditorLayoutStore.getState().focusTab('copilot')
     }
   }, [hasPending, workflow?.id])
+
+  // On first open of an EMPTY workflow/crew, land on the Library so there's
+  // something to drag in — an empty canvas + the Inspector (nothing selected)
+  // is a dead end. Runs once per opened id; a populated workflow keeps the
+  // user's last-used tab, and a Copilot handoff (hasPending) wins.
+  const tabInitFor = useRef<string | null>(null)
+  useEffect(() => {
+    if (!workflow?.id || tabInitFor.current === workflow.id) return
+    tabInitFor.current = workflow.id
+    if (!hasPending && nodes.length === 0) {
+      useEditorLayoutStore.getState().focusTab('library')
+    }
+  }, [workflow?.id, hasPending, nodes.length])
 
   if (isLoading) return <EditorLoading />
   if (error || !workflow) return <EditorError onBack={() => navigate(APP_ROUTES.AUTOMATIONS)} />
