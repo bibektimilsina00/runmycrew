@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type EditorTab = 'copilot' | 'library' | 'config' | 'logs' | 'test' | 'memory'
+export type EditorTab = 'copilot' | 'library' | 'config' | 'logs' | 'test'
 export type PanelZone = 'right' | 'bottom'
 
 const TAB_LOCKED_ZONES: Partial<Record<EditorTab, PanelZone>> = {
@@ -14,8 +14,10 @@ const DEFAULT_ZONES: Record<EditorTab, PanelZone> = {
   config: 'right',
   test: 'right',
   logs: 'bottom',
-  memory: 'right',
 }
+
+/** Tabs that are still valid — used to sanitize stale persisted state. */
+const VALID_TABS: readonly EditorTab[] = ['copilot', 'library', 'config', 'logs', 'test']
 
 const MIN_BOTTOM_HEIGHT = 140
 const MAX_BOTTOM_HEIGHT = 640
@@ -170,10 +172,12 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
       }),
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<EditorLayoutState>
-        // Always enforce locked zones — guard against stale persisted state.
-        const zones: Record<EditorTab, PanelZone> = {
-          ...DEFAULT_ZONES,
-          ...(p.panelZones ?? {}),
+        // Only carry forward zones for tabs that still exist — drops removed
+        // tabs (e.g. a stale 'memory') from older persisted payloads.
+        const zones = { ...DEFAULT_ZONES }
+        for (const tab of VALID_TABS) {
+          const z = p.panelZones?.[tab]
+          if (z) zones[tab] = z
         }
         for (const [tab, lockedZone] of Object.entries(TAB_LOCKED_ZONES) as [
           EditorTab,
@@ -181,10 +185,20 @@ export const useEditorLayoutStore = create<EditorLayoutState>()(
         ][]) {
           zones[tab] = lockedZone
         }
+        // Reset an active tab that no longer exists back to a safe default.
+        const safeTab = (t: EditorTab | undefined, fallback: EditorTab) =>
+          t && VALID_TABS.includes(t) ? t : fallback
         // Force bottomOpen to default (false) even if a pre-v2 persisted
         // payload still has it — covers users who upgrade with the panel
         // open in localStorage.
-        return { ...current, ...p, panelZones: zones, bottomOpen: false }
+        return {
+          ...current,
+          ...p,
+          panelZones: zones,
+          rightActiveTab: safeTab(p.rightActiveTab, 'copilot'),
+          bottomActiveTab: safeTab(p.bottomActiveTab, 'logs'),
+          bottomOpen: false,
+        }
       },
     },
   ),
