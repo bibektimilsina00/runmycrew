@@ -90,16 +90,19 @@ const OPERATE_NAV = [
 ]
 
 const RUNS = [
-  { name: 'Daily standup digest',  trigger: 'Schedule', dur: '1.2s', ago: '9:00', status: 'ok' as const },
-  { name: 'Urgent issue → Slack',  trigger: 'Webhook',  dur: '0.4s', ago: '8:41', status: 'ok' as const },
-  { name: 'New lead → Notion CRM', trigger: 'Meta',     dur: '0.9s', ago: '8:32', status: 'ok' as const },
-  { name: 'Weekly metrics digest', trigger: 'Schedule', dur: '2.1s', ago: '7:00', status: 'warn' as const },
+  { name: 'Daily standup digest',    trigger: 'Schedule', dur: '1.2s', ago: '9:00', status: 'ok' as const },
+  { name: 'Urgent issue → Slack',    trigger: 'Webhook',  dur: '0.4s', ago: '8:41', status: 'ok' as const },
+  { name: 'New lead → Notion CRM',   trigger: 'Meta',     dur: '0.9s', ago: '8:32', status: 'ok' as const },
+  { name: 'Stripe refund alert',     trigger: 'Webhook',  dur: '0.3s', ago: '8:12', status: 'ok' as const },
+  { name: 'Weekly metrics digest',   trigger: 'Schedule', dur: '2.1s', ago: '7:00', status: 'warn' as const },
+  { name: 'Calendar → standup note', trigger: 'Google',   dur: '0.7s', ago: '6:48', status: 'ok' as const },
+  { name: 'PR merged → deploy',      trigger: 'GitHub',   dur: '1.8s', ago: '6:20', status: 'ok' as const },
+  { name: 'Invoice → QuickBooks',    trigger: 'Webhook',  dur: '0.5s', ago: '5:55', status: 'ok' as const },
 ]
 
 const SCHEDULES = [
-  { time: '9:00',  name: 'Daily standup digest', sub: '0 9 * * 1-5' },
+  { time: '9:00',  name: 'Daily standup digest',  sub: '0 9 * * 1-5' },
   { time: '12:00', name: 'Weekly metrics digest', sub: '0 12 * * 5' },
-  { time: '17:00', name: 'EOD summary',           sub: '0 17 * * *' },
 ]
 
 const CONNECTIONS = [
