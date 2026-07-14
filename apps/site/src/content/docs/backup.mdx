@@ -1,0 +1,29 @@
+---
+title: "Backup & restore"
+description: Protect and recover your data.
+group: Self-hosting
+order: 4
+---
+
+## What is backed up
+
+Workflows, runs, connections (encrypted with your `ENCRYPTION_KEY`), tables, knowledge bases and users all live in Postgres. Keep `ENCRYPTION_KEY` somewhere safe and separate — without it, restored credentials can’t be decrypted.
+
+## Automatic backups
+
+The `backup` service runs on a 24-hour loop: `pg_dump --format=custom | gzip` into the `pg_backups` volume, updating a `latest.dump.gz` symlink and pruning dumps older than 14 days.
+
+> The loop sleeps 24h from container start, so “nightly” means “every 24h since the backup container last (re)started,” not a fixed clock hour. Restart the container at your preferred time to anchor it.
+
+## Restore
+
+`deploy/restore.sh` performs a destructive `pg_restore` from a dump path (or `latest.dump.gz`):
+
+```bash
+cd deploy
+./restore.sh /backups/latest.dump.gz   # DROPS + restores the database
+```
+
+## Offsite copies
+
+The `pg_backups` volume lives on the same host — copy it somewhere else on a schedule (e.g. `rclone` to object storage) so a lost VPS doesn’t take your backups with it.

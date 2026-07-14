@@ -1,0 +1,40 @@
+---
+title: Self-host overview
+description: Run RunMyCrew on your own infrastructure.
+group: Self-hosting
+order: 1
+---
+
+## The stack
+
+The production stack (`deploy/docker-compose.production.yml`) pulls pre-built images from GHCR and runs eight services:
+
+- **web** — Caddy reverse proxy + the React app; terminates TLS and is the only public service (ports 80/443).
+- **site** — the Next.js marketing site.
+- **api** — the FastAPI backend (internal :8000).
+- **worker** — Celery worker that executes workflow runs.
+- **beat** — Celery beat scheduler for cron triggers (exactly one replica).
+- **db** — Postgres 15 with pgvector.
+- **redis** — Celery broker + result backend + cache (AOF persistence).
+- **backup** — nightly `pg_dump` with 14-day retention.
+
+## Requirements
+
+- A Linux host with Docker + Docker Compose v2.
+- ~2 vCPU / 4 GB RAM to start; workers scale with run volume.
+- A domain (and DNS) for the app and API — Caddy provisions TLS automatically.
+
+## Quickstart
+
+```bash
+git clone https://github.com/<owner>/runmycrew && cd runmycrew/deploy
+cp .env.production.example .env
+# fill in secrets (see the Environment reference)
+docker compose -f docker-compose.production.yml up -d
+```
+
+The `deploy/deploy.sh` wrapper automates redeploys: git pull → `docker compose pull` → `up -d` → image prune. See [Docker compose](/docs/docker) for the service-by-service breakdown and [Environment reference](/docs/env) for every variable.
+
+## Hosted vs self-hosted
+
+The hosted product at [app.runmycrew.com](https://app.runmycrew.com) is the same codebase with managed infra, upgrades and backups. Self-host when you need data residency, private networking, or your own model keys — everything else is identical.

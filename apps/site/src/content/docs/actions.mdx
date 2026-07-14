@@ -1,0 +1,28 @@
+---
+title: Actions
+description: Fan out to every connected tool in a single run.
+group: Building workflows
+order: 4
+---
+
+## What actions do
+
+An action takes data from upstream nodes, performs an operation (usually against a [connection](/docs/oauth)), and returns a result for downstream nodes to use.
+
+## 200+ integrations
+
+RunMyCrew ships 200+ app integrations — Slack, GitHub, Notion, Google Workspace, Stripe, Salesforce, Airtable, HubSpot, Linear, Twilio, Shopify and many more — each with native actions for its common operations. No wrapper code, no maintaining API clients.
+
+## HTTP & databases
+
+- `action.http_request` — call any REST/GraphQL API (see [Custom apps](/docs/custom-apps)).
+- `action.postgres`, `action.mysql`, `action.mongodb`, `action.dynamodb`, `action.neo4j` — query or mutate a database directly.
+
+## AI actions
+
+Drop intelligence into any step: summarize with `action.llm`, run a tool-using `action.agent`, score with `action.evaluator`, or generate images, speech and embeddings (`action.image_gen`, `action.tts`, `action.embeddings`). See [Crew AI](/docs/crew-ai).
+
+## Files & timing
+
+- `common.file` — read a URL, write a per-run file, or parse JSON/CSV/text.
+- `action.delay` / `action.wait` — pause between steps.

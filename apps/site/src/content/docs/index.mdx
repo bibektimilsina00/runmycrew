@@ -1,0 +1,61 @@
+---
+title: Introduction
+description: RunMyCrew is the automation system for teams and agents — connect your apps, build workflows from a prompt, and run everything with full observability.
+group: Get started
+order: 1
+---
+
+RunMyCrew turns plain-English intent into running automation. Describe what you
+want, connect the apps you already use, and every execution is logged
+end-to-end — no glue code, no cron server to babysit.
+
+## Overview
+
+Workflows in RunMyCrew are graphs of **triggers**, **conditions** and
+**actions**. They run on schedules, webhooks or app events, and every run is
+captured with its inputs, outputs, and timing so you can see exactly what
+happened.
+
+<CardGrid>
+  <Card title="Quickstart" href="/docs/quickstart">
+    Build and run your first workflow in under five minutes.
+  </Card>
+  <Card title="Core concepts" href="/docs/concepts">
+    Triggers, conditions, actions, and the execution model.
+  </Card>
+  <Card title="Crew AI" href="/docs/crew-ai">
+    Generate a working workflow from a single prompt.
+  </Card>
+  <Card title="Self-hosting" href="/docs/self-host">
+    Run the whole stack on your own infrastructure.
+  </Card>
+</CardGrid>
+
+## Core concepts
+
+- **Triggers** — start a workflow from an app event, a webhook, or a schedule.
+- **Conditions** — branch and filter without writing glue code.
+- **Actions** — fan out to every connected tool in a single run.
+- **Connections** — OAuth-managed credentials for each integration.
+
+## Install
+
+Self-host with Docker:
+
+```bash
+docker compose -f deploy/docker-compose.production.yml up -d
+```
+
+Or sign up for the hosted app and skip the infrastructure entirely — it's free
+while we're in [early access](/pricing).
+
+## Next steps
+
+<CardGrid>
+  <Card title="Connect an app" href="/docs/oauth">
+    Add OAuth credentials for the tools your workflows touch.
+  </Card>
+  <Card title="Agent loops" href="/docs/agent-loops">
+    Schedule autonomous agents that own recurring work.
+  </Card>
+</CardGrid>

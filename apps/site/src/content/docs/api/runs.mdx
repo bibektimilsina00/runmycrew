@@ -1,0 +1,52 @@
+---
+title: Runs
+description: Trigger and inspect executions via the API.
+group: API
+order: 3
+---
+
+## The execution object
+
+```json
+{
+  "id": "uuid",
+  "workflow_id": "uuid",
+  "status": "success | running | failed | cancelled",
+  "trigger_type": "manual | schedule | webhook | ...",
+  "input_data": { ... },
+  "output_data": { ... },
+  "started_at": "...",
+  "finished_at": "...",
+  "logs": [ { node, status, output, duration_ms }, ... ]
+}
+```
+
+## List runs
+
+```http
+# Runs for one workflow
+GET /api/v1/executions/?workflow_id={uuid}
+
+# Runs across the workspace (paginated + filterable)
+GET /api/v1/executions/all?limit=50&offset=0&status=failed
+# → { executions, total, limit, offset }
+```
+
+## Run detail
+
+Fetch one execution including its full `logs` array — the same data the [run inspector](/docs/replay) renders.
+
+```http
+GET /api/v1/executions/{execution_id}
+```
+
+## Rerun, cancel, resume
+
+```json
+POST /api/v1/executions/{id}/rerun    # replay with the original input
+POST /api/v1/executions/{id}/cancel   # stop a running execution
+POST /api/v1/executions/{id}/resume   # continue a paused run
+{ "token": "<resume-token>", "input": { ... } }
+```
+
+**Resume** is used by human-in-the-loop steps: a paused run emits a one-time `token`; posting it back (no other auth required — the token is the secret) continues the run with the supplied input.

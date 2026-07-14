@@ -1,8 +1,13 @@
-export { DocsLayout }  from './components/DocsLayout'
+export { DocsLayout } from './components/DocsLayout'
 export { DocsSidebar } from './components/DocsSidebar'
-export { DocsToc }     from './components/DocsToc'
-export type { TocEntry } from './components/DocsToc'
-export { DOCS_NAV, findDoc } from './data/nav'
-export type { DocGroup, DocLeaf } from './data/nav'
-export { DOC_CONTENT } from './content'
-export type { DocContent } from './content'
+export { DocsToc } from './components/DocsToc'
+export {
+  getNav,
+  getDoc,
+  getFlatDocs,
+  getAllSlugs,
+  type DocMeta,
+  type NavGroup,
+  type LoadedDoc,
+  type TocEntry,
+} from './source'

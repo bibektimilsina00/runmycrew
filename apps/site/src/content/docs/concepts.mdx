@@ -1,0 +1,38 @@
+---
+title: Core concepts
+description: Triggers, conditions, actions, and the execution model.
+group: Get started
+order: 3
+---
+
+## Workflows are graphs
+
+A **workflow** is a directed graph of `{ nodes, edges }`. A *trigger* node starts it; edges carry execution from one node to the next; leaf nodes end the run. The graph is the single source of truth — the same shape you see in the editor is what the engine executes and what the API returns.
+
+## Nodes
+
+Every node is one of a few kinds:
+
+- **Trigger** — starts the workflow (schedule, webhook, app event, or manual). One per workflow.
+- **Condition** — branches or filters the run based on data.
+- **Action** — does something in a connected app (post a message, create an issue, send an email).
+- **AI / agent** — calls a model to summarize, classify, or autonomously drive tools.
+- **HTTP** — calls any REST/GraphQL API directly.
+
+See [Triggers](/docs/triggers), [Conditions](/docs/conditions) and [Actions](/docs/actions) for each in depth.
+
+## How data flows
+
+Each node produces a JSON output. Downstream nodes reference upstream outputs with a template expression — for example `{{trigger.issue.title}}` or `{{steps.summarize.text}}`. Secrets are referenced the same way via `{{secrets.NAME}}` and injected only at run time.
+
+## Runs & the engine
+
+Each execution is a **run** with a status (`running`, `success`, `failed`, `cancelled`), the input that started it, the output it produced, and a per-node log. Runs execute on background workers, so a slow action never blocks the trigger. Failed steps follow the workflow’s [retry policy](/docs/retries).
+
+## Automations vs crews
+
+A workflow’s `kind` is **automation** (deterministic trigger → steps) or **crew** (an AI-driven agent workflow). Both share the same graph model, editor and run history. Autonomous, scheduled crews are covered in [Agent loops](/docs/agent-loops).
+
+## Versions
+
+Editing a workflow’s graph auto-snapshots the previous version. Browse history and roll back at any time — see the [Workflows API](/docs/api/workflows).

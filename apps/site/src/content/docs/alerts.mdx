@@ -1,0 +1,24 @@
+---
+title: Alerts
+description: Get notified on failures and key events.
+group: "Run & observe"
+order: 4
+---
+
+## Failure alerts
+
+Alerts fire on terminal failure after retries are exhausted, so you only hear about problems that need a human. Set the workspace’s escalation channel under settings.
+
+## Channels
+
+- **Slack** — a Block Kit message to a channel.
+- **Webhook** — the full alert POSTed as JSON to your endpoint.
+- **Email** — via the workspace’s email config.
+
+## What’s in an alert
+
+Each alert carries the run id and link, the status and failure reason, usage totals, and a short trace summary of the last steps — enough to triage without opening the app.
+
+## Escalation policy
+
+For autonomous agents you can set a failure policy of `retry`, `escalate` or `silent` — see [Agent loops](/docs/agent-loops) for how budgets and escalation work together.

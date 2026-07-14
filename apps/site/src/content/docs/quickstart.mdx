@@ -1,0 +1,41 @@
+---
+title: Quickstart
+description: Build your first workflow in under five minutes.
+group: Get started
+order: 2
+---
+
+## 1. Connect an app
+
+From the dashboard, click *Connect app* and authorize **GitHub** and **Slack**. Each opens an OAuth consent screen and returns to RunMyCrew marked **OK**. See [OAuth integrations](/docs/oauth).
+
+## 2. Describe the workflow
+
+In the **Build with AI** box, type what you want in plain English:
+
+> When a GitHub issue is labeled “urgent”, post it to #incidents in Slack and create a Linear ticket.
+
+Press *Generate*. Crew AI maps your sentence to a trigger, a condition and two actions. Read more in [Crew AI](/docs/crew-ai).
+
+## 3. Review the graph
+
+The editor opens with the generated graph. Every node is editable — click one to open the inspector, change a channel, add a filter, or wire an extra step. Nothing runs until you say so.
+
+## 4. Run it
+
+Click **Run** to execute once with a sample payload, or **Activate** to arm the trigger so it fires on real events. You can also trigger a run from the API:
+
+```http
+POST /api/v1/workflows/{workflow_id}/run
+Authorization: Bearer fuse_live_…
+```
+
+## 5. Observe
+
+Open the run in **Runs**. Every step shows its input, output, timing and status. If something failed, you’ll see exactly which node and why — then [replay](/docs/replay) it with the same payload after a fix.
+
+## Next steps
+
+- [Core concepts](/docs/concepts) — how workflows execute.
+- [Triggers](/docs/triggers), [conditions](/docs/conditions), [actions](/docs/actions).
+- [Agent loops](/docs/agent-loops) — autonomous, scheduled agents.

@@ -1,0 +1,22 @@
+---
+title: Run replay
+description: Re-run a past execution with the same input.
+group: "Run & observe"
+order: 5
+---
+
+## The run inspector
+
+Open a run and pick a node to see its *Input*, *Output* and timing. This is the fastest way to understand what a workflow actually did versus what you expected.
+
+## The live trace
+
+For agent nodes, a *Trace* tab shows every tool call as it happens — arguments, result, duration — flipping from *running* to *success*/*failed* in place, no page refresh.
+
+## Rerun & replay
+
+Click *Rerun* (or `POST /api/v1/executions/{id}/rerun`) to replay the workflow with the original input. Perfect for verifying a fix against the exact case that failed.
+
+## Resume paused runs
+
+Runs paused on a [human-approval](/docs/conditions) step resume when the approver acts — or via `POST /api/v1/executions/{id}/resume` with the one-time token.

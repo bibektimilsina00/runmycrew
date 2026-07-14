@@ -1,0 +1,41 @@
+---
+title: Webhooks
+description: Trigger workflows from inbound HTTP requests.
+group: Connections
+order: 2
+---
+
+## Inbound webhooks
+
+Every webhook trigger has a stable URL under `/api/v1/webhooks/…`. The full request — body, headers, query — is captured and becomes the trigger’s output payload, ready to reference in downstream nodes.
+
+## Generic webhook
+
+Any source can POST to a user-defined path:
+
+```http
+POST /api/v1/webhooks/{your-path}
+
+# Check the URL and whether a workflow is listening:
+GET  /api/v1/webhooks/{your-path}/info
+```
+
+## Signed webhooks
+
+For untrusted senders, require an HMAC signature. Mint a secret, configure it on the sender, and RunMyCrew verifies every request:
+
+```http
+POST /api/v1/webhooks/utils/generate-secret          # mint a signing secret
+
+# GitHub-scoped receiver (verifies the X-Hub-Signature):
+POST /api/v1/webhooks/github/{workflow_id}
+
+# Provider-manifest receiver (GitLab, Twilio, …):
+POST /api/v1/webhooks/{provider}/{workflow_id}/{node_id}
+```
+
+Requests that fail signature verification are rejected before the workflow runs.
+
+## Listen for a test event
+
+While editing, click *Listen* on a webhook trigger to capture the next real event as a fixture — then build the rest of the workflow against a concrete payload instead of guessing its shape.
