@@ -7,8 +7,9 @@ import { EXTERNAL_LINKS } from '@/shared/constants/routes'
 export type Tier = {
   slug: 'free' | 'pro' | 'enterprise'
   name: string
-  price: string          // display string, e.g. '$0' or '$29 / user'
+  price: string          // current display price — 'Free' during early access
   cadence?: string       // e.g. '/ month'
+  priceLater?: string    // planned price once paid plans launch (shown muted)
   tagline: string
   ctaLabel: string
   ctaHref: string
@@ -16,47 +17,50 @@ export type Tier = {
   highlight?: boolean    // visually featured tier (Pro)
 }
 
+// Early access: every plan is free right now. `priceLater` keeps the eventual
+// price visible so it's honest, not a bait-and-switch — but nobody is charged
+// today and no card is required.
 export const TIERS: Tier[] = [
   {
     slug: 'free',
     name: 'Free',
-    price: '$0',
-    cadence: '/ month',
-    tagline: 'For solo builders trying RunMyCrew on side projects.',
-    ctaLabel: 'Start for free',
+    price: 'Free',
+    tagline: 'For solo builders. Stays free — forever.',
+    ctaLabel: 'Start building',
     ctaHref: EXTERNAL_LINKS.REGISTER,
     features: [
       '1 workspace · 1 user',
-      '500 workflow runs / month',
-      'Up to 5 active workflows',
-      '7 days run history',
+      'Generous run limits',
+      'All core nodes & integrations',
+      'Run history & logs',
       'Community support',
     ],
   },
   {
     slug: 'pro',
     name: 'Pro',
-    price: '$29',
-    cadence: '/ user / month',
-    tagline: 'For teams shipping workflows that customers depend on.',
-    ctaLabel: 'Start free trial',
+    price: 'Free',
+    cadence: 'in early access',
+    priceLater: 'later ~$29 / user / mo',
+    tagline: 'For teams shipping workflows customers depend on.',
+    ctaLabel: 'Start free — no card',
     ctaHref: EXTERNAL_LINKS.REGISTER,
     highlight: true,
     features: [
-      'Unlimited workspaces',
-      '50,000 runs / month included',
-      'Unlimited active workflows',
-      '30 days run history',
-      'Run replay + alerts',
-      'Email support, 1 business day SLA',
+      'Everything, unlocked while in early access',
+      'Unlimited workspaces & workflows',
+      'Full run history, replay + alerts',
+      'Custom apps (HTTP nodes)',
+      'Priority email support',
+      'Founder pricing when paid plans launch',
     ],
   },
   {
     slug: 'enterprise',
     name: 'Enterprise',
     price: 'Custom',
-    tagline: 'For organisations with compliance, SSO and region pinning.',
-    ctaLabel: 'Talk to sales',
+    tagline: 'For orgs needing compliance, SSO and region pinning.',
+    ctaLabel: 'Talk to us',
     ctaHref: '/contact',
     features: [
       'Everything in Pro',
@@ -64,7 +68,7 @@ export const TIERS: Tier[] = [
       'Audit log export',
       'Region pinning + private VPC',
       'Custom rate limits',
-      'Dedicated support + 99.95% SLA',
+      'Dedicated support + SLA',
     ],
   },
 ]
