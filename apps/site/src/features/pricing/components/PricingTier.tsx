@@ -22,12 +22,19 @@ export function PricingTier({ tier }: { tier: Tier }) {
         <div className="text-[13px] leading-snug text-muted-foreground">{tier.tagline}</div>
       </div>
 
-      <div className="flex items-baseline gap-1">
-        <span className="font-mono text-[34px] font-semibold tracking-[-0.022em] text-foreground">
-          {tier.price}
-        </span>
-        {tier.cadence && (
-          <span className="text-[13px] font-medium text-muted-foreground">{tier.cadence}</span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-mono text-[34px] font-semibold tracking-[-0.022em] text-foreground">
+            {tier.price}
+          </span>
+          {tier.cadence && (
+            <span className="text-[13px] font-medium text-muted-foreground">{tier.cadence}</span>
+          )}
+        </div>
+        {tier.priceLater && (
+          <span className="text-[12px] font-medium text-muted-foreground/70 line-through decoration-muted-foreground/40">
+            {tier.priceLater}
+          </span>
         )}
       </div>
 

@@ -4,7 +4,6 @@ import { useState, type CSSProperties } from 'react'
 import {
   Search,
   ChevronsUpDown,
-  ChevronDown,
   Plus,
   Plug,
   Home,
@@ -31,10 +30,9 @@ import { BrandGlyph } from './BrandGlyph'
  * the app's exact design tokens (scoped as CSS variables on the window
  * root), so the class strings match production 1:1.
  *
- * Interactive: workspace nav switches, the Build-with-AI model selector
- * opens a popover, the workflow/crew segmented control toggles, and the
- * suggested-automation cards fill the prompt — enough to feel live without
- * shipping the whole app.
+ * Interactive: workspace nav switches, the workflow/crew segmented control
+ * toggles, and the suggested-automation cards fill the prompt — enough to
+ * feel live without shipping the whole app.
  */
 
 /* Real app palette (apps/web/src/index.css, dark theme). */
@@ -73,8 +71,6 @@ const SUGGESTIONS = [
   'When a new row is added to Notion, send a welcome email',
   'Fetch JSON from an API and save it to a database',
 ]
-
-const MODELS = ['Claude Sonnet', 'Claude Opus', 'GPT-5', 'Gemini 2.5 Pro']
 
 const WORKSPACE_NAV = [
   { id: 'home',        label: 'Home',        icon: Home },
@@ -120,8 +116,6 @@ export function DashboardMockup() {
   const [activeNav, setActiveNav] = useState('home')
   const [kind, setKind] = useState<'workflow' | 'crew'>('workflow')
   const [prompt, setPrompt] = useState('')
-  const [model, setModel] = useState(MODELS[0])
-  const [modelOpen, setModelOpen] = useState(false)
 
   return (
     <div className="relative mt-16 pb-[124px] sm:mt-24 sm:pb-[150px]">
@@ -147,10 +141,6 @@ export function DashboardMockup() {
                 setPrompt={setPrompt}
                 kind={kind}
                 setKind={setKind}
-                model={model}
-                setModel={setModel}
-                modelOpen={modelOpen}
-                setModelOpen={setModelOpen}
               />
               <Suggestions onPick={setPrompt} />
               <div className="grid grid-cols-1 items-start gap-[18px] lg:grid-cols-[1.55fr_1fr]">
@@ -389,16 +379,12 @@ function Spark({ data }: { data: number[] }) {
 /* ─── Prompt card ───────────────────────────────────────────────────── */
 
 function PromptCard({
-  prompt, setPrompt, kind, setKind, model, setModel, modelOpen, setModelOpen,
+  prompt, setPrompt, kind, setKind,
 }: {
   prompt: string
   setPrompt: (v: string) => void
   kind: 'workflow' | 'crew'
   setKind: (k: 'workflow' | 'crew') => void
-  model: string
-  setModel: (m: string) => void
-  modelOpen: boolean
-  setModelOpen: (v: boolean) => void
 }) {
   const placeholder = kind === 'crew' ? 'What should this crew do?' : 'What workflow shall we automate?'
   return (
@@ -409,32 +395,6 @@ function PromptCard({
           <BrandMark className="h-[22px] w-[22px]" />
         </span>
         <span className="text-[13.5px] font-semibold text-[var(--text)]">Build with AI</span>
-        <button
-          onClick={() => setModelOpen(!modelOpen)}
-          className="ml-auto inline-flex items-center gap-[6px] rounded-[7px] border border-[var(--border-soft)] px-[9px] py-[4px] text-[12px] font-medium text-[var(--text-mute)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-        >
-          <span className="h-[6px] w-[6px] rounded-full bg-[var(--ok)]" />
-          {model}
-          <ChevronDown className={`h-[12px] w-[12px] transition-transform ${modelOpen ? 'rotate-180' : ''}`} />
-        </button>
-        {modelOpen && (
-          <>
-            <div className="fixed inset-0 z-30" onClick={() => setModelOpen(false)} />
-            <div className="absolute right-[20px] top-[46px] z-40 w-[176px] rounded-[10px] border border-[var(--border)] bg-[var(--bg-2)] p-[5px] shadow-[0_24px_56px_-20px_rgba(0,0,0,0.7)]">
-              {MODELS.map((m) => (
-                <button
-                  key={m}
-                  onClick={() => { setModel(m); setModelOpen(false) }}
-                  className="flex w-full items-center gap-[8px] rounded-[7px] px-[10px] py-[7px] text-left text-[13px] font-medium text-[var(--text-mute)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)]"
-                >
-                  <span className={`h-[6px] w-[6px] rounded-full ${m === model ? 'bg-[var(--ok)]' : 'bg-[var(--text-dim)]'}`} />
-                  <span className="flex-1">{m}</span>
-                  {m === model && <Check className="h-[13px] w-[13px] text-[var(--accent)]" />}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
       </div>
 
       {/* Body */}
