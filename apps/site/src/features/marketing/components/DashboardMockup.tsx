@@ -127,7 +127,7 @@ export function DashboardMockup() {
     <div className="relative mt-16 pb-[124px] sm:mt-24 sm:pb-[150px]">
       <div
         style={THEME}
-        className="relative z-10 flex h-[1200px] overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
+        className="relative z-10 flex h-[1100px] overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
       >
         {/* Top-edge sheen — the highlight real windows catch. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -172,7 +172,7 @@ export function DashboardMockup() {
           gutters. Sized like Linear's wrapper (window top → base + 28px). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 z-0 h-[1320px] w-screen -translate-x-1/2 select-none"
+        className="pointer-events-none absolute left-1/2 top-0 z-0 h-[1220px] w-screen -translate-x-1/2 select-none"
         style={{
           background:
             'radial-gradient(52.53% 57.5% at 50% 100%, rgba(8,9,10,0) 0%, rgba(8,9,10,0.5) 100%), linear-gradient(#08090a 10%, #d0d6e0 100%)',
