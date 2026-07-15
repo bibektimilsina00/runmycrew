@@ -4,9 +4,9 @@
 
 # RunMyCrew
 
-### The automation system for teams and agents
+### Automation in plain English
 
-Connect every app you already use. Build workflows by describing them in plain English. Run them reliably with full observability — self-hosted or in the cloud.
+Describe what you want in a sentence → AI builds the workflow → one click and it's live. No nodes to wire, no glue code, no reading integration docs. Connect 250+ apps, self-host the whole thing, or use the cloud.
 
 <br />
 
@@ -21,6 +21,10 @@ Connect every app you already use. Build workflows by describing them in plain E
 <br />
 
 **[🌐 Live app](https://app.runmycrew.com)** · **[🎯 Marketing site](https://runmycrew.com)** · **[📚 Docs](https://runmycrew.com/docs)** · **[🐛 Report a bug](https://github.com/bibektimilsina00/runmycrew/issues/new)**
+
+<br />
+
+> ⚠️ **Early access — very much a work in progress.** RunMyCrew is in early beta: it works end-to-end today, but expect rough edges and breaking changes. Try it, and please [open an issue](https://github.com/bibektimilsina00/runmycrew/issues/new) with feedback — it's what shapes what we build next.
 
 </div>
 
@@ -67,13 +71,14 @@ The codebase is a **pnpm + uv monorepo** with four apps and a shared deploy fold
 |---|---|
 | 🤖 **Crew AI** | Generate, refine, and explain workflows with a Claude-powered chat panel inside the editor. |
 | 🧩 **Visual node-based builder** | React Flow canvas with typed inputs, expression bindings, conditional branching, and a live inspector. |
-| 🔌 **19+ first-party integrations** | Google Workspace (Drive, Sheets, Docs, Slides, Calendar, Gmail, Chat, People, YouTube, Search Console), Slack, GitHub, Notion, Stripe, Meta, Anthropic, OpenAI, Linear, Jira — and growing. |
+| 🔌 **250+ integrations** | GitHub, Slack, Notion, Linear, Google Workspace, Stripe, HubSpot, Salesforce, Jira, Airtable, Meta, OpenAI, Anthropic — plus a long tail (Databricks, Snowflake-adjacent, Shopify, Twilio, Sentry, and hundreds more). |
+| 🔑 **One-click OAuth** | Real OAuth for 15+ of the big ones (GitHub, Google, Slack, Notion, Linear, Microsoft, HubSpot, Asana, Discord, Dropbox, Box, Calendly, Zoom, DocuSign, LinkedIn). Click *Connect*, approve, done — no API keys, no pasted tokens. |
 | 📡 **Triggers everywhere** | Webhooks, polling, app events, cron schedules, and manual triggers. Beat survives restarts. |
 | 🧠 **Knowledge base (RAG)** | First-class Postgres + pgvector store for retrieval-augmented agents. |
 | 👥 **Multi-tenant workspaces** | Invite teammates by email, per-workspace credentials, role-based access. |
 | 🎨 **6 color schemes** | Linear / Slate (default) / Indigo / Emerald / Ember / Plum. Pick from Settings → Appearance. |
 | 🔁 **Run history & replay** | Every run is logged with inputs, outputs, timing, and the exact payload at each step. Replay any past run with one click. |
-| 📨 **Production-grade auth** | JWT sessions, password hashing with Argon2, password reset emails via SMTP, soon: OAuth and SSO. |
+| 📨 **Production-grade auth** | JWT sessions, Argon2 password hashing, password-reset emails, and Google OAuth sign-in. |
 | 🐳 **Single-host Docker stack** | 7 services (web, api, worker, beat, db, redis, backup) on one VPS. Caddy handles HTTPS. |
 | 🚀 **Hardened CI/CD** | GitHub Actions matrix builds → ghcr.io with SBOM + provenance attestations + Trivy scans, auto-deploy over SSH on every `main` push. |
 
@@ -90,49 +95,12 @@ The product features an editorial-grade Linear-style dark UI with 6 colour schem
 
 ## 🏗 Architecture
 
-A single-host stack you can fit on a 2 GB VPS, but every layer scales horizontally when you outgrow it.
+A single-host stack that fits on a 2 GB VPS, but every layer scales horizontally when you outgrow it.
 
-```mermaid
-flowchart LR
-  subgraph Browser
-    UI[React SPA<br/><sub>apps/web</sub>]
-    SITE[Marketing site<br/><sub>apps/site</sub>]
-  end
-
-  subgraph "VPS / Cluster"
-    CADDY[Caddy<br/><sub>auto-HTTPS, reverse proxy</sub>]
-    API[FastAPI<br/><sub>apps/api</sub>]
-    WORKER[Celery Worker<br/><sub>apps/worker</sub>]
-    BEAT[Celery Beat]
-    PG[(PostgreSQL<br/>+ pgvector)]
-    REDIS[(Redis<br/>broker + cache)]
-    BACKUP[pg_dump<br/>nightly]
-  end
-
-  subgraph External
-    OAUTH[OAuth Providers<br/>Google · Slack · GitHub · …]
-    LLM[Claude / OpenAI APIs]
-    SMTP[SMTP relay]
-  end
-
-  UI -- HTTPS --> CADDY
-  SITE -- HTTPS --> CADDY
-  CADDY -- /api/* --> API
-  CADDY -- "/" --> UI
-  CADDY -- "runmycrew.com" --> SITE
-
-  API <--> PG
-  API <--> REDIS
-  WORKER <--> REDIS
-  WORKER <--> PG
-  BEAT --> REDIS
-  BACKUP --> PG
-
-  API --> LLM
-  API --> SMTP
-  WORKER --> OAUTH
-  WORKER --> LLM
-```
+- **Caddy** terminates HTTPS (auto Let's Encrypt) and reverse-proxies: `/api/*` and `/ws/*` → the API, everything else → the product web app, and `runmycrew.com` → the marketing site.
+- **API** (FastAPI) handles HTTP + WebSockets and talks to Postgres, Redis, LLM providers, and OAuth apps.
+- **Worker** (Celery) runs every workflow/agent execution off a Redis queue; **Beat** fires schedules and polling triggers. Neither has to be up for the API to serve.
+- **Postgres** (+ pgvector) is the single source of truth; **Redis** is broker + cache + pub/sub for live run streaming. A nightly `pg_dump` container keeps backups.
 
 **Layered backend** keeps the code easy to reason about:
 
