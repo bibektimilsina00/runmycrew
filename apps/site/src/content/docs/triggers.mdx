@@ -1,0 +1,33 @@
+---
+title: Triggers
+description: Start a workflow from an app event, webhook, or schedule.
+group: Building workflows
+order: 2
+---
+
+## What a trigger is
+
+Each workflow has exactly one trigger. Its output — the event that fired it — is available to every later node as `{{trigger.…}}`.
+
+## Built-in triggers
+
+- `trigger.manual` — run on demand from the editor or API.
+- `trigger.form` — collect input fields, filled at run time.
+- `trigger.cron` — run on a cron schedule (see [Scheduling](/docs/scheduling)).
+- `trigger.webhook` — fire on an inbound HTTP POST (see [Webhooks](/docs/webhooks)).
+- `trigger.chat_app` — publish the workflow as a hosted chat/form app.
+
+## App-event triggers
+
+Dozens of integrations expose native event triggers — start a workflow on a GitHub push, a new Gmail message, a Stripe charge, a Notion page change, a Linear issue update, a Typeform submission, a WhatsApp message, and more.
+
+## Webhook vs polling
+
+Two delivery mechanisms, chosen per trigger:
+
+- **Webhook-delivered** — the app pushes events to RunMyCrew instantly (GitHub, Slack, Stripe, Linear, Meta, Twilio…).
+- **Polling** — RunMyCrew checks the app on an interval for apps without webhooks (Gmail, Calendar, Drive, Sheets, IMAP, RSS, HubSpot, Salesforce, Asana…).
+
+## Testing triggers
+
+Click *Listen* on a trigger to capture the next real event as a fixture, then build the rest of the workflow against a concrete payload. Validate cron expressions and preview upcoming fire times right in the inspector.

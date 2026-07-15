@@ -1,0 +1,42 @@
+---
+title: Scheduling
+description: Run workflows on a cron schedule.
+group: "Run & observe"
+order: 1
+---
+
+## Cron triggers
+
+Add a `trigger.cron` node and give it a standard cron expression. Common patterns:
+
+```bash
+0 9 * * 1-5     # 9:00 AM, Monday–Friday
+*/15 * * * *    # every 15 minutes
+0 0 1 * *       # midnight on the 1st of each month
+```
+
+## Validate & preview
+
+The inspector validates the expression as you type and previews the next fire times, so you never arm a broken schedule. (`POST /api/v1/cron/validate`, `GET /api/v1/cron/next-runs`.)
+
+## Concurrency
+
+What happens when the next fire lands before the previous run finishes? Pick a policy per workflow:
+
+- `skip` (default) — drop the new fire while a run is in progress.
+- `queue` — wait up to N seconds for the running fire to finish.
+- `replace` — cancel the running fire and start fresh.
+
+Under the hood this uses a Redis mutex keyed on the workflow id.
+
+## Missed fires (drift)
+
+Workers crash, queues back up, deploys eat a tick. When the scheduler wakes late and finds missed fires, the drift policy decides:
+
+- `latest` (default) — fire once for *now* only.
+- `catchup` — replay every missed tick (capped at 10).
+- `skip` — drop the tick if more than one interval late.
+
+## What runs the clock
+
+Scheduling needs the Celery **beat** service and Redis — both in the default stack. Run exactly one beat replica. See [Self-host overview](/docs/self-host).

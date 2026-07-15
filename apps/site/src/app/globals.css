@@ -229,9 +229,34 @@
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   overflow-x: auto;
-  margin: 18px 0;
+  margin: 0; /* CodeBlock wrapper owns the vertical rhythm */
 }
-.prose-docs pre code { padding: 0; background: transparent; }
+.prose-docs pre code {
+  padding: 0;
+  background: transparent;
+  font-size: inherit;
+  /* Shiki emits per-token color; let it win over the inline-code color. */
+  color: inherit;
+}
+/* rehype-pretty-code: keepBackground:false, so our pre owns the bg. Line
+   grid + optional highlighted lines + filename caption. */
+.prose-docs pre code [data-line] { display: inline-block; width: 100%; }
+.prose-docs pre code [data-highlighted-line] {
+  background: rgba(94,106,210,0.12);
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+.prose-docs figure[data-rehype-pretty-code-figure] { margin: 0; }
+.prose-docs [data-rehype-pretty-code-title] {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted-foreground);
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+}
+.prose-docs [data-rehype-pretty-code-title] + pre { border-radius: 0 0 10px 10px; }
 .prose-docs blockquote {
   margin: 18px 0;
   padding: 4px 14px;
@@ -246,3 +271,30 @@
   color: var(--muted-foreground);
   margin: 0 0 24px;
 }
+/* Heading anchor — the "#" that appears on hover next to h2/h3. */
+.prose-docs .doc-anchor {
+  margin-left: 8px;
+  color: var(--muted-foreground);
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.prose-docs h2:hover .doc-anchor,
+.prose-docs h3:hover .doc-anchor { opacity: 0.5; }
+.prose-docs .doc-anchor:hover { opacity: 1 !important; text-decoration: none; }
+/* GFM tables (wrapped in an overflow container by the MDX `table` component). */
+.prose-docs table th,
+.prose-docs table td {
+  text-align: left;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.prose-docs table th {
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 12.5px;
+  background: rgba(255,255,255,0.02);
+}
+.prose-docs table tr:last-child td { border-bottom: 0; }
+.prose-docs table code { font-size: 12.5px; white-space: nowrap; }

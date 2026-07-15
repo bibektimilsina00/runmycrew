@@ -1,0 +1,40 @@
+---
+title: OAuth integrations
+description: Connect apps with managed OAuth credentials.
+group: Connections
+order: 1
+---
+
+## What is a connection?
+
+When you add an integration, RunMyCrew runs the provider’s OAuth flow and stores the resulting tokens (encrypted) against your workspace. Trigger and action nodes reference the connection by id, so credentials never live inside a workflow graph.
+
+## Connecting an app
+
+1. Open **Connections** in the sidebar, or click *Connect app* on the dashboard.
+2. Pick a provider and approve the scopes in the provider’s consent screen.
+3. You’re redirected back — the connection shows **OK** and is ready to use in any node.
+
+## Supported providers
+
+Connectable over OAuth today:
+
+- **Google** — Gmail, Calendar, Sheets, Drive.
+- **Slack** — messages, channels, users.
+- **GitHub** — issues, PRs, Actions.
+- **Notion** — databases and pages.
+- **Linear** — issues and projects.
+- **Microsoft** — 365 / Outlook.
+- **Discord** — channels and bots.
+- **Meta** — Ads and lead forms.
+- Plus Asana, HubSpot, Calendly, Zoom, Box, Dropbox, DocuSign and LinkedIn.
+
+Self-hosting? Each provider needs its own client id/secret — see the [Environment reference](/docs/env).
+
+## Security & tokens
+
+Tokens are encrypted at rest with your workspace’s Fernet `ENCRYPTION_KEY` and decrypted only at execution time. A connection is scoped to the workspace it was created in; it is never shared across workspaces.
+
+## Expiry & reconnect
+
+RunMyCrew refreshes access tokens automatically using the stored refresh token. If a provider revokes access or a refresh fails, the connection is marked **needs attention** and any workflow that depends on it surfaces the error — reconnect in one click to restore it.

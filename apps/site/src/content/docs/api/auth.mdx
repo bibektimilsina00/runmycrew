@@ -1,0 +1,60 @@
+---
+title: Authentication
+description: Authenticate with a JWT or an API key.
+group: API
+order: 1
+---
+
+## Base URL
+
+All endpoints live under the `/api/v1` prefix. On the hosted product the base URL is `https://api.runmycrew.com/api/v1`; self-hosted it is whatever host your API service runs on. The OpenAPI schema is served at `/api/v1/openapi.json`, and a public health probe at `GET /health`.
+
+## Auth schemes
+
+The API accepts three credential forms:
+
+- **JWT bearer** — `Authorization: Bearer <jwt>`. Minted by `/auth/login`; the token subject is the user email.
+- **API key header** — `x-api-key: fuse_live_…`.
+- **API key bearer** — `Authorization: Bearer fuse_live_…`. Keys are matched by SHA-256 hash, never stored in plaintext.
+
+## Email + password
+
+Register, then exchange credentials for a token.
+
+```http
+# Create an account
+POST /api/v1/auth/register
+{ "email": "ada@acme.com", "password": "your-password", "full_name": "Ada" }
+
+# Log in → { access_token, token_type: "bearer" }
+POST /api/v1/auth/login
+{ "email": "ada@acme.com", "password": "your-password" }
+
+# Use the token
+GET /api/v1/auth/me
+Authorization: Bearer <access_token>
+```
+
+Password reset is a two-step flow: `POST /auth/forgot-password` emails a token, `POST /auth/reset-password` consumes it. Social sign-in (Google, GitHub, Microsoft) is a browser redirect at `/auth/{provider}/start` and only mints an internal JWT — there is no third-party OAuth token endpoint for the API.
+
+## API keys
+
+For servers and scripts, create a long-lived key instead of storing a password. Manage keys under `/api-keys` (JWT-auth):
+
+```http
+POST /api/v1/api-keys
+{ "name": "CI pipeline" }
+
+# → the plaintext token is returned ONCE:
+{ "id": "...", "name": "CI pipeline", "key_preview": "fuse_live_…abcd", "token": "fuse_live_…" }
+```
+
+Store `token` immediately — it is never shown again. List keys with `GET /api-keys` and revoke with `DELETE /api-keys/{id}`.
+
+## Workspace header
+
+Data endpoints are workspace-scoped. Pass `X-Workspace-ID: <uuid>` to target a specific workspace. The header is optional — when omitted, the API resolves your default/personal workspace.
+
+## Errors
+
+The API uses standard status codes: `401` for a missing or invalid credential, `403` when your role lacks edit rights on the workspace, `404` for an unknown resource, and `422` for a schema validation error (with a field-level detail array).

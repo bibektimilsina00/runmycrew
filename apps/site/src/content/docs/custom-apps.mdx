@@ -1,0 +1,28 @@
+---
+title: Custom apps
+description: Call any HTTP API with custom nodes.
+group: Connections
+order: 3
+---
+
+## When to use
+
+Use a custom integration when the app you need isn’t in the [provider list](/docs/oauth), or when you need an endpoint the managed integration doesn’t expose yet.
+
+## The HTTP node
+
+The HTTP request action calls any URL with a method, headers, query and JSON body, and returns the parsed response for downstream nodes. Reference earlier node outputs anywhere in the request:
+
+```http
+POST https://api.example.com/v1/tickets
+Authorization: Bearer {{secrets.EXAMPLE_TOKEN}}
+{ "title": "{{trigger.issue.title}}", "priority": "high" }
+```
+
+## Stored credentials
+
+Don’t paste secrets into the graph. Store them as workspace **secrets** (encrypted at rest) and reference them as `{{secrets.NAME}}` — the value is injected only at run time and never rendered in logs.
+
+## Publishing an app
+
+A finished workflow can be published as a shareable public app with its own URL, so teammates or customers can run it with a form instead of opening the editor. Public apps run under per-workspace spend and concurrency caps you control.

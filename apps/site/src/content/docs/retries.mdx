@@ -1,0 +1,22 @@
+---
+title: Retries
+description: Automatic retry and backoff when a step fails.
+group: "Run & observe"
+order: 2
+---
+
+## Why retries
+
+Most action failures are temporary. Retrying with backoff turns a flaky dependency into a non-event, and keeps your alerts meaningful — you only hear about failures that *persist*.
+
+## Per-node config
+
+Every node exposes retry settings in its inspector — the max attempt count and the delay between attempts. Defaults are sensible; raise them for slow or rate-limited APIs, lower them for steps that must not repeat.
+
+## Backoff
+
+Retries wait between attempts (backoff) so you don’t hammer a struggling API. Each attempt is logged on the run, so you can see how many it took to succeed.
+
+## When retries run out
+
+If a step exhausts its attempts, the run is marked `failed` and your [alerts](/docs/alerts) fire. Fix the cause, then [replay](/docs/replay) the run with its original input.

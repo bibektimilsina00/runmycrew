@@ -1,0 +1,74 @@
+---
+title: Workflows
+description: Create, toggle, and run workflows via the API.
+group: API
+order: 2
+---
+
+## The workflow object
+
+A workflow is a named graph. The `graph` holds `{ nodes, edges }`; `kind` is `automation` (default) or `crew`.
+
+```json
+{
+  "id": "uuid",
+  "name": "Urgent issues → Slack",
+  "graph": { "nodes": [...], "edges": [...] },
+  "kind": "automation",
+  "is_active": true,
+  "workspace_id": "uuid",
+  "created_at": "...",
+  "updated_at": "..."
+}
+```
+
+## List & read
+
+```http
+GET  /api/v1/workflows/                 # list (optional ?kind=)
+GET  /api/v1/workflows/with-stats       # + status, run count, last/next run
+GET  /api/v1/workflows/{workflow_id}    # one workflow
+```
+
+## Create
+
+`name` is required; `graph` defaults to empty. Returns `201` with the created workflow.
+
+```json
+POST /api/v1/workflows/
+{
+  "name": "Daily standup digest",
+  "description": "Summarise GitHub activity to Slack",
+  "graph": { "nodes": [...], "edges": [...] },
+  "kind": "automation"
+}
+```
+
+## Update & version
+
+`PUT /workflows/{id}` replaces the workflow. When the graph changes, RunMyCrew auto-snapshots the previous version so you can roll back:
+
+```http
+GET  /api/v1/workflows/{id}/versions
+POST /api/v1/workflows/{id}/versions/{version_id}/restore
+```
+
+## Run
+
+Trigger a manual run. Optionally override the graph or pass input data. Returns the new execution id — poll it via the [Runs API](/docs/api/runs).
+
+```json
+POST /api/v1/workflows/{workflow_id}/run
+{ "input_data": { "issue": 4821 } }
+
+# → { "execution_id": "uuid" }
+```
+
+## Toggle, duplicate, delete
+
+```http
+PATCH  /api/v1/workflows/{id}/toggle      # flip is_active
+POST   /api/v1/workflows/{id}/duplicate   # deep copy
+DELETE /api/v1/workflows/{id}             # 204
+PATCH  /api/v1/workflows/batch            # reorder / move between folders
+```

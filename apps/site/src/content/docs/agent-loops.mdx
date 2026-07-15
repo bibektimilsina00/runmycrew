@@ -1,0 +1,140 @@
+---
+title: Agent loops
+description: Schedule autonomous agents that own recurring work — with hard budgets, escalation, and a live trace you can audit step by step.
+group: "Run & observe"
+order: 6
+---
+
+Schedule autonomous agents that own recurring work — triaging bugs, merging
+dependency PRs, turning Sentry alerts into GitHub issues — with hard budgets,
+escalation, and a live trace you can audit step by step.
+
+## What is a loop?
+
+A **loop** is a workflow whose trigger fires on its own — usually a cron
+expression, sometimes a webhook — and whose action is an agent node with tool
+access. Each fire is one autonomous run: the agent thinks, calls tools,
+observes results, and stops when its success condition holds or its budget runs
+out.
+
+Concretely, a loop is just three nodes wired in a row:
+
+```text
+trigger.cron  →  action.agent  →  (optional) success/failure branches
+```
+
+## Why agent loops?
+
+Most automation today is *brittle if-this-then-that* wiring — every branch is
+hard-coded, every edge case lives in a special-cased node, and any drift in the
+upstream system means a Saturday-morning page. Agent loops invert that:
+
+- You describe the *goal* in one prompt: *"If a Linear bug ticket has no owner
+  after 30 minutes in `Triage`, assign it to the on-call engineer and post a
+  heads-up in `#eng-triage`."*
+- The agent picks its own tools, retries on its own, reasons about partial
+  failures, and stops when the work is done.
+- You set a **budget** so it can never run away — at worst it gives up and pages
+  a human.
+
+## Anatomy of a loop
+
+Every loop ships with the same building blocks. They are all exposed in the
+agent node inspector under *Advanced*.
+
+- **Iterations** — max reasoning turns per fire (default 10, hard cap 100).
+- **Wall-clock budget** — max seconds the loop is allowed to run (default 600,
+  hard cap 3,600).
+- **Token + cost budget** — max input tokens and max USD spend (hard caps 5M
+  tokens, $50 per run).
+- **Success condition** — a JSONata expression against the agent's final JSON
+  output (e.g. `action_taken or no_new_issues`).
+- **Failure policy** — what to do when no success condition holds: `retry`,
+  `escalate`, or `silent`.
+
+## Budgets — the unkillable safety net
+
+Loops cost real money. Every iteration is an LLM call; every tool call is an API
+hit. Without a budget the worst-case is a bug in your prompt costing thousands
+of dollars overnight.
+
+RunMyCrew enforces four budgets at the loop's edge. The agent checks them before
+every LLM call and short-circuits with a `budget_exhausted` status the moment
+any one trips:
+
+- `maxIterations` — counts assistant turns.
+- `maxSeconds` — wall-clock against the run's start time.
+- `maxInputTokens` — sum of every prompt's input tokens.
+- `maxCostUsd` — sums per-model pricing across every LLM call.
+
+The system clamps each user value at the hard caps above so a mis-typed config
+can't bypass them.
+
+## Success conditions
+
+The agent's final response is parsed as JSON when possible. The `successWhen`
+field is a JSONata expression run against that object. If it evaluates truthy,
+the loop completes. If it evaluates falsy (and there are iterations left), the
+agent gets one more turn with a synthesised *re-evaluate* message and tries
+again.
+
+The expression is validated at save-time so a typo fails the editor rather than
+the cron at 3 AM.
+
+## Concurrency + cron drift
+
+Cron fires don't always land on time — workers crash, queues back up, deploys
+eat a tick. Two concerns:
+
+1. **Concurrency** — what happens when fire N+1 lands before fire N has
+   finished?
+2. **Drift** — what happens when the worker wakes up 10 minutes late and finds 5
+   missed fires?
+
+Each workflow picks a policy for both, persisted on the workflow itself:
+
+- Concurrency: `skip` (default) — drop the new fire if the workflow is already
+  running. `queue` — wait up to N seconds for the running fire to finish.
+  `replace` — cancel the running fire and start fresh.
+- Cron drift: `latest` (default) — fire once for *now* only. `catchup` — replay
+  every missed tick (capped at 10). `skip` — drop the tick entirely if more than
+  one interval late.
+
+Under the hood, concurrency uses a Redis `SETNX + Lua CAS-release` mutex keyed
+on the workflow id. The scheduler emits one Celery payload per fire it decides
+to honour.
+
+## Escalation
+
+When `failurePolicy = escalate` and a loop ends in any terminal state besides
+success, the workspace's **escalation channel** gets a structured payload with
+the run id, link, status, failure reason, usage totals, and a five-step trace
+summary (last tool calls). Channels supported:
+
+- Slack (Block Kit message)
+- Generic webhook (POSTs the full payload as JSON)
+- Email (via the workspace SMTP config)
+
+## The live trace
+
+Open the editor's **Logs** panel while a loop runs. Pick the agent node; a
+*Trace* tab appears alongside *Output* and *Input*. Each tool call shows up as a
+step the moment it starts, with status, arguments, result, and duration. The
+step flips from *running* to *success* / *failed* in place — no re-layout, no
+page refresh.
+
+## Starter templates
+
+Three loop templates ship in the box to copy and adapt:
+
+- **Triage Linear bugs** — cron every 30 min, linear + slack tools.
+- **Dependabot auto-merge** — webhook, github + slack tools.
+- **Sentry → GitHub** — cron every 15 min, sentry + github + memory tools.
+
+## Self-hosting notes
+
+Loops need Redis (for the concurrency mutex and the cron tracker) and a Celery
+worker running the `check_cron_triggers` beat. Both are part of the default
+`docker-compose` stack — see [Self-host overview](/docs/self-host). Set the
+escalation channel under workspace settings to route loop failures somewhere a
+human will read them.

@@ -1,0 +1,40 @@
+---
+title: Conditions
+description: Branch and filter runs without writing glue code.
+group: Building workflows
+order: 3
+---
+
+## Branching & filtering
+
+A condition node evaluates an expression against the run’s data and routes execution accordingly — continue, stop, or take a different path.
+
+## Logic nodes
+
+- `logic.condition` — boolean branch (if / else).
+- `logic.switch` — route to N labeled branches by a field value.
+- `logic.merge` — join multiple branches back into one object.
+- `logic.set_variable` — stash a value for downstream nodes.
+- `logic.json_transform` — reshape or extract fields with a template.
+- `logic.code` — run Python or JavaScript for anything declarative nodes can’t express.
+- `logic.sub_workflow` — call another workflow and use its output.
+
+## Expressions
+
+Conditions and transforms use expression syntax (JSONata / Jinja2) over the run’s data. Reference upstream outputs the same way you do elsewhere:
+
+```
+{{trigger.label}} = "urgent" and {{trigger.assignee}} is empty
+```
+
+## Loops
+
+Iterate over data or repeat steps:
+
+- `logic.foreach` — run downstream nodes once per array item.
+- `logic.for` — a fixed number of iterations with a counter.
+- `logic.while` / `logic.do_while` — repeat while a condition holds.
+
+## Human approval
+
+`logic.human_input` pauses a run and waits for a person to approve or supply input. The run resumes via a one-time token — see the [Runs API](/docs/api/runs) resume endpoint.

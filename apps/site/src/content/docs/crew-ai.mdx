@@ -1,0 +1,41 @@
+---
+title: Crew AI
+description: Generate a working workflow from a single prompt.
+group: Building workflows
+order: 1
+---
+
+## What Crew AI does
+
+Crew AI (the *Copilot*) turns a sentence into a working workflow. It doesn’t generate a black box — it emits real nodes and edges you can inspect, tweak and run, the same graph the engine executes.
+
+## How generation works
+
+The Copilot runs an agentic loop (up to 10 iterations) that streams atomic graph operations — `add_node`, `add_edge` — to the editor over SSE, so you watch the workflow assemble node by node. Under the hood it uses two tools to stay grounded in the real catalog:
+
+- `search_node_types` — find the right node for a task across 340+ types.
+- `get_node_metadata` — read a node’s exact properties before configuring it.
+
+The result is validated and auto-laid-out before it lands in the editor.
+
+## Agent nodes
+
+Beyond deterministic steps, workflows can contain **agent** nodes that reason and call tools:
+
+- `action.agent` — an AI agent with a model, tools, memory and structured output.
+- `action.llm` — a single prompt → text, no tool loop.
+- `ai.agent_crew` — a maker/checker crew that verifies its own work.
+- `ai.task_planner` + `ai.parallel` — decompose a goal into a task DAG and run role-agents in parallel.
+- `action.knowledge`, `action.memory` — semantic search over your knowledge bases and run memory.
+
+## Personas
+
+A **persona** is a reusable named agent — a role, a prompt, and default model + tools — that you overlay onto agent nodes. Define “Support Triager” once and drop it into any crew.
+
+## Models & providers
+
+Route each agent to any of ten providers — OpenAI, Anthropic, Google, Groq, DeepSeek, Fireworks, Mistral, xAI, Together and OpenRouter — by adding that provider’s key. The Copilot itself defaults to a fast model per provider (e.g. `gpt-4o-mini`, `claude-haiku-4-5`, `gemini-2.5-flash`).
+
+## Editing with AI
+
+Crew AI also edits existing graphs — “add a Slack approval before the deploy step” — applying incremental changes rather than regenerating from scratch. For autonomous, scheduled agents, see [Agent loops](/docs/agent-loops).

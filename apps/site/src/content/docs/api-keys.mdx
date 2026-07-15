@@ -1,0 +1,36 @@
+---
+title: API keys
+description: Authenticate programmatic access to RunMyCrew.
+group: Connections
+order: 4
+---
+
+## What API keys are for
+
+Use a key to trigger workflows, read runs, or manage resources from your own code. For calling *other* apps from inside a workflow, use [connections](/docs/oauth) instead.
+
+## Create a key
+
+```http
+POST /api/v1/api-keys
+{ "name": "CI pipeline" }
+
+# → token shown ONCE:
+{ "key_preview": "fuse_live_…abcd", "token": "fuse_live_…" }
+```
+
+## Using a key
+
+Send it as a header — either works:
+
+```http
+x-api-key: fuse_live_…
+# or
+Authorization: Bearer fuse_live_…
+```
+
+See the full [Authentication](/docs/api/auth) reference for workspace scoping.
+
+## Rotate & revoke
+
+Keys are stored as SHA-256 hashes — the plaintext can’t be recovered, so treat the one-time `token` like a password. List keys with `GET /api-keys` and revoke instantly with `DELETE /api-keys/{id}`. Rotate by creating a new key, switching your clients over, then deleting the old one.

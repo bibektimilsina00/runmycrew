@@ -1,0 +1,46 @@
+---
+title: Docker compose
+description: Deploy the full stack with one compose file.
+group: Self-hosting
+order: 2
+---
+
+## Compose files
+
+- `deploy/docker-compose.production.yml` — the production stack (pulls images, no local build).
+- `docker-compose.yml` — local dev (builds api + worker locally; db/redis/api/worker only).
+- `docker-compose.e2e.yml` — the end-to-end test stack; not for hosting.
+
+## Services & ports
+
+Only `web` is published — it fronts everything else on the internal Docker network:
+
+```
+web     80, 443   Caddy + React app (public, TLS)
+site    3100      Next.js marketing (internal)
+api     8000      FastAPI (internal)
+worker  —         Celery worker (concurrency 2)
+beat    —         Celery beat (single replica — never scale >1)
+db      5432      Postgres 15 + pgvector (internal)
+redis   6379      broker / results / cache (internal)
+backup  —         pg_dump loop, 14-day retention
+```
+
+The dev compose additionally publishes `api:8000`, `db:5432` and `redis:6379` to localhost for debugging.
+
+## Bring it up
+
+```bash
+cd deploy
+docker compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml ps
+docker compose -f docker-compose.production.yml logs -f api
+```
+
+Database migrations run automatically on API start. The `pg-init/01_extensions.sql` script enables `pgvector` on first boot.
+
+## Day-2 operations
+
+- **Update** — `./deploy.sh` (pull, recreate, prune).
+- **Scale workers** — `docker compose up -d --scale worker=3`. Leave `beat` at 1.
+- **Backups** — see [Backup & restore](/docs/backup).

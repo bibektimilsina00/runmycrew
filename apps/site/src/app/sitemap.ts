@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { MARKETING_URL } from '@/shared/constants/routes'
 import { POSTS } from '@/features/blog/data/posts'
-import { DOCS_NAV } from '@/features/docs/data/nav'
+import { getFlatDocs } from '@/features/docs'
 
 const BASE = MARKETING_URL.replace(/\/$/, '')
 
@@ -41,14 +41,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }))
 
-  const docsEntries = DOCS_NAV.flatMap((group) =>
-    group.items.map((leaf) => ({
-      url: leaf.slug ? `${BASE}/docs/${leaf.slug}` : `${BASE}/docs`,
-      lastModified,
-      changeFrequency: 'monthly' as const,
-      priority: 0.4,
-    })),
-  )
+  const docsEntries = getFlatDocs().map((doc) => ({
+    url: `${BASE}${doc.href}`,
+    lastModified,
+    changeFrequency: 'monthly' as const,
+    priority: 0.4,
+  }))
 
   return [...staticEntries, ...blogEntries, ...docsEntries]
 }
