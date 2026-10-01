@@ -1,18 +1,15 @@
 {
-	# Email for Let's Encrypt expiry / revocation notices. Swap if you
-	# want them going elsewhere.
-	email support@runmycrew.com
-
-	# Default Caddy auto-issues from Let's Encrypt and renews 30 days
-	# before expiry. No certbot required.
+	# This container runs BEHIND the shared reverse proxy (/opt/proxy →
+	# proxy-caddy) which owns the host's :80/:443 and terminates TLS with the
+	# Cloudflare origin cert. So this Caddy is a plain-HTTP upstream on :80 and
+	# routes purely by Host header. `auto_https off` because it must never try
+	# ACME (it can't — it doesn't own the ports, and issuance fails behind
+	# Cloudflare) and must never 308 :80→:443 (that loops behind Cloudflare).
+	auto_https off
 }
 
 # ─────────────────────────────────────────────────────────────────────
-# Container-local health probe (compose healthcheck).
-# Must be plain HTTP on localhost: the managed sites below make Caddy
-# 308-redirect every :80 request to HTTPS, and a redirect to
-# https://localhost can never handshake — the container sat permanently
-# "unhealthy" while serving fine.
+# Container-local health probe (compose healthcheck hits http://localhost).
 # ─────────────────────────────────────────────────────────────────────
 http://localhost {
 	respond /healthz "ok" 200
@@ -23,10 +20,11 @@ http://localhost {
 # Reverse-proxies to the Next.js standalone server in the `site`
 # container. The product app lives on the `app.` subdomain.
 # ─────────────────────────────────────────────────────────────────────
-runmycrew.com {
+http://runmycrew.com {
 	encode zstd gzip
 
 	header {
+		# TLS is terminated at Cloudflare, so HSTS is still correct to send.
 		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
@@ -55,10 +53,9 @@ runmycrew.com {
 # ─────────────────────────────────────────────────────────────────────
 # Product app — app.runmycrew.com
 # Caddy serves the static React build + reverse-proxies `/api/*`,
-# `/ws/*`, `/health`, etc. to the FastAPI container. This block is
-# what used to live on the apex.
+# `/ws/*`, `/health`, etc. to the FastAPI container.
 # ─────────────────────────────────────────────────────────────────────
-app.runmycrew.com {
+http://app.runmycrew.com {
 	encode zstd gzip
 
 	header {
@@ -104,12 +101,10 @@ app.runmycrew.com {
 	}
 }
 
-# Caddy auto-issues 308 redirects from :80 to :443 for both managed
-# sites above — no explicit `http://` blocks needed.
-
 # ─────────────────────────────────────────────────────────────────────
-# www → apex canonical redirect (runmycrew.com)
+# www → apex canonical redirect. Cloudflare serves the browser over
+# HTTPS; the redirect target is the https apex.
 # ─────────────────────────────────────────────────────────────────────
-www.runmycrew.com {
+http://www.runmycrew.com {
 	redir https://runmycrew.com{uri} permanent
 }

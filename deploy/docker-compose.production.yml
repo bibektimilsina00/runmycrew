@@ -10,9 +10,18 @@
 # Tag pinning: set RUNMYCREW_IMAGE_TAG=sha-abc1234 in .env to roll back
 # without changing this file. Default `latest` tracks main.
 #
-# Resource caps assume a 2 GB VPS. Bump if you upgrade the droplet
-# (see docs/devops-plan.md §3).
+# Resource caps assume a ~2 GB slice. Bump if the host has more.
+#
+# INGRESS: this stack runs BEHIND the host's shared reverse proxy
+# (/opt/proxy → proxy-caddy) which owns :80/:443 and terminates TLS with
+# the Cloudflare origin cert. `web` publishes NO host ports; it joins the
+# external `web` network and proxy-caddy reaches it as `runmycrew-web-1:80`.
+# See deploy/sites-runmycrew.caddy for the proxy route.
 # ───────────────────────────────────────────────────────────────────────
+
+# Fixes the compose project name so containers are `runmycrew-<svc>-1`,
+# the stable DNS name the shared proxy upstreams by.
+name: runmycrew
 
 # YAML anchor reused on every service so logs rotate uniformly. With
 # the default unbounded driver, a single chatty service fills the
@@ -35,14 +44,11 @@ services:
   web:
     image: ghcr.io/${GITHUB_OWNER}/runmycrew-web:${RUNMYCREW_IMAGE_TAG:-latest}
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      # Persistent Let's Encrypt certs + Caddy state so renewals
-      # survive container restarts.
-      - caddy_data:/data
-      - caddy_config:/config
+    # No published ports and no Caddy state volume — ingress is the shared
+    # proxy-caddy and this container does no ACME (auto_https off). It joins
+    # `default` (to reach api/site) and the external `web` network (so
+    # proxy-caddy can reach it).
+    networks: [default, web]
     depends_on:
       api:
         condition: service_healthy
@@ -281,6 +287,10 @@ services:
 volumes:
   postgres_data:  # Postgres data dir — DO NOT delete.
   redis_data:     # Redis AOF — Celery state survives restarts.
-  caddy_data:     # Let's Encrypt certs + Caddy ACME state.
-  caddy_config:   # Caddy adapted config.
   pg_backups:     # Nightly dump output (also rsync off-box later).
+
+# `web` is the host-wide shared proxy network (created by /opt/proxy). It
+# already exists on the box; compose attaches to it, never creates it.
+networks:
+  web:
+    external: true

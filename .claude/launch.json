@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "make",
+      "runtimeArgs": ["api"],
+      "port": 8000
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "runmycrew-web", "dev"],
+      "port": 3001
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "runmycrew-site", "dev"],
+      "port": 3100
+    },
+    {
+      "name": "worker",
+      "runtimeExecutable": "make",
+      "runtimeArgs": ["worker"]
+    }
+  ]
+}

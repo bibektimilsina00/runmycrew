@@ -1,0 +1,31 @@
+# runmycrew — shared-proxy site file. Deploy to /opt/proxy/sites/runmycrew.caddy
+# on the host, then `docker exec proxy-caddy caddy reload --config /etc/caddy/Caddyfile`.
+#
+# Cloudflare Full (strict): proxy-caddy terminates TLS with the origin cert
+# (/opt/proxy/certs/runmycrew.pem, covers runmycrew.com + *.runmycrew.com,
+# valid to 2041). All three hostnames pass through to the runmycrew-web
+# container over the shared `web` network; that container's internal Caddy
+# (apps/web/Caddyfile, auto_https off) splits by Host:
+#   runmycrew.com      → marketing site (site:3100)
+#   app.runmycrew.com  → React build + /api/* → api:8000
+#   www.runmycrew.com  → 308 redirect to the apex
+# Caddy preserves the inbound Host on reverse_proxy, so the split works.
+(runmycrew_upstream) {
+	tls /etc/caddy/certs/runmycrew.pem /etc/caddy/certs/runmycrew.key
+	reverse_proxy runmycrew-web-1:80 {
+		lb_try_duration 15s
+		lb_try_interval 500ms
+	}
+}
+
+runmycrew.com {
+	import runmycrew_upstream
+}
+
+www.runmycrew.com {
+	import runmycrew_upstream
+}
+
+app.runmycrew.com {
+	import runmycrew_upstream
+}
